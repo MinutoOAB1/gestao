@@ -62,7 +62,6 @@ export default function ClientFormPage() {
     const { id } = useParams();
     const isEditMode = !!id;
     const [loading, setLoading] = useState(false);
-    const [pageLoading, setPageLoading] = useState(isEditMode);
     const [activeSection, setActiveSection] = useState(0);
 
     const [formData, setFormData] = useState({

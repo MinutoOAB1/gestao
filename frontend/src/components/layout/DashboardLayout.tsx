@@ -247,15 +247,11 @@ export default function DashboardLayout() {
     const isClientDetail = location.pathname.startsWith('/clientes/') && location.pathname.split('/').length > 2 && location.pathname.split('/')[2] !== 'novo';
     const isFullScreenPage = isKanban || isAgenda || isDocumentos || isDocumentEditor || isClientDetail;
     const [collapsed, setCollapsed] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<{ processes: any[], clients: any[] }>({ processes: [], clients: [] });
-    const [showSearchResults, setShowSearchResults] = useState(false);
 
     const [teamMembers, setTeamMembers] = useState<Array<{ id: string, name: string, avatar: string | null, role: string }>>([]);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
     const [processExpanded, setProcessExpanded] = useState(location.pathname.startsWith('/processos'));
-    const searchAbortRef = useRef<AbortController | null>(null);
     const pathSegments = location.pathname.split('/').filter(Boolean);
 
     // Fetch team members
@@ -278,41 +274,7 @@ export default function DashboardLayout() {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
-    // Search function with abort controller
-    useEffect(() => {
-        const search = async () => {
-            if (searchQuery.length < 2) {
-                setSearchResults({ processes: [], clients: [] });
-                setShowSearchResults(false);
-                return;
-            }
-            if (searchAbortRef.current) searchAbortRef.current.abort();
-            const controller = new AbortController();
-            searchAbortRef.current = controller;
-            try {
-                const [processesRes, clientsRes] = await Promise.all([
-                    api.get('/processes', { signal: controller.signal }),
-                    api.get('/clients', { signal: controller.signal })
-                ]);
-                if (controller.signal.aborted) return;
-                const query = searchQuery.toLowerCase();
-                const filteredProcesses = (processesRes.data || []).filter((p: any) =>
-                    p.title?.toLowerCase().includes(query) || p.number?.toLowerCase().includes(query)
-                ).slice(0, 5);
-                const filteredClients = (clientsRes.data || []).filter((c: any) =>
-                    c.name?.toLowerCase().includes(query) || c.email?.toLowerCase().includes(query)
-                ).slice(0, 5);
-                setSearchResults({ processes: filteredProcesses, clients: filteredClients });
-                setShowSearchResults(filteredProcesses.length > 0 || filteredClients.length > 0);
-            } catch (error: any) {
-                if (error?.name !== 'CanceledError' && error?.name !== 'AbortError') {
-                    console.error('Search error:', error);
-                }
-            }
-        };
-        const debounce = setTimeout(search, 300);
-        return () => { clearTimeout(debounce); };
-    }, [searchQuery]);
+
 
     return (
         <div className="flex h-screen-stable bg-app-bg text-app-text-main font-body overflow-hidden">

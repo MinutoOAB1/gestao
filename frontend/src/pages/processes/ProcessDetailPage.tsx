@@ -40,6 +40,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
     const { id: paramId } = useParams();
     const id = processIdProp || paramId;
     const navigate = useNavigate();
+    const { addToast } = useToast();
     const [process, setProcess] = useState<Process | null>(null);
     const [loading, setLoading] = useState(true);
 

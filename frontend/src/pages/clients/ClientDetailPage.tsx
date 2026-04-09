@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
     ArrowLeft, Briefcase, FileText, DollarSign, 
-    Plus, X, MapPin, Mail, Phone,
-    AlertCircle, ChevronRight, Globe, Edit2, 
-    Trash2, MessageSquare, FileBadge,
-    History, Send, ArrowUpRight, ArrowDownRight, User, StickyNote, Tag, Check,
-    Headset, CheckCircle, Circle, CheckSquare, Clock
+    Plus, X, MapPin, Mail, Phone, Search, Filter, MoreHorizontal,
+    AlertCircle, ChevronRight, Edit2, Trash2, StickyNote, History, User,
+    CheckCircle, Circle, CheckSquare, Clock, Calendar, TrendingUp, 
+    CheckCircle2, FileBadge, Send, Check, Headset
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -860,7 +859,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                 {timeline.length === 0 ? (
                                     <p className="text-sm text-slate-500">Nenhum evento registrado.</p>
                                 ) : (
-                                    timeline.map((event: any, index: number) => {
+                                    timeline.map((event: any) => {
                                         const iconMap: Record<string, { icon: any; color: string; bg: string }> = {
                                             'PROCESS':  { icon: Briefcase,    color: 'text-blue-500',    bg: 'bg-blue-100 dark:bg-blue-500/20' },
                                             'UPDATE':   { icon: History,      color: 'text-purple-500',  bg: 'bg-purple-100 dark:bg-purple-500/20' },
