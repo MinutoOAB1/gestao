@@ -62,7 +62,7 @@ export default function ClientFormPage() {
     const { id } = useParams();
     const isEditMode = !!id;
     const [loading, setLoading] = useState(false);
-    const [pageLoading, setPageLoading] = useState(isEditMode);
+
     const [activeSection, setActiveSection] = useState(0);
 
     const [formData, setFormData] = useState({
@@ -132,7 +132,7 @@ export default function ClientFormPage() {
                     console.error('Error fetching client:', error);
                     addToast('Erro ao carregar dados do cliente.', 'error');
                 } finally {
-                    setPageLoading(false);
+
                 }
             };
             fetchClient();
