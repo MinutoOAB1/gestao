@@ -8,7 +8,7 @@ import { twMerge } from 'tailwind-merge';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, memo, useRef } from 'react';
+import { useState, useEffect, memo } from 'react';
 import NotificationPanel from '../ui/NotificationPanel';
 import ChatDrawer from '../chat/ChatDrawer';
 import GlobalSearch from '../shared/GlobalSearch';

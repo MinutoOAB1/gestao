@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
     ArrowLeft, Briefcase, FileText, DollarSign, 
-    Plus, X, MapPin, Mail, Phone, Search, Filter, MoreHorizontal,
+    Plus, X, MapPin, Mail, Phone,
     AlertCircle, ChevronRight, Edit2, Trash2, StickyNote, History, User,
-    CheckCircle, Circle, CheckSquare, Clock, Calendar, TrendingUp, 
-    CheckCircle2, FileBadge, Send, Check, Headset
+    CheckCircle, Circle, CheckSquare, Clock, FileBadge, Send, Check, Headset,
+    Tag, MessageSquare, ArrowDownRight, ArrowUpRight
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
