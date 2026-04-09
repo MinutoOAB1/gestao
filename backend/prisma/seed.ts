@@ -22,7 +22,7 @@ async function main() {
         update: {},
         create: {
             email: 'admin@escritorio.com',
-            password: '$2b$10$7pRXagGH9PLcL/9w.SHHjucWQisYYnvxLN1AnbMvacgF7/j9mAhaOC', // password: 'password123'
+            password: '$2b$10$flbdU/D0V5JkpFIgfm2QWO0c4OoqyE28/92/G29N.rmb8iPeKgqIK', // password: 'password123'
             name: 'Administrador',
             role: 'ADMIN',
             tenantId: tenant.id,
