@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: `http://${window.location.hostname}:3000`,
+    baseURL: import.meta.env.PROD 
+        ? '/_/backend' 
+        : `http://${window.location.hostname}:3000`,
 });
 
 // Interceptor para adicionar token JWT se existir
