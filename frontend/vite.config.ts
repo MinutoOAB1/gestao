@@ -24,10 +24,6 @@ export default defineConfig({
           'ui-vendor': ['framer-motion', 'lucide-react', 'clsx'],
           'dnd-vendor': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
         },
-        // Optimize chunk file names for caching
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
     // Increase chunk size warning limit
