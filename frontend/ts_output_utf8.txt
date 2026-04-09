@@ -1,0 +1,24 @@
+﻿22:14:35 - Projects in this build: 
+    * tsconfig.app.json
+    * tsconfig.node.json
+    * tsconfig.json
+
+22:14:35 - Project 'tsconfig.app.json' is being forcibly rebuilt
+
+22:14:35 - Building project 'C:/Users/victo/OneDrive/Documentos/Antigravi-platadv/frontend/tsconfig.app.json'...
+
+src/components/auth/Protect.tsx(1,10): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/PrivateRoute.tsx(4,56): error TS2503: Cannot find namespace 'JSX'.
+src/components/ui/Avatar.tsx(1,10): error TS1484: 'HTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Badge.tsx(1,10): error TS1484: 'HTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Button.tsx(1,22): error TS1484: 'ButtonHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Card.tsx(1,10): error TS1484: 'HTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/index.ts(24,10): error TS2305: Module '"./Skeleton"' has no exported member 'default'.
+src/components/ui/index.ts(24,45): error TS2724: '"./Skeleton"' has no exported member named 'SkeletonList'. Did you mean 'Skeleton'?
+src/components/ui/index.ts(24,59): error TS2305: Module '"./Skeleton"' has no exported member 'SkeletonTable'.
+src/components/ui/Input.tsx(1,22): error TS1484: 'InputHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Select.tsx(1,22): error TS1484: 'SelectHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+22:14:41 - Project 'tsconfig.node.json' is being forcibly rebuilt
+
+22:14:41 - Building project 'C:/Users/victo/OneDrive/Documentos/Antigravi-platadv/frontend/tsconfig.node.json'...
+

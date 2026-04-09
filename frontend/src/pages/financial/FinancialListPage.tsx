@@ -1,0 +1,2206 @@
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
+import { Plus, TrendingUp, TrendingDown, Download, Search, Filter, RefreshCw, Paperclip, AlertTriangle, Building, Users, DollarSign, Trash2, Calendar, MessageSquare, Info, CheckCircle2, Hourglass, Repeat } from 'lucide-react';
+import { motion } from 'framer-motion';
+import api from '../../services/api';
+import { clsx } from 'clsx';
+import Modal from '../../components/ui/Modal';
+import { Protect } from '../../components/auth/Protect';
+import { useToast } from '../../context/ToastContext';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+interface FinancialRecord {
+    id: string;
+    type: 'INCOME' | 'EXPENSE';
+    category: string;
+    amount: number;
+    description: string;
+    date: string;
+    status: string;
+    processRef?: string;
+    partnerId?: string;
+    clientId?: string;
+    client?: { id: string; name: string };
+    // Recurring payment fields
+    isRecurring?: boolean;
+    recurrenceType?: string;
+    totalInstallments?: number;
+    currentInstallment?: number;
+    parentRecordId?: string | null;
+    isUrgent?: boolean;
+    notes?: string;
+}
+
+interface Partner {
+    id: string;
+    name: string;
+    initials: string;
+    type: string;
+    percentage: number | null;
+    fixedAmount: number | null;
+    pendingAmount: number;
+    color: string;
+    email?: string;
+    phone?: string;
+    notes?: string;
+}
+
+interface FinancialStats {
+    balance: number;
+    pendingIncome: number;
+    pendingIncomeCount: number;
+    receivedPercent: number;
+    pendingExpense: number;
+    dueTodayCount: number;
+    dueTodayAmount: number;
+    totalRepasses?: number;
+}
+
+interface ProcessItem {
+    id: string;
+    number: string;
+    title: string;
+    status: string;
+}
+
+interface ClientItem {
+    id: string;
+    name: string;
+    email?: string;
+}
+
+interface NewTransaction {
+    type: 'INCOME' | 'EXPENSE';
+    category: string;
+    amount: string;
+    description: string;
+    date: string;
+    status: string;
+    recurrence: 'UNICA' | 'MENSAL' | 'ANUAL' | 'PERSONALIZADO';
+    installments: number; // Number of installments for recurring payments
+    urgent: boolean;
+    notes: string;
+    linkTo: string;
+    partnerId?: string;
+    partnerPercentage?: number;
+}
+
+interface NewPartner {
+    name: string;
+    initials: string;
+    type: string;
+    percentage: string;
+    fixedAmount: string;
+    color: string;
+    email: string;
+    phone: string;
+    notes: string;
+}
+
+// Brazilian currency formatter
+const formatBRL = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+};
+
+const INCOME_CATEGORIES = ['Honorários', 'Consultoria', 'Parecer Jurídico', 'Outros'];
+const EXPENSE_CATEGORY_LIST = ['Pessoal', 'Custas Processuais', 'Infraestrutura', 'Marketing', 'Impostos', 'Outros'];
+const PARTNER_TYPES = ['TRABALHISTA', 'CÍVEL', 'TRIBUTÁRIO', 'CRIMINAL', 'PREVIDENCIÁRIO', 'FAMÍLIA', 'MARKETING', 'ADMINISTRATIVO', 'OUTROS'];
+const PARTNER_COLORS = [
+    'bg-amber-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500',
+    'bg-red-500', 'bg-pink-500', 'bg-indigo-500', 'bg-cyan-500', 'bg-slate-400'
+];
+
+export default function FinancialListPage() {
+    const { addToast } = useToast();
+    const [records, setRecords] = useState<FinancialRecord[]>([]);
+    const [partners, setPartners] = useState<Partner[]>([]);
+    const [processes, setProcesses] = useState<ProcessItem[]>([]);
+    const [clients, setClients] = useState<ClientItem[]>([]);
+    const [repasses, setRepasses] = useState<any[]>([]);
+    const [stats, setStats] = useState<FinancialStats | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
+    const [editingRecord, setEditingRecord] = useState<FinancialRecord | null>(null);
+    const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [activeNoteRecord, setActiveNoteRecord] = useState<FinancialRecord | null>(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [dateFilterStart, setDateFilterStart] = useState('');
+    const [dateFilterEnd, setDateFilterEnd] = useState('');
+    const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '1A'>('1M');
+    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses'>('transactions');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isReconModalOpen, setIsReconModalOpen] = useState(false);
+    const [bankBalance, setBankBalance] = useState('');
+
+    const [newTransaction, setNewTransaction] = useState<NewTransaction>({
+        type: 'INCOME',
+        category: '',
+        amount: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+        status: 'PENDING',
+        recurrence: 'UNICA',
+        installments: 1,
+        urgent: false,
+        notes: '',
+        linkTo: '',
+        partnerId: '',
+        partnerPercentage: 0
+    });
+
+    const [newPartner, setNewPartner] = useState<NewPartner>({
+        name: '',
+        initials: '',
+        type: 'CÍVEL',
+        percentage: '',
+        fixedAmount: '',
+        color: 'bg-blue-500',
+        email: '',
+        phone: '',
+        notes: ''
+    });
+
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const [recordsRes, statsRes, partnersRes, processesRes, clientsRes, repassesRes] = await Promise.all([
+                api.get('/financial'),
+                api.get('/financial/stats'),
+                api.get('/partnerships').catch(() => ({ data: [] })),
+                api.get('/processes').catch(() => ({ data: [] })),
+                api.get('/clients').catch(() => ({ data: [] })),
+                api.get('/partnerships/transactions/all').catch(() => ({ data: [] }))
+            ]);
+            setRecords(recordsRes.data);
+            setStats(statsRes.data);
+            setPartners(partnersRes.data);
+            setProcesses(processesRes.data);
+            setClients(clientsRes.data);
+            setRepasses(repassesRes.data);
+        } catch (error) {
+            console.error('Erro ao buscar dados:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    // Installment grouping expand/collapse state
+    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+    const toggleGroup = (groupId: string) => {
+        setExpandedGroups(prev => {
+            const next = new Set(prev);
+            if (next.has(groupId)) {
+                next.delete(groupId);
+            } else {
+                next.add(groupId);
+            }
+            return next;
+        });
+    };
+
+
+    // Memoized stats and filtered data
+    const totalRepasses = useMemo(() =>
+        partners.reduce((sum, p) => sum + (p.pendingAmount || 0), 0),
+        [partners]);
+
+    const currentMonthBalance = useMemo(() => {
+        return records.filter(r => {
+            if (!r.date || r.date.length < 10) return false;
+            const [year, month, day] = r.date.substring(0, 10).split('-').map(Number);
+            const d = new Date(year, month - 1, day);
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            return r.status === 'PAID' && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        }).reduce((acc, r) => {
+            return acc + (r.type === 'INCOME' ? (Number(r.amount) || 0) : -(Number(r.amount) || 0));
+        }, 0);
+    }, [records]);
+
+    const chartData = useMemo(() => {
+        const data = [];
+        const now = new Date();
+
+        if (chartPeriod === '7D') {
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+
+                const dayRecords = records.filter(r => {
+                    const recordDate = new Date(r.date);
+                    return recordDate.getDate() === date.getDate() &&
+                        recordDate.getMonth() === date.getMonth() &&
+                        recordDate.getFullYear() === date.getFullYear() &&
+                        r.status === 'PAID';
+                });
+
+                const income = dayRecords.filter(r => r.type === 'INCOME').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+                const expense = dayRecords.filter(r => r.type === 'EXPENSE').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+                data.push({
+                    name: dayName.charAt(0).toUpperCase() + dayName.slice(1),
+                    Receitas: income,
+                    Despesas: expense,
+                    Saldo: income - expense
+                });
+            }
+        } else if (chartPeriod === '1M') {
+            for (let i = 29; i >= 0; i -= 2) {
+                const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                const dayName = date.getDate().toString().padStart(2, '0') + '/' + (date.getMonth() + 1).toString().padStart(2, '0');
+
+                const dayRecords = records.filter(r => {
+                    const recordDate = new Date(r.date);
+                    const diffTime = date.getTime() - recordDate.getTime();
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays >= 0 && diffDays < 2 && r.status === 'PAID';
+                });
+
+                const income = dayRecords.filter(r => r.type === 'INCOME').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+                const expense = dayRecords.filter(r => r.type === 'EXPENSE').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+                data.push({
+                    name: dayName,
+                    Receitas: income,
+                    Despesas: expense,
+                    Saldo: income - expense
+                });
+            }
+        } else if (chartPeriod === '1A') {
+            for (let i = 11; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const monthName = date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+
+                const monthRecords = records.filter(r => {
+                    const recordDate = new Date(r.date);
+                    return recordDate.getMonth() === date.getMonth() &&
+                        recordDate.getFullYear() === date.getFullYear() &&
+                        r.status === 'PAID';
+                });
+
+                const income = monthRecords.filter(r => r.type === 'INCOME').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+                const expense = monthRecords.filter(r => r.type === 'EXPENSE').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+                data.push({
+                    name: monthName.charAt(0).toUpperCase() + monthName.slice(1),
+                    Receitas: income,
+                    Despesas: expense,
+                    Saldo: income - expense
+                });
+            }
+        }
+
+        return data;
+    }, [records, chartPeriod]);
+
+    const handleSaveTransaction = useCallback(async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        try {
+            if (!newTransaction.amount || !newTransaction.description || !newTransaction.category || !newTransaction.date) {
+                addToast('Preencha todos os campos obrigatórios: Descrição, Valor, Data e Categoria', 'warning');
+                return;
+            }
+
+            const amountStr = newTransaction.amount.toString().replace(',', '.');
+            const amount = parseFloat(amountStr);
+
+            if (isNaN(amount) || amount <= 0) {
+                addToast('Valor inválido', 'warning');
+                return;
+            }
+
+            const payload: any = {
+                type: newTransaction.type,
+                category: newTransaction.category,
+                amount: amount,
+                description: newTransaction.description,
+                date: newTransaction.date,
+                status: newTransaction.status || 'PENDING',
+                recurrenceType: newTransaction.recurrence,
+                totalInstallments: newTransaction.recurrence !== 'UNICA' ? newTransaction.installments : 1,
+                isUrgent: newTransaction.urgent,
+                notes: newTransaction.notes,
+            };
+
+            if (newTransaction.linkTo && newTransaction.linkTo.startsWith('client:')) {
+                payload.clientId = newTransaction.linkTo.replace('client:', '');
+            }
+
+            if (newTransaction.type === 'INCOME' && newTransaction.partnerId) {
+                payload.partnerId = newTransaction.partnerId;
+                payload.partnerPercentage = newTransaction.partnerPercentage;
+            }
+
+            if (editingRecord) {
+                await api.patch(`/financial/${editingRecord.id}`, payload);
+            } else {
+                await api.post('/financial', payload);
+            }
+
+            setIsModalOpen(false);
+            setEditingRecord(null);
+            resetTransactionForm();
+            fetchData();
+            addToast(editingRecord ? 'Transação atualizada com sucesso' : 'Transação salva com sucesso', 'success');
+        } catch (error) {
+            console.error('Erro ao salvar transação:', error);
+            addToast('Erro ao salvar transação. Tente novamente.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [isSubmitting, newTransaction, editingRecord, addToast, fetchData]);
+
+    const handleSavePartner = useCallback(async () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        try {
+            if (!newPartner.name || !newPartner.initials || !newPartner.type) {
+                addToast('Preencha nome, iniciais e tipo', 'warning');
+                return;
+            }
+
+            const payload = {
+                name: newPartner.name,
+                initials: newPartner.initials.toUpperCase(),
+                type: newPartner.type,
+                percentage: newPartner.percentage ? parseFloat(newPartner.percentage) : null,
+                fixedAmount: newPartner.fixedAmount ? parseFloat(newPartner.fixedAmount) : null,
+                color: newPartner.color,
+                email: newPartner.email || null,
+                phone: newPartner.phone || null,
+                notes: newPartner.notes || null
+            };
+
+            if (editingPartner) {
+                await api.patch(`/partnerships/${editingPartner.id}`, payload);
+            } else {
+                await api.post('/partnerships', payload);
+            }
+
+            setIsPartnerModalOpen(false);
+            setEditingPartner(null);
+            resetPartnerForm();
+            fetchData();
+            addToast(editingPartner ? 'Parceria atualizada' : 'Parceria salva', 'success');
+        } catch (error) {
+            console.error('Erro ao salvar parceria:', error);
+            addToast('Erro ao salvar parceria. Tente novamente.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [isSubmitting, newPartner, editingPartner, addToast, fetchData]);
+
+    const handleDeletePartner = useCallback(async (id: string) => {
+        if (!confirm('Tem certeza que deseja desativar esta parceria?')) return;
+        try {
+            await api.delete(`/partnerships/${id}`);
+            fetchData();
+        } catch (error) {
+            console.error('Erro ao excluir parceria:', error);
+        }
+    }, [fetchData]);
+
+    const handlePayRepasse = useCallback(async (id: string) => {
+        try {
+            await api.patch(`/partnerships/transactions/${id}/pay`);
+            fetchData();
+            addToast('Repasse pago com sucesso', 'success');
+        } catch (error) {
+            console.error('Erro ao pagar repasse:', error);
+            addToast('Erro ao confirmar pagamento do repasse.', 'error');
+        }
+    }, [fetchData, addToast]);
+
+    const handleEdit = useCallback((record: FinancialRecord) => {
+        setEditingRecord(record);
+        setNewTransaction({
+            type: record.type,
+            category: record.category,
+            amount: record.amount.toString(),
+            description: record.description,
+            date: record.date ? record.date.substring(0, 10) : new Date().toISOString().split('T')[0],
+            status: record.status,
+            recurrence: (record.recurrenceType as 'UNICA' | 'MENSAL' | 'ANUAL' | 'PERSONALIZADO') || 'UNICA',
+            installments: record.totalInstallments || 1,
+            urgent: record.isUrgent || false,
+            notes: record.notes || '',
+            linkTo: record.clientId ? `client:${record.clientId}` : '',
+            partnerId: record.partnerId || '',
+            partnerPercentage: (record as any).partnerPercentage || 0
+        });
+        setIsModalOpen(true);
+    }, []);
+
+    const handleEditPartner = useCallback((partner: Partner) => {
+        setEditingPartner(partner);
+        setNewPartner({
+            name: partner.name,
+            initials: partner.initials,
+            type: partner.type,
+            percentage: partner.percentage?.toString() || '',
+            fixedAmount: partner.fixedAmount?.toString() || '',
+            color: partner.color,
+            email: partner.email || '',
+            phone: partner.phone || '',
+            notes: partner.notes || ''
+        });
+        setIsPartnerModalOpen(true);
+    }, []);
+
+    const handleDelete = useCallback(async (id: string) => {
+        try {
+            await api.delete(`/financial/${id}`);
+            setDeleteConfirm(null);
+            fetchData();
+            addToast('Transação excluída com sucesso', 'success');
+        } catch (error) {
+            console.error('Erro ao excluir:', error);
+            addToast('Erro ao excluir transação.', 'error');
+        }
+    }, [fetchData, addToast]);
+
+    const resetTransactionForm = () => {
+        setNewTransaction({
+            type: 'INCOME',
+            category: '',
+            amount: '',
+            description: '',
+            date: new Date().toISOString().split('T')[0],
+            status: 'PENDING',
+            recurrence: 'UNICA',
+            installments: 1,
+            urgent: false,
+            notes: '',
+            linkTo: '',
+            partnerId: '',
+            partnerPercentage: 0
+        });
+    };
+
+    const resetPartnerForm = () => {
+        setNewPartner({
+            name: '',
+            initials: '',
+            type: 'CÍVEL',
+            percentage: '',
+            fixedAmount: '',
+            color: 'bg-blue-500',
+            email: '',
+            phone: '',
+            notes: ''
+        });
+    };
+
+    const openNewTransaction = () => {
+        resetTransactionForm();
+        setEditingRecord(null);
+        setIsModalOpen(true);
+    };
+
+    const openNewPartner = () => {
+        resetPartnerForm();
+        setEditingPartner(null);
+        setIsPartnerModalOpen(true);
+    };
+
+    // Open report in new tab
+    const openReport = async () => {
+        try {
+            addToast("Buscando dados e gerando relatório...", "info");
+            const params = new URLSearchParams();
+            if (dateFilterStart) params.append('startDate', dateFilterStart);
+            if (dateFilterEnd) params.append('endDate', dateFilterEnd);
+            if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
+            if (searchQuery) params.append('search', searchQuery);
+            
+            const response = await api.get(`/financial/report/pdf?${params.toString()}`, { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/html' }));
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Erro ao gerar relatório:', error);
+            addToast('Erro ao gerar o relatório financeiro.', 'error');
+        }
+    };
+
+    // Check if overdue (must be defined before groupedRecords useMemo)
+    const isOverdue = (dateStr: string, status: string) => {
+        if (status === 'PAID') return false;
+        if (!dateStr || dateStr.length < 10) return false;
+
+        const [year, month, day] = dateStr.substring(0, 10).split('-').map(Number);
+        const dueDate = new Date(year, month - 1, day);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return dueDate < today;
+    };
+
+    // Memoized grouped records - groups recurring installments together
+    const groupedRecords = useMemo(() => {
+        const filtered = records.filter(r => {
+            const description = r.description || '';
+            const category = r.category || '';
+            const query = debouncedSearch.toLowerCase();
+            const matchesSearch = description.toLowerCase().includes(query) ||
+                category.toLowerCase().includes(query);
+            const matchesStatus = statusFilter === 'all' ||
+                (statusFilter === 'pending' && r.status === 'PENDING') ||
+                (statusFilter === 'paid' && r.status === 'PAID') ||
+                (statusFilter === 'overdue' && r.status === 'PENDING' && isOverdue(r.date, r.status));
+            let matchesDate = true;
+            if (dateFilterStart || dateFilterEnd) {
+                const rDate = new Date(r.date);
+                if (dateFilterStart) {
+                    const start = new Date(dateFilterStart);
+                    start.setHours(0,0,0,0);
+                    if (rDate < start) matchesDate = false;
+                }
+                if (dateFilterEnd) {
+                    const end = new Date(dateFilterEnd);
+                    end.setHours(23,59,59,999);
+                    if (rDate > end) matchesDate = false;
+                }
+            }
+            return matchesSearch && matchesStatus && matchesDate;
+        });
+        filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        // Group recurring installments by description+type+category+totalInstallments
+        const groupMap = new Map<string, any[]>();
+        const placed = new Set<string>();
+        const result: any[] = [];
+
+        for (const rec of filtered) {
+            if (rec.isRecurring && rec.totalInstallments && rec.totalInstallments > 1) {
+                const key = (rec.description || '').trim().toLowerCase() + '|' + rec.type + '|' + (rec.category || '') + '|' + rec.totalInstallments;
+                if (!groupMap.has(key)) groupMap.set(key, []);
+                groupMap.get(key)!.push(rec);
+            }
+        }
+
+        for (const rec of filtered) {
+            if (rec.isRecurring && rec.totalInstallments && rec.totalInstallments > 1) {
+                const key = (rec.description || '').trim().toLowerCase() + '|' + rec.type + '|' + (rec.category || '') + '|' + rec.totalInstallments;
+                const group = groupMap.get(key);
+                if (group && group.length >= 2 && !placed.has(key)) {
+                    placed.add(key);
+                    const paidCount = group.filter((g: any) => g.status === 'PAID').length;
+                    const anyOverdue = group.some((g: any) => g.status === 'PENDING' && isOverdue(g.date, g.status));
+                    const totalAmount = group.reduce((sum: number, g: any) => sum + (Number(g.amount) || 0), 0);
+                    result.push({
+                        _isGroupHeader: true,
+                        _groupKey: key,
+                        _children: group,
+                        _paidCount: paidCount,
+                        _anyOverdue: anyOverdue,
+                        id: 'group_' + key,
+                        description: group[0].description,
+                        type: group[0].type,
+                        category: group[0].category,
+                        client: group[0].client,
+                        date: group[0].date,
+                        amount: totalAmount,
+                        status: paidCount === group.length ? 'PAID' : 'PENDING',
+                        totalInstallments: group[0].totalInstallments,
+                        isRecurring: true,
+                        isUrgent: group.some((g: any) => g.isUrgent),
+                    });
+                } else if (!group || group.length < 2) {
+                    result.push(rec);
+                }
+                // if group.length >= 2 && placed, skip (already placed header)
+            } else {
+                result.push(rec);
+            }
+        }
+        return result;
+    }, [records, debouncedSearch, statusFilter]);
+
+    // Get relative date label
+    const getDateLabel = (dateStr: string) => {
+        if (!dateStr || dateStr.length < 10) return 'Data Inválida';
+        // Parse date manually to avoid UTC drift (YYYY-MM-DD)
+        const [year, month, day] = dateStr.substring(0, 10).split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dTime = date.getTime();
+        const tTime = today.getTime();
+        const yTime = yesterday.getTime();
+        const tmTime = tomorrow.getTime();
+
+        if (dTime === tTime) return 'Hoje';
+        if (dTime === yTime) return 'Ontem';
+        if (dTime === tmTime) return 'Amanhã';
+
+        return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+
+
+    // Bank Reconciliation Logic
+    const handleReconciliation = useCallback(() => {
+        // Parse the input balance (Brazilian format to float)
+        const cleanVal = bankBalance.replace(/\./g, '').replace(',', '.');
+        const bankVal = parseFloat(cleanVal);
+
+        if (isNaN(bankVal)) {
+            addToast('Por favor, informe um valor válido para o saldo.', 'error');
+            return;
+        }
+
+        const sysVal = stats?.balance || 0;
+        const diff = bankVal - sysVal;
+
+        if (Math.abs(diff) < 0.01) {
+            addToast('O sistema está perfeitamente alinhado com o banco!', 'success');
+            setIsReconModalOpen(false);
+            setBankBalance('');
+            return;
+        }
+
+        // Open transaction modal to create adjustment
+        setIsReconModalOpen(false);
+        setBankBalance('');
+        setEditingRecord(null);
+        setNewTransaction({
+            type: diff > 0 ? 'INCOME' : 'EXPENSE',
+            category: 'Outros',
+            amount: Math.abs(diff).toFixed(2),
+            description: 'Ajuste de Reconciliação Bancária',
+            date: new Date().toISOString().split('T')[0],
+            status: 'PAID',
+            recurrence: 'UNICA',
+            installments: 1,
+            urgent: false,
+            notes: 'Ajuste automático gerado pela ferramenta de Reconciliação Bancária para equiparar o saldo do sistema ao do banco.',
+            linkTo: ''
+        });
+        setIsModalOpen(true);
+        addToast(`Diferença de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.abs(diff))} encontrada. Preenchendo ajuste...`, 'info');
+    }, [bankBalance, stats, addToast]);
+
+    if (loading) {
+        return (
+            <div className="space-y-6 pb-20 md:pb-0 animate-pulse">
+                {/* Header skeleton */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div className="h-8 w-52 bg-app-stroke/40 rounded-lg" />
+                        <div className="h-4 w-80 bg-app-stroke/30 rounded-lg mt-2" />
+                    </div>
+                    <div className="flex gap-2">
+                        <div className="h-10 w-44 bg-app-stroke/30 rounded-xl" />
+                        <div className="h-10 w-28 bg-app-stroke/30 rounded-xl" />
+                        <div className="h-10 w-40 bg-primary/20 rounded-xl" />
+                    </div>
+                </div>
+                {/* Cards skeleton */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="bg-app-card border border-app-stroke rounded-2xl p-5">
+                            <div className="h-3 w-24 bg-app-stroke/40 rounded mb-3" />
+                            <div className="h-7 w-36 bg-app-stroke/50 rounded mb-2" />
+                            <div className="h-2 w-full bg-app-stroke/30 rounded-full" />
+                        </div>
+                    ))}
+                </div>
+                {/* Table skeleton */}
+                <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden">
+                    <div className="h-12 bg-app-bg border-b border-app-stroke" />
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-app-stroke/30">
+                            <div className="w-1 h-8 bg-app-stroke/40 rounded-full" />
+                            <div className="h-4 w-20 bg-app-stroke/30 rounded" />
+                            <div className="flex-1 flex items-center gap-3">
+                                <div className="w-8 h-8 bg-app-stroke/30 rounded-lg" />
+                                <div className="h-4 w-40 bg-app-stroke/40 rounded" />
+                            </div>
+                            <div className="h-4 w-20 bg-app-stroke/30 rounded" />
+                            <div className="h-6 w-16 bg-app-stroke/30 rounded-full" />
+                            <div className="h-4 w-24 bg-app-stroke/40 rounded" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6 pb-20 md:pb-0">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold text-app-text-main">Gestão Financeira</h1>
+                    <p className="text-app-text-muted text-sm mt-1">
+                        Central de controle de fluxo de caixa, contratos de parceria e reconciliação.
+                    </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        onClick={() => setIsReconModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-app-card border border-app-stroke rounded-xl text-app-text-main text-sm font-medium hover:bg-app-stroke/30 transition-colors"
+                    >
+                        <RefreshCw size={16} />
+                        Reconciliação Bancária
+                    </button>
+                    <Protect roles={['ADMIN', 'LAWYER']}>
+                        <button
+                            onClick={openReport}
+                            className="flex items-center gap-2 px-4 py-2 bg-app-card border border-app-stroke text-app-text-main rounded-xl text-sm font-medium hover:bg-app-stroke/50 transition-colors"
+                        >
+                            <Download size={16} />
+                            Relatórios
+                        </button>
+                    </Protect>
+                    <Protect roles={['ADMIN', 'LAWYER']}>
+                        <button
+                            onClick={openNewTransaction}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                        >
+                            <DollarSign size={16} />
+                            Nova Movimentação
+                        </button>
+                    </Protect>
+                </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Saldo Atual */}
+                <motion.div
+                    className={clsx(
+                        "border rounded-2xl p-5 relative overflow-hidden transition-all",
+                        (stats?.balance || 0) >= 0 ? "bg-gradient-to-br from-green-500/10 to-app-card border-green-500/30 shadow-lg shadow-green-500/10" : "bg-gradient-to-br from-red-500/10 to-app-card border-red-500/30 shadow-lg shadow-red-500/10"
+                    )}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                >
+                    <div className={clsx(
+                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
+                        (stats?.balance || 0) >= 0 ? "bg-green-500/20" : "bg-red-500/20"
+                    )} />
+                    <div className="flex justify-between items-start mb-2">
+                        <p className="text-app-text-muted text-xs">Saldo Atual</p>
+                        <div className={clsx(
+                            "w-8 h-8 rounded-lg flex items-center justify-center",
+                            (stats?.balance || 0) >= 0 ? "bg-green-500/20" : "bg-red-500/20"
+                        )}>
+                            <Building size={16} className={(stats?.balance || 0) >= 0 ? "text-green-500" : "text-red-500"} />
+                        </div>
+                    </div>
+                    <p className="text-sm text-app-text-muted">R$</p>
+                    <div className="flex items-center gap-2">
+                        <p className={clsx(
+                            "text-2xl font-bold",
+                            (stats?.balance || 0) >= 0 ? "text-green-500" : "text-red-500"
+                        )}>
+                            {formatBRL(stats?.balance || 0).replace('R$', '').trim()}
+                        </p>
+                        {(stats?.balance || 0) >= 0 ? (
+                            <TrendingUp size={20} className="text-green-500" />
+                        ) : (
+                            <TrendingDown size={20} className="text-red-500" />
+                        )}
+                    </div>
+                    <p className="text-xs text-app-text-muted mt-1">
+                        Disponível em Caixa
+                    </p>
+                </motion.div>
+
+                {/* Contas a Receber */}
+                <motion.div
+                    className={clsx(
+                        "border rounded-2xl p-5 relative overflow-hidden transition-all",
+                        (stats?.pendingIncome || 0) > 0 ? "bg-gradient-to-br from-blue-500/10 to-app-card border-blue-500/30 shadow-lg shadow-blue-500/10" : "bg-app-card border-app-stroke"
+                    )}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                >
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl" />
+                    <div className="flex justify-between items-start mb-2">
+                        <div>
+                            <p className="text-app-text-muted text-xs">Contas a Receber</p>
+                            <p className="text-[10px] text-app-text-muted">(Mês Atual)</p>
+                        </div>
+                        <span className="px-2 py-0.5 bg-blue-500/20 text-blue-500 text-[10px] font-bold rounded-full">
+                            {stats?.pendingIncomeCount || 0} Pendentes
+                        </span>
+                    </div>
+                    <p className="text-2xl font-bold text-blue-500">{formatBRL(stats?.pendingIncome || 0)}</p>
+                    <div className="mt-2 pt-2 border-t border-app-stroke">
+                        <div className="flex justify-between items-center mb-1">
+                            <span className="text-[10px] text-app-text-muted">Progresso do Mês</span>
+                            <span className="text-[10px] font-medium text-app-text-main">{stats?.receivedPercent || 0}% Recebido</span>
+                        </div>
+                        <div className="h-1.5 bg-app-stroke rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${stats?.receivedPercent || 0}%` }} />
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Contas a Pagar */}
+                <motion.div
+                    className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                >
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-500/10 rounded-full blur-2xl" />
+                    <div className="flex justify-between items-start mb-2">
+                        <div>
+                            <p className="text-app-text-muted text-xs">Contas a Pagar</p>
+                            <p className="text-[10px] text-app-text-muted">(Total Pendente)</p>
+                        </div>
+                        <span className={clsx(
+                            "px-2 py-0.5 text-[10px] font-bold rounded-full",
+                            (stats?.dueTodayCount || 0) > 0 ? "bg-red-500/20 text-red-500 animate-pulse" : "bg-app-stroke text-app-text-muted"
+                        )}>
+                            {stats?.dueTodayCount || 0} Vencendo
+                        </span>
+                    </div>
+                    <p className="text-2xl font-bold text-red-500">{formatBRL(stats?.pendingExpense || 0)}</p>
+                    <div className="mt-2 pt-2 border-t border-app-stroke flex justify-between items-center">
+                        <span className="text-xs text-app-text-muted">
+                            Vencimento Hoje:
+                        </span>
+                        <span className={clsx(
+                            "text-sm font-bold",
+                            (stats?.dueTodayAmount || 0) > 0 ? "text-red-400" : "text-app-text-main"
+                        )}>
+                            {formatBRL(stats?.dueTodayAmount || 0)}
+                        </span>
+                    </div>
+                </motion.div>
+
+                {/* Resultado do Mês (New Metric) */}
+                <motion.div
+                    className={clsx(
+                        "border rounded-2xl p-5 relative overflow-hidden transition-all",
+                        currentMonthBalance >= 0 ? "bg-gradient-to-br from-emerald-500/10 to-app-card border-emerald-500/30 shadow-lg shadow-emerald-500/10" : "bg-gradient-to-br from-rose-500/10 to-app-card border-rose-500/30 shadow-lg shadow-rose-500/10"
+                    )}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                >
+                    <div className={clsx(
+                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
+                        currentMonthBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
+                    )} />
+                    <div className="flex justify-between items-start mb-2">
+                        <p className="text-app-text-muted text-xs">Resultado Realizado (Mês Atual)</p>
+                        <div className={clsx(
+                            "w-8 h-8 rounded-lg flex items-center justify-center",
+                            currentMonthBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
+                        )}>
+                            {currentMonthBalance >= 0 ? <TrendingUp size={16} className="text-emerald-500" /> : <TrendingDown size={16} className="text-rose-500" />}
+                        </div>
+                    </div>
+                    <p className="text-sm text-app-text-muted">R$</p>
+                    <p className={clsx(
+                        "text-2xl font-bold",
+                        currentMonthBalance >= 0 ? "text-emerald-500" : "text-rose-500"
+                    )}>
+                        {formatBRL(Math.abs(currentMonthBalance)).replace('R$', '').trim()}
+                    </p>
+                    <p className="text-xs text-app-text-muted mt-1">
+                        {currentMonthBalance >= 0 ? 'Lucro Recebido' : 'Prejuízo Efetivo'}
+                    </p>
+                </motion.div>
+
+                {/* Repasses de Parcerias */}
+                <motion.div
+                    className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden hidden"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                >
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl" />
+                    <div className="flex justify-between items-start mb-2">
+                        <p className="text-app-text-muted text-xs">Repasses de Parcerias</p>
+                        <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                            <Users size={16} className="text-purple-500" />
+                        </div>
+                    </div>
+                    <p className="text-2xl font-bold text-app-text-main">{formatBRL(totalRepasses)}</p>
+                    <p className="text-xs text-app-text-muted mt-1">A repassar este mês</p>
+                </motion.div>
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Cash Flow Chart */}
+                <div className="lg:col-span-2 bg-app-card border border-app-stroke rounded-2xl p-5">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <div>
+                            <h3 className="text-app-text-main font-bold text-lg">Fluxo de Caixa</h3>
+                            <p className="text-app-text-muted text-xs">Entradas vs Saídas e projeção para o próximo trimestre</p>
+                        </div>
+                        <div className="flex bg-app-bg border border-app-stroke rounded-lg p-1">
+                            {(['7D', '1M', '1A'] as const).map((period) => (
+                                <button
+                                    key={period}
+                                    onClick={() => setChartPeriod(period)}
+                                    className={clsx(
+                                        "relative px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                                        chartPeriod === period
+                                            ? "text-app-text-main"
+                                            : "text-app-text-muted hover:text-app-text-main"
+                                    )}
+                                >
+                                    {chartPeriod === period && (
+                                        <motion.div
+                                            layoutId="chartPeriodTab"
+                                            className="absolute inset-0 bg-app-card rounded-md shadow"
+                                            initial={false}
+                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                        />
+                                    )}
+                                    <span className="relative z-10">{period === '7D' ? '7 Dias' : period === '1M' ? '30 Dias' : '90 Dias'}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Interactive Wave Chart */}
+                    <div className="h-64 relative w-full mt-4">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart
+                                data={chartData}
+                                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                            >
+                                <defs>
+                                    <linearGradient id="colorSaldo" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value / 1000 > 0 ? (value / 1000) + 'k' : value}`} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                                <Tooltip
+                                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f8fafc' }}
+                                    itemStyle={{ color: '#f8fafc' }}
+                                    formatter={(value: any) => [new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value), '']}
+                                />
+                                <Area type="monotone" dataKey="Saldo" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorSaldo)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Partnership Contracts */}
+                <div className="bg-app-card border border-app-stroke rounded-2xl p-5">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-app-text-main font-bold">Contratos de Parceria</h3>
+                        <Protect roles={['ADMIN', 'LAWYER']}>
+                            <button
+                                onClick={openNewPartner}
+                                className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition-colors"
+                            >
+                                <Plus size={14} />
+                            </button>
+                        </Protect>
+                    </div>
+
+                    <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                        {partners.length > 0 ? (
+                            partners.map((partner) => (
+                                <div
+                                    key={partner.id}
+                                    onClick={() => handleEditPartner(partner)}
+                                    className="bg-app-bg border border-app-stroke rounded-xl p-3 hover:border-primary/30 transition-colors cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={clsx("w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm", partner.color)}>
+                                            {partner.initials}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <p className="text-sm font-medium text-app-text-main">{partner.name}</p>
+                                                <span className="text-xs text-app-text-muted">
+                                                    {partner.percentage !== null ? `${partner.percentage}%` : 'Fixo'}
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] text-app-text-muted uppercase">{partner.type}</p>
+                                        </div>
+                                    </div>
+                                    {partner.pendingAmount > 0 && (
+                                        <div className="mt-2 pt-2 border-t border-app-stroke flex justify-between items-center">
+                                            <span className="text-[10px] text-app-text-muted">Repasse Pendente</span>
+                                            <span className="text-sm font-bold text-app-text-main">{formatBRL(partner.pendingAmount)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-8 text-app-text-muted">
+                                <Users size={32} className="mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">Nenhum parceiro cadastrado</p>
+                                <button
+                                    onClick={openNewPartner}
+                                    className="mt-2 text-primary text-sm hover:underline"
+                                >
+                                    Adicionar primeiro parceiro
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Tabs Row */}
+            <div className="flex border-b border-app-stroke mb-4 overflow-x-auto custom-scrollbar">
+                <button
+                    onClick={() => setActiveTab('transactions')}
+                    className={clsx(
+                        "px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
+                        activeTab === 'transactions' ? "border-primary text-primary" : "border-transparent text-app-text-muted hover:text-app-text-main"
+                    )}
+                >
+                    Controle de Entradas e Saídas
+                </button>
+                <button
+                    onClick={() => setActiveTab('repasses')}
+                    className={clsx(
+                        "px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
+                        activeTab === 'repasses' ? "border-primary text-primary" : "border-transparent text-app-text-muted hover:text-app-text-main"
+                    )}
+                >
+                    Planilha de Honorários (Repasses)
+                </button>
+            </div>
+
+            {/* Transactions Table */}
+            {activeTab === 'transactions' && (
+                <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden">
+                    <div className="p-5 border-b border-app-stroke">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <h3 className="text-lg font-bold text-app-text-main">Controle de Parcelas & Transações</h3>
+                            <div className="flex flex-wrap gap-2">
+                                <div className="relative">
+                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar parcela..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-9 pr-4 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-main outline-none focus:border-primary transition-colors w-40 sm:w-48"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-1 bg-app-bg border border-app-stroke rounded-lg px-2 py-1">
+                                    <input 
+                                        type="date" 
+                                        value={dateFilterStart}
+                                        onChange={e => setDateFilterStart(e.target.value)}
+                                        className="bg-transparent text-sm text-app-text-main outline-none w-[110px]"
+                                        title="Data Inicial"
+                                    />
+                                    <span className="text-app-text-muted text-xs">até</span>
+                                    <input 
+                                        type="date" 
+                                        value={dateFilterEnd}
+                                        onChange={e => setDateFilterEnd(e.target.value)}
+                                        className="bg-transparent text-sm text-app-text-main outline-none w-[110px]"
+                                        title="Data Final"
+                                    />
+                                </div>
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="px-3 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                >
+                                    <option value="all">Todos os Status</option>
+                                    <option value="pending">Pendentes</option>
+                                    <option value="paid">Pagos</option>
+                                    <option value="overdue">Atrasados</option>
+                                </select>
+                                <button 
+                                    onClick={() => { setDateFilterStart(''); setDateFilterEnd(''); setStatusFilter('all'); setSearchQuery(''); }}
+                                    className="flex items-center gap-2 px-3 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-muted hover:text-app-text-main transition-colors"
+                                    title="Limpar todos os filtros"
+                                >
+                                    Limpar
+                                </button>
+                                <button className="flex items-center gap-2 px-3 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-muted hover:text-app-text-main transition-colors">
+                                    <Filter size={14} />
+                                    Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto hidden md:block">
+                        <table className="w-full">
+                            <thead className="bg-app-bg/80 backdrop-blur-sm border-b border-app-stroke sticky top-0 z-10">
+                                <tr>
+                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Vencimento</th>
+                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Descrição / Contrato</th>
+                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Cliente</th>
+                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Categoria / Parceiro</th>
+                                    <th className="px-5 py-3 text-center text-xs font-medium text-app-text-muted uppercase tracking-wider">Comprovante</th>
+                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Status</th>
+                                    <th className="px-5 py-3 text-right text-xs font-medium text-app-text-muted uppercase tracking-wider">Valor</th>
+                                    <th className="px-5 py-3 text-right text-xs font-medium text-app-text-muted uppercase tracking-wider"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-app-stroke/40">
+                                {groupedRecords.length > 0 ? (
+                                    groupedRecords.map((record) => (
+                                        <FinancialTableRow
+                                            key={record.id}
+                                            record={record}
+                                            expandedGroups={expandedGroups}
+                                            toggleGroup={toggleGroup}
+                                            handleEdit={handleEdit}
+                                            handleDelete={handleDelete}
+                                            deleteConfirm={deleteConfirm}
+                                            setDeleteConfirm={setDeleteConfirm}
+                                            isOverdue={isOverdue}
+                                            setActiveNoteRecord={setActiveNoteRecord}
+                                        />
+                                    ))
+                                ) : (
+                                    <tr><td colSpan={8} className="px-5 py-12 text-center text-app-text-muted">Nenhuma transação encontrada.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Transaction Cards */}
+                    <div className="md:hidden divide-y divide-app-stroke">
+                        {groupedRecords.length > 0 ? (
+                            groupedRecords.map((record) => (
+                                <FinancialMobileRow
+                                    key={record.id}
+                                    record={record}
+                                    expandedGroups={expandedGroups}
+                                    toggleGroup={toggleGroup}
+                                    handleEdit={handleEdit}
+                                    handleDelete={handleDelete}
+                                    deleteConfirm={deleteConfirm}
+                                    setDeleteConfirm={setDeleteConfirm}
+                                    isOverdue={isOverdue}
+                                    getDateLabel={getDateLabel}
+                                    setActiveNoteRecord={setActiveNoteRecord}
+                                />
+                            ))
+                        ) : (
+                            <div className="p-8 text-center text-app-text-muted">Nenhuma transação encontrada.</div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Repasses Table */}
+            {activeTab === 'repasses' && (
+                <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden mt-4">
+                    <div className="p-5 border-b border-app-stroke flex justify-between items-center">
+                        <div>
+                            <h3 className="text-lg font-bold text-app-text-main">Repasses de Honorários</h3>
+                            <p className="text-sm text-app-text-muted">Lista dos valores devidos a parceiros do escritório.</p>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                                <tr className="border-b border-app-stroke/50 bg-app-bg/50 text-xs font-semibold text-app-text-muted">
+                                    <th className="px-6 py-4 rounded-tl-xl whitespace-nowrap">DATA</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">PARCEIRO</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">ORIGEM</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">VALOR DO REPASSE</th>
+                                    <th className="px-6 py-4 whitespace-nowrap">STATUS</th>
+                                    <th className="px-6 py-4 rounded-tr-xl text-right whitespace-nowrap">AÇÕES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {repasses?.length > 0 ? (
+                                    repasses.map((rep: any) => (
+                                        <tr key={rep.id} className="border-b border-app-stroke/50 hover:bg-app-bg/30 transition-colors group">
+                                            <td className="px-6 py-4 align-middle whitespace-nowrap">
+                                                <div className="flex items-center gap-2 text-sm text-app-text-main">
+                                                    <Calendar size={14} className="text-app-text-muted" />
+                                                    {rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('pt-BR') : 'Sem data'}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs", rep.partner?.color || 'bg-slate-500')}>
+                                                        {rep.partner?.initials}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-app-text-main whitespace-nowrap">
+                                                            {rep.partner?.name}
+                                                        </p>
+                                                        <p className="text-[10px] text-app-text-muted">
+                                                            {rep.partner?.type}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle max-w-[200px]">
+                                                <p className="text-sm text-app-text-main truncate" title={rep.description}>
+                                                    {rep.description}
+                                                </p>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle whitespace-nowrap">
+                                                <span className="text-sm font-bold text-app-text-main">
+                                                    {formatBRL(rep.amount)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle whitespace-nowrap">
+                                                <span className={clsx(
+                                                    "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit",
+                                                    rep.status === 'PAID'
+                                                        ? "bg-green-500/10 text-green-500"
+                                                        : "bg-amber-500/10 text-amber-500"
+                                                )}>
+                                                    <div className={clsx(
+                                                        "w-1.5 h-1.5 rounded-full",
+                                                        rep.status === 'PAID' ? "bg-green-500" : "bg-amber-500"
+                                                    )} />
+                                                    {rep.status === 'PAID' ? 'Pago' : 'Pendente'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 align-middle text-right whitespace-nowrap">
+                                                {rep.status === 'PENDING' && (
+                                                    <button
+                                                        onClick={() => handlePayRepasse(rep.id)}
+                                                        className="px-4 py-2 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors shadow-lg shadow-green-500/20"
+                                                    >
+                                                        Marcar Pago
+                                                    </button>
+                                                )}
+                                                {rep.status === 'PAID' && (
+                                                    <span className="text-xs text-app-text-muted italic">Repassado</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-app-text-muted">
+                                            Nenhum repasse registrado na planilha de honorários.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )
+            }
+
+            {/* Transaction Modal */}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title=""
+                size="xl"
+            >
+
+                <div className="space-y-5">
+                    {/* Header */}
+                    <div className="mb-2">
+                        <h2 className="text-xl font-bold text-app-text-main">Nova Movimentação Financeira</h2>
+                        <p className="text-xs text-app-text-muted mt-1">Preencha os dados da transação para registro no fluxo de caixa.</p>
+                    </div>
+
+                    {/* Transaction Type Toggle */}
+                    <div>
+                        <p className="text-xs font-medium text-app-text-muted mb-2">Tipo de Transação</p>
+                        <div className="flex gap-3">
+                            <button
+                                className={clsx(
+                                    "flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
+                                    newTransaction.type === 'INCOME'
+                                        ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                        : "bg-app-bg/50 text-app-text-muted border border-app-stroke hover:border-primary/50"
+                                )}
+                                onClick={() => setNewTransaction({ ...newTransaction, type: 'INCOME' })}
+                            >
+                                <TrendingUp size={16} />
+                                Receita (Entrada)
+                            </button>
+                            <button
+                                className={clsx(
+                                    "flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
+                                    newTransaction.type === 'EXPENSE'
+                                        ? "bg-red-500/10 text-red-400 border-2 border-red-500"
+                                        : "bg-app-bg/50 text-app-text-muted border border-app-stroke hover:border-red-500/50"
+                                )}
+                                onClick={() => setNewTransaction({ ...newTransaction, type: 'EXPENSE' })}
+                            >
+                                <TrendingDown size={16} />
+                                Despesa (Saída)
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <label className="block text-xs font-medium text-app-text-muted mb-1">
+                            DESCRIÇÃO DA TRANSAÇÃO <span className="text-red-400">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={newTransaction.description}
+                            onChange={e => setNewTransaction({ ...newTransaction, description: e.target.value })}
+                            className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors placeholder:text-app-text-muted/50"
+                            placeholder="Ex: Pagamento de Honorários..."
+                        />
+                    </div>
+
+                    {/* Value and Date */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">
+                                VALOR (R$) <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={newTransaction.amount}
+                                onChange={e => setNewTransaction({ ...newTransaction, amount: e.target.value })}
+                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="R$ 0.00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">
+                                DATA DE VENCIMENTO <span className="text-red-400">*</span>
+                            </label>
+                            <input
+                                type="date"
+                                value={newTransaction.date}
+                                onChange={e => setNewTransaction({ ...newTransaction, date: e.target.value })}
+                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Classification & Links Section */}
+                    <div className="bg-app-bg/30 border border-app-stroke rounded-xl p-4">
+                        <h3 className="text-sm font-semibold text-app-text-main mb-3 flex items-center gap-2">
+                            <div className="w-2 h-2 bg-primary rounded-full" />
+                            Classificação & Vínculos
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Categoria</label>
+                                <select
+                                    value={newTransaction.category}
+                                    onChange={e => setNewTransaction({ ...newTransaction, category: e.target.value })}
+                                    className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                >
+                                    <option value="">Selecione uma categoria...</option>
+                                    {(newTransaction.type === 'INCOME' ? INCOME_CATEGORIES : EXPENSE_CATEGORY_LIST).map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Vincular a (Opcional)</label>
+                                <select
+                                    value={newTransaction.linkTo}
+                                    onChange={e => setNewTransaction({ ...newTransaction, linkTo: e.target.value })}
+                                    className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                >
+                                    <option value="">Selecione...</option>
+                                    {processes.length > 0 && (
+                                        <optgroup label="📋 Processos Ativos">
+                                            {processes.filter(p => p.status !== 'ARQUIVADO' && p.status !== 'ENCERRADO').map(process => (
+                                                <option key={`process-${process.id}`} value={`process:${process.id}`}>
+                                                    {process.number} - {process.title}
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    )}
+                                    {clients.length > 0 && (
+                                        <optgroup label="👤 Clientes">
+                                            {clients.map(client => (
+                                                <option key={`client-${client.id}`} value={`client:${client.id}`}>
+                                                    {client.name}
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Posição dinâmica: Repasse para Parceiros SÓ se for RECEITA */}
+                        {newTransaction.type === 'INCOME' && (
+                            <div className="mt-4 pt-4 border-t border-app-stroke border-dashed grid grid-cols-1 sm:grid-cols-12 gap-4">
+                                <div className="sm:col-span-8">
+                                    <label className="block text-[10px] font-medium text-app-text-muted flex items-center gap-1 mb-1 uppercase">
+                                        <Users size={12} className="text-primary" /> Advogado Parceiro / Indicador (Repasse)
+                                    </label>
+                                    <select
+                                        value={newTransaction.partnerId || ''}
+                                        onChange={e => {
+                                            const partnerId = e.target.value;
+                                            const partner = partners.find(p => p.id === partnerId);
+                                            setNewTransaction({
+                                                ...newTransaction,
+                                                partnerId,
+                                                partnerPercentage: partner ? (partner.percentage || 0) : 0
+                                            });
+                                        }}
+                                        className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors text-primary font-medium"
+                                    >
+                                        <option value="">Nenhum repasse</option>
+                                        {partners.map(partner => (
+                                            <option key={`partner-${partner.id}`} value={partner.id}>
+                                                {partner.name} ({partner.type})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {newTransaction.partnerId && (
+                                    <div className="sm:col-span-4">
+                                        <label className="block text-[10px] whitespace-nowrap font-medium text-app-text-muted mb-1 uppercase">
+                                            Porcentagem do Repasse
+                                        </label>
+                                        <div className="flex relative items-center">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="100"
+                                                step="0.01"
+                                                value={newTransaction.partnerPercentage || ''}
+                                                onChange={e => setNewTransaction({ ...newTransaction, partnerPercentage: parseFloat(e.target.value) || 0 })}
+                                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg pl-4 pr-10 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors font-mono"
+                                                placeholder="Ex: 30"
+                                            />
+                                            <span className="absolute right-4 text-app-text-muted select-none pointer-events-none">%</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Status and Recurrence Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        {/* Payment Status */}
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-2 uppercase">Status do Pagamento</label>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setNewTransaction({ ...newTransaction, status: 'PENDING' })}
+                                    className={clsx(
+                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                                        newTransaction.status === 'PENDING'
+                                            ? "bg-app-bg border-2 border-app-text-main text-app-text-main"
+                                            : "bg-app-bg/50 border border-app-stroke text-app-text-muted hover:border-app-text-main"
+                                    )}
+                                >
+                                    <div className={clsx(
+                                        "w-4 h-4 rounded-full border-2 flex items-center justify-center",
+                                        newTransaction.status === 'PENDING' ? "border-app-text-main" : "border-app-text-muted"
+                                    )}>
+                                        {newTransaction.status === 'PENDING' && <div className="w-2 h-2 rounded-full bg-app-text-main" />}
+                                    </div>
+                                    Pendente
+                                </button>
+                                <button
+                                    onClick={() => setNewTransaction({ ...newTransaction, status: 'PAID' })}
+                                    className={clsx(
+                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                                        newTransaction.status === 'PAID'
+                                            ? "bg-app-bg border-2 border-app-text-main text-app-text-main"
+                                            : "bg-app-bg/50 border border-app-stroke text-app-text-muted hover:border-app-text-main"
+                                    )}
+                                >
+                                    <div className={clsx(
+                                        "w-4 h-4 rounded-full border-2 flex items-center justify-center",
+                                        newTransaction.status === 'PAID' ? "border-app-text-main" : "border-app-text-muted"
+                                    )}>
+                                        {newTransaction.status === 'PAID' && <div className="w-2 h-2 rounded-full bg-app-text-main" />}
+                                    </div>
+                                    Pago
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Recurrence */}
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-2 uppercase">Recorrência</label>
+                            <div className="flex gap-1 flex-wrap">
+                                {(['UNICA', 'MENSAL', 'ANUAL', 'PERSONALIZADO'] as const).map((rec) => (
+                                    <button
+                                        key={rec}
+                                        onClick={() => setNewTransaction({ ...newTransaction, recurrence: rec, installments: rec === 'UNICA' ? 1 : newTransaction.installments })}
+                                        className={clsx(
+                                            "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+                                            newTransaction.recurrence === rec
+                                                ? "bg-app-bg border border-app-text-main text-app-text-main"
+                                                : "bg-app-bg/50 border border-app-stroke text-app-text-muted hover:border-app-text-main"
+                                        )}
+                                    >
+                                        {rec === 'UNICA' ? 'Única' : rec === 'MENSAL' ? 'Mensal' : rec === 'ANUAL' ? 'Anual' : 'Personalizado'}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Installments input - only show when recurrence is not UNICA */}
+                            {newTransaction.recurrence !== 'UNICA' && (
+                                <div className="mt-3 flex items-center gap-3">
+                                    <label className="text-xs text-app-text-muted">Quantidade de Parcelas:</label>
+                                    <input
+                                        type="number"
+                                        min="2"
+                                        max="60"
+                                        value={newTransaction.installments}
+                                        onChange={e => setNewTransaction({ ...newTransaction, installments: parseInt(e.target.value) || 2 })}
+                                        className="w-20 bg-app-bg/50 border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors text-center"
+                                    />
+                                    <span className="text-xs text-app-text-muted">
+                                        (Serão criadas {newTransaction.installments} parcelas: 1/{newTransaction.installments}, 2/{newTransaction.installments}...)
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Attach and Urgent Row */}
+                    <div className="flex items-center justify-between">
+                        <button className="flex items-center gap-2 text-primary text-sm font-medium hover:underline">
+                            <Paperclip size={14} />
+                            Anexar Comprovante / Nota Fiscal
+                        </button>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={newTransaction.urgent}
+                                onChange={e => setNewTransaction({ ...newTransaction, urgent: e.target.checked })}
+                                className="w-4 h-4 rounded border-app-stroke text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm text-app-text-muted">Marcar como Urgente</span>
+                        </label>
+                    </div>
+
+                    {/* Notes */}
+                    <div>
+                        <label className="block text-xs font-medium text-app-text-muted mb-1 uppercase">Notas Adicionais</label>
+                        <textarea
+                            value={newTransaction.notes}
+                            onChange={e => setNewTransaction({ ...newTransaction, notes: e.target.value })}
+                            className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors resize-none placeholder:text-app-text-muted/50"
+                            rows={3}
+                            placeholder="Observações internas sobre esta movimentação..."
+                        />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-app-stroke">
+                        <button
+                            onClick={() => setIsModalOpen(false)}
+                            className="order-2 sm:order-1 px-5 py-2.5 bg-app-bg border border-app-stroke rounded-lg text-sm font-medium text-app-text-main hover:bg-app-stroke/50 transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <div className="order-1 sm:order-2 flex flex-col sm:flex-row gap-2">
+                            <button
+                                className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-primary/10 border border-primary text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
+                            >
+                                <Download size={14} />
+                                Gerar Boleto/Fatura
+                            </button>
+                            <button
+                                onClick={handleSaveTransaction}
+                                disabled={isSubmitting}
+                                className={clsx(
+                                    "flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-lg text-sm font-medium transition-colors shadow-lg",
+                                    isSubmitting ? "bg-green-500/50 cursor-not-allowed" : "bg-green-500 hover:bg-green-600 shadow-green-500/20"
+                                )}
+                            >
+                                {isSubmitting ? 'Salvando...' : '✓ Salvar Movimentação'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Partner Modal */}
+            <Modal
+                isOpen={isPartnerModalOpen}
+                onClose={() => setIsPartnerModalOpen(false)}
+                title={editingPartner ? 'Editar Parceiro' : 'Novo Parceiro'}
+            >
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Nome *</label>
+                            <input
+                                type="text"
+                                value={newPartner.name}
+                                onChange={e => setNewPartner({ ...newPartner, name: e.target.value })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="Ex: Adv. Ana Maria"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Iniciais *</label>
+                            <input
+                                type="text"
+                                value={newPartner.initials}
+                                maxLength={2}
+                                onChange={e => setNewPartner({ ...newPartner, initials: e.target.value.toUpperCase() })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="AM"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Tipo *</label>
+                            <select
+                                value={newPartner.type}
+                                onChange={e => setNewPartner({ ...newPartner, type: e.target.value })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                            >
+                                {PARTNER_TYPES.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Cor</label>
+                            <div className="flex gap-1 flex-wrap">
+                                {PARTNER_COLORS.map(color => (
+                                    <button
+                                        key={color}
+                                        onClick={() => setNewPartner({ ...newPartner, color })}
+                                        className={clsx(
+                                            "w-6 h-6 rounded-md transition-all",
+                                            color,
+                                            newPartner.color === color && "ring-2 ring-offset-2 ring-primary"
+                                        )}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="relative group">
+                            <label className="block text-xs font-medium text-app-text-muted mb-1 flex items-center justify-between">
+                                Percentual (%)
+                                <span className={clsx(
+                                    "px-1.5 py-0.5 rounded text-[10px] uppercase font-bold",
+                                    newPartner.percentage ? "bg-primary/20 text-primary" : "bg-app-stroke text-app-text-muted"
+                                )}>
+                                    Repasse Automático
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                value={newPartner.percentage}
+                                onChange={e => setNewPartner({ ...newPartner, percentage: e.target.value, fixedAmount: '' })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="Ex: 30"
+                            />
+                            {newPartner.percentage && (
+                                <p className="text-[10px] text-primary mt-1 leading-tight">
+                                    Cálculo automático ativado. Este parceiro receberá exatamente {newPartner.percentage}% de repasse de todas as receitas.
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Ou Valor Fixo (R$)</label>
+                            <input
+                                type="number"
+                                value={newPartner.fixedAmount}
+                                onChange={e => setNewPartner({ ...newPartner, fixedAmount: e.target.value, percentage: '' })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="Ex: 1500"
+                            />
+                            {newPartner.fixedAmount && (
+                                <p className="text-[10px] text-app-text-muted mt-1 leading-tight">
+                                    Valores fixos não ativam cálculo automático no cadastro de receitas.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Email</label>
+                            <input
+                                type="email"
+                                value={newPartner.email}
+                                onChange={e => setNewPartner({ ...newPartner, email: e.target.value })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="email@exemplo.com"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-app-text-muted mb-1">Telefone</label>
+                            <input
+                                type="tel"
+                                value={newPartner.phone}
+                                onChange={e => setNewPartner({ ...newPartner, phone: e.target.value })}
+                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="(11) 99999-9999"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-app-text-muted mb-1">Observações</label>
+                        <textarea
+                            value={newPartner.notes}
+                            onChange={e => setNewPartner({ ...newPartner, notes: e.target.value })}
+                            className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                            rows={2}
+                            placeholder="Notas sobre a parceria..."
+                        />
+                    </div>
+
+                    <div className="flex justify-between items-center mt-4">
+                        {editingPartner && (
+                            <Protect roles={['ADMIN', 'LAWYER']}>
+                                <button
+                                    onClick={() => {
+                                        handleDeletePartner(editingPartner.id);
+                                        setIsPartnerModalOpen(false);
+                                    }}
+                                    className="px-4 py-2 text-sm text-red-500 hover:text-red-600 transition-colors"
+                                >
+                                    Desativar Parceiro
+                                </button>
+                            </Protect>
+                        )}
+                        <div className="flex gap-2 ml-auto">
+                            <button
+                                onClick={() => setIsPartnerModalOpen(false)}
+                                className="px-4 py-2 text-sm text-app-text-muted hover:text-app-text-main transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSavePartner}
+                                disabled={isSubmitting}
+                                className={clsx(
+                                    "px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors",
+                                    isSubmitting ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary-dark"
+                                )}
+                            >
+                                {isSubmitting ? 'Salvando...' : 'Salvar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                isOpen={!!deleteConfirm}
+                onClose={() => setDeleteConfirm(null)}
+                title="Excluir Transação"
+            >
+                <div>
+                    <p className="text-app-text-muted mb-6">Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.</p>
+                    <div className="flex justify-end gap-2">
+                        <button
+                            onClick={() => setDeleteConfirm(null)}
+                            className="px-4 py-2 text-sm text-app-text-muted hover:text-app-text-main transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
+                            className="px-4 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors"
+                        >
+                            Excluir
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Reconciliation Modal */}
+            <Modal
+                isOpen={isReconModalOpen}
+                onClose={() => {
+                    setIsReconModalOpen(false);
+                    setBankBalance('');
+                }}
+                title="Reconciliação Bancária"
+            >
+                <div>
+                    <p className="text-app-text-muted mb-6 text-sm">
+                        A reconciliação compara o seu Saldo Atual no sistema com o saldo real no seu banco principal.
+                        Se houver diferença, o sistema criará automaticamente um lançamento de ajuste para você aprovar.
+                    </p>
+
+                    <div className="bg-app-bg border border-app-stroke rounded-xl p-4 mb-6 flex justify-between items-center">
+                        <span className="text-sm text-app-text-muted">Saldo no Sistema:</span>
+                        <span className="text-lg font-bold text-app-text-main">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats?.balance || 0)}
+                        </span>
+                    </div>
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-app-text-main mb-2">Saldo Real no Banco (R$)</label>
+                        <input
+                            type="text"
+                            value={bankBalance}
+                            onChange={(e) => setBankBalance(e.target.value)}
+                            placeholder="Ex: 5.000,00"
+                            className="w-full bg-app-bg border border-app-stroke rounded-xl p-3 text-app-text-main focus:border-primary focus:outline-none transition-colors"
+                        />
+                    </div>
+
+                    <div className="flex justify-end gap-2">
+                        <button
+                            onClick={() => {
+                                setIsReconModalOpen(false);
+                                setBankBalance('');
+                            }}
+                            className="px-4 py-2 text-sm text-app-text-muted hover:text-app-text-main transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={handleReconciliation}
+                            disabled={!bankBalance}
+                            className={clsx(
+                                "px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2",
+                                !bankBalance ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary-dark"
+                            )}
+                        >
+                            <RefreshCw size={16} />
+                            Verificar Diferença
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Note View Modal */}
+            <Modal
+                isOpen={!!activeNoteRecord}
+                onClose={() => setActiveNoteRecord(null)}
+                title="Observações do Lançamento"
+                size="md"
+            >
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3 p-3 bg-app-bg/50 border border-app-stroke rounded-xl">
+                        <div className={clsx(
+                            "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                            activeNoteRecord?.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+                        )}>
+                            {activeNoteRecord?.type === 'INCOME' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-app-text-main">{activeNoteRecord?.description}</p>
+                            <p className="text-xs text-app-text-muted">
+                                {activeNoteRecord?.date && getDateLabel(activeNoteRecord.date)} • {activeNoteRecord?.category}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl relative">
+                        <div className="absolute top-4 right-4 text-primary/20">
+                            <Info size={40} />
+                        </div>
+                        <h4 className="text-xs font-bold text-primary uppercase mb-2">Nota Adicional:</h4>
+                        <p className="text-sm text-app-text-main leading-relaxed whitespace-pre-wrap relative z-10">
+                            {activeNoteRecord?.notes || 'Nenhuma observação detalhada para este lançamento.'}
+                        </p>
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                        <button
+                            onClick={() => setActiveNoteRecord(null)}
+                            className="px-6 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm font-medium text-app-text-main hover:bg-app-stroke/50 transition-colors"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+        </div >
+    );
+}
+
+// Memoized Helper Components
+
+
+const FinancialTableRow = memo(({
+    record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, setActiveNoteRecord
+}: any) => {
+    const isGroup = record._isGroupHeader === true;
+    const isExpanded = isGroup && expandedGroups.has(record.id);
+
+    const getDateLabel = (dateStr: string) => {
+        if (!dateStr || dateStr.length < 10) return 'Data Inválida';
+        const [year, month, day] = dateStr.substring(0, 10).split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dTime = date.getTime();
+        if (dTime === today.getTime()) return 'Hoje';
+        if (dTime === yesterday.getTime()) return 'Ontem';
+        if (dTime === tomorrow.getTime()) return 'Amanhã';
+
+        return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+
+    return (
+        <React.Fragment key={record.id}>
+            <tr className={clsx(
+                "border-b border-app-stroke/30 transition-colors group",
+                isGroup ? "bg-blue-500/5 hover:bg-blue-500/10 cursor-pointer" : "hover:bg-app-bg/50 even:bg-app-bg/20"
+            )} onClick={() => isGroup ? toggleGroup(record.id) : undefined}>
+                <td className="w-1 px-5 py-4">
+                    <div className={clsx(
+                        "w-1 h-8 rounded-full transition-colors",
+                        record.type === 'INCOME' ? "bg-green-500" : "bg-red-500"
+                    )} />
+                </td>
+                <td className="px-5 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                        {isGroup && (
+                            <span className="text-app-text-muted text-xs mr-1 select-none w-3 text-center transition-transform">
+                                {isExpanded ? "▼" : "▶"}
+                            </span>
+                        )}
+                        {isOverdue(record.date, record.status) && !isGroup && (
+                            <AlertTriangle size={14} className="text-red-500" />
+                        )}
+                        {(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) && isGroup && (
+                            <AlertTriangle size={14} className="text-red-500" />
+                        )}
+                        <span className={clsx("text-sm transition-colors", (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "text-red-500 font-medium" : "text-app-text-main group-hover:text-primary")}>
+                            {getDateLabel(record.date)}
+                        </span>
+                    </div>
+                </td>
+                <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                        {!isGroup && (
+                            <div className={clsx(
+                                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
+                                record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+                            )}>
+                                {record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                            </div>
+                        )}
+                        <div>
+                            <p className="text-sm font-semibold text-app-text-main flex items-center gap-2 flex-wrap">
+                        {record.description}
+                        {isGroup && (
+                            <span className="px-2 py-0.5 text-[10px] bg-blue-500/10 text-blue-400 rounded-full font-medium shrink-0 flex items-center gap-1">
+                                <Repeat size={10} />
+                                {record._children.length} parcelas
+                            </span>
+                        )}
+                        {record.paymentMethod && <span className="text-[10px] px-2 py-0.5 rounded-full bg-app-stroke/50 text-app-text-muted shrink-0 flex items-center gap-1.5 border border-app-stroke" title="Método de Pagamento"><DollarSign size={10} /> {record.paymentMethod}</span>}
+                        {!isGroup && record.isUrgent && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500/20 text-red-500 rounded-full shrink-0 animate-pulse">URGENTE</span>}
+                    </p>
+                    {record.client && <p className="text-xs text-app-text-muted mt-0.5 max-w-[200px] truncate">Cli: {record.client.name}</p>}
+                        </div>
+                    </div>
+                </td>
+                <td className="px-5 py-4 whitespace-nowrap"><span className="px-2.5 py-1 bg-app-bg/50 border border-app-stroke rounded-lg text-xs font-medium text-app-text-muted">{record.category}</span></td>
+                <td className="px-5 py-3 whitespace-nowrap text-center">
+                    {isGroup ? (
+                        <span className="text-xs font-medium bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/20 shadow-sm flex items-center gap-1 justify-center w-fit mx-auto">
+                            {record._paidCount}/{record._children.length} Pagos
+                        </span>
+                    ) : (record.isRecurring && record.totalInstallments && record.totalInstallments > 1) ? (
+                        <span className="text-xs font-medium bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-lg border border-blue-500/20 flex items-center gap-1 justify-center w-fit mx-auto">
+                            <Repeat size={12} />
+                            P. {record.currentInstallment || 1}/{record.totalInstallments}
+                        </span>
+                    ) : (
+                        <span className="text-xs text-app-text-muted">-</span>
+                    )}
+                </td>
+                <td className="px-5 py-4 text-center">
+                    {record.notes && !isGroup ? (
+                        <button onClick={(e) => { e.stopPropagation(); setActiveNoteRecord(record); }} className="p-1.5 text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors tooltip relative inline-flex" title="Anotação presente">
+                            <MessageSquare size={14} />
+                        </button>
+                    ) : (
+                        <span className="text-app-text-muted/30">-</span>
+                    )}
+                </td>
+                <td className="px-5 py-4 whitespace-nowrap">
+                    <span className={clsx(
+                        "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit shadow-sm",
+                        record.status === 'PAID'
+                            ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                            : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status))
+                                ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                                : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                    )}>
+                        {record.status === 'PAID' ? <CheckCircle2 size={12} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={12} /> : <Hourglass size={12} />}
+                        {record.status === 'PAID' ? 'Pago' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
+                    </span>
+                </td>
+                <td className="px-5 py-4 text-right whitespace-nowrap">
+                    <span className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-green-500" : "text-red-500")}>
+                        {record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}
+                    </span>
+                </td>
+                <td className="px-5 py-4 text-right whitespace-nowrap">
+                    {!isGroup && (
+                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {record.status === 'PENDING' && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
+                                    className={clsx(
+                                        "px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors shadow-sm",
+                                        record.type === 'INCOME'
+                                            ? "bg-green-500/10 text-green-500 hover:bg-green-500/20 border border-green-500/20"
+                                            : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                                    )}
+                                >
+                                    {record.type === 'INCOME' ? 'Receber' : 'Pagar'}
+                                </button>
+                            )}
+                            {record.status === 'PAID' && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
+                                    className="px-2 py-1.5 text-xs font-medium text-app-text-muted hover:text-white bg-app-bg hover:bg-app-stroke rounded-lg transition-colors border border-app-stroke"
+                                >
+                                    Editar
+                                </button>
+                            )}
+                            {deleteConfirm === record.id ? (
+                                <div className="flex items-center gap-1">
+                                    <button onClick={() => handleDelete(record.id)} className="px-2 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600">Sim</button>
+                                    <button onClick={() => setDeleteConfirm(null)} className="px-2 py-1.5 bg-app-stroke text-app-text-muted text-xs font-medium rounded-lg hover:bg-app-stroke/80">Não</button>
+                                </div>
+                            ) : (
+                                <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(record.id); }} className="p-1.5 text-app-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
+                                    <Trash2 size={16} />
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </td>
+            </tr>
+            {/* Expanded Children Rows */}
+            {isGroup && isExpanded && record._children.map((child: any) => (
+                <tr key={child.id} className="border-b border-app-stroke/30 bg-app-bg/50 hover:bg-app-bg transition-colors">
+                    <td className="w-1 px-5 py-3 border-l-4 border-l-blue-500/30"></td>
+                    <td className="px-5 py-4 whitespace-nowrap"><div className="flex items-center gap-2 pl-4">{isOverdue(child.date, child.status) && <AlertTriangle size={12} className="text-red-500" />}<span className={clsx("text-xs", isOverdue(child.date, child.status) ? "text-red-500 font-medium" : "text-app-text-muted")}>{getDateLabel(child.date)}</span></div></td>
+                    <td className="px-5 py-4"><p className="text-xs text-app-text-muted flex items-center gap-2">Parcela {child.currentInstallment || '?'}</p></td>
+                    <td className="px-5 py-4"><span className="text-xs text-app-text-muted/50">-</span></td>
+                    <td className="px-5 py-4 text-center"><span className="text-[10px] font-medium bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">P. {child.currentInstallment || '?'}/{child.totalInstallments}</span></td>
+                    <td className="px-5 py-4 text-center"><span className="text-app-text-muted/30">-</span></td>
+                    <td className="px-5 py-4 whitespace-nowrap"><span className={clsx("px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 w-fit", child.status === 'PAID' ? "bg-green-500/10 text-green-500" : isOverdue(child.date, child.status) ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500")}>{child.status === 'PAID' ? <CheckCircle2 size={10} /> : isOverdue(child.date, child.status) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}{child.status === 'PAID' ? 'Pago' : isOverdue(child.date, child.status) ? 'Atraso' : 'Pendente'}</span></td>
+                    <td className="px-5 py-4 text-right whitespace-nowrap"><span className={clsx("text-xs", child.type === 'INCOME' ? "text-green-500/70" : "text-red-500/70")}>{child.type === 'INCOME' ? '+' : '-'}{formatBRL(child.amount)}</span></td>
+                    <td className="px-5 py-4 text-right whitespace-nowrap"><div className="flex items-center justify-end gap-1">{child.status === 'PENDING' && <button onClick={() => handleEdit(child)} className={clsx("px-2 py-0.5 text-[10px] font-medium rounded", child.type === 'INCOME' ? "bg-green-500/10 text-green-400" : "bg-primary/10 text-primary")}>{child.type === 'INCOME' ? 'Receber' : 'Pagar'}</button>}{deleteConfirm === child.id ? (<div className="flex items-center gap-1"><button onClick={() => handleDelete(child.id)} className="px-2 py-0.5 bg-red-500 text-white text-[10px] rounded">Sim</button><button onClick={() => setDeleteConfirm(null)} className="px-2 py-0.5 bg-app-stroke text-app-text-muted text-[10px] rounded">Não</button></div>) : (<button onClick={() => setDeleteConfirm(child.id)} className="p-1 text-app-text-muted hover:text-red-500 rounded transition-colors"><Trash2 size={13} /></button>)}</div></td>
+                </tr>
+            ))}
+        </React.Fragment>
+    );
+});
+
+const FinancialMobileRow = memo(({
+    record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, getDateLabel, setActiveNoteRecord
+}: any) => {
+    const isGroup = record._isGroupHeader === true;
+    const isExpanded = isGroup && expandedGroups.has(record.id);
+
+    return (
+        <React.Fragment key={record.id}>
+            <div className={clsx("p-4 transition-colors touch-manipulation", isGroup ? "bg-blue-500/5 active:bg-blue-500/10 border-l-2 border-l-blue-500/40" : "hover:bg-app-stroke/10 active:bg-app-stroke/20")} onClick={() => isGroup ? toggleGroup(record.id) : undefined}>
+                <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2 mt-0.5 shrink-0">
+                        {isGroup && <span className="text-app-text-muted text-sm select-none">{isExpanded ? "▼" : "▶"}</span>}
+                        <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center", record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500")}>{record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}</div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-semibold text-app-text-main truncate">{record.description}{isGroup && <span className="text-xs text-app-text-muted ml-1 flex items-center gap-0.5 inline-flex"><Repeat size={10} /> ({record._children.length} parc)</span>}</p>
+                            {record.notes && !isGroup && <button onClick={(e) => { e.stopPropagation(); setActiveNoteRecord(record); }} className="p-1 text-primary bg-primary/10 rounded-full shrink-0"><MessageSquare size={12} /></button>}
+                            {isGroup && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-500/10 text-blue-400 rounded-full shrink-0">{record._paidCount}/{record._children.length}</span>}
+                            {record.isUrgent && !isGroup && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500/20 text-red-400 rounded-full shrink-0">URGENTE</span>}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-app-text-muted">
+                            <span className={(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "text-red-500 font-medium" : ""}>{(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) && "⚠ "}{getDateLabel(record.date)}</span>
+                            <span>•</span><span>{record.category}</span>
+                            {!isGroup && record.isRecurring && record.totalInstallments && record.totalInstallments > 1 && <><span>•</span><span className="text-blue-400">{record.currentInstallment || 1}/{record.totalInstallments}</span></>}
+                        </div>
+                        {record.client && <p className="text-xs text-app-text-muted mt-1">Cliente: {record.client.name}</p>}
+                    </div>
+                    <div className="text-right shrink-0">
+                        <p className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-green-500" : "text-red-500")}>{record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}</p>
+                        <span className={clsx("inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full", record.status === 'PAID' ? "bg-green-500/10 text-green-500" : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500")}>
+                            {record.status === 'PAID' ? <CheckCircle2 size={10} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}
+                            {record.status === 'PAID' ? 'Pago' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
+                        </span>
+                    </div>
+                </div>
+                {!isGroup && record.status === 'PENDING' && (
+                    <div className="flex gap-2 mt-2 pt-2 border-t border-app-stroke/50">
+                        <button onClick={(e) => { e.stopPropagation(); handleEdit(record); }} className={clsx("flex-1 py-2 text-xs font-medium rounded-lg transition-colors text-center", record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-primary/10 text-primary")}>{record.type === 'INCOME' ? 'Marcar Recebido' : 'Marcar Pago'}</button>
+                        {deleteConfirm === record.id ? (<div className="flex gap-1"><button onClick={() => handleDelete(record.id)} className="px-3 py-2 bg-red-500 text-white text-xs font-medium rounded-lg">Confirmar</button><button onClick={() => setDeleteConfirm(null)} className="px-3 py-2 bg-app-stroke text-app-text-muted text-xs font-medium rounded-lg">Não</button></div>) : (<button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(record.id); }} className="p-2 text-app-text-muted hover:text-red-500 rounded-lg transition-colors" title="Apagar"><Trash2 size={16} /></button>)}
+                    </div>
+                )}
+                {!isGroup && record.status !== 'PENDING' && (
+                    <div className="flex gap-2 mt-2 pt-2 border-t border-app-stroke/50">
+                        {deleteConfirm === record.id ? (<div className="flex gap-1"><button onClick={() => handleDelete(record.id)} className="px-3 py-2 bg-red-500 text-white text-xs font-medium rounded-lg">Confirmar</button><button onClick={() => setDeleteConfirm(null)} className="px-3 py-2 bg-app-stroke text-app-text-muted text-xs font-medium rounded-lg">Cancelar</button></div>) : (<button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(record.id); }} className="p-2 text-app-text-muted hover:text-red-500 rounded-lg transition-colors flex items-center gap-1.5 text-xs" title="Apagar"><Trash2 size={14} /> Apagar</button>)}
+                    </div>
+                )}
+            </div>
+            {isGroup && isExpanded && (
+                <div className="bg-app-bg/50 px-3 py-2 border-t border-app-stroke/30">
+                    <div className="pl-4 border-l-2 border-blue-500/30 space-y-2 py-1">
+                        {record._children.map((child: any) => (
+                            <div key={child.id} className="flex justify-between items-center py-1.5">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-px bg-blue-500/30 inline-block" />
+                                    {isOverdue(child.date, child.status) && <AlertTriangle size={10} className="text-red-500" />}
+                                    <span className={clsx("text-xs", isOverdue(child.date, child.status) ? "text-red-500 font-medium" : "text-app-text-muted")}>{getDateLabel(child.date)}</span>
+                                    <span className="text-[10px] text-app-text-muted">P. {child.currentInstallment || '?'}/{child.totalInstallments}</span>
+                                    <span className={clsx("px-1.5 py-0.5 text-[9px] font-medium rounded-full flex items-center gap-1", child.status === 'PAID' ? "bg-green-500/10 text-green-500" : isOverdue(child.date, child.status) ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500")}>
+                                        {child.status === 'PAID' ? <CheckCircle2 size={10} /> : isOverdue(child.date, child.status) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}
+                                        {child.status === 'PAID' ? 'Pago' : isOverdue(child.date, child.status) ? 'Atrasado' : 'Pend'}
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className={clsx("text-xs font-semibold", child.type === 'INCOME' ? "text-green-500/80" : "text-red-500/80")}>{child.type === 'INCOME' ? '+' : '-'}{formatBRL(child.amount)}</span>
+                                    {child.status === 'PENDING' && <button onClick={(e) => { e.stopPropagation(); handleEdit(child); }} className={clsx("px-2 py-0.5 text-[10px] font-medium rounded", child.type === 'INCOME' ? "bg-green-500/10 text-green-400" : "bg-primary/10 text-primary")}>{child.type === 'INCOME' ? 'Receber' : 'Pagar'}</button>}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </React.Fragment>
+    );
+});

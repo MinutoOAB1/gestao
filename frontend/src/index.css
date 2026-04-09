@@ -1,0 +1,895 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark theme (default) - Refined "LegalDesk" Palette */
+:root {
+  --app-bg: #090E17;
+  /* Deeper, more formal dark background (Midnight) */
+  --app-card: #131B2B;
+  /* Oxford Blue tint for cards */
+  --app-input: #1C263A;
+  /* Input background */
+  --app-stroke: #2A364E;
+  /* Border/Divider color */
+  --app-text-main: #F8FAFC;
+  /* Crisp white for better contrast */
+  --app-text-muted: #94A3B8;
+  /* Slate-400 */
+  --app-text-label: #64748B;
+  /* Slate-500 */
+}
+
+/* Light theme - Improved contrast "Document" style */
+:root.light {
+  --app-bg: #F4F7FA;
+  /* Very subtle cool gray (Paper feeling) */
+  --app-card: #FFFFFF;
+  /* Pure white cards */
+  --app-input: #FFFFFF;
+  /* Inputs same as card but with distinct border */
+  --app-stroke: #D1D5DB;
+  /* Gray-300 borders */
+  --app-text-main: #111827;
+  /* Near-black for crisp readability */
+  --app-text-muted: #4B5563;
+  /* Gray-600 */
+  --app-text-label: #6B7280;
+  /* Gray-500 */
+}
+
+@layer base {
+  body {
+    @apply bg-app-bg text-app-text-main font-body antialiased selection:bg-primary selection:text-white text-[15px] leading-relaxed;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    --shadow-lg: 0 4px 6px rgba(0,0,0,0.05), 0 10px 24px rgba(0,0,0,0.08);
+    --shadow-xl: 0 8px 30px rgba(0,0,0,0.12);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans font-bold tracking-tight;
+    color: var(--app-text-main);
+  }
+
+  input,
+  select,
+  textarea {
+    @apply bg-app-input border-app-stroke placeholder-app-text-label rounded-xl;
+    color: var(--app-text-main);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  button {
+    @apply font-sans font-medium tracking-wide transition-all duration-200;
+  }
+}
+
+/* Custom kanban scrollbar */
+.kanban-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-track {
+  background: var(--app-bg);
+  border-radius: 4px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3b82f6; /* Blue 500 */
+  border-radius: 4px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #2563eb; /* Blue 600 */
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5); /* Slate 800 */
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3b82f6;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--app-bg);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--app-stroke);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--app-text-label);
+}
+
+/* Hide scrollbar but allow scroll */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Light mode specific overrides */
+
+.light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .hover\:bg-white\/5:hover {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.light .hover\:bg-white\/10:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .border-white\/10 {
+  border-color: var(--app-stroke) !important;
+}
+
+/* Light mode blue color fixes */
+.light .text-blue-400,
+.light .text-blue-500 {
+  color: #1D4ED8 !important;
+  /* Darker blue for better contrast */
+}
+
+.light .bg-blue-500\/10 {
+  background-color: rgba(29, 78, 216, 0.12) !important;
+}
+
+/* Light mode shadow adjustments - stronger shadows for depth */
+.light .shadow-2xl {
+  --tw-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
+}
+
+.light .shadow-lg {
+  --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.light .shadow-sm {
+  --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Light mode primary button text should stay white */
+.light .bg-primary,
+.light .bg-primary-dark {
+  color: white !important;
+}
+
+/* Light mode gray backgrounds - more visible */
+.light .bg-gray-100 {
+  background-color: #E2E8F0 !important;
+}
+
+.light .bg-gray-50 {
+  background-color: #F1F5F9 !important;
+}
+
+/* Light mode card and input improvements */
+.light .bg-app-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.light .bg-app-input {
+  border: 1px solid #CBD5E1;
+}
+
+/* Light mode chat improvements */
+.light .bg-gray-200 {
+  background-color: #CBD5E1 !important;
+}
+
+/* Light mode text contrast fixes */
+.light .text-gray-400 {
+  color: #64748B !important;
+}
+
+.light .text-gray-500 {
+  color: #475569 !important;
+}
+
+/* Light mode card borders */
+.light .border-app-stroke {
+  border-color: #E2E8F0;
+}
+
+/* Elegant curved corner for sidebar-topbar connection */
+.sidebar-curved-corner {
+  position: relative;
+}
+
+.sidebar-curved-corner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -24px;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border-top-left-radius: 0;
+  box-shadow: -12px -12px 0 0 var(--app-card);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Dark mode curved corner */
+.dark .sidebar-curved-corner::after,
+:root:not(.light) .sidebar-curved-corner::after {
+  box-shadow: -12px -12px 0 0 var(--app-card);
+}
+
+/* Light mode curved corner */
+.light .sidebar-curved-corner::after {
+  box-shadow: -12px -12px 0 0 var(--app-card);
+}
+
+/* Curved content area - creates the smooth transition */
+.content-curved-top {
+  position: relative;
+  border-top-left-radius: 24px;
+  margin-left: -1px;
+  overflow: hidden;
+}
+
+/* Alternative elegant curved transition using clip-path */
+.curved-header-transition {
+  position: relative;
+}
+
+.curved-header-transition::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle at 0 100%, transparent 32px, var(--app-bg) 0);
+  z-index: 5;
+}
+
+/* Smooth shadow for curved effect */
+.sidebar-shadow-curved {
+  box-shadow:
+    4px 0 6px -1px rgba(0, 0, 0, 0.1),
+    8px 0 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.light .sidebar-shadow-curved {
+  box-shadow:
+    4px 0 6px -1px rgba(0, 0, 0, 0.05),
+    8px 0 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================
+   PERFORMANCE & ANIMATION OPTIMIZATIONS
+   ========================================== */
+
+/* Smooth scroll for the entire app */
+html {
+  scroll-behavior: smooth;
+}
+
+/* GPU acceleration for animated elements */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Will-change hints for frequently animated elements */
+.will-animate {
+  will-change: transform, opacity;
+}
+
+.will-animate-transform {
+  will-change: transform;
+}
+
+/* Optimized transitions - faster and smoother */
+.transition-fast {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-medium {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Touch-friendly utilities */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+/* Prevent text selection on interactive elements */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Tap highlight removal for iOS */
+.no-tap-highlight {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Contain utilities - reduce layout recalculations */
+.contain-layout {
+  contain: layout;
+}
+
+.contain-content {
+  contain: content;
+}
+
+.contain-paint {
+  contain: paint;
+}
+
+/* Content-visibility: auto - skip rendering off-screen sections */
+.auto-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
+
+/* Stable viewport height for mobile (handles address bar) */
+.h-screen-stable {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.min-h-screen-stable {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Fluid typography */
+.text-fluid-xs {
+  font-size: clamp(0.65rem, 0.6rem + 0.25vw, 0.75rem);
+}
+
+.text-fluid-sm {
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+}
+
+.text-fluid-base {
+  font-size: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+}
+
+.text-fluid-lg {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+}
+
+.text-fluid-xl {
+  font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+}
+
+.text-fluid-2xl {
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+}
+
+/* Safe area padding for notched devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Mobile-first responsive card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile table to cards helper */
+@media (max-width: 767px) {
+  .mobile-card-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .desktop-table {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-card-layout {
+    display: none !important;
+  }
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Staggered animation delay utilities */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+
+/* ==========================================
+   SKELETON SHIMMER ANIMATION
+   ========================================== */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08) 40%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0.08) 60%,
+      transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+.light .skeleton-shimmer::after {
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 0, 0, 0.04) 40%,
+      rgba(0, 0, 0, 0.08) 50%,
+      rgba(0, 0, 0, 0.04) 60%,
+      transparent);
+}
+
+/* ==========================================
+   SMOOTH THEME TRANSITION (WAVE EFFECT)
+   ========================================== */
+
+/* View Transitions API - Wave theme transition */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* Disable instant theme flash during transition */
+.theme-transitioning * {
+  transition: none !important;
+}
+
+/* Fallback overlay styles */
+.theme-wave-overlay {
+  will-change: clip-path;
+}
+
+/* Prevent transition on page load */
+.preload-transitions,
+.preload-transitions * {
+  transition: none !important;
+}
+
+/* Theme toggle animation helper */
+@keyframes themeFlash {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.95;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.theme-flash {
+  animation: themeFlash 0.3s ease-out;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==========================================
+   MOBILE RESPONSIVENESS UTILITIES
+   ========================================== */
+
+/* Better mobile padding */
+@media (max-width: 640px) {
+  .mobile-compact-padding {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .mobile-compact-gap {
+    gap: 0.75rem !important;
+  }
+
+  /* Compact mobile cards */
+  .mobile-card {
+    padding: 1rem !important;
+  }
+
+  /* Mobile button sizing */
+  .mobile-btn-sm {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Mobile text sizing */
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .mobile-text-xs {
+    font-size: 0.75rem !important;
+  }
+
+  /* Hide on mobile */
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* Stack horizontally on mobile */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+
+  /* Full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+}
+
+/* Medium screens */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .tablet-two-cols {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Show only on mobile */
+@media (min-width: 640px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 767px) {
+
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Exception for inline buttons */
+  .inline-btn {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Mobile modal improvements */
+@media (max-width: 640px) {
+  .modal-mobile-full {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 1.5rem 1.5rem 0 0 !important;
+  }
+}
+
+/* Better scrolling on mobile */
+@supports (-webkit-touch-callout: none) {
+
+  /* iOS specific */
+  .ios-scroll-fix {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Prevent layout shift on mobile */
+.mobile-stable-height {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+/* Fullscreen report animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+    margin-left: 0%;
+  }
+
+  50% {
+    width: 60%;
+    margin-left: 20%;
+  }
+
+  100% {
+    width: 0%;
+    margin-left: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s ease-in-out infinite;
+}
+
+/* Glow pulse animation */
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* ==========================================
+   DOCUMENT EDITOR PREMIUM FX
+   ========================================== */
+
+.magic-highlight {
+  position: relative;
+  animation: magicFade 3s ease-out forwards;
+}
+
+@keyframes magicFade {
+  0% {
+    background-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    color: #064e3b;
+  }
+  20% {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+    color: inherit;
+  }
+}
+
+/* Tooltip helper */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Document Editor Overrides */
+.tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Mammoth HTML Preview Normalization */
+.magic-highlight span, .magic-highlight {
+  display: inline;
+}
+
+/* Ensure paper has clean typography from Mammoth */
+.bg-white p {
+  margin-bottom: 1em;
+}
+
+.bg-white h1, .bg-white h2, .bg-white h3 {
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+  color: #000;
+}
+
+/* Custom Kanban Scrollbar */
+.kanban-scrollbar::-webkit-scrollbar {
+  height: 10px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9; /* Tailwind slate-100 */
+  border-radius: 8px;
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-track {
+  background: #1e293b; /* Tailwind slate-800 */
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* Tailwind slate-300 */
+  border-radius: 8px;
+  border: 2px solid #f1f5f9;
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569; /* Tailwind slate-600 */
+  border: 2px solid #1e293b;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* Tailwind slate-400 */
+}
+
+.dark .kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b; /* Tailwind slate-500 */
+}

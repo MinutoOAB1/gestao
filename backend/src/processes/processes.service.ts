@@ -1,0 +1,219 @@
+import { Injectable } from '@nestjs/common';
+import { CreateProcessDto } from './dto/create-process.dto';
+import { UpdateProcessDto } from './dto/update-process.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+
+@Injectable()
+export class ProcessesService {
+  constructor(
+    private prisma: PrismaService,
+    private eventEmitter: EventEmitter2
+  ) { }
+
+  // ─── Process CRUD ────────────────────────────────────────
+
+  async create(createProcessDto: CreateProcessDto, tenantId: string, createdById?: string) {
+    try {
+      const parseDate = (d: any) => {
+        if (!d) return undefined;
+        if (typeof d === 'string' && d.length === 10) {
+          const [year, month, day] = d.split('-').map(Number);
+          return new Date(year, month - 1, day, 12, 0, 0);
+        }
+        const date = new Date(d);
+        if (isNaN(date.getTime())) return undefined;
+        return date;
+      };
+
+      const deadline = parseDate(createProcessDto.deadline);
+      const { deadline: _, ...restDto } = createProcessDto;
+      const process = await this.prisma.process.create({
+        data: {
+          ...restDto,
+          deadline,
+          tenantId,
+          status: createProcessDto.status || 'ACTIVE',
+        },
+      });
+
+      // Emit event for AI analysis and ecosystem harmony
+      this.eventEmitter.emit('process.created', {
+        processId: process.id,
+        tenantId: process.tenantId,
+        title: process.title,
+        description: process.description, // context for AI
+        number: process.number,
+        createdById
+      });
+
+      return process;
+    } catch (error) {
+      console.error('Error creating process:', error);
+      throw error;
+    }
+  }
+
+  findAll(tenantId: string, take = 50, skip = 0) {
+    return this.prisma.process.findMany({
+      where: { tenantId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        client: { select: { id: true, name: true, email: true } },
+        labels: true,
+        checklists: { include: { items: true } },
+        _count: { select: { comments: true } },
+      },
+      take,
+      skip,
+    });
+  }
+
+  findOne(id: string, tenantId: string) {
+    return this.prisma.process.findFirst({
+      where: { id, tenantId },
+      include: {
+        client: { select: { id: true, name: true, email: true } },
+        labels: true,
+        checklists: { include: { items: { orderBy: { order: 'asc' } } } },
+        comments: {
+          include: { user: { select: { id: true, name: true, avatar: true } } },
+          orderBy: { createdAt: 'desc' },
+        },
+        updates: { orderBy: { date: 'desc' }, take: 10 },
+        notes: { orderBy: { createdAt: 'desc' } },
+      },
+    });
+  }
+
+  async update(id: string, updateProcessDto: UpdateProcessDto, tenantId: string) {
+    const data: any = { ...updateProcessDto };
+
+    if (data.deadline) {
+      if (typeof data.deadline === 'string' && data.deadline.length === 10) {
+        const [year, month, day] = data.deadline.split('-').map(Number);
+        data.deadline = new Date(year, month - 1, day, 12, 0, 0);
+      } else {
+        const d = new Date(data.deadline);
+        if (!isNaN(d.getTime())) {
+          d.setHours(12, 0, 0, 0);
+          data.deadline = d;
+        }
+      }
+    }
+
+    const updated = await this.prisma.process.update({
+      where: { id, tenantId },
+      data,
+    });
+
+    // Event Emitter: Emit when a process is marked as won/completed
+    if (data.status === 'GANHO' || data.status === 'COMPLETED' || data.status === 'WON' || data.kanbanColumn === 'Ganho' || data.kanbanColumn === 'Concluído') {
+      this.eventEmitter.emit('process.won', {
+        processId: updated.id,
+        tenantId: updated.tenantId,
+        title: updated.title,
+        value: updated.value || 0,
+        clientId: updated.clientId
+      });
+    }
+
+    return updated;
+  }
+
+  remove(id: string, tenantId: string) {
+    return this.prisma.process.delete({
+      where: { id, tenantId },
+    });
+  }
+
+  // ─── Checklists ──────────────────────────────────────────
+
+  async createChecklist(processId: string, title: string, tenantId: string) {
+    // verify ownership
+    await this.prisma.process.findFirstOrThrow({ where: { id: processId, tenantId } });
+    return this.prisma.processChecklist.create({
+      data: { processId, title },
+      include: { items: true },
+    });
+  }
+
+  async deleteChecklist(checklistId: string) {
+    return this.prisma.processChecklist.delete({ where: { id: checklistId } });
+  }
+
+  async addChecklistItem(checklistId: string, text: string) {
+    const count = await this.prisma.processChecklistItem.count({ where: { checklistId } });
+    return this.prisma.processChecklistItem.create({
+      data: { checklistId, text, order: count },
+    });
+  }
+
+  async updateChecklistItem(itemId: string, data: { text?: string; completed?: boolean }) {
+    return this.prisma.processChecklistItem.update({
+      where: { id: itemId },
+      data,
+    });
+  }
+
+  async deleteChecklistItem(itemId: string) {
+    return this.prisma.processChecklistItem.delete({ where: { id: itemId } });
+  }
+
+  // ─── Labels ──────────────────────────────────────────────
+
+  async getLabels(tenantId: string) {
+    return this.prisma.processLabel.findMany({
+      where: { tenantId },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async createLabel(tenantId: string, name: string, color: string) {
+    return this.prisma.processLabel.create({
+      data: { name, color, tenantId },
+    });
+  }
+
+  async deleteLabel(labelId: string) {
+    return this.prisma.processLabel.delete({ where: { id: labelId } });
+  }
+
+  async addLabelToProcess(processId: string, labelId: string, tenantId: string) {
+    return this.prisma.process.update({
+      where: { id: processId, tenantId },
+      data: { labels: { connect: { id: labelId } } },
+      include: { labels: true },
+    });
+  }
+
+  async removeLabelFromProcess(processId: string, labelId: string, tenantId: string) {
+    return this.prisma.process.update({
+      where: { id: processId, tenantId },
+      data: { labels: { disconnect: { id: labelId } } },
+      include: { labels: true },
+    });
+  }
+
+  // ─── Comments ────────────────────────────────────────────
+
+  async getComments(processId: string) {
+    return this.prisma.processComment.findMany({
+      where: { processId },
+      include: { user: { select: { id: true, name: true, avatar: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async addComment(processId: string, userId: string, content: string) {
+    return this.prisma.processComment.create({
+      data: { processId, userId, content },
+      include: { user: { select: { id: true, name: true, avatar: true } } },
+    });
+  }
+
+  async deleteComment(commentId: string) {
+    return this.prisma.processComment.delete({ where: { id: commentId } });
+  }
+}
+

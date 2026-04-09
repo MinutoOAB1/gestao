@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ea294e14-1ddb-4b45-aa45-b1ea3e200980",
+    "description": "Honorários",
+    "currentInstallment": 1,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:45.075Z"
+  },
+  {
+    "id": "9046d8bd-c27f-4896-98f2-9356281998d3",
+    "description": "Honorários",
+    "currentInstallment": 2,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:45.512Z"
+  },
+  {
+    "id": "79448f1c-8d56-4efc-9798-c5a85f8d3dba",
+    "description": "Honorários",
+    "currentInstallment": 3,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:45.924Z"
+  },
+  {
+    "id": "c680a08a-a6c1-4ec5-ab7b-ffc3add70357",
+    "description": "Honorários",
+    "currentInstallment": 4,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:46.130Z"
+  },
+  {
+    "id": "f073f332-0bee-4420-a2f7-c9127c0fa9b2",
+    "description": "Honorários",
+    "currentInstallment": 5,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:46.336Z"
+  },
+  {
+    "id": "2a5a50b5-5bae-42c3-a347-9f3b53a1d669",
+    "description": "Honorários",
+    "currentInstallment": 1,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:47.764Z"
+  },
+  {
+    "id": "ff890fee-b7f6-4a2c-aa22-83f397877eef",
+    "description": "Honorários",
+    "currentInstallment": 2,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:48.184Z"
+  },
+  {
+    "id": "a4c76404-9fa8-42a3-8a57-460a6672b237",
+    "description": "Honorários",
+    "currentInstallment": 3,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:48.604Z"
+  },
+  {
+    "id": "69ac5187-fca8-4648-81fb-5fddf5a2522a",
+    "description": "Honorários",
+    "currentInstallment": 4,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:48.815Z"
+  },
+  {
+    "id": "35fa4a04-9a10-4065-b63a-0d9997e0c384",
+    "description": "Honorários",
+    "currentInstallment": 5,
+    "amount": 1500,
+    "createdAt": "2026-03-03T03:41:49.027Z"
+  }
+]

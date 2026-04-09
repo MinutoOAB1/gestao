@@ -1,0 +1,653 @@
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { Plus, Users, Calendar, Calculator, AlertTriangle, Gavel, FileText, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { DashboardSkeleton } from '../../components/ui/Skeleton';
+import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
+import TeamPerformanceChart from '../../components/dashboard/TeamPerformanceChart';
+
+import WelcomeOverlay from '../../components/dashboard/WelcomeOverlay';
+
+// Brazilian currency formatter
+const formatBRL = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+};
+
+const formatBRLCompact = (value: number) => {
+    if (value >= 1000) {
+        return `R$ ${(value / 1000).toFixed(1).replace('.', ',')}k`;
+    }
+    return formatBRL(value);
+};
+
+// Sparkline Chart Component (Relaces WaveChart)
+
+
+
+
+const MovingWaveChart = memo(() => {
+    return (
+        <div className="w-full h-full opacity-40 overflow-hidden relative">
+            <svg viewBox="0 0 800 200" className="w-full h-full" preserveAspectRatio="none">
+                <motion.path
+                    d="M 0 100 C 200 80 400 120 600 90 C 700 75 800 110 800 110"
+                    fill="none"
+                    stroke="#3B82F6"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    animate={{
+                        d: [
+                            "M 0 100 C 200 80 400 120 600 90 C 700 75 800 110 800 110",
+                            "M 0 110 C 200 120 400 80 600 110 C 700 125 800 90 800 90",
+                            "M 0 100 C 200 80 400 120 600 90 C 700 75 800 110 800 110"
+                        ]
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                />
+                {/* Subtle fill under the line */}
+                <motion.path
+                    d="M 0 100 C 200 80 400 120 600 90 C 700 75 800 110 800 110 V 200 H 0 Z"
+                    fill="url(#waveGradient)"
+                    animate={{
+                        d: [
+                            "M 0 100 C 200 80 400 120 600 90 C 700 75 800 110 800 110 V 200 H 0 Z",
+                            "M 0 110 C 200 120 400 80 600 110 C 700 125 800 90 800 90 V 200 H 0 Z",
+                            "M 0 100 C 200 80 400 120 600 90 C 700 75 800 110 800 110 V 200 H 0 Z"
+                        ]
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                />
+                <defs>
+                    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+    );
+});
+
+const QuickAction = memo(({ icon: Icon, label, colorClass, onClick }: any) => (
+    <motion.button
+        onClick={onClick}
+        className="flex flex-col items-center gap-1.5 sm:gap-2 group touch-manipulation no-tap-highlight"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.92 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    >
+        <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl ${colorClass} bg-opacity-10 flex items-center justify-center transition-fast group-hover:bg-opacity-25 group-hover:shadow-lg backdrop-blur-sm border border-white/5 will-animate`}>
+            <Icon size={20} className={`sm:w-6 sm:h-6 ${colorClass.replace('bg-', 'text-')} transition-fast group-hover:scale-110`} />
+        </div>
+        <span className="text-[10px] sm:text-xs font-medium text-app-text-muted transition-fast group-hover:text-app-text-main text-center leading-tight">{label}</span>
+    </motion.button>
+));
+
+const DeadlineCard = memo(({ type, title, subtitle, time, color }: any) => (
+    <div
+        className="bg-app-card p-4 rounded-xl border border-app-stroke relative overflow-hidden flex items-center gap-4 cursor-pointer transition-colors hover:border-primary/20"
+        style={{ boxShadow: premiumShadow }}
+    >
+        <div className={`absolute left-0 top-0 bottom-0 w-1 ${color} transition-all duration-300`}></div>
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-opacity-10 ${color.replace('bg-', 'bg-').replace('text-', '')} bg-app-stroke/30 transition-all duration-300`}>
+            {type === 'urgent' && <AlertTriangle size={18} className={color.replace('bg-', 'text-')} />}
+            {type === 'warning' && <Gavel size={18} className={color.replace('bg-', 'text-')} />}
+            {type === 'info' && <FileText size={18} className={color.replace('bg-', 'text-')} />}
+        </div>
+        <div className="flex-1">
+            <div className="flex justify-between items-start">
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${color.replace('bg-', 'text-')}`}>
+                    {type === 'urgent' ? 'Urgente' : type === 'warning' ? 'Amanhã' : '3 Dias'}
+                </span>
+                <span className="text-xs text-app-text-muted">{time}</span>
+            </div>
+            <h4 className="font-semibold text-app-text-main text-sm line-clamp-1 mt-0.5">{title}</h4>
+            <p className="text-xs text-app-text-muted line-clamp-1">{subtitle}</p>
+        </div>
+    </div>
+));
+
+// Snappy animation variants
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.03,
+            delayChildren: 0.01,
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            type: "spring" as const,
+            stiffness: 500,
+            damping: 30,
+        }
+    }
+};
+
+// Subtle premium shadow (replaces intense neon glow)
+const premiumShadow = '0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)';
+
+interface DashboardData {
+    totalIncome: number;
+    totalExpense: number;
+    balance: number;
+    clientsCount: number;
+    processesCount: number;
+    eventsCount: number;
+    recentClients: any[];
+    upcomingEvents: any[];
+}
+
+interface ProductivityStats {
+    upcomingDeadlines: number;
+    newProcesses: number;
+    totalProcesses: number;
+    totalClients: number;
+    activeClients: number;
+    pendingPayments: number;
+    newComments: number;
+    unreadNotifications: number;
+    recentProcessComments?: any[];
+    recentClientNotes?: any[];
+    pendingActions?: {
+        oldProcesses: any[];
+        incompleteClients: any[];
+    };
+    urgentPayments: any[];
+    upcomingHearings: any[];
+    recentUpdates: any[];
+}
+
+export default function DashboardHome() {
+    const navigate = useNavigate();
+    const [data, setData] = useState<DashboardData>({
+        totalIncome: 0,
+        totalExpense: 0,
+        balance: 0,
+        clientsCount: 0,
+        processesCount: 0,
+        eventsCount: 0,
+        recentClients: [],
+        upcomingEvents: []
+    });
+    const [productivity, setProductivity] = useState<ProductivityStats>({
+        upcomingDeadlines: 0,
+        newProcesses: 0,
+        totalProcesses: 0,
+        totalClients: 0,
+        activeClients: 0,
+        pendingPayments: 0,
+        newComments: 0,
+        unreadNotifications: 0,
+        recentProcessComments: [],
+        recentClientNotes: [],
+        pendingActions: { oldProcesses: [], incompleteClients: [] },
+        urgentPayments: [],
+        upcomingHearings: [],
+        recentUpdates: []
+    });
+    const [loading, setLoading] = useState(true);
+    const [isFinanceHidden, setIsFinanceHidden] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(false);
+
+    const fetchDashboardData = useCallback(async () => {
+        try {
+            const [clientsRes, , eventsRes, statsRes] = await Promise.all([
+                api.get('/clients?take=3').catch(() => ({ data: [] })),
+                api.get('/processes?take=1').catch(() => ({ data: [] })),
+                api.get('/agenda').catch(() => ({ data: [] })),
+                api.get('/dashboard/stats').catch(() => ({ data: null }))
+            ]);
+
+            const stats = statsRes.data;
+            if (stats) {
+                setProductivity(stats);
+            }
+
+            const clients = clientsRes.data || [];
+            const events = eventsRes.data || [];
+
+            const now = new Date();
+            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const upcomingEvents = events
+                .filter((e: any) => new Date(e.start) >= now && new Date(e.start) <= nextWeek)
+                .sort((a: any, b: any) => new Date(a.start).getTime() - new Date(b.start).getTime())
+                .slice(0, 3);
+
+            setData({
+                totalIncome: stats?.pendingPayments || 0,
+                totalExpense: 0,
+                balance: (stats?.pendingPayments || 0),
+                clientsCount: stats?.totalClients || clients.length,
+                processesCount: stats?.totalProcesses || 0,
+                eventsCount: events.length,
+                recentClients: clients.slice(0, 3),
+                upcomingEvents
+            });
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [navigate]);
+    useEffect(() => {
+        fetchDashboardData();
+        
+        // Show welcome overlay on every dashboard visit UNLESS opted out
+        const shouldHide = localStorage.getItem('hide_welcome_overlay') === 'true';
+        if (!shouldHide) {
+            setShowWelcome(true);
+        }
+
+        // Send welcome notification once on first visit after update
+        const notifSentKey = 'performance_chart_notif_sent';
+        if (!localStorage.getItem(notifSentKey)) {
+            api.post('/notifications/test').then(() => {
+                localStorage.setItem(notifSentKey, 'true');
+                console.log('[Dashboard] Performance chart notification sent!');
+            }).catch(() => { });
+        }
+    }, [fetchDashboardData]);
+
+    const percentChange = useMemo(() => data.balance > 0 ? '+12%' : '-5%', [data.balance]);
+
+    const displayUrgentPayments = useMemo(() => productivity.urgentPayments?.slice(0, 3) || [], [productivity.urgentPayments]);
+    const displayUpcomingEvents = useMemo(() => data.upcomingEvents || [], [data.upcomingEvents]);
+    const displayRecentClients = useMemo(() => data.recentClients || [], [data.recentClients]);
+
+    const handleNovoProcesso = useCallback(() => navigate('/processos/novo'), [navigate]);
+    const handleNovoCliente = useCallback(() => navigate('/clientes/novo'), [navigate]);
+    const handleAgendar = useCallback(() => navigate('/agenda'), [navigate]);
+    const handleHonorarios = useCallback(() => navigate('/financeiro/novo'), [navigate]);
+
+    if (loading) {
+        return <DashboardSkeleton />;
+    }
+
+    return (
+        <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-5 px-1 sm:px-0 pb-24 md:pb-8"
+        >
+            <div className="pt-2"></div>
+            {/* Quick Actions Grid - prominent position */}
+            <motion.div variants={itemVariants}>
+                <h2 className="text-lg font-bold text-app-text-main mb-3 px-2">Ações Rápidas</h2>
+                <div className="grid grid-cols-4 gap-2 sm:gap-4 px-1 sm:px-2">
+                    <QuickAction icon={Plus} label="Processo" colorClass="bg-slate-700/10 text-slate-700 dark:bg-slate-300/10 dark:text-slate-300" onClick={handleNovoProcesso} />
+                    <QuickAction icon={Users} label="Cliente" colorClass="bg-stone-600/10 text-stone-600 dark:bg-stone-400/10 dark:text-stone-400" onClick={handleNovoCliente} />
+                    <QuickAction icon={Calendar} label="Agendar" colorClass="bg-indigo-700/10 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400" onClick={handleAgendar} />
+                    <QuickAction icon={Calculator} label="Honorários" colorClass="bg-teal-700/10 text-teal-700 dark:bg-teal-400/10 dark:text-teal-400" onClick={handleHonorarios} />
+                </div>
+            </motion.div>
+
+            {/* Resumo Financeiro Card */}
+            <motion.div variants={itemVariants}>
+                <div className="flex justify-between items-center mb-4 px-2">
+                    <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
+                    <motion.button
+                        onClick={() => navigate('/financeiro')}
+                        className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                    >
+                        Ver tudo
+                    </motion.button>
+                </div>
+                <div
+                    className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-6 relative overflow-hidden transition-colors hover:border-primary/20"
+                    style={{ boxShadow: premiumShadow }}
+                >
+                    {/* Privacy Toggle Button */}
+                    <button
+                        onClick={() => setIsFinanceHidden(!isFinanceHidden)}
+                        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 rounded-lg bg-gray-100 dark:bg-slate-700/50 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                        title={isFinanceHidden ? "Mostrar valores" : "Ocultar valores"}
+                    >
+                        {isFinanceHidden ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
+                    </button>
+
+                    <div className="relative z-10">
+                        <p className="text-xs sm:text-sm text-app-text-muted mb-1">Saldo Total</p>
+                        <div className="flex items-center gap-3">
+                            <h3 className={`text-2xl sm:text-3xl font-bold text-app-text-main transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
+                                {formatBRL(data.balance)}
+                            </h3>
+                            <span className={`${data.balance >= 0 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'} text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
+                                {percentChange}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none">
+                        <MovingWaveChart />
+                    </div>
+
+                    <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-app-stroke grid grid-cols-2 gap-4 sm:gap-8 relative z-10">
+                        <div>
+                            <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Receitas</p>
+                            <p className={`text-base sm:text-lg font-bold text-emerald-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalIncome)}</p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Despesas</p>
+                            <p className={`text-base sm:text-lg font-bold text-red-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalExpense)}</p>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Stats Cards - use productivity stats for accurate totals */}
+            <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 sm:gap-4">
+                {[
+                    { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10', path: '/clientes' },
+                    { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-indigo-500', bg: 'bg-indigo-500/10', path: '/processos' },
+                    { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/agenda' }
+                ].map((stat, i) => (
+                    <motion.div
+                        key={i}
+                        onClick={() => navigate(stat.path)}
+                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-all hover:border-primary/20 cursor-pointer touch-manipulation group"
+                        style={{ boxShadow: premiumShadow }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${stat.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                                <stat.icon size={16} className={`sm:w-[18px] sm:h-[18px] ${stat.color}`} />
+                            </div>
+                            <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-xl sm:text-2xl font-bold text-app-text-main">{stat.value}</p>
+                        <p className="text-[10px] sm:text-xs text-app-text-muted">{stat.label}</p>
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            {/* Productivity Metrics - Clean style */}
+            <motion.div variants={itemVariants}>
+                <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                    {/* A Receber (Gold / Champagne) - DESTAQUE */}
+                    <div
+                        className="col-span-2 lg:col-span-2 bg-gradient-to-br from-[#D4AF37]/20 to-app-card rounded-xl border border-[#D4AF37]/30 p-4 sm:p-5 transition-colors hover:border-[#D4AF37]/50 relative overflow-hidden"
+                        style={{ boxShadow: premiumShadow }}
+                    >
+                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#D4AF37]/10 rounded-full blur-2xl pointer-events-none" />
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center">
+                                <Calculator size={20} className="text-[#D4AF37]" />
+                            </div>
+                            <div>
+                                <p className="text-[12px] sm:text-xs text-app-text-main font-semibold uppercase tracking-wider">A Receber</p>
+                                <p className="text-[10px] text-[#D4AF37]/80 font-medium">Valores pendentes</p>
+                            </div>
+                        </div>
+                        <p className="text-3xl sm:text-4xl font-black text-[#D4AF37] tracking-tight">{formatBRLCompact(productivity.pendingPayments)}</p>
+                    </div>
+
+                    {/* Prazos Vencendo (Keep Red) */}
+                    <div
+                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-red-500/20 flex flex-col justify-center"
+                        style={{ boxShadow: premiumShadow }}
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+                                <AlertTriangle size={16} className="text-red-500" />
+                            </div>
+                        </div>
+                        <p className="text-xl sm:text-2xl font-bold text-red-500">{productivity.upcomingDeadlines}</p>
+                        <p className="text-[11px] sm:text-xs text-app-text-muted">Prazos</p>
+                    </div>
+
+                    {/* Processos Novos (Neutral Slate) */}
+                    <div
+                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-slate-500/20 flex flex-col justify-center"
+                        style={{ boxShadow: premiumShadow }}
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-slate-500/10 flex items-center justify-center">
+                                <FileText size={16} className="text-slate-500 dark:text-slate-400" />
+                            </div>
+                        </div>
+                        <p className="text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-300">{productivity.newProcesses}</p>
+                        <p className="text-[11px] sm:text-xs text-app-text-muted">Novos Process.</p>
+                    </div>
+
+                    {/* Clientes Ativos (Teal / Formal Green) */}
+                    <div
+                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-teal-600/20 flex flex-col justify-center"
+                        style={{ boxShadow: premiumShadow }}
+                    >
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 rounded-lg bg-teal-600/10 flex items-center justify-center">
+                                <Users size={16} className="text-teal-600 dark:text-teal-400" />
+                            </div>
+                        </div>
+                        <p className="text-xl sm:text-2xl font-bold text-teal-700 dark:text-teal-400">{productivity.activeClients}</p>
+                        <p className="text-[11px] sm:text-xs text-app-text-muted">Clientes Ativos</p>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Urgent Payments Alert Section */}
+            {productivity.urgentPayments && productivity.urgentPayments.length > 0 && (
+                <motion.div variants={itemVariants}>
+                    <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-2xl p-5">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
+                                    <AlertTriangle size={20} className="text-red-500" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-app-text-main">Pagamentos Urgentes</h3>
+                                    <p className="text-xs text-app-text-muted">{productivity.urgentPayments.length} pagamento(s) marcado(s) como urgente</p>
+                                </div>
+                            </div>
+                            <motion.button
+                                onClick={() => navigate('/financeiro')}
+                                className="text-xs text-red-400 font-medium hover:text-red-300 transition-colors"
+                                whileHover={{ scale: 1.05 }}
+                            >
+                                Ver todos →
+                            </motion.button>
+                        </div>
+                        <div className="space-y-2">
+                            {displayUrgentPayments.map((payment: any, i: number) => (
+                                <motion.div
+                                    key={payment.id || i}
+                                    className="bg-app-card/50 backdrop-blur-sm border border-app-stroke rounded-xl p-3 flex items-center justify-between"
+                                    whileHover={{ scale: 1.01 }}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-2 h-2 rounded-full ${payment.type === 'INCOME' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+                                        <div>
+                                            <p className="text-sm font-medium text-app-text-main">{payment.description}</p>
+                                            <p className="text-xs text-app-text-muted">
+                                                Vence: {new Date(payment.date).toLocaleDateString('pt-BR')}
+                                                {payment.totalInstallments > 1 && ` • Parcela ${payment.currentInstallment}/${payment.totalInstallments}`}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span className={`text-sm font-bold ${payment.type === 'INCOME' ? 'text-green-500' : 'text-red-400'}`}>
+                                        {formatBRL(payment.amount)}
+                                    </span>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Team Performance Chart */}
+            <motion.div variants={itemVariants}>
+                <TeamPerformanceChart />
+            </motion.div>
+
+            {/* Próximos Prazos & Últimos Clientes - Side by Side */}
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {/* Próximos Prazos */}
+                <div>
+                    <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Próximos Prazos</h2>
+                    <div className="space-y-3">
+                        {displayUpcomingEvents.length > 0 ? (
+                            displayUpcomingEvents.map((event: any, i: number) => {
+                                const eventDate = new Date(event.start);
+                                const today = new Date();
+                                const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+                                let type = 'info';
+                                let color = 'bg-slate-500 text-slate-500'; // Default Event
+
+                                if (diffDays <= 1) {
+                                    type = 'urgent';
+                                    color = 'bg-red-500 text-red-500'; 
+                                } else if (diffDays <= 3) {
+                                    type = 'warning';
+                                    color = 'bg-[#D4AF37] text-[#D4AF37]'; 
+                                } else {
+                                    type = 'info';
+                                    color = 'bg-emerald-500 text-emerald-500';
+                                }
+
+                                return (
+                                    <DeadlineCard
+                                        key={event.id || i}
+                                        type={type}
+                                        title={event.title}
+                                        subtitle={event.description || 'Sem descrição'}
+                                        time={eventDate.toLocaleString('pt-BR', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
+                                        color={color}
+                                    />
+                                );
+                            })
+                        ) : (
+                            <div
+                                className="bg-app-card p-6 rounded-xl border border-app-stroke text-center transition-colors hover:border-primary/20"
+                                style={{ boxShadow: premiumShadow }}
+                            >
+                                <p className="text-app-text-muted">Nenhum evento nos próximos 7 dias</p>
+                                <button
+                                    onClick={handleAgendar}
+                                    className="text-primary text-sm font-medium mt-2 hover:underline transition-colors"
+                                >
+                                    Agendar novo evento
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div >
+
+                {/* Últimos Clientes */}
+                < div >
+                    <div className="flex justify-between items-center mb-4 px-2">
+                        <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
+                        <motion.button
+                            onClick={() => navigate('/clientes')}
+                            className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                        >
+                            Ver todos
+                        </motion.button>
+                    </div>
+                    <div
+                        className="bg-app-card rounded-2xl border border-app-stroke divide-y divide-app-stroke/50 transition-colors hover:border-primary/20"
+                        style={{ boxShadow: premiumShadow }}
+                    >
+                        {displayRecentClients.length > 0 ? (
+                            displayRecentClients.map((client: any, i: number) => {
+                                const colors = [
+                                    'from-blue-500 to-blue-600',
+                                    'from-emerald-500 to-emerald-600',
+                                    'from-amber-500 to-amber-600',
+                                    'from-purple-500 to-purple-600',
+                                    'from-rose-500 to-rose-600',
+                                ];
+                                const avatarGrad = colors[i % colors.length];
+                                const isNew = client.createdAt && (new Date().getTime() - new Date(client.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+                                return (
+                                    <div
+                                        key={client.id || i}
+                                        className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-primary/5 group"
+                                        onClick={() => navigate(`/clientes/${client.id}`)}
+                                    >
+                                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarGrad} flex items-center justify-center shrink-0 shadow-md shadow-black/10`}>
+                                            <span className="text-white font-bold text-sm">
+                                                {client.name?.charAt(0)?.toUpperCase() || 'C'}
+                                            </span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="text-sm font-semibold text-app-text-main truncate">{client.name}</h4>
+                                                {isNew && <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Novo</span>}
+                                            </div>
+                                            <p className="text-xs text-app-text-muted truncate">{client.email || 'Sem email'}</p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] text-app-text-muted">{new Date(client.createdAt).toLocaleDateString('pt-BR')}</span>
+                                            <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="p-6 text-center">
+                                <p className="text-app-text-muted">Nenhum cliente cadastrado</p>
+                                <button
+                                    onClick={handleNovoCliente}
+                                    className="text-primary text-sm font-medium mt-2 hover:underline transition-colors"
+                                >
+                                    Cadastrar primeiro cliente
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div >
+            </motion.div >
+
+            {/* Welcome Floating Card */}
+            <WelcomeOverlay 
+                isOpen={showWelcome} 
+                onClose={() => setShowWelcome(false)} 
+                userName={JSON.parse(localStorage.getItem('user') || '{}')?.name?.split(' ')[0] || 'Advogado'}
+                stats={{
+                    deadlines: productivity.upcomingDeadlines,
+                    newProcesses: productivity.newProcesses,
+                    updates: productivity.recentUpdates?.length || 0,
+                    comments: productivity.newComments || 0,
+                    mentions: productivity.unreadNotifications || 0,
+                    recentProcessComments: productivity.recentProcessComments || [],
+                    recentClientNotes: productivity.recentClientNotes || [],
+                    pendingActions: productivity.pendingActions || { oldProcesses: [], incompleteClients: [] }
+                }}
+                onShowAgainChange={(hide) => {
+                    localStorage.setItem('hide_welcome_overlay', hide ? 'true' : 'false');
+                }}
+            />
+        </motion.div >
+    );
+}

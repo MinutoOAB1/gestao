@@ -1,0 +1,48 @@
+--- DATA RECOVERY REPORT ---
+
+[TENANT] Name: "Escritório Padrão" | Slug: "dev-tenant" | ID: "dev-tenant-001"
+  Users: 1
+  Clients: 9
+  Processes: 13
+  Financial: 15
+  Events: 5
+  Documents: 1
+
+[TENANT] Name: "Escritório de Admin" | Slug: "escritório-de-admin" | ID: "c1eea287-c634-4c66-88fe-c34b917b4a83"
+  Users: 1
+  Clients: 0
+  Processes: 0
+  Financial: 0
+  Events: 0
+  Documents: 0
+
+[TENANT] Name: "Escritório de Test" | Slug: "escritório-de-test" | ID: "cee3dbcd-4b12-4cbf-bad6-65dff22f7837"
+  Users: 1
+  Clients: 0
+  Processes: 0
+  Financial: 26
+  Events: 0
+  Documents: 0
+
+[TENANT] Name: "Escritório de Tester" | Slug: "escritório-de-tester" | ID: "a02a57f2-64ce-41b7-896b-06662f181780"
+  Users: 1
+  Clients: 0
+  Processes: 0
+  Financial: 0
+  Events: 0
+  Documents: 0
+
+[TENANT] Name: "Escritório de Jetski" | Slug: "escritório-de-jetski" | ID: "3ca2e238-ecb2-4a1f-920b-9fba861c9c86"
+  Users: 1
+  Clients: 0
+  Processes: 1
+  Financial: 0
+  Events: 0
+  Documents: 0
+
+--- ALL USERS ---
+admin@admin.com | Admin User | Tenant: Escritório de Admin (c1eea287-c634-4c66-88fe-c34b917b4a83)
+test@blueadv.com.br | Test User | Tenant: Escritório de Test (cee3dbcd-4b12-4cbf-bad6-65dff22f7837)
+tester@blueadv.com.br | Tester Bot | Tenant: Escritório de Tester (a02a57f2-64ce-41b7-896b-06662f181780)
+admin@escritorio.com | Administrador | Tenant: Escritório Padrão (dev-tenant-001)
+jetski_dev@blueadv.com.br | Jetski Agent | Tenant: Escritório de Jetski (3ca2e238-ecb2-4a1f-920b-9fba861c9c86)

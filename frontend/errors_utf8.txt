@@ -1,0 +1,23 @@
+﻿src/components/auth/Protect.tsx(1,10): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/chat/ChatDrawer.tsx(5,44): error TS6133: 'MoreVertical' is declared but its value is never read.
+src/components/chat/ChatDrawer.tsx(122,37): error TS2503: Cannot find namespace 'NodeJS'.
+src/components/chat/ChatDrawer.tsx(446,19): error TS6133: 'uploadingMessage' is declared but its value is never read.
+src/components/PrivateRoute.tsx(4,56): error TS2503: Cannot find namespace 'JSX'.
+src/components/ui/Avatar.tsx(1,10): error TS1484: 'HTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Badge.tsx(1,10): error TS1484: 'HTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Button.tsx(1,22): error TS1484: 'ButtonHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Card.tsx(1,10): error TS1484: 'HTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/index.ts(24,10): error TS2305: Module '"./Skeleton"' has no exported member 'default'.
+src/components/ui/index.ts(24,45): error TS2724: '"./Skeleton"' has no exported member named 'SkeletonList'. Did you mean 'Skeleton'?
+src/components/ui/index.ts(24,59): error TS2305: Module '"./Skeleton"' has no exported member 'SkeletonTable'.
+src/components/ui/Input.tsx(1,22): error TS1484: 'InputHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/ui/Select.tsx(1,22): error TS1484: 'SelectHTMLAttributes' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/context/ChatContext.tsx(98,44): error TS6133: 'userId' is declared but its value is never read.
+src/context/ChatContext.tsx(109,37): error TS6198: All destructured elements are unused.
+src/context/TimerContext.tsx(59,23): error TS2503: Cannot find namespace 'NodeJS'.
+src/pages/ai/IAAnalisePage.tsx(26,17): error TS6133: 'FileTextIcon' is declared but its value is never read.
+src/pages/ai/IAAnalisePage.tsx(323,19): error TS6133: 'pdfHeight' is declared but its value is never read.
+src/pages/clients/ClientListPage.tsx(3,31): error TS6133: 'Mail' is declared but its value is never read.
+src/pages/clients/ClientListPage.tsx(3,37): error TS6133: 'Folder' is declared but its value is never read.
+src/pages/clients/ClientListPage.tsx(3,45): error TS6133: 'MoreVertical' is declared but its value is never read.
+src/pages/processes/ProcessListPage.tsx(156,21): error TS2304: Cannot find name 'memo'.
