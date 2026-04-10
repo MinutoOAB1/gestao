@@ -2,14 +2,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import * as express from 'express';
+import express from 'express';
 
 let cachedApp: any;
 
 async function createApp() {
   if (cachedApp) return cachedApp;
 
-  const expressApp = (express as any).default ? (express as any).default() : express();
+  const expressApp = express();
   const adapter = new ExpressAdapter(expressApp);
 
   const app = await NestFactory.create(AppModule, adapter, {
