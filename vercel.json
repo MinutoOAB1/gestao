@@ -1,17 +1,22 @@
 {
   "version": 2,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/_/backend/(.*)",
-      "destination": "/api/index.ts"
+      "src": "/_/backend/(.*)",
+      "dest": "/api/index.ts",
+      "continue": true
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.ts"
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts",
+      "continue": true
     },
     {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
     }
   ]
 }
