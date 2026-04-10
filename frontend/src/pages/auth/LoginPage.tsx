@@ -62,7 +62,9 @@ export default function LoginPage() {
             login(res.data.access_token, res.data.user);
             navigate('/');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Credenciais inválidas. Tente novamente.');
+            const serverMessage = err.response?.data?.message;
+            const finalMessage = Array.isArray(serverMessage) ? serverMessage[0] : serverMessage;
+            setError(finalMessage || 'Credenciais inválidas. Tente novamente.');
             // If 2FA code was wrong, don't go back to password step
             if (!requires2FA) {
                 setTwoFactorCode('');
