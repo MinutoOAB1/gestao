@@ -9,8 +9,13 @@ async function bootstrap() {
   if (!cachedApp) {
     const expressApp = express();
     const adapter = new ExpressAdapter(expressApp);
+    
+    // Explicitly set some environment flags
+    process.env.NEST_BOOTSTRAP_CONTEXT = 'serverless';
+
     const app = await NestFactory.create(AppModule, adapter, {
-      logger: ['error', 'warn', 'log'],
+      logger: ['error', 'warn'],
+      abortOnError: false,
     });
 
     app.enableCors();
@@ -21,10 +26,13 @@ async function bootstrap() {
 }
 
 export default async (req: any, res: any) => {
+  // Always set JSON content-type to avoid Vercel treating 401s as HTML
+  res.setHeader('Content-Type', 'application/json');
+
   try {
-    // Basic diagnostic for root API calls
-    if (req.url === '/api/health') {
-        return res.status(200).json({ status: 'ok', bootstrap: 'started' });
+    // Health check bypass
+    if (req.url === '/api/health' || req.url === '/api/ping') {
+        return res.status(200).json({ status: 'ok', msg: 'Backend is online' });
     }
 
     const app = await bootstrap();
@@ -36,12 +44,11 @@ export default async (req: any, res: any) => {
 
     return app(req, res);
   } catch (error: any) {
-    console.error('BOOTSTRAP ERROR:', error);
+    console.error('BOOTSTRAP FATAL ERROR:', error);
     return res.status(500).json({
-      error: 'Backend Bootstrap Failed',
-      message: error.message,
-      stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined,
-      hint: 'Check if all dependencies are installed and DATABASE_URL is correct.'
+      error: 'Backend Failure',
+      details: error.message,
+      hint: 'Verification of DATABASE_URL and Prisma generation is required.'
     });
   }
 };
