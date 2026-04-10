@@ -22,26 +22,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       const tenantId = this.tenantContext.getTenantId();
       const bypass = this.tenantContext.isBypassed();
       
-      try {
-        // Use a single multi-statement command to increase chance of keeping the same connection
-        // in pooled environments like Supabase Transaction Mode.
-        let sql = '';
-        if (bypass) {
-          sql += "SET app.bypass_rls = 'on'; ";
-        } else {
-          sql += "SET app.bypass_rls = 'off'; ";
-        }
+      if (!bypass || tenantId) {
+        try {
+          let sql = '';
+          if (bypass) {
+            sql += "SET app.bypass_rls = 'on'; ";
+          } else {
+            sql += "SET app.bypass_rls = 'off'; ";
+          }
 
-        if (tenantId) {
-          sql += `SET app.current_tenant_id = '${tenantId}';`;
-        } else {
-          sql += "RESET app.current_tenant_id;";
-        }
+          if (tenantId) {
+            sql += `SET app.current_tenant_id = '${tenantId}';`;
+          } else {
+            sql += "RESET app.current_tenant_id;";
+          }
 
-        await this.$executeRawUnsafe(sql);
-      } catch (error) {
-        // Logging error but not blocking the query
-        // console.error('Error setting RLS context:', error);
+          await this.$executeRawUnsafe(sql);
+        } catch (error) {
+          // Silent catch to prevent blocking
+        }
       }
 
       return next(params);
