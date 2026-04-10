@@ -11,8 +11,9 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./frontend/src/*"]
+      "@/*": ["./frontend/src/*"],
+      "@backend/*": ["./backend/src/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "frontend", "backend"]
+  "exclude": ["node_modules", "dist", "frontend/dist", "backend/dist"]
 }
