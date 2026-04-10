@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../../backend/src/app.module';
-import * as express from 'express';
+import express from 'express';
 
 // @ts-ignore
 const compression = require('compression');
