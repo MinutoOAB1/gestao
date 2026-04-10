@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 
 class SocketService {
-    private socket: Socket | null = null;
+    private socket: any = null;
     private static instance: SocketService;
     private listeners: Map<string, Function[]> = new Map();
 
@@ -44,11 +44,11 @@ class SocketService {
         });
 
         // Debug events
-        this.socket.io.on("error", (error) => {
+        this.socket.io.on("error", (error: any) => {
             console.error('[SocketService] Transport Error:', error);
         });
 
-        this.socket.io.on("reconnect_attempt", (attempt) => {
+        this.socket.io.on("reconnect_attempt", (attempt: number) => {
             console.log('[SocketService] Reconnecting attempt:', attempt);
         });
 
@@ -66,7 +66,7 @@ class SocketService {
             });
         });
 
-        this.socket.on('disconnect', (reason) => {
+        this.socket.on('disconnect', (reason: string) => {
             console.warn('[SocketService] Disconnected:', reason);
             this.emit('connectionChange', false);
 
@@ -75,7 +75,7 @@ class SocketService {
             }
         });
 
-        this.socket.on('connect_error', (err) => {
+        this.socket.on('connect_error', (err: Error) => {
             console.error('[SocketService] Connection Error:', err.message);
             this.emit('connectionChange', false);
         });
@@ -83,7 +83,7 @@ class SocketService {
         // Proxy events
         const events = ['onlineUsers', 'userOnline', 'userOffline', 'newMessage', 'newDirectMessage', 'userTyping', 'userTypingDirect', 'newNotification', 'notificationUpdate', 'messageReaction'];
         events.forEach(event => {
-            this.socket?.on(event, (data) => {
+            this.socket?.on(event, (data: any) => {
                 this.emit(event, data);
             });
         });

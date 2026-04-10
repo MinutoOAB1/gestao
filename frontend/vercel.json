@@ -1,20 +1,17 @@
 {
   "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/ping",
-      "dest": "/api/ping.ts"
+      "source": "/api/ping",
+      "destination": "/api/ping.ts"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
     }
   ],
   "functions": {
