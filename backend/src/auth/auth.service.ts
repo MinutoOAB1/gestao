@@ -20,7 +20,8 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     return this.tenantContext.runWithTenant(null, true, async () => {
-      const { name, email, password, companyName } = registerDto;
+      const { name, password, companyName } = registerDto;
+      const email = registerDto.email.toLowerCase().trim();
 
       // Check if user exists
       const existingUser = await this.prisma.user.findUnique({
@@ -62,9 +63,13 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
+    // Normal account login without tenant context to allow finding the user first
     return this.tenantContext.runWithTenant(null, true, async () => {
-      const { email, password, twoFactorCode } = loginDto;
-      console.log(`Login attempt for email: ${email}`);
+      const { password, twoFactorCode } = loginDto;
+      const email = loginDto.email.toLowerCase().trim();
+
+      console.log(`[AUTH] Login attempt for email: ${email}`);
+
       const user = await this.prisma.user.findUnique({
         where: { email },
         include: {
