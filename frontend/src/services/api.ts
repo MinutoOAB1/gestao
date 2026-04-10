@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: import.meta.env.PROD 
-        ? '/_/backend' 
+        ? '/api' 
         : `http://${window.location.hostname}:3000`,
 });
 

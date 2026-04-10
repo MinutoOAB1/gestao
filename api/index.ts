@@ -23,15 +23,14 @@ async function bootstrap() {
 export default async (req: any, res: any) => {
   try {
     // Basic diagnostic for root API calls
-    if (req.url === '/_/backend/health' || req.url === '/api/health') {
+    if (req.url === '/api/health') {
         return res.status(200).json({ status: 'ok', bootstrap: 'started' });
     }
 
     const app = await bootstrap();
     
-    // Strip prefixes for internal routing
+    // Strip prefix for internal routing
     if (req.url) {
-      req.url = req.url.replace('/_/backend', '') || '/';
       req.url = req.url.replace('/api', '') || '/';
     }
 
