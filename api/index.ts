@@ -1,53 +1,48 @@
-// Ponto de entrada oficial para Vercel Serverless (na raiz)
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../backend/src/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+import { AppModule } from '../backend/src/app.module';
+import * as express from 'express';
 
 let cachedApp: any;
 
-async function createApp() {
-  if (cachedApp) return cachedApp;
+async function bootstrap() {
+  if (!cachedApp) {
+    const expressApp = express();
+    const adapter = new ExpressAdapter(expressApp);
+    const app = await NestFactory.create(AppModule, adapter, {
+      logger: ['error', 'warn', 'log'],
+    });
 
-  const expressApp = express();
-  const adapter = new ExpressAdapter(expressApp);
-
-  const app = await NestFactory.create(AppModule, adapter, {
-    logger: ['error', 'warn', 'log'],
-  });
-
-  // Limite de tamanho para uploads
-  app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-  app.enableCors({
-    origin: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
-
-  await app.init();
-  cachedApp = expressApp;
-  return expressApp;
+    app.enableCors();
+    await app.init();
+    cachedApp = expressApp;
+  }
+  return cachedApp;
 }
 
-export default async function handler(req: any, res: any) {
+export default async (req: any, res: any) => {
   try {
-    // Limpa o prefixo /_/backend se existir
+    // Basic diagnostic for root API calls
+    if (req.url === '/_/backend/health' || req.url === '/api/health') {
+        return res.status(200).json({ status: 'ok', bootstrap: 'started' });
+    }
+
+    const app = await bootstrap();
+    
+    // Strip prefixes for internal routing
     if (req.url) {
       req.url = req.url.replace('/_/backend', '') || '/';
       req.url = req.url.replace('/api', '') || '/';
     }
-    
-    const app = await createApp();
-    app(req, res);
+
+    return app(req, res);
   } catch (error: any) {
-    console.error('VERCEL_HANDLER_ERROR:', error);
-    res.status(500).json({
-      error: 'Incapaz de inicializar o backend Nestor no Vercel',
+    console.error('BOOTSTRAP ERROR:', error);
+    return res.status(500).json({
+      error: 'Backend Bootstrap Failed',
       message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-      hint: 'Verifique se as variáveis de ambiente e o Prisma Client estão configurados no painel do Vercel.'
+      stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined,
+      hint: 'Check if all dependencies are installed and DATABASE_URL is correct.'
     });
   }
-}
+};
