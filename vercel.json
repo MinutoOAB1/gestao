@@ -6,12 +6,16 @@
       "destination": "/api/ping.ts"
     },
     {
+      "source": "/api/debug/health",
+      "destination": "/api/index.ts"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     },
     {
       "source": "/((?!api).*)",
-      "destination": "/index.html"
+      "destination": "/frontend/dist/$1"
     }
   ],
   "functions": {
