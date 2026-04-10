@@ -3,52 +3,61 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../backend/src/app.module';
 import * as express from 'express';
 
-let cachedApp: any;
+// @ts-ignore
+const compression = require('compression');
 
-async function bootstrap() {
-  if (!cachedApp) {
-    const expressApp = express();
-    const adapter = new ExpressAdapter(expressApp);
-    
-    // Explicitly set some environment flags
-    process.env.NEST_BOOTSTRAP_CONTEXT = 'serverless';
+let cachedServer: any;
 
-    const app = await NestFactory.create(AppModule, adapter, {
-      logger: ['error', 'warn'],
-      abortOnError: false,
-    });
+async function createServer() {
+  if (cachedServer) return cachedServer;
 
-    app.enableCors();
-    await app.init();
-    cachedApp = expressApp;
-  }
-  return cachedApp;
+  const expressApp = express();
+  const adapter = new ExpressAdapter(expressApp);
+
+  const app = await NestFactory.create(AppModule, adapter, {
+    logger: ['error', 'warn', 'log'],
+  });
+
+  // Parity with local main.ts configuration
+  app.use(compression());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
+  await app.init();
+  cachedServer = expressApp;
+  return expressApp;
 }
 
-export default async (req: any, res: any) => {
-  // Always set JSON content-type to avoid Vercel treating 401s as HTML
+export default async function handler(req: any, res: any) {
+  // Diagnostic headers
+  res.setHeader('X-Backend-Initialized', 'true');
   res.setHeader('Content-Type', 'application/json');
 
   try {
-    // Health check bypass
-    if (req.url === '/api/health' || req.url === '/api/ping') {
-        return res.status(200).json({ status: 'ok', msg: 'Backend is online' });
+    // Ping/Health check bypass for rapid verification
+    if (req.url === '/api/ping' || req.url === '/api/health') {
+        return res.status(200).json({ status: 'ok', source: 'serverless-handler' });
     }
 
-    const app = await bootstrap();
-    
-    // Strip prefix for internal routing
-    if (req.url) {
+    // Strip the /api prefix so NestJS internal routes match correctly
+    if (req.url && req.url.startsWith('/api')) {
       req.url = req.url.replace('/api', '') || '/';
     }
 
-    return app(req, res);
+    const server = await createServer();
+    return server(req, res);
   } catch (error: any) {
-    console.error('BOOTSTRAP FATAL ERROR:', error);
+    console.error('SERVERLESS BOOTSTRAP ERROR:', error);
     return res.status(500).json({
-      error: 'Backend Failure',
-      details: error.message,
-      hint: 'Verification of DATABASE_URL and Prisma generation is required.'
+      error: 'Backend Bootstrap Failure (Manual Build Mode)',
+      message: error.message,
+      hint: 'Verify DATABASE_URL environment variable and Prisma Client generation.'
     });
   }
-};
+}
