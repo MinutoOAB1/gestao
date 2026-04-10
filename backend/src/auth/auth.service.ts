@@ -78,14 +78,14 @@ export class AuthService {
 
       if (!user) {
         console.log(`User not found: ${email}`);
-        throw new UnauthorizedException('Invalid credentials');
+        throw new UnauthorizedException(`DEBUG: Usuário ${email} não encontrado no banco de dados.`);
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
       console.log(`Password match for ${email}: ${passwordMatch}`);
 
       if (!passwordMatch) {
-        throw new UnauthorizedException('Invalid credentials');
+        throw new UnauthorizedException(`DEBUG: Senha incorreta para o usuário ${email}. Verifique se há maiúsculas/minúsculas.`);
       }
 
       // Check if 2FA is enabled
