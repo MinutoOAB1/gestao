@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
-    "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend"
+    "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend",
+    "postinstall": "prisma generate --schema=backend/prisma/schema.prisma"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

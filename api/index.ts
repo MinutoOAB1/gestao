@@ -32,12 +32,22 @@ async function createApp() {
 }
 
 export default async function handler(req: any, res: any) {
-  // Limpa o prefixo /_/backend se existir para o NestJS processar a rota interna
-  if (req.url) {
-    req.url = req.url.replace('/_/backend', '') || '/';
-    req.url = req.url.replace('/api', '') || '/';
+  try {
+    // Limpa o prefixo /_/backend se existir
+    if (req.url) {
+      req.url = req.url.replace('/_/backend', '') || '/';
+      req.url = req.url.replace('/api', '') || '/';
+    }
+    
+    const app = await createApp();
+    app(req, res);
+  } catch (error: any) {
+    console.error('VERCEL_HANDLER_ERROR:', error);
+    res.status(500).json({
+      error: 'Incapaz de inicializar o backend Nestor no Vercel',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      hint: 'Verifique se as variáveis de ambiente e o Prisma Client estão configurados no painel do Vercel.'
+    });
   }
-  
-  const app = await createApp();
-  app(req, res);
 }
