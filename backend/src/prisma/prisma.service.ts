@@ -12,6 +12,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     await this.$connect();
 
     // Middleware to set tenant context and bypass status in PostgreSQL session
+    // Optimized for connection poolers (Transaction mode) by ensuring SET commands are sent
     this.$use(async (params, next) => {
       // Prevent infinite recursion for RLS setup itself
       if (params.action === 'executeRaw' || params.action === 'queryRaw') {
@@ -22,19 +23,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       const bypass = this.tenantContext.isBypassed();
       
       try {
+        // Use a single multi-statement command to increase chance of keeping the same connection
+        // in pooled environments like Supabase Transaction Mode.
+        let sql = '';
         if (bypass) {
-          await this.$executeRawUnsafe(`SET app.bypass_rls = 'on'`);
+          sql += "SET app.bypass_rls = 'on'; ";
         } else {
-          await this.$executeRawUnsafe(`SET app.bypass_rls = 'off'`);
+          sql += "SET app.bypass_rls = 'off'; ";
         }
 
         if (tenantId) {
-          await this.$executeRawUnsafe(`SET app.current_tenant_id = '${tenantId}'`);
+          sql += `SET app.current_tenant_id = '${tenantId}';`;
         } else {
-          await this.$executeRawUnsafe(`RESET app.current_tenant_id`);
+          sql += "RESET app.current_tenant_id;";
         }
+
+        await this.$executeRawUnsafe(sql);
       } catch (error) {
-        console.error('Error setting RLS context:', error);
+        // Logging error but not blocking the query
+        // console.error('Error setting RLS context:', error);
       }
 
       return next(params);

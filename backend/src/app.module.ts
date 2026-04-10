@@ -31,6 +31,7 @@ import { UserFilesModule } from './user-files/user-files.module';
 import { BackupModule } from './backup/backup.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TenantMiddleware } from './prisma/tenant.middleware';
+import { HealthController } from './health/health.controller';
 
 
 @Module({
@@ -67,7 +68,7 @@ import { TenantMiddleware } from './prisma/tenant.middleware';
     UserFilesModule,
     BackupModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [
     AppService,
     {
