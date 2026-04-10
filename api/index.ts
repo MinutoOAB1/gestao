@@ -1,6 +1,6 @@
-// Vercel Serverless Function entry point
+// Ponto de entrada oficial para Vercel Serverless (na raiz)
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
+import { AppModule } from '../backend/src/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 
@@ -16,12 +16,9 @@ async function createApp() {
     logger: ['error', 'warn', 'log'],
   });
 
-  // Increase body size limit
+  // Limite de tamanho para uploads
   app.use(express.json({ limit: '50mb' }));
-  app.use((express as any).urlencoded
-    ? (express as any).urlencoded({ extended: true, limit: '50mb' })
-    : (_req: any, _res: any, next: any) => next()
-  );
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   app.enableCors({
     origin: true,
@@ -35,9 +32,10 @@ async function createApp() {
 }
 
 export default async function handler(req: any, res: any) {
-  // Strip the /_/backend prefix so NestJS routes match correctly
-  if (req.url && req.url.startsWith('/_/backend')) {
+  // Limpa o prefixo /_/backend se existir para o NestJS processar a rota interna
+  if (req.url) {
     req.url = req.url.replace('/_/backend', '') || '/';
+    req.url = req.url.replace('/api', '') || '/';
   }
   
   const app = await createApp();

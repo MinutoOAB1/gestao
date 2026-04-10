@@ -3,21 +3,15 @@
   "rewrites": [
     {
       "source": "/_/backend/(.*)",
-      "destination": "/backend/api/index.ts"
+      "destination": "/api/index.ts"
     },
     {
       "source": "/api/(.*)",
-      "destination": "/backend/api/index.ts"
+      "destination": "/api/index.ts"
     },
     {
       "source": "/(.*)",
       "destination": "/frontend/$1"
     }
-  ],
-  "functions": {
-    "backend/api/index.ts": {
-      "runtime": "vercel-node@latest",
-      "includeFiles": "backend/node_modules/.prisma/**,backend/prisma/**"
-    }
-  }
+  ]
 }
