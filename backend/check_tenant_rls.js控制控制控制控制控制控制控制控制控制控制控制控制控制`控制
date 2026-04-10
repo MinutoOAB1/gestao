@@ -1,0 +1,19 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+async function main() {
+  try {
+    const tenantRls = await prisma.$queryRaw`
+      SELECT tablename, rowsecurity FROM pg_tables WHERE tablename = 'Tenant';
+    `;
+    console.log('--- RLS STATUS FOR Tenant TABLE ---');
+    console.log(JSON.stringify(tenantRls, null, 2));
+
+  } catch (error) {
+    console.error('Error fetching RLS status:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+main();

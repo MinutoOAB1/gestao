@@ -25,7 +25,7 @@ class SocketService {
         }
 
         const socketUrl = import.meta.env.PROD
-            ? `${window.location.origin}/_/backend/chat`
+            ? `${window.location.origin}/api/chat`
             : `http://${window.location.hostname}:3000/chat`;
 
         const token = localStorage.getItem('token');

@@ -114,35 +114,40 @@ export class AuthService {
       // Login successful - record login history
       const deviceHash = this.generateDeviceHash(ipAddress, userAgent);
 
-      // Check if this is a new device
-      const existingDevice = await this.prisma.loginHistory.findFirst({
-        where: {
-          userId: user.id,
-          deviceHash,
-        },
-      });
+      try {
+        // Check if this is a new device
+        const existingDevice = await this.prisma.loginHistory.findFirst({
+          where: {
+            userId: user.id,
+            deviceHash,
+          },
+        });
 
-      // Record this login
-      await this.prisma.loginHistory.create({
-        data: {
-          userId: user.id,
-          ipAddress,
-          userAgent,
-          deviceHash,
-          success: true,
-        },
-      });
+        // Record this login
+        await this.prisma.loginHistory.create({
+          data: {
+            userId: user.id,
+            ipAddress,
+            userAgent,
+            deviceHash,
+            success: true,
+          },
+        });
 
-      // If new device and user has login alerts enabled, send email
-      if (!existingDevice && user.tenant.settings?.loginAlerts) {
-        await this.emailService.sendLoginAlert(
-          user.email,
-          user.name,
-          {
-            ip: ipAddress || 'Unknown',
-            userAgent: userAgent || 'Unknown',
-          }
-        );
+        // If new device and user has login alerts enabled, send email
+        if (!existingDevice && user.tenant.settings?.loginAlerts) {
+          await this.emailService.sendLoginAlert(
+            user.email,
+            user.name,
+            {
+              ip: ipAddress || 'Unknown',
+              userAgent: userAgent || 'Unknown',
+            }
+          ).catch(err => console.error('Failed to send login alert:', err));
+        }
+      } catch (logError) {
+        console.error('SERVERLESS LOGGING ERROR (LoginHistory):', logError);
+        // Non-blocking error - we still want the user to log in
       }
 
       const payload = { email: user.email, sub: user.id, tenantId: user.tenantId, role: user.role };
