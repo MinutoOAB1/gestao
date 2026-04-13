@@ -89,7 +89,7 @@ export default async function handler(req: any, res: any) {
       stack: error.stack,
       method: req.method,
       url: req.url,
-      path: 'serverless/index.ts'
+      path: 'api/index.ts'
     });
   }
 }
