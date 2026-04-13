@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../backend/src/app.module';
@@ -56,7 +57,7 @@ export default async function handler(req: any, res: any) {
   // Health & Debug check
   if (req.url === '/api/debug/health') {
     try {
-      await createServer();
+      const server = await createServer();
       const prisma = cachedApp.get(PrismaService);
       const userCount = await prisma.user.count();
       return res.status(200).json({
@@ -69,11 +70,13 @@ export default async function handler(req: any, res: any) {
         hasApp: !!cachedApp
       });
     } catch (dbErr: any) {
+      console.error('HEALTH CHECK ERROR:', dbErr);
       return res.status(500).json({
         status: 'DOWN',
-        dbError: dbErr.message,
+        errorType: 'Database/Bootstrap Error',
+        message: dbErr.message,
         stack: dbErr.stack,
-        hint: 'Check DATABASE_URL and if prisma generate was run.'
+        hint: 'Check DATABASE_URL and if prisma generate was run at the root.'
       });
     }
   }
@@ -85,6 +88,7 @@ export default async function handler(req: any, res: any) {
     console.error('SERVERLESS BOOTSTRAP ERROR:', error);
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
+      errorType: 'Framework/Module Loading Failure',
       message: error.message,
       stack: error.stack,
       method: req.method,
