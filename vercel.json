@@ -1,20 +1,25 @@
 {
   "version": 2,
-  "routes": [
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "vercel-node@latest"
+    },
+    "api/**/*.js": {
+      "runtime": "vercel-node@latest"
+    }
+  },
+  "rewrites": [
     {
-      "src": "/api/ping",
-      "dest": "/api/ping.js"
+      "source": "/api/ping",
+      "destination": "/api/ping.js"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }

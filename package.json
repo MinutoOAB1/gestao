@@ -11,6 +11,7 @@
     "typescript": "~5.9.3"
   },
   "scripts": {
+    "vercel-build": "npx prisma generate --schema=backend/prisma/schema.prisma && npm run build --workspace=frontend",
     "build": "npx prisma generate --schema=backend/prisma/schema.prisma && npm run build --workspace=frontend",
     "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend"
   }
