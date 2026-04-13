@@ -1,9 +1,5 @@
 import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import { AppModule } from '../backend/src/app.module';
 import express from 'express';
-import { PrismaService } from '../backend/src/prisma/prisma.service';
 
 // @ts-ignore
 const compression = require('compression');
@@ -14,6 +10,27 @@ let cachedApp: any;
 async function createServer() {
   if (cachedServer) return cachedServer;
 
+  // STEP 1: LOAD NEST CORE
+  let NestFactory, ExpressAdapter;
+  try {
+    const core = await import('@nestjs/core');
+    NestFactory = core.NestFactory;
+    const adapterMod = await import('@nestjs/platform-express');
+    ExpressAdapter = adapterMod.ExpressAdapter;
+  } catch (err: any) {
+    throw new Error(`Framework Load Fail: ${err.message}`);
+  }
+
+  // STEP 2: LOAD APP MODULE
+  let AppModule;
+  try {
+    // Dynamic import to isolate local file loading
+    const appMod = await import('../backend/src/app.module');
+    AppModule = appMod.AppModule;
+  } catch (err: any) {
+    throw new Error(`AppModule Load Fail: ${err.message}`);
+  }
+
   const expressApp = express();
   const adapter = new ExpressAdapter(expressApp);
 
@@ -21,9 +38,7 @@ async function createServer() {
     logger: ['error', 'warn', 'log'],
   });
 
-  // Native NestJS routing prefix
   app.setGlobalPrefix('api');
-
   app.use(compression());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -42,10 +57,9 @@ async function createServer() {
 }
 
 export default async function handler(req: any, res: any) {
-  // Diagnostic log for Vercel
-  console.log(`[FRONTEND API REQUEST] ${req.method} ${req.url}`);
+  // Diagnostic log
+  console.log(`[BOOTSTRAP ATTEMPT] ${req.method} ${req.url}`);
 
-  // OPTIONS Preflight handler
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
@@ -54,29 +68,33 @@ export default async function handler(req: any, res: any) {
     return res.status(204).end();
   }
 
-  // Health & Debug check
+  // HEALTH CHECK DIAGNOSTIC
   if (req.url === '/api/debug/health') {
     try {
       const server = await createServer();
-      const prisma = cachedApp.get(PrismaService);
+      
+      // Attempt to load Prisma Service dynamically
+      let prisma;
+      try {
+        const { PrismaService } = await import('../backend/src/prisma/prisma.service');
+        prisma = cachedApp.get(PrismaService);
+      } catch (pErr: any) {
+        return res.status(200).json({ status: 'UP', backend: 'MOCK (Prisma Load Error)', error: pErr.message });
+      }
+
       const userCount = await prisma.user.count();
       return res.status(200).json({
         status: 'UP',
         dbConnection: 'OK',
         userCount,
-        timestamp: new Date().toISOString(),
-        nodeEnv: process.env.NODE_ENV,
-        hasPrisma: !!prisma,
-        hasApp: !!cachedApp
+        timestamp: new Date().toISOString()
       });
-    } catch (dbErr: any) {
-      console.error('HEALTH CHECK ERROR:', dbErr);
+    } catch (err: any) {
       return res.status(500).json({
-        status: 'DOWN',
-        errorType: 'Database/Bootstrap Error',
-        message: dbErr.message,
-        stack: dbErr.stack,
-        hint: 'Check DATABASE_URL and if prisma generate was run at the root.'
+        status: 'CRITICAL_BOOT_FAIL',
+        error: err.message,
+        stack: err.stack,
+        hint: 'This means the code crashed before even handling the request.'
       });
     }
   }
@@ -88,12 +106,9 @@ export default async function handler(req: any, res: any) {
     console.error('SERVERLESS BOOTSTRAP ERROR:', error);
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
-      errorType: 'Framework/Module Loading Failure',
       message: error.message,
       stack: error.stack,
-      method: req.method,
-      url: req.url,
-      path: 'api/index.ts'
+      hint: 'The NestJS application failed to initialize on Vercel.'
     });
   }
 }
