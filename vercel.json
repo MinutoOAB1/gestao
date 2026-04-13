@@ -2,12 +2,16 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/api/ping-test",
-      "destination": "/frontend/api/ping.js"
+      "source": "/api/ping",
+      "destination": "/api/ping.js"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/health.ts"
     },
     {
       "source": "/api/(.*)",
-      "destination": "/frontend/api/index.ts"
+      "destination": "/api/index.ts"
     },
     {
       "source": "/((?!api/).*)",
