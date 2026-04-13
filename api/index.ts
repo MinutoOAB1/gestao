@@ -86,10 +86,10 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
       message: error.message,
-      stack: error.stack, // Temporarily verbose
+      stack: error.stack,
       method: req.method,
       url: req.url,
-      path: 'frontend/api/index.ts'
+      path: 'api/index.ts'
     });
   }
 }
