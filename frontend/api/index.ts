@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { AppModule } from '../backend/src/app.module';
+// Path adjusted: frontend/api -> .. (frontend) -> .. (root) -> backend/src
+import { AppModule } from '../../backend/src/app.module';
 import express from 'express';
-import { PrismaService } from '../backend/src/prisma/prisma.service';
+import { PrismaService } from '../../backend/src/prisma/prisma.service';
 
 // @ts-ignore
 const compression = require('compression');
@@ -21,9 +22,7 @@ async function createServer() {
     logger: ['error', 'warn', 'log'],
   });
 
-  // Native NestJS routing prefix
   app.setGlobalPrefix('api');
-
   app.use(compression());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -42,10 +41,8 @@ async function createServer() {
 }
 
 export default async function handler(req: any, res: any) {
-  // Diagnostic log for Vercel
-  console.log(`[FRONTEND API REQUEST] ${req.method} ${req.url}`);
+  console.log(`[CONSOLIDATED API REQUEST] ${req.method} ${req.url}`);
 
-  // OPTIONS Preflight handler
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
@@ -55,7 +52,7 @@ export default async function handler(req: any, res: any) {
   }
 
   // Health & Debug check
-  if (req.url === '/api/debug/health') {
+  if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
       const server = await createServer();
       const prisma = cachedApp.get(PrismaService);
@@ -65,18 +62,13 @@ export default async function handler(req: any, res: any) {
         dbConnection: 'OK',
         userCount,
         timestamp: new Date().toISOString(),
-        nodeEnv: process.env.NODE_ENV,
-        hasPrisma: !!prisma,
-        hasApp: !!cachedApp
+        location: 'frontend/api/index.ts'
       });
     } catch (dbErr: any) {
-      console.error('HEALTH CHECK ERROR:', dbErr);
       return res.status(500).json({
         status: 'DOWN',
-        errorType: 'Database/Bootstrap Error',
-        message: dbErr.message,
-        stack: dbErr.stack,
-        hint: 'Check DATABASE_URL and if prisma generate was run at the root.'
+        error: dbErr.message,
+        hint: 'Check DATABASE_URL and Prisma generation.'
       });
     }
   }
@@ -88,12 +80,8 @@ export default async function handler(req: any, res: any) {
     console.error('SERVERLESS BOOTSTRAP ERROR:', error);
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
-      errorType: 'Framework/Module Loading Failure',
       message: error.message,
-      stack: error.stack,
-      method: req.method,
-      url: req.url,
-      path: 'api/index.ts'
+      location: 'frontend/api/index.ts'
     });
   }
 }
