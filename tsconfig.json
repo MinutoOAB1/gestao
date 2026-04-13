@@ -2,8 +2,11 @@
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "target": "ESNext",
+    "target": "ES6",
+    "experimentalDecorators": true, 
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
+    "allowJs": true,
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
