@@ -1,25 +1,26 @@
 {
   "version": 2,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/ping",
-      "destination": "/api/ping.js"
+      "src": "/api/ping",
+      "dest": "/api/ping.js"
     },
     {
-      "source": "/api/diag",
-      "destination": "/api/diag.ts"
+      "src": "/api/diag",
+      "dest": "/api/diag.ts"
     },
     {
-      "source": "/api/debug/health",
-      "destination": "/api/index.ts"
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
     },
     {
-      "source": "/api/:path*",
-      "destination": "/api/index.ts"
+      "src": "/(.*)",
+      "dest": "/$1",
+      "check": true
     },
     {
-      "source": "/((?!api/).*)",
-      "destination": "/frontend/dist/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
