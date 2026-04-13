@@ -1,10 +1,9 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-// Path adjusted: frontend/api -> .. (frontend) -> .. (root) -> backend/src
-import { AppModule } from '../../backend/src/app.module';
+import { AppModule } from '../backend/src/app.module';
+import { PrismaService } from '../backend/src/prisma/prisma.service';
 import express from 'express';
-import { PrismaService } from '../../backend/src/prisma/prisma.service';
 
 // @ts-ignore
 const compression = require('compression');
@@ -41,7 +40,7 @@ async function createServer() {
 }
 
 export default async function handler(req: any, res: any) {
-  console.log(`[CONSOLIDATED API REQUEST] ${req.method} ${req.url}`);
+  console.log(`[ROOT API REQUEST] ${req.method} ${req.url}`);
 
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -51,7 +50,7 @@ export default async function handler(req: any, res: any) {
     return res.status(204).end();
   }
 
-  // Health & Debug check
+  // Unified Health Check
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
       const server = await createServer();
@@ -62,13 +61,13 @@ export default async function handler(req: any, res: any) {
         dbConnection: 'OK',
         userCount,
         timestamp: new Date().toISOString(),
-        location: 'frontend/api/index.ts'
+        location: 'root/api/index.ts'
       });
     } catch (dbErr: any) {
       return res.status(500).json({
         status: 'DOWN',
         error: dbErr.message,
-        hint: 'Check DATABASE_URL and Prisma generation.'
+        hint: 'Check DATABASE_URL in Vercel settings.'
       });
     }
   }
@@ -77,11 +76,11 @@ export default async function handler(req: any, res: any) {
     const server = await createServer();
     return server(req, res);
   } catch (error: any) {
-    console.error('SERVERLESS BOOTSTRAP ERROR:', error);
+    console.error('BOOTSTRAP ERROR:', error);
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
       message: error.message,
-      location: 'frontend/api/index.ts'
+      location: 'root/api/index.ts'
     });
   }
 }
