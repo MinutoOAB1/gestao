@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { AppModule } from '../../backend/src/app.module';
+import { AppModule } from '../backend/src/app.module';
 import express from 'express';
-import { PrismaService } from '../../backend/src/prisma/prisma.service';
+import { PrismaService } from '../backend/src/prisma/prisma.service';
 
 // @ts-ignore
 const compression = require('compression');
