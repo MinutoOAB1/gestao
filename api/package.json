@@ -1,0 +1,18 @@
+{
+  "name": "gestao-api-isolated",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "@prisma/client": "5.19.1",
+    "compression": "^1.8.1",
+    "express": "^4.18.2",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "prisma": "5.19.1"
+  }
+}
