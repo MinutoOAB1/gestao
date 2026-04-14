@@ -1,25 +1,27 @@
 {
   "version": 2,
   "functions": {
-    "frontend/api/**/*.ts": {
-      "runtime": "vercel-node@latest"
+    "api/**/*.ts": {
+      "runtime": "vercel-node@latest",
+      "memory": 1024,
+      "maxDuration": 10
     },
-    "frontend/api/**/*.js": {
+    "api/**/*.js": {
       "runtime": "vercel-node@latest"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/ping",
-      "destination": "/frontend/api/ping.js"
+      "src": "/api/ping",
+      "dest": "/api/ping.js"
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/frontend/api/index.ts"
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
     },
     {
-      "source": "/((?!api/).*)",
-      "destination": "/frontend/dist/index.html"
+      "src": "/((?!api/).*)",
+      "dest": "/index.html"
     }
   ]
 }

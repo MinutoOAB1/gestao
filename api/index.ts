@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-// Adjusted path: frontend/api -> .. (frontend) -> .. (root) -> backend/src
-import { AppModule } from '../../backend/src/app.module';
-import { PrismaService } from '../../backend/src/prisma/prisma.service';
+// Root location paths: api/index.ts -> ../backend/src
+import { AppModule } from '../backend/src/app.module';
+import { PrismaService } from '../backend/src/prisma/prisma.service';
 import express from 'express';
 
 // @ts-ignore
@@ -41,7 +41,7 @@ async function createServer() {
 }
 
 export default async function handler(req: any, res: any) {
-  console.log(`[FRONTEND-API REQUEST] ${req.method} ${req.url}`);
+  console.log(`[ROOT API REQUEST] ${req.method} ${req.url}`);
 
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -62,7 +62,7 @@ export default async function handler(req: any, res: any) {
         dbConnection: 'OK',
         userCount,
         timestamp: new Date().toISOString(),
-        location: 'frontend/api/index.ts'
+        location: 'root/api/index.ts'
       });
     } catch (dbErr: any) {
       return res.status(500).json({
@@ -81,7 +81,7 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
       message: error.message,
-      location: 'frontend/api/index.ts'
+      location: 'root/api/index.ts'
     });
   }
 }
