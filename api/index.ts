@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-// Root location paths: api/index.ts -> ../../backend/src
-import { AppModule } from '../../backend/src/app.module';
-import { PrismaService } from '../../backend/src/prisma/prisma.service';
+// Root location paths: api/index.ts -> ../backend/src
+import { AppModule } from '../backend/src/app.module';
+import { PrismaService } from '../backend/src/prisma/prisma.service';
 import express from 'express';
 
 // @ts-ignore
