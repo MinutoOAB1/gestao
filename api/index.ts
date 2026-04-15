@@ -4,6 +4,13 @@ if (typeof global !== 'undefined') {
   if (typeof global.Path2D === 'undefined') global.Path2D = class Path2D {} as any;
 }
 
+let ROOT_RES: any = null;
+process.on('uncaughtException', (err) => {
+  if (ROOT_RES && !ROOT_RES.headersSent) {
+    ROOT_RES.status(500).json({ error: "FATAL_RUNTIME_CRASH", message: err.message, stack: err.stack });
+  }
+});
+
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
@@ -47,6 +54,7 @@ async function createServer() {
 }
 
 export default async function handler(req: any, res: any) {
+  ROOT_RES = res;
   console.log(`[ROOT API REQUEST] ${req.method} ${req.url}`);
 
   if (req.method === 'OPTIONS') {
