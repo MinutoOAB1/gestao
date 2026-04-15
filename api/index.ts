@@ -1,3 +1,9 @@
+// Vercel Serverless Node 20+ specific polyfills for missing browser APIS used by pdf.js/canvas
+if (typeof global !== 'undefined') {
+  if (typeof global.DOMMatrix === 'undefined') global.DOMMatrix = class DOMMatrix {} as any;
+  if (typeof global.Path2D === 'undefined') global.Path2D = class Path2D {} as any;
+}
+
 let cachedServer: any;
 let cachedApp: any;
 

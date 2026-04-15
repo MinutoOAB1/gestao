@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UploadedFile, UseInterceptors, BadRequestException, Request, Get } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AiService } from './ai.service';
-const pdfParse = require('pdf-parse');
+// pdf-parse dynamic import delayed to avoid DOMMatrix startup crashes
 
 @Controller('ai')
 export class AiController {
@@ -63,6 +63,7 @@ export class AiController {
         } else if (file.mimetype === 'application/pdf') {
             try {
                 console.log('[AI Controller] Processando PDF com pdf-parse...');
+                const pdfParse = require('pdf-parse');
                 const pdfData = await pdfParse(file.buffer);
                 text = pdfData.text;
                 console.log('[AI Controller] PDF processado. Caracteres extraídos:', text.length);
