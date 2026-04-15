@@ -4,19 +4,22 @@ if (typeof global !== 'undefined') {
   if (typeof global.Path2D === 'undefined') global.Path2D = class Path2D {} as any;
 }
 
+import 'reflect-metadata';
+import { NestFactory } from '@nestjs/core';
+import { ExpressAdapter } from '@nestjs/platform-express';
+// Root location paths: api/index.ts -> ../backend/src
+import { AppModule } from '../backend/src/app.module';
+import { PrismaService } from '../backend/src/prisma/prisma.service';
+import express from 'express';
+
+// @ts-ignore
+const compression = require('compression');
+
 let cachedServer: any;
 let cachedApp: any;
 
 async function createServer() {
   if (cachedServer) return cachedServer;
-
-  // Delayed imports to allow Vercel Serverless Function to catch 'Cannot find module' exceptions
-  require('reflect-metadata');
-  const express = require('express');
-  const compression = require('compression');
-  const { NestFactory } = require('@nestjs/core');
-  const { ExpressAdapter } = require('@nestjs/platform-express');
-  const { AppModule } = require('../backend/src/app.module');
 
   const expressApp = express();
   const adapter = new ExpressAdapter(expressApp);
@@ -58,7 +61,6 @@ export default async function handler(req: any, res: any) {
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
       const server = await createServer();
-      const { PrismaService } = require('../backend/src/prisma/prisma.service');
       const prisma = cachedApp.get(PrismaService);
       const userCount = await prisma.user.count();
       return res.status(200).json({
