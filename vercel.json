@@ -2,6 +2,16 @@
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "vercel-node@latest",
+      "memory": 1024,
+      "maxDuration": 15
+    },
+    "api/**/*.js": {
+      "runtime": "vercel-node@latest"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/ping",
