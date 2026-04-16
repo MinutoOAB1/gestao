@@ -2,22 +2,52 @@
 if (typeof global !== 'undefined') {
   if (typeof global.DOMMatrix === 'undefined') global.DOMMatrix = class DOMMatrix {} as any;
   if (typeof global.Path2D === 'undefined') global.Path2D = class Path2D {} as any;
+  
+  // Extended Browser Polyfills for contract/PDF libraries
+  if (typeof global.window === 'undefined') global.window = global as any;
+  if (typeof global.document === 'undefined') {
+    global.document = {
+      createElement: () => ({ getContext: () => ({}) }),
+      getElementsByTagName: () => [],
+      documentElement: { style: {} },
+    } as any;
+  }
+  if (typeof global.navigator === 'undefined') {
+    global.navigator = { userAgent: 'node', platform: 'linux' } as any;
+  }
 }
 
 let ROOT_RES: any = null;
 process.on('uncaughtException', (err) => {
+  console.error('[FATAL UNCAUGHT EXCEPTION]', err);
   if (ROOT_RES && !ROOT_RES.headersSent) {
-    ROOT_RES.status(500).json({ error: "FATAL_RUNTIME_CRASH", message: err.message, stack: err.stack });
+    ROOT_RES.status(500).json({ 
+      error: "FATAL_RUNTIME_CRASH", 
+      message: err.message, 
+      stack: err.stack,
+      hint: "Check for top-level code executing during module import."
+    });
   }
 });
 
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-// Root location paths: api_server.ts -> backend/src
-import { AppModule } from './backend/src/app.module';
-import { PrismaService } from './backend/src/prisma/prisma.service';
 import express from 'express';
+
+// Diagnostic Import Trap
+let AppModule: any;
+let PrismaService: any;
+
+try {
+  // Root location paths: api_server.ts -> backend/src
+  AppModule = require('./backend/src/app.module').AppModule;
+  PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
+} catch (loadErr: any) {
+  console.error('[MODULE LOAD FAILURE]', loadErr);
+  // Re-throw so it reaches uncaughtException or the handler
+  throw new Error(`Failed to load AppModule: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
+}
 
 // @ts-ignore
 const compression = require('compression');
