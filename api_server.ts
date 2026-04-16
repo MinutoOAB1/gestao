@@ -41,21 +41,18 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
-console.log('[BOOTSTRAP] Loading PRE-COMPILED AppModule dist...');
+// Diagnostic Module Bypass (Atomic Test)
+import { MinimalModule } from './backend/src/minimal.module';
+AppModule = MinimalModule;
+console.log('[BOOTSTRAP] MinimalModule selected for bypass test.');
+/* 
 try {
-  // Path for NestJS build: backend/dist/src/app.module.js
-  AppModule = require('./backend/dist/src/app.module').AppModule;
-  PrismaService = require('./backend/dist/src/prisma/prisma.service').PrismaService;
-  console.log('[BOOTSTRAP] Compiled AppModule loaded successfully.');
+  // AppModule = require('./backend/dist/src/app.module').AppModule;
+  // PrismaService = require('./backend/dist/src/prisma/prisma.service').PrismaService;
 } catch (loadErr: any) {
-  console.error('[MODULE LOAD FAILURE] Falling back to src (This might be slow)...', loadErr);
-  try {
-     AppModule = require('./backend/src/app.module').AppModule;
-     PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
-  } catch (fallbackErr: any) {
-     throw new Error(`Failed to load AppModule dist/src: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
-  }
+  // ...
 }
+*/
 
 // @ts-ignore
 const compression = require('compression');
