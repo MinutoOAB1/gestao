@@ -121,24 +121,29 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // Unified Health Check
+  // Unified Health Check (Simplified for Binary Isolation Test)
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
+      console.log('[HEALTH] Starting createServer trigger...');
       const server = await createServer();
-      const prisma = cachedApp.get(PrismaService);
-      const userCount = await prisma.user.count();
+      console.log('[HEALTH] createServer finished. Logic operational.');
+      
+      // DECOUPLED: Prisma is NOT called here to isolate the crash
       return res.status(200).json({
         status: 'UP',
-        dbConnection: 'OK',
-        userCount,
+        message: 'NestJS Framework is successfully bootstrapped.',
+        dbCheck: 'SKIPPED_FOR_ISOLATION',
         timestamp: new Date().toISOString(),
+        memory: process.memoryUsage(),
         location: 'root/api_server.ts'
       });
-    } catch (dbErr: any) {
+    } catch (bootErr: any) {
+      console.error('[HEALTH] Bootstrap error caught:', bootErr);
       return res.status(500).json({
         status: 'DOWN',
-        error: dbErr.message,
-        hint: 'Check DATABASE_URL in Vercel settings.'
+        error: bootErr.message,
+        stack: bootErr.stack,
+        hint: 'If this is a timeout, check for blocking top-level code.'
       });
     }
   }
@@ -147,7 +152,7 @@ export default async function handler(req: any, res: any) {
     const server = await createServer();
     return server(req, res);
   } catch (error: any) {
-    console.error('BOOTSTRAP ERROR:', error);
+    console.error('FINAL BOOTSTRAP ERROR:', error);
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
       message: error.message,
