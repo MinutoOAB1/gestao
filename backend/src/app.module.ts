@@ -39,11 +39,11 @@ import { HealthController } from './health/health.controller';
     ConfigModule.forRoot({ isGlobal: true }),
     EventEmitterModule.forRoot(),
     // Rate limiting: 100 requests per 60 seconds per IP
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
-    ScheduleModule.forRoot(),
+    // ThrottlerModule.forRoot([{
+    //   ttl: 60000,
+    //   limit: 100,
+    // }]),
+    // ScheduleModule.forRoot(),
     EmailModule,
     PrismaModule,
     SupabaseModule,
@@ -71,10 +71,10 @@ import { HealthController } from './health/health.controller';
   controllers: [AppController, HealthController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
