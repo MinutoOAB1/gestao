@@ -41,15 +41,21 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
-// Full Application Restoration (NestJS 10 Stable) - PRISMA BYPASS TEST
+// Full Application Restoration (CommonJS Unified)
 try {
-  console.log('[BOOTSTRAP] Loading AppModule src (PRISMA DISABLED)...');
-  AppModule = require('./backend/src/app.module').AppModule;
-  PrismaService = class MockPrisma {}; // Bypass native load
-  console.log('[BOOTSTRAP] AppModule loaded successfully (Prisma decoupled).');
+  console.log('[BOOTSTRAP] Loading UNIFIED AppModule dist...');
+  // Note: Nest build usually flattens src into dist
+  AppModule = require('./backend/dist/app.module').AppModule;
+  PrismaService = require('./backend/dist/prisma/prisma.service').PrismaService;
+  console.log('[BOOTSTRAP] Unified AppModule loaded successfully.');
 } catch (loadErr: any) {
-  console.error('[MODULE LOAD FAILURE]', loadErr);
-  throw new Error(`Failed to load AppModule: ${loadErr.message}`);
+  console.error('[MODULE LOAD FAILURE] Falling back to dist/src...', loadErr);
+  try {
+     AppModule = require('./backend/dist/src/app.module').AppModule;
+     PrismaService = require('./backend/dist/src/prisma/prisma.service').PrismaService;
+  } catch (fallbackErr: any) {
+     throw new Error(`Failed to load Unified AppModule: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
+  }
 }
 
 // @ts-ignore
@@ -116,13 +122,16 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // Unified Health Check (Prisma Bypass Mode)
+  // Unified Health Check
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
       const server = await createServer();
+      const prisma = cachedApp.get(PrismaService);
+      const userCount = await prisma.user.count();
       return res.status(200).json({
         status: 'UP',
-        message: 'NestJS Framework ALIVE (Prisma Detached)',
+        dbConnection: 'OK',
+        userCount,
         timestamp: new Date().toISOString(),
         location: 'root/api_server.ts'
       });
@@ -130,7 +139,7 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({
         status: 'DOWN',
         error: dbErr.message,
-        hint: 'Framework level crash.'
+        hint: 'Check DATABASE_URL in Vercel settings.'
       });
     }
   }
