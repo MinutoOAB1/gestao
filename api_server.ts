@@ -41,12 +41,12 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
-// Full Application Restoration (NestJS 10 Stable)
+// Full Application Restoration (NestJS 10 Stable) - PRISMA BYPASS TEST
 try {
-  console.log('[BOOTSTRAP] Loading AppModule src...');
+  console.log('[BOOTSTRAP] Loading AppModule src (PRISMA DISABLED)...');
   AppModule = require('./backend/src/app.module').AppModule;
-  PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
-  console.log('[BOOTSTRAP] AppModule src loaded successfully.');
+  PrismaService = class MockPrisma {}; // Bypass native load
+  console.log('[BOOTSTRAP] AppModule loaded successfully (Prisma decoupled).');
 } catch (loadErr: any) {
   console.error('[MODULE LOAD FAILURE]', loadErr);
   throw new Error(`Failed to load AppModule: ${loadErr.message}`);
@@ -116,16 +116,13 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // Unified Health Check
+  // Unified Health Check (Prisma Bypass Mode)
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
       const server = await createServer();
-      const prisma = cachedApp.get(PrismaService);
-      const userCount = await prisma.user.count();
       return res.status(200).json({
         status: 'UP',
-        dbConnection: 'OK',
-        userCount,
+        message: 'NestJS Framework ALIVE (Prisma Detached)',
         timestamp: new Date().toISOString(),
         location: 'root/api_server.ts'
       });
@@ -133,7 +130,7 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({
         status: 'DOWN',
         error: dbErr.message,
-        hint: 'Check DATABASE_URL in Vercel settings.'
+        hint: 'Framework level crash.'
       });
     }
   }
