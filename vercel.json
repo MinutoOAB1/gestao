@@ -3,7 +3,7 @@
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "functions": {
-    "api_server.ts": {
+    "api/server.ts": {
       "memory": 3008,
       "maxDuration": 15,
       "includeFiles": [
@@ -16,7 +16,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api_server.ts"
+      "destination": "/api/server.ts"
     }
   ]
 }

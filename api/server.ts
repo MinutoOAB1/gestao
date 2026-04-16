@@ -44,15 +44,15 @@ let PrismaService: any;
 // Full Application Restoration (CommonJS Unified)
 try {
   console.log('[BOOTSTRAP] Loading UNIFIED AppModule dist...');
-  // Note: Nest build usually flattens src into dist
-  AppModule = require('./backend/dist/app.module').AppModule;
-  PrismaService = require('./backend/dist/prisma/prisma.service').PrismaService;
+  // Note: Path shifted to .. because we are now in api/
+  AppModule = require('../backend/dist/app.module').AppModule;
+  PrismaService = require('../backend/dist/prisma/prisma.service').PrismaService;
   console.log('[BOOTSTRAP] Unified AppModule loaded successfully.');
 } catch (loadErr: any) {
-  console.error('[MODULE LOAD FAILURE] Falling back to dist/src...', loadErr);
+  console.error('[MODULE LOAD FAILURE] Falling back to src...', loadErr);
   try {
-     AppModule = require('./backend/dist/src/app.module').AppModule;
-     PrismaService = require('./backend/dist/src/prisma/prisma.service').PrismaService;
+     AppModule = require('../backend/src/app.module').AppModule;
+     PrismaService = require('../backend/src/prisma/prisma.service').PrismaService;
   } catch (fallbackErr: any) {
      throw new Error(`Failed to load Unified AppModule: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
   }
