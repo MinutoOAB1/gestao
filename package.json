@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "frontend",
-    "backend"
+    "backend",
+    "api"
   ],
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
