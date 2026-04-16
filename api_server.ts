@@ -10,10 +10,12 @@ if (typeof global !== 'undefined') {
       createElement: () => ({ getContext: () => ({}) }),
       getElementsByTagName: () => [],
       documentElement: { style: {} },
+      querySelector: () => null,
+      addEventListener: () => {},
     } as any;
   }
   if (typeof global.navigator === 'undefined') {
-    global.navigator = { userAgent: 'node', platform: 'linux' } as any;
+    global.navigator = { userAgent: 'node', platform: 'linux', languages: ['pt-BR'] } as any;
   }
 }
 
@@ -39,13 +41,13 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
+console.log('[BOOTSTRAP] Loading AppModule src...');
 try {
-  // Root location paths: api_server.ts -> backend/src
   AppModule = require('./backend/src/app.module').AppModule;
   PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
+  console.log('[BOOTSTRAP] AppModule loaded successfully.');
 } catch (loadErr: any) {
   console.error('[MODULE LOAD FAILURE]', loadErr);
-  // Re-throw so it reaches uncaughtException or the handler
   throw new Error(`Failed to load AppModule: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
 }
 
@@ -58,18 +60,24 @@ let cachedApp: any;
 async function createServer() {
   if (cachedServer) return cachedServer;
 
+  console.log('[BOOTSTRAP] Creating Express instance...');
   const expressApp = express();
   const adapter = new ExpressAdapter(expressApp);
 
+  console.log('[BOOTSTRAP] Executing NestFactory.create...');
   const app = await NestFactory.create(AppModule, adapter, {
-    logger: ['error', 'warn', 'log'],
+    logger: ['error', 'warn', 'log', 'verbose'],
   });
 
+  console.log('[BOOTSTRAP] Setting Global Prefix...');
   app.setGlobalPrefix('api');
+  
+  console.log('[BOOTSTRAP] Applying Global Middleware...');
   app.use(compression());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+  console.log('[BOOTSTRAP] Configuring CORS...');
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -77,7 +85,10 @@ async function createServer() {
     allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
   });
 
+  console.log('[BOOTSTRAP] Executing app.init()...');
   await app.init();
+  
+  console.log('[BOOTSTRAP] Bootstrap sequence COMPLETE.');
   cachedApp = app;
   cachedServer = expressApp;
   return expressApp;
