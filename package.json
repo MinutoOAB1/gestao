@@ -54,8 +54,8 @@
   },
   "scripts": {
     "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma",
-    "vercel-build": "npm run build --workspace=frontend",
-    "build": "npm run build --workspace=frontend",
+    "vercel-build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
     "install-all": "npm install && npm install --workspace=backend && npm install --workspace=frontend"
   }
 }

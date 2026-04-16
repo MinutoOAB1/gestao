@@ -41,14 +41,20 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
-console.log('[BOOTSTRAP] Loading AppModule src...');
+console.log('[BOOTSTRAP] Loading PRE-COMPILED AppModule dist...');
 try {
-  AppModule = require('./backend/src/app.module').AppModule;
-  PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
-  console.log('[BOOTSTRAP] AppModule loaded successfully.');
+  // Path for NestJS build: backend/dist/src/app.module.js
+  AppModule = require('./backend/dist/src/app.module').AppModule;
+  PrismaService = require('./backend/dist/src/prisma/prisma.service').PrismaService;
+  console.log('[BOOTSTRAP] Compiled AppModule loaded successfully.');
 } catch (loadErr: any) {
-  console.error('[MODULE LOAD FAILURE]', loadErr);
-  throw new Error(`Failed to load AppModule: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
+  console.error('[MODULE LOAD FAILURE] Falling back to src (This might be slow)...', loadErr);
+  try {
+     AppModule = require('./backend/src/app.module').AppModule;
+     PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
+  } catch (fallbackErr: any) {
+     throw new Error(`Failed to load AppModule dist/src: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
+  }
 }
 
 // @ts-ignore

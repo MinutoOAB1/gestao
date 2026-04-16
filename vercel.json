@@ -8,7 +8,8 @@
       "maxDuration": 15,
       "includeFiles": [
         "node_modules/.prisma/client/**/*",
-        "backend/prisma/schema.prisma"
+        "backend/prisma/schema.prisma",
+        "backend/dist/**/*"
       ]
     }
   },
