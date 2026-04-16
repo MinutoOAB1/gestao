@@ -41,18 +41,16 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
-// Diagnostic Module Bypass (Atomic Test)
-import { MinimalModule } from './backend/src/minimal.module';
-AppModule = MinimalModule;
-console.log('[BOOTSTRAP] MinimalModule selected for bypass test.');
-/* 
+// Full Application Restoration (NestJS 10 Stable)
 try {
-  // AppModule = require('./backend/dist/src/app.module').AppModule;
-  // PrismaService = require('./backend/dist/src/prisma/prisma.service').PrismaService;
+  console.log('[BOOTSTRAP] Loading AppModule src...');
+  AppModule = require('./backend/src/app.module').AppModule;
+  PrismaService = require('./backend/src/prisma/prisma.service').PrismaService;
+  console.log('[BOOTSTRAP] AppModule src loaded successfully.');
 } catch (loadErr: any) {
-  // ...
+  console.error('[MODULE LOAD FAILURE]', loadErr);
+  throw new Error(`Failed to load AppModule: ${loadErr.message}`);
 }
-*/
 
 // @ts-ignore
 const compression = require('compression');
@@ -118,29 +116,24 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // Unified Health Check (Simplified for Binary Isolation Test)
+  // Unified Health Check
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
-      console.log('[HEALTH] Starting createServer trigger...');
       const server = await createServer();
-      console.log('[HEALTH] createServer finished. Logic operational.');
-      
-      // DECOUPLED: Prisma is NOT called here to isolate the crash
+      const prisma = cachedApp.get(PrismaService);
+      const userCount = await prisma.user.count();
       return res.status(200).json({
         status: 'UP',
-        message: 'NestJS Framework is successfully bootstrapped.',
-        dbCheck: 'SKIPPED_FOR_ISOLATION',
+        dbConnection: 'OK',
+        userCount,
         timestamp: new Date().toISOString(),
-        memory: process.memoryUsage(),
         location: 'root/api_server.ts'
       });
-    } catch (bootErr: any) {
-      console.error('[HEALTH] Bootstrap error caught:', bootErr);
+    } catch (dbErr: any) {
       return res.status(500).json({
         status: 'DOWN',
-        error: bootErr.message,
-        stack: bootErr.stack,
-        hint: 'If this is a timeout, check for blocking top-level code.'
+        error: dbErr.message,
+        hint: 'Check DATABASE_URL in Vercel settings.'
       });
     }
   }
