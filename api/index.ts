@@ -65,6 +65,15 @@ export default async function handler(req: any, res: any) {
     return res.status(204).end();
   }
 
+  // Minimal Infrastructure Test
+  if (req.url === '/api/test-minimal') {
+    return res.status(200).json({
+      status: 'OK',
+      message: 'Infrastructure is working. NestJS bootstrap was bypassed.',
+      timestamp: new Date().toISOString()
+    });
+  }
+
   // Unified Health Check
   if (req.url === '/api/debug/health' || req.url === '/debug/health') {
     try {
