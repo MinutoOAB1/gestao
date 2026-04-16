@@ -14,9 +14,9 @@ process.on('uncaughtException', (err) => {
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
-// Root location paths: api/index.ts -> ../backend/src
-import { AppModule } from '../backend/src/app.module';
-import { PrismaService } from '../backend/src/prisma/prisma.service';
+// Root location paths: api_server.ts -> backend/src
+import { AppModule } from './backend/src/app.module';
+import { PrismaService } from './backend/src/prisma/prisma.service';
 import express from 'express';
 
 // @ts-ignore
@@ -55,7 +55,7 @@ async function createServer() {
 
 export default async function handler(req: any, res: any) {
   ROOT_RES = res;
-  console.log(`[ROOT API REQUEST] ${req.method} ${req.url}`);
+  console.log(`[ROOT API SERVER REQUEST] ${req.method} ${req.url}`);
 
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -69,7 +69,7 @@ export default async function handler(req: any, res: any) {
   if (req.url === '/api/test-minimal') {
     return res.status(200).json({
       status: 'OK',
-      message: 'Infrastructure is working. NestJS bootstrap was bypassed.',
+      message: 'Infrastructure is working. NestJS bootstrap was bypassed. Context: ROOT',
       timestamp: new Date().toISOString()
     });
   }
@@ -85,7 +85,7 @@ export default async function handler(req: any, res: any) {
         dbConnection: 'OK',
         userCount,
         timestamp: new Date().toISOString(),
-        location: 'root/api/index.ts'
+        location: 'root/api_server.ts'
       });
     } catch (dbErr: any) {
       return res.status(500).json({
@@ -104,7 +104,7 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
       message: error.message,
-      location: 'root/api/index.ts'
+      location: 'root/api_server.ts'
     });
   }
 }
