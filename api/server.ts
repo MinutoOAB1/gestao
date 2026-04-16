@@ -41,10 +41,9 @@ import express from 'express';
 let AppModule: any;
 let PrismaService: any;
 
-// Full Application Restoration (CommonJS Unified)
+// Full Application Restoration (CommonJS Unified + Local Prisma)
 try {
   console.log('[BOOTSTRAP] Loading UNIFIED AppModule dist...');
-  // Note: Path shifted to .. because we are now in api/
   AppModule = require('../backend/dist/app.module').AppModule;
   PrismaService = require('../backend/dist/prisma/prisma.service').PrismaService;
   console.log('[BOOTSTRAP] Unified AppModule loaded successfully.');

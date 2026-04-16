@@ -7,7 +7,7 @@
       "memory": 3008,
       "maxDuration": 15,
       "includeFiles": [
-        "node_modules/.prisma/client/**/*",
+        "api/prisma-client/**/*",
         "backend/prisma/schema.prisma",
         "backend/dist/**/*"
       ]
