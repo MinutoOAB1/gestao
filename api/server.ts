@@ -44,8 +44,8 @@ let PrismaService: any;
 // Full Application Restoration (CommonJS Unified + Local Prisma)
 try {
   console.log('[BOOTSTRAP] Loading UNIFIED AppModule dist...');
-  AppModule = require('../backend/dist/app.module').AppModule;
-  PrismaService = require('../backend/dist/prisma/prisma.service').PrismaService;
+  AppModule = require('../backend/dist/src/app.module').AppModule;
+  PrismaService = require('../backend/dist/src/prisma/prisma.service').PrismaService;
   console.log('[BOOTSTRAP] Unified AppModule loaded successfully.');
 } catch (loadErr: any) {
   console.error('[MODULE LOAD FAILURE] Falling back to src...', loadErr);

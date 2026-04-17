@@ -1,6 +1,7 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  output        = "../../api/prisma-client"
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -19,10 +20,10 @@ model Tenant {
   maxUsers          Int                   @default(3)
   aiAnalysisLogs    AiAnalysisLog[]
   clients           Client[]
-  clientChecklists  ClientChecklistItem[]
   clientNotes       ClientNote[]
-  clientServiceLogs ClientServiceLog[]
   clientTags        ClientTag[]
+  clientServiceLogs ClientServiceLog[]
+  clientChecklists  ClientChecklistItem[]
   contracts         Contract[]
   documents         Document[]
   auditLogs         DocumentAuditLog[]
@@ -211,10 +212,10 @@ model Client {
   status           String                @default("ATIVO")
   customFields     Json?
   tenant           Tenant                @relation(fields: [tenantId], references: [id])
-  checklistItems   ClientChecklistItem[]
   notes            ClientNote[]
-  serviceLogs      ClientServiceLog[]
   tags             ClientTag[]
+  serviceLogs      ClientServiceLog[]
+  checklistItems   ClientChecklistItem[]
   contracts        Contract[]
   financialRecords FinancialRecord[]
   processes        Process[]
@@ -376,10 +377,10 @@ model Event {
   tenantId        String
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
+  status          String               @default("ATIVO")
   reminderSent    Boolean              @default(false)
   clientId        String?
   clientName      String?
-  status          String               @default("ATIVO")
   tenant          Tenant               @relation(fields: [tenantId], references: [id])
   assignees       EventAssignee[]
   checklistItems  EventChecklistItem[]

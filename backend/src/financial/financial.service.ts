@@ -242,7 +242,7 @@ export class FinancialService {
             select: { financialRecordId: true, partnerId: true, amount: true }
         });
 
-        const splitMap = new Map(splits.map(s => [s.financialRecordId, s]));
+        const splitMap = new Map<string, any>(splits.map(s => [s.financialRecordId as string, s]));
 
         return records.map(record => {
             const split = splitMap.get(record.id);
@@ -251,7 +251,7 @@ export class FinancialService {
                     ...record,
                     partnerId: split.partnerId,
                     partnerPercentage: (split.amount / record.amount) * 100
-                };
+                } as any;
             }
             return record;
         });

@@ -19,7 +19,9 @@ async function main() {
     // Create a default admin user if doesn't exist
     const adminUser = await prisma.user.upsert({
         where: { email: 'admin@escritorio.com' },
-        update: {},
+        update: {
+            password: '$2b$10$flbdU/D0V5JkpFIgfm2QWO0c4OoqyE28/92/G29N.rmb8iPeKgqIK', // password: 'password123'
+        },
         create: {
             email: 'admin@escritorio.com',
             password: '$2b$10$flbdU/D0V5JkpFIgfm2QWO0c4OoqyE28/92/G29N.rmb8iPeKgqIK', // password: 'password123'

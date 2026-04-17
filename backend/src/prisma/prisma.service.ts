@@ -24,20 +24,17 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       
       if (!bypass || tenantId) {
         try {
-          let sql = '';
           if (bypass) {
-            sql += "SELECT set_config('app.bypass_rls', 'on', false); ";
+            await this.$executeRawUnsafe("SELECT set_config('app.bypass_rls', 'on', false);");
           } else {
-            sql += "SELECT set_config('app.bypass_rls', 'off', false); ";
+            await this.$executeRawUnsafe("SELECT set_config('app.bypass_rls', 'off', false);");
           }
 
           if (tenantId) {
-            sql += `SELECT set_config('app.current_tenant_id', '${tenantId}', false);`;
+            await this.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', '${tenantId}', false);`);
           } else {
-            sql += "SELECT set_config('app.current_tenant_id', '', false);";
+            await this.$executeRawUnsafe("SELECT set_config('app.current_tenant_id', '', false);");
           }
-
-          await this.$executeRawUnsafe(sql);
         } catch (error) {
           console.error('RLS CONTEXT SETUP ERROR:', error.message);
         }
