@@ -24,3 +24,4 @@ tsc_errors*.txt
 .gemini/
 scripts/backup/
 .backup/
+api/nest-app/

@@ -53,7 +53,7 @@
   "scripts": {
     "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma",
     "build": "npm run vercel-build",
-    "vercel-build": "npm run build:backend && npm run build:frontend",
+    "vercel-build": "npm run build:backend && rm -rf api/nest-app && cp -r backend/dist/src api/nest-app && npm run build:frontend",
     "build:backend": "cd backend && npm install && npm run build",
     "build:frontend": "cd frontend && npm install && npm run build",
     "install-all": "npm install"
