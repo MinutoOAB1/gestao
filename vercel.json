@@ -6,12 +6,7 @@
     "api/server.ts": {
       "memory": 3008,
       "maxDuration": 15,
-      "includeFiles": [
-        "node_modules/.prisma/client/**/*",
-        "backend/prisma/schema.prisma",
-        "backend/dist/**/*",
-        "backend/node_modules/**/*"
-      ]
+      "includeFiles": "{node_modules/.prisma/client/**/*,backend/prisma/schema.prisma,backend/dist/**/*,backend/node_modules/**/*}"
     }
   },
   "rewrites": [
