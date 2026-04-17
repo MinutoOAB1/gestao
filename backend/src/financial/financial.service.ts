@@ -340,9 +340,11 @@ export class FinancialService {
             data.amount = parseFloat(data.amount);
         }
 
+        const { partnerId, partnerPercentage, ...prismaData } = data;
+
         const newRecord = await this.prisma.financialRecord.update({
             where: { id },
-            data,
+            data: prismaData,
         });
 
         // Audit log

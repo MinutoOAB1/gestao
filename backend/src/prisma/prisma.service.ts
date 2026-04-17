@@ -24,16 +24,18 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       
       if (!bypass || tenantId) {
         try {
+          // IMPORTANT: We use SET LOCAL so the setting only lasts for the current transaction.
+          // This is critical for connection poolers (PgBouncer/Supabase Pooler).
           if (bypass) {
-            await this.$executeRawUnsafe("SELECT set_config('app.bypass_rls', 'on', false);");
+            await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'on';");
           } else {
-            await this.$executeRawUnsafe("SELECT set_config('app.bypass_rls', 'off', false);");
+            await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'off';");
           }
 
           if (tenantId) {
-            await this.$executeRawUnsafe(`SELECT set_config('app.current_tenant_id', '${tenantId}', false);`);
+            await this.$executeRawUnsafe(`SET LOCAL app.current_tenant_id = '${tenantId}';`);
           } else {
-            await this.$executeRawUnsafe("SELECT set_config('app.current_tenant_id', '', false);");
+            await this.$executeRawUnsafe("SET LOCAL app.current_tenant_id = '';");
           }
         } catch (error) {
           console.error('RLS CONTEXT SETUP ERROR:', error.message);

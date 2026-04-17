@@ -4,7 +4,7 @@ import {
     ArrowLeft, Briefcase, FileText, DollarSign, 
     Plus, X, MapPin, Mail, Phone,
     AlertCircle, ChevronRight, Edit2, Trash2, StickyNote, History, User,
-    CheckCircle, Circle, CheckSquare, Clock, FileBadge, Send, Check, Headset,
+    CheckCircle, Circle, CheckSquare, FileBadge, Send, Check, Headset,
     Tag, MessageSquare, ArrowDownRight, ArrowUpRight
 } from 'lucide-react';
 import api from '../../services/api';
