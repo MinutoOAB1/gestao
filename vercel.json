@@ -2,13 +2,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
-  "functions": {
-    "api/server.ts": {
-      "memory": 3008,
-      "maxDuration": 15,
-      "includeFiles": "backend/dist/**"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
