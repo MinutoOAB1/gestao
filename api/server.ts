@@ -19,71 +19,48 @@ if (typeof global !== 'undefined') {
   }
 }
 
-let ROOT_RES: any = null;
-process.on('uncaughtException', (err) => {
-  console.error('[FATAL UNCAUGHT EXCEPTION]', err);
-  if (ROOT_RES && !ROOT_RES.headersSent) {
-    ROOT_RES.status(500).json({ 
-      error: "FATAL_RUNTIME_CRASH", 
-      message: err.message, 
-      stack: err.stack,
-      hint: "Check for top-level code executing during module import."
-    });
-  }
-});
-
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
-
-// Diagnostic Import Trap
-let AppModule: any;
-let PrismaService: any;
-
-// Full Application Restoration (CommonJS Unified + Local Prisma)
-try {
-  console.log('[BOOTSTRAP] Loading UNIFIED AppModule dist...');
-  AppModule = require('../backend/dist/src/app.module').AppModule;
-  PrismaService = require('../backend/dist/src/prisma/prisma.service').PrismaService;
-  console.log('[BOOTSTRAP] Unified AppModule loaded successfully.');
-} catch (loadErr: any) {
-  console.error('[MODULE LOAD FAILURE] Falling back to src...', loadErr);
-  try {
-     AppModule = require('../backend/src/app.module').AppModule;
-     PrismaService = require('../backend/src/prisma/prisma.service').PrismaService;
-  } catch (fallbackErr: any) {
-     throw new Error(`Failed to load Unified AppModule: ${loadErr.message}\x0aStack: ${loadErr.stack}`);
-  }
-}
 
 // @ts-ignore
 const compression = require('compression');
 
 let cachedServer: any;
 let cachedApp: any;
+let bootError: any = null;
+
+// Lazy-load AppModule to capture errors properly
+let AppModule: any;
+let PrismaService: any;
+
+try {
+  AppModule = require('../backend/dist/src/app.module').AppModule;
+  PrismaService = require('../backend/dist/src/prisma/prisma.service').PrismaService;
+  console.log('[BOOTSTRAP] AppModule loaded successfully from backend/dist/src/');
+} catch (err: any) {
+  console.error('[BOOTSTRAP] Failed to load AppModule:', err.message);
+  bootError = err;
+}
 
 async function createServer() {
   if (cachedServer) return cachedServer;
+  if (bootError) throw bootError;
 
-  console.log('[BOOTSTRAP] Creating Express instance...');
+  console.log('[BOOTSTRAP] Creating NestJS app...');
   const expressApp = express();
   const adapter = new ExpressAdapter(expressApp);
 
-  console.log('[BOOTSTRAP] Executing NestFactory.create...');
   const app = await NestFactory.create(AppModule, adapter, {
-    logger: ['error', 'warn', 'log', 'verbose'],
+    logger: ['error', 'warn', 'log'],
   });
 
-  console.log('[BOOTSTRAP] Setting Global Prefix...');
   app.setGlobalPrefix('api');
-  
-  console.log('[BOOTSTRAP] Applying Global Middleware...');
   app.use(compression());
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-  console.log('[BOOTSTRAP] Configuring CORS...');
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -91,18 +68,16 @@ async function createServer() {
     allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
   });
 
-  console.log('[BOOTSTRAP] Executing app.init()...');
   await app.init();
+  console.log('[BOOTSTRAP] NestJS app initialized successfully.');
   
-  console.log('[BOOTSTRAP] Bootstrap sequence COMPLETE.');
   cachedApp = app;
   cachedServer = expressApp;
   return expressApp;
 }
 
 export default async function handler(req: any, res: any) {
-  ROOT_RES = res;
-  console.log(`[ROOT API SERVER REQUEST] ${req.method} ${req.url}`);
+  console.log(`[API] ${req.method} ${req.url}`);
 
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -112,46 +87,29 @@ export default async function handler(req: any, res: any) {
     return res.status(204).end();
   }
 
-  // Minimal Infrastructure Test
+  // Diagnostic endpoint - works even if NestJS fails to boot
   if (req.url === '/api/test-minimal') {
     return res.status(200).json({
-      status: 'OK',
-      message: 'Infrastructure is working. NestJS bootstrap was bypassed. Context: ROOT',
-      timestamp: new Date().toISOString()
+      status: bootError ? 'ERROR' : 'OK',
+      bootError: bootError ? { message: bootError.message, stack: bootError.stack } : null,
+      timestamp: new Date().toISOString(),
+      nodeVersion: process.version,
+      env: {
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        hasJwtSecret: !!process.env.JWT_SECRET,
+      }
     });
-  }
-
-  // Unified Health Check
-  if (req.url === '/api/debug/health' || req.url === '/debug/health') {
-    try {
-      const server = await createServer();
-      const prisma = cachedApp.get(PrismaService);
-      const userCount = await prisma.user.count();
-      return res.status(200).json({
-        status: 'UP',
-        dbConnection: 'OK',
-        userCount,
-        timestamp: new Date().toISOString(),
-        location: 'root/api_server.ts'
-      });
-    } catch (dbErr: any) {
-      return res.status(500).json({
-        status: 'DOWN',
-        error: dbErr.message,
-        hint: 'Check DATABASE_URL in Vercel settings.'
-      });
-    }
   }
 
   try {
     const server = await createServer();
     return server(req, res);
   } catch (error: any) {
-    console.error('FINAL BOOTSTRAP ERROR:', error);
+    console.error('[API ERROR]', error);
     return res.status(500).json({
       error: 'Backend Bootstrap Failure',
       message: error.message,
-      location: 'root/api_server.ts'
+      stack: error.stack,
     });
   }
 }
