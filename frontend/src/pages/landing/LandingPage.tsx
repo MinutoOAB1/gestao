@@ -131,7 +131,6 @@ function HeroSection() {
                             onClick={() => navigate('/register')}
                             className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-[#0B1120] dark:bg-white text-white dark:text-[#0B1120] font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg group"
                         >
-                        >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </button>
@@ -250,7 +249,6 @@ function FeaturesSection() {
                         <div
                             key={idx}
                             className="group p-8 bg-white dark:bg-[#0B1120] rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
-                        >
                         >
                             <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center mb-6 border border-slate-200 dark:border-slate-700">
                                 <feature.icon size={24} />
@@ -378,7 +376,6 @@ function PricingSection() {
                                 ? 'bg-white dark:bg-[#0B1120] border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10'
                                 : 'bg-white dark:bg-[#0B1120] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                                 }`}
-                        >
                         >
                             {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full">
