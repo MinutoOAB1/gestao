@@ -94,9 +94,5 @@ export class AiController {
         }
     }
 
-    @Post('chat')
-    async chat(@Body() body: { context: string; message: string; history?: any[] }) {
-        return this.aiService.chatLegal(body.context, body.message, body.history || []);
-    }
 }
 

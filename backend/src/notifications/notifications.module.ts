@@ -4,13 +4,11 @@ import { NotificationsService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsGateway } from './notifications.gateway';
 import { PrismaModule } from '../prisma/prisma.module';
-import { ChatModule } from '../chat/chat.module';
 
 @Global()
 @Module({
     imports: [
         PrismaModule,
-        forwardRef(() => ChatModule),
         JwtModule.register({
             secret: process.env.JWT_SECRET || 'fallback-secret',
         }),

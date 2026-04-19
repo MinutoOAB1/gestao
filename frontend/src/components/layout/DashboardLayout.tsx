@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { PrefetchLink } from '../ui/PrefetchLink';
 import { BrandLogo } from '../ui/BrandLogo';
-import { Users, FileText, Calendar, DollarSign, Settings, LogOut, ChevronRight, Search, Menu, Home, Plus, Folder, Sun, Moon, ClipboardList, Shield, History, ChevronDown, User, MessageSquare, X, MoreHorizontal, Clock, Pause } from 'lucide-react';
+import { Users, FileText, Calendar, DollarSign, Settings, LogOut, ChevronRight, Search, Menu, Home, Plus, Folder, Sun, Moon, ClipboardList, Shield, History, ChevronDown, User, X, MoreHorizontal, Clock, Pause } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAuth } from '../../context/AuthContext';
@@ -10,7 +10,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, memo } from 'react';
 import NotificationPanel from '../ui/NotificationPanel';
-import ChatDrawer from '../chat/ChatDrawer';
 import GlobalSearch from '../shared/GlobalSearch';
 import { useTimer } from '../../context/TimerContext';
 import api from '../../services/api';
@@ -249,7 +248,6 @@ export default function DashboardLayout() {
     const [collapsed, setCollapsed] = useState(false);
 
     const [teamMembers, setTeamMembers] = useState<Array<{ id: string, name: string, avatar: string | null, role: string }>>([]);
-    const [isChatOpen, setIsChatOpen] = useState(false);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
     const [processExpanded, setProcessExpanded] = useState(location.pathname.startsWith('/app/processos'));
     const pathSegments = location.pathname.split('/').filter(Boolean);
@@ -529,14 +527,6 @@ export default function DashboardLayout() {
                                         <Clock size={20} />
                                     </button>
                                 )}
-                                <button
-                                    onClick={() => setIsChatOpen(true)}
-                                    className="p-2.5 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-colors relative"
-                                    title="Chat da Equipe"
-                                >
-                                    <MessageSquare size={20} />
-                                    <span className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full"></span>
-                                </button>
                                 <NotificationPanel />
                             </div>
 
@@ -703,8 +693,6 @@ export default function DashboardLayout() {
                 )}
             </AnimatePresence>
 
-            {/* Chat Drawer */}
-            <ChatDrawer isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
 
             {/* Global Search Modal (Ctrl+K) */}
             <GlobalSearch />

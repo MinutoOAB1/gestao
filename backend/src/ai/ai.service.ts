@@ -207,18 +207,6 @@ export class AiService {
     }
   }
 
-  async chatLegal(contractContext: string, message: string, history: any[] = []) {
-    const messages = [
-      {
-        role: 'system',
-        content: `Você é um assistente jurídico de elite. Use o seguinte contexto do contrato para responder: ${contractContext}`
-      },
-      ...history,
-      { role: 'user', content: message }
-    ];
-
-    return this.callOpenRouter(messages);
-  }
 
   // Generate comprehensive client report using AI - returns structured data for rich frontend rendering
   async generateClientReport(clientData: {

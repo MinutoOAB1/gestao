@@ -6,7 +6,6 @@ import { ToastProvider } from './context/ToastContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { DeadlineProvider } from './context/DeadlineContext';
 import { TimerProvider } from './context/TimerContext';
-import { ChatProvider } from './context/ChatContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import OfflineIndicator from './components/ui/OfflineIndicator';
@@ -64,7 +63,6 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <TimerProvider>
-            <ChatProvider>
               <ToastProvider>
                 <NotificationProvider>
                   <DeadlineProvider>
@@ -117,7 +115,6 @@ function App() {
                   </DeadlineProvider>
                 </NotificationProvider>
               </ToastProvider>
-            </ChatProvider>
           </TimerProvider>
         </BrowserRouter>
       </AuthProvider>

@@ -490,46 +490,6 @@ model Template {
   tenant           Tenant   @relation(fields: [tenantId], references: [id])
 }
 
-model ChatChannel {
-  id        String        @id @default(uuid())
-  name      String
-  type      String        @default("PROCESS")
-  processId String?
-  tenantId  String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  messages  ChatMessage[]
-}
-
-model ChatMessage {
-  id           String      @id @default(uuid())
-  content      String
-  senderId     String
-  senderName   String
-  senderAvatar String?
-  channelId    String
-  fileName     String?
-  fileUrl      String?
-  fileSize     String?
-  fileType     String?
-  replyToId    String?
-  reactions    String?
-  isPinned     Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  channel      ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-}
-
-model DirectMessage {
-  id           String   @id @default(uuid())
-  content      String
-  senderId     String
-  senderName   String
-  senderAvatar String?
-  recipientId  String
-  tenantId     String
-  isRead       Boolean  @default(false)
-  createdAt    DateTime @default(now())
-}
 
 model TenantSettings {
   id                 String  @id @default(uuid())

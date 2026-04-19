@@ -7,7 +7,7 @@ import {
     Play,
     CheckCircle2,
     AlertTriangle,
-    MessageSquare,
+    Star,
     FileText,
     ArrowRight,
     Maximize2,
@@ -85,8 +85,6 @@ export default function IAAnalisePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
     const [selectedClause, setSelectedClause] = useState<any | null>(null);
-    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-    const [chatInput, setChatInput] = useState('');
     const [uploadOpen, setUploadOpen] = useState(false);
     const [fileToUpload, setFileToUpload] = useState<File | null>(null);
     const [zoomLevel, setZoomLevel] = useState(100);
@@ -160,10 +158,6 @@ export default function IAAnalisePage() {
     const documentRef = useRef<HTMLDivElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
-    // Scroll to bottom of chat
-    useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [chatMessages]);
 
     // Load document from sidebar when clicked - poll for changes
     useEffect(() => {
@@ -260,26 +254,6 @@ export default function IAAnalisePage() {
         setSelectedClause(null);
     };
 
-    const handleSendMessage = async () => {
-        if (!chatInput.trim() || !analysis) return;
-
-        const newUserMsg: ChatMessage = { role: 'user', content: chatInput };
-        setChatMessages(prev => [...prev, newUserMsg]);
-        setChatInput('');
-
-        try {
-            const response = await api.post('/ai/chat', {
-                context: contractText,
-                message: chatInput,
-                history: chatMessages.slice(-10) // Send last 10 messages for context
-            });
-
-            const aiMsg: ChatMessage = { role: 'model', content: response.data };
-            setChatMessages(prev => [...prev, aiMsg]);
-        } catch (error) {
-            console.error('Erro no chat:', error);
-        }
-    };
 
     const applySuggestedRedaction = (clause: any) => {
         if (!analysis) return;
@@ -515,7 +489,7 @@ export default function IAAnalisePage() {
                         className="flex items-center gap-2 px-4 py-2 text-slate-500 hover:text-white transition-colors"
                         title="Avaliar IA"
                     >
-                        <MessageSquare size={16} />
+                        <Star size={16} />
                     </button>
                     <label className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-800 transition-all cursor-pointer">
                         <input
@@ -587,7 +561,6 @@ export default function IAAnalisePage() {
                             {[
                                 { icon: Shield, label: 'Due Diligence Profunda' },
                                 { icon: Zap, label: 'Sugestões de Redação' },
-                                { icon: MessageSquare, label: 'Chat Contextual' }
                             ].map((feat, i) => (
                                 <div key={i} className="flex flex-col items-center gap-2">
                                     <div className="p-3 bg-slate-100 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500">
@@ -1235,81 +1208,6 @@ export default function IAAnalisePage() {
                                     </>
                                 )}
 
-                                {/* IA Assistant (Persistent at bottom, Image 2 style) */}
-                                <div className="flex-none mt-auto pt-2">
-                                    <div className="bg-white dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
-                                        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="relative">
-                                                    <div className="w-10 h-10 rounded-2xl bg-[#1053ff] flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                                                        <Shield size={20} fill="currentColor" />
-                                                    </div>
-                                                    <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-[#161b2c]" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">IA Assistant</h4>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Online & Analisando</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-4">
-                                                <button className="text-slate-500 hover:text-slate-900 dark:text-slate-600 dark:hover:text-white"><RefreshCw size={14} /></button>
-                                                <button className="text-slate-500 hover:text-slate-900 dark:text-slate-600 dark:hover:text-white"><Maximize2 size={14} /></button>
-                                            </div>
-                                        </div>
-
-                                        <div className="h-64 overflow-y-auto custom-scrollbar p-6 space-y-6 bg-slate-50 dark:bg-[#0c0e17]/30">
-                                            {chatMessages.length === 0 ? (
-                                                <div className="text-center space-y-4 py-8">
-                                                    <div className="w-12 h-12 bg-slate-200 dark:bg-slate-900 rounded-full flex items-center justify-center mx-auto text-slate-400 dark:text-slate-700">
-                                                        <MessageSquare size={24} />
-                                                    </div>
-                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest max-w-[200px] mx-auto leading-relaxed">
-                                                        Encontrei 3 pontos críticos. Deseja que eu reescreva a Cláusula 4.2?
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                chatMessages.map((msg, idx) => (
-                                                    <div key={idx} className={clsx("flex gap-3", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}>
-                                                        <div className={clsx(
-                                                            "w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white",
-                                                            msg.role === 'user' ? "bg-slate-800" : "bg-[#1053ff]"
-                                                        )}>
-                                                            {msg.role === 'user' ? <Plus className="rotate-45" size={14} /> : <Shield size={14} fill="currentColor" />}
-                                                        </div>
-                                                        <div className={clsx(
-                                                            "max-w-[80%] p-4 rounded-3xl text-xs leading-relaxed",
-                                                            msg.role === 'user' ? "bg-[#1053ff] text-white rounded-tr-none" : "bg-slate-100 dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 rounded-tl-none"
-                                                        )}>
-                                                            {msg.content}
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            )}
-                                            <div ref={chatEndRef} />
-                                        </div>
-
-                                        <div className="p-4 bg-white dark:bg-[#161b2c] border-t border-slate-200 dark:border-slate-800">
-                                            <div className="flex items-center gap-3 bg-slate-100 dark:bg-[#0c0e17] border border-slate-200 dark:border-slate-800 rounded-2xl px-4 py-2 group focus-within:border-[#1053ff]/50 transition-all">
-                                                <Plus size={18} className="text-slate-600 hover:text-white cursor-pointer" />
-                                                <input
-                                                    type="text"
-                                                    className="flex-1 bg-transparent border-none outline-none text-xs text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-600 py-1"
-                                                    placeholder="Faça uma pergunta sobre o contrato..."
-                                                    value={chatInput}
-                                                    onChange={(e) => setChatInput(e.target.value)}
-                                                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                                                />
-                                                <Send
-                                                    size={18}
-                                                    className={clsx("cursor-pointer transition-colors", chatInput.trim() ? "text-[#1053ff]" : "text-slate-700")}
-                                                    onClick={handleSendMessage}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     )}
@@ -1335,7 +1233,7 @@ export default function IAAnalisePage() {
                             </button>
 
                             <div className="w-14 h-14 bg-[#1053ff] rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-lg shadow-blue-500/20">
-                                <MessageSquare size={28} fill="currentColor" />
+                                <Star size={28} fill="currentColor" />
                             </div>
 
                             <h2 className="text-2xl font-black text-white mb-2">Avalie a Análise da IA</h2>

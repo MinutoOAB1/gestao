@@ -22,7 +22,6 @@ import { ProcessUpdatesModule } from './process-updates/process-updates.module';
 import { ProcessNotesModule } from './process-notes/process-notes.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { ChatModule } from './chat/chat.module';
 import { TimesheetModule } from './timesheet/timesheet.module';
 import { SettingsModule } from './settings/settings.module';
 import { EmailModule } from './email/email.module';
@@ -62,7 +61,6 @@ import { HealthController } from './health/health.controller';
     ProcessNotesModule,
     DashboardModule,
     // NotificationsModule,
-    // ChatModule,
     TimesheetModule,
     SettingsModule,
     UserFilesModule,
