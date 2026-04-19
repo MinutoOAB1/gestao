@@ -5,7 +5,7 @@ import {
     Plus, X, MapPin, Mail, Phone,
     AlertCircle, ChevronRight, Edit2, Trash2, StickyNote, History, User,
     CheckCircle, Circle, CheckSquare, Clock, FileBadge, Send, Check, Headset,
-    Tag, MessageSquare, ArrowDownRight, ArrowUpRight
+    Tag, MessageSquare, ArrowDownRight, ArrowUpRight, RefreshCcw
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -302,7 +302,15 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                 type: 'CREATED',
                 title: 'Cliente Cadastrado',
                 description: 'Perfil do cliente foi criado no sistema.'
-            }
+            },
+            ...(client.activities || []).map((a: any) => ({
+                id: `act_${a.id}`,
+                date: a.createdAt,
+                type: a.type,
+                title: a.type.replace(/_/g, ' '),
+                description: a.description,
+                metadata: a.metadata
+            }))
         ].sort((a, b) => {
             const timeA = a.date ? new Date(a.date).getTime() : 0;
             const timeB = b.date ? new Date(b.date).getTime() : 0;
@@ -844,50 +852,84 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
 
                     {/* === TAB: LINHA DO TEMPO === */}
                     {activeTab === 'timeline' && (
-                    <div>
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold flex items-center gap-2"><History size={20} className="text-indigo-500" />Linha do Tempo</h3>
-                                <button onClick={() => setShowServiceLogModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 text-teal-600 hover:bg-teal-100 dark:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20 rounded-md transition-colors text-sm font-medium">
-                                    <Headset size={16} /> Registrar Atendimento
-                                </button>
-                            </div>
-                            <div className="relative pl-8 space-y-0 max-h-[600px] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar">
-                                {/* Vertical connecting line */}
-                                <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-indigo-500/40 via-slate-200 dark:via-slate-700 to-transparent" />
-                                
-                                {timeline.length === 0 ? (
-                                    <p className="text-sm text-slate-500">Nenhum evento registrado.</p>
-                                ) : (
-                                    timeline.map((event: any) => {
-                                        const iconMap: Record<string, { icon: any; color: string; bg: string }> = {
-                                            'PROCESS':  { icon: Briefcase,    color: 'text-blue-500',    bg: 'bg-blue-100 dark:bg-blue-500/20' },
-                                            'UPDATE':   { icon: History,      color: 'text-purple-500',  bg: 'bg-purple-100 dark:bg-purple-500/20' },
-                                            'NOTE':     { icon: StickyNote,   color: 'text-amber-500',   bg: 'bg-amber-100 dark:bg-amber-500/20' },
-                                            'FINANCIAL':{ icon: DollarSign,   color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-500/20' },
-                                            'CREATED':  { icon: User,         color: 'text-slate-500',   bg: 'bg-slate-100 dark:bg-slate-500/20' },
-                                            'SERVICE_LOG':{ icon: Headset,    color: 'text-teal-500',    bg: 'bg-teal-100 dark:bg-teal-500/20' },
-                                        };
-                                        const style = iconMap[event.type] || iconMap['CREATED'];
-                                        const IconComp = style.icon;
-                                        return (
-                                            <div key={event.id} className="relative pb-6 last:pb-0 group">
-                                                {/* Timeline dot with icon */}
-                                                <div className={clsx("absolute -left-[17px] top-1 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm transition-transform group-hover:scale-110", style.bg)}>
-                                                    <IconComp size={14} className={style.color} />
-                                                </div>
-                                                <div className="ml-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
-                                                    <div className="flex items-center justify-between mb-1">
-                                                        <span className={clsx("text-xs font-bold uppercase tracking-wider", style.color)}>{event.title}</span>
-                                                        <span className="text-[10px] text-slate-400 font-medium bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{formatDate(event.date)}</span>
+                    <div className="space-y-6 max-w-3xl mx-auto animate-in slide-in-from-bottom-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold flex items-center gap-2">
+                                <History size={20} className="text-indigo-500" />
+                                Histórico de Atividades
+                            </h3>
+                            <button onClick={() => setShowServiceLogModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 text-teal-600 hover:bg-teal-100 dark:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20 rounded-md transition-colors text-sm font-medium">
+                                <Headset size={16} /> Registrar Atendimento
+                            </button>
+                        </div>
+                        
+                        <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:via-blue-400 before:to-transparent">
+                            {timeline.length === 0 ? (
+                                <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                                    <History size={48} className="mx-auto text-slate-300 mb-4" />
+                                    <p className="text-slate-500 font-medium">Nenhuma atividade registrada ainda.</p>
+                                </div>
+                            ) : (
+                                timeline.map((item: any, idx) => {
+                                    // Map activity types to icons and colors
+                                    const getTypeConfig = (type: string) => {
+                                        switch(type) {
+                                            case 'PROCESS_CREATED': return { icon: Briefcase, color: 'bg-blue-500', label: 'Processo' };
+                                            case 'PROCESS_WON': return { icon: CheckCircle, color: 'bg-emerald-500', label: 'Vitória' };
+                                            case 'STATUS_CHANGED': return { icon: RefreshCcw, color: 'bg-amber-500', label: 'Status' };
+                                            case 'NOTE_ADDED': return { icon: StickyNote, color: 'bg-purple-500', label: 'Nota' };
+                                            case 'SERVICE_LOG': return { icon: Headset, color: 'bg-indigo-500', label: 'Atendimento' };
+                                            case 'FINANCIAL': return { icon: DollarSign, color: 'bg-green-600', label: 'Financeiro' };
+                                            case 'CREATED': return { icon: User, color: 'bg-slate-500', label: 'Cadastro' };
+                                            case 'UPDATE': return { icon: Clock, color: 'bg-blue-400', label: 'Movimentação' };
+                                            case 'PROCESS': return { icon: Briefcase, color: 'bg-blue-500', label: 'Processo' };
+                                            default: return { icon: History, color: 'bg-slate-400', label: 'Sistema' };
+                                        }
+                                    };
+                                    
+                                    const config = getTypeConfig(item.type);
+                                    const Icon = config.icon;
+
+                                    return (
+                                        <div key={item.id} className="relative flex items-start gap-6 group">
+                                            {/* Timeline dot/icon */}
+                                            <div className={`absolute left-0 mt-1 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white dark:border-slate-950 ${config.color} text-white shadow-sm z-10 group-hover:scale-110 transition-transform`}>
+                                                <Icon size={18} />
+                                            </div>
+
+                                            <div className="flex-1 ml-12 pt-1">
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${config.color} bg-opacity-10 text-opacity-100`} style={{ color: config.color.replace('bg-', 'text-') }}>
+                                                            {config.label}
+                                                        </span>
+                                                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                                                            {item.title}
+                                                        </h4>
                                                     </div>
-                                                    <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-3">{event.description}</p>
+                                                    <time className="text-[11px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                                        {new Date(item.date).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                    </time>
+                                                </div>
+                                                
+                                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm group-hover:shadow-md transition-shadow">
+                                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                                        {item.description}
+                                                    </p>
+                                                    {item.author && (
+                                                        <div className="mt-3 flex items-center gap-2 pt-3 border-t border-slate-50 dark:border-slate-800">
+                                                            <div className="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">
+                                                                {item.author.charAt(0)}
+                                                            </div>
+                                                            <span className="text-[11px] font-medium text-slate-500">Por {item.author}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
-                                        );
-                                    })
-                                )}
-                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
                         </div>
                     </div>
                     )}

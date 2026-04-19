@@ -19,7 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import {
     CheckSquare, MessageSquare, FileText, Trash2,
-    Plus, Search, Filter, MoreVertical, Calendar, AlertTriangle, CheckCircle, X, Save, LayoutGrid, List
+    Plus, Search, Filter, MoreVertical, Calendar, AlertTriangle, CheckCircle, X, Save, LayoutGrid, List, Users
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
@@ -544,8 +544,8 @@ function FilterModal({
 }: {
     isOpen: boolean;
     onClose: () => void;
-    filters: { area: string; hasDeadline: boolean; assignedTo: string };
-    onApply: (filters: { area: string; hasDeadline: boolean; assignedTo: string }) => void;
+    filters: { area: string; hasDeadline: boolean; assignedTo: string; assignedToMe: boolean };
+    onApply: (filters: { area: string; hasDeadline: boolean; assignedTo: string; assignedToMe: boolean }) => void;
     teamMembers: Array<{ id: string, name: string, avatar?: string | null, role: string }>;
 }) {
     const [localFilters, setLocalFilters] = useState(filters);
@@ -586,7 +586,7 @@ function FilterModal({
                     </div>
                 </div>
                 <div className="flex justify-end gap-2 mt-6">
-                    <button onClick={() => { setLocalFilters({ area: '', hasDeadline: false, assignedTo: '' }); onApply({ area: '', hasDeadline: false, assignedTo: '' }); onClose(); }} className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Limpar</button>
+                    <button onClick={() => { setLocalFilters({ area: '', hasDeadline: false, assignedTo: '', assignedToMe: false }); onApply({ area: '', hasDeadline: false, assignedTo: '', assignedToMe: false }); onClose(); }} className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Limpar</button>
                     <button onClick={() => { onApply(localFilters); onClose(); }} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">Aplicar</button>
                 </div>
             </div>
@@ -618,7 +618,7 @@ export default function KanbanPage() {
     const [activeProcess, setActiveProcess] = useState<Process | null>(null);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState({ area: '', hasDeadline: false, assignedTo: '' });
+    const [filters, setFilters] = useState({ area: '', hasDeadline: false, assignedTo: '', assignedToMe: false });
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [showDeadlineFilter, setShowDeadlineFilter] = useState<'all' | 'today' | 'week' | 'overdue'>('all');
     const [modalOpen, setModalOpen] = useState(false);
@@ -726,6 +726,7 @@ export default function KanbanPage() {
                 p.client?.name?.toLowerCase().includes(q);
             const matchesArea = !filters.area || p.area === filters.area;
             const matchesAssigned = !filters.assignedTo || p.assignedTo?.toLowerCase().includes(filters.assignedTo.toLowerCase());
+            const matchesAssignedToMe = !filters.assignedToMe || p.assignedTo === 'Me' || p.assignedTo === teamMembers.find(m => m.id === localStorage.getItem('user_id'))?.name; // Simple heuristic
             const matchesHasDeadline = !filters.hasDeadline || !!p.deadline;
             let matchesDeadlineFilter = true;
             if (showDeadlineFilter !== 'all' && p.deadline) {
@@ -897,6 +898,17 @@ export default function KanbanPage() {
 
                     {/* Filters & Actions row on mobile */}
                     <div className="flex items-center gap-2 overflow-x-auto pb-2 xl:pb-0 scrollbar-hide shrink-0 w-full xl:w-auto">
+                        <button
+                            onClick={() => setFilters(prev => ({ ...prev, assignedToMe: !prev.assignedToMe }))}
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors touch-manipulation min-h-[40px] whitespace-nowrap ${filters.assignedToMe
+                                ? 'bg-indigo-100 text-indigo-700 border border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-700'
+                                : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 hover:border-indigo-400 hover:text-indigo-600'
+                                }`}
+                        >
+                            <Users size={15} />
+                            <span>Meus Processos</span>
+                        </button>
+
                         <button
                             onClick={() => setShowFilterModal(true)}
                             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors touch-manipulation min-h-[40px] whitespace-nowrap ${filters.area || filters.assignedTo || filters.hasDeadline

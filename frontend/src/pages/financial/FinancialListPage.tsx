@@ -106,8 +106,8 @@ const formatBRL = (value: number) => {
     }).format(value);
 };
 
-const INCOME_CATEGORIES = ['Honorários', 'Consultoria', 'Parecer Jurídico', 'Outros'];
-const EXPENSE_CATEGORY_LIST = ['Pessoal', 'Custas Processuais', 'Infraestrutura', 'Marketing', 'Impostos', 'Outros'];
+const INCOME_CATEGORIES = ['Honorários Contratuais', 'Honorários Sucumbenciais', 'Consultoria', 'Parecer Jurídico', 'Custas Reembolsadas', 'Acordo Judicial', 'Outros'];
+const EXPENSE_CATEGORY_LIST = ['Pessoal / Salários', 'Custas Processuais', 'Infraestrutura / Aluguel', 'Marketing / Softwares', 'Impostos', 'Token / Assinatura Digital', 'Viagens / Deslocamento', 'Outros'];
 const PARTNER_TYPES = ['TRABALHISTA', 'CÍVEL', 'TRIBUTÁRIO', 'CRIMINAL', 'PREVIDENCIÁRIO', 'FAMÍLIA', 'MARKETING', 'ADMINISTRATIVO', 'OUTROS'];
 const PARTNER_COLORS = [
     'bg-amber-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500',
@@ -156,7 +156,7 @@ export default function FinancialListPage() {
         status: 'PENDING',
         recurrence: 'UNICA',
         installments: 1,
-        urgent: false,
+        urgent: true,
         notes: '',
         linkTo: '',
         partnerId: '',

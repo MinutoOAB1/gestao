@@ -102,13 +102,21 @@ export class ProcessesService {
       }
     }
 
+    // Handle completion logic
+    const isCompleted = data.status === 'GANHO' || data.status === 'COMPLETED' || data.status === 'WON' || data.kanbanColumn === 'Ganho' || data.kanbanColumn === 'Concluído';
+    if (isCompleted) {
+      data.completedAt = new Date();
+    } else if (data.status === 'ACTIVE' || data.status === 'OPEN' || data.kanbanColumn === 'novo') {
+      data.completedAt = null;
+    }
+
     const updated = await this.prisma.process.update({
       where: { id, tenantId },
       data,
     });
 
     // Event Emitter: Emit when a process is marked as won/completed
-    if (data.status === 'GANHO' || data.status === 'COMPLETED' || data.status === 'WON' || data.kanbanColumn === 'Ganho' || data.kanbanColumn === 'Concluído') {
+    if (isCompleted) {
       this.eventEmitter.emit('process.won', {
         processId: updated.id,
         tenantId: updated.tenantId,

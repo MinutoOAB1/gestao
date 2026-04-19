@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit, FileText, Users, Calendar, DollarSign, MapPin, Tag, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, Users, Calendar, DollarSign, MapPin, Tag, Trash2, CheckCircle } from 'lucide-react';
 import api from '../../services/api';
 import { clsx } from 'clsx';
 import { useToast } from '../../context/ToastContext';
@@ -26,6 +26,7 @@ interface Process {
     };
     createdAt: string;
     updatedAt: string;
+    completedAt?: string;
 }
 
 const statusColors: Record<string, string> = {
@@ -197,6 +198,17 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
                                 {new Date(process.createdAt).toLocaleDateString('pt-BR')}
                             </p>
                         </div>
+                        {process.completedAt && (
+                            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <CheckCircle size={14} className="text-emerald-500" />
+                                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Concluído em</span>
+                                </div>
+                                <p className="text-emerald-700 dark:text-emerald-300 font-bold">
+                                    {new Date(process.completedAt).toLocaleDateString('pt-BR')}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
 

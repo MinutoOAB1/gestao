@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ClientsService {
     constructor(private prisma: PrismaService) { }
 
-    create(createClientDto: CreateClientDto, tenantId: string) {
+    async create(createClientDto: CreateClientDto, tenantId: string) {
         // Sanitize: convert empty strings to null for optional fields
         console.log('Creating client with data:', createClientDto);
         const data: any = { ...createClientDto, tenantId };
@@ -54,7 +55,11 @@ export class ClientsService {
             };
         }
 
-        return this.prisma.client.create({ data, include: { tags: true } });
+        const client = await this.prisma.client.create({ data, include: { tags: true } });
+        
+        await this.logActivity(client.id, tenantId, 'CLIENT_CREATED', `Cliente ${client.name} cadastrado na plataforma.`);
+        
+        return client;
     }
 
     findAll(tenantId: string, take = 50, skip = 0) {
@@ -84,7 +89,8 @@ export class ClientsService {
             include: { 
                 tags: { orderBy: { order: 'asc' } },
                 serviceLogs: { orderBy: { date: 'desc' } },
-                checklistItems: { orderBy: { createdAt: 'asc' } }
+                checklistItems: { orderBy: { createdAt: 'asc' } },
+                activities: { orderBy: { createdAt: 'desc' }, take: 50 }
             },
         });
     }
@@ -146,11 +152,16 @@ export class ClientsService {
     async updateStatus(id: string, status: string, tenantId: string) {
         const existing = await this.prisma.client.findFirst({ where: { id, tenantId } });
         if (!existing) throw new Error('Cliente não encontrado');
-        return this.prisma.client.update({
+        
+        const updated = await this.prisma.client.update({
             where: { id },
             data: { status },
             include: { tags: { orderBy: { order: 'asc' } } },
         });
+
+        await this.logActivity(id, tenantId, 'STATUS_CHANGED', `Status alterado para ${status}.`);
+        
+        return updated;
     }
 
     // === Tags ===
@@ -182,9 +193,14 @@ export class ClientsService {
     async addNote(clientId: string, content: string, priority: string, isUrgent: boolean, userId: string, userName: string, tenantId: string) {
         const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
         if (!client) throw new Error('Cliente não encontrado');
-        return this.prisma.clientNote.create({
+        
+        const note = await this.prisma.clientNote.create({
             data: { content, priority, isUrgent, clientId, createdBy: userName, createdById: userId, tenantId },
         });
+
+        await this.logActivity(clientId, tenantId, 'NOTE_ADDED', `Nova anotação adicionada por ${userName}.`);
+        
+        return note;
     }
 
     async getNotes(clientId: string, tenantId: string) {
@@ -204,9 +220,14 @@ export class ClientsService {
     async addServiceLog(clientId: string, summary: string, type: string, durationMinutes: number, userId: string, tenantId: string) {
         const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
         if (!client) throw new Error('Cliente não encontrado');
-        return this.prisma.clientServiceLog.create({
+        
+        const log = await this.prisma.clientServiceLog.create({
             data: { summary, type, durationMinutes, clientId, createdById: userId, tenantId },
         });
+
+        await this.logActivity(clientId, tenantId, 'SERVICE_LOG', `Atendimento do tipo ${type} registrado.`);
+        
+        return log;
     }
 
     // === Onboarding Checklists ===
@@ -231,5 +252,34 @@ export class ClientsService {
         const item = await this.prisma.clientChecklistItem.findFirst({ where: { id: itemId, tenantId } });
         if (!item) throw new Error('Item do checklist não encontrado');
         return this.prisma.clientChecklistItem.delete({ where: { id: itemId } });
+    }
+
+    // === Event Listeners ===
+    @OnEvent('process.created')
+    async handleProcessCreated(payload: any) {
+        if (payload.clientId) {
+            await this.logActivity(payload.clientId, payload.tenantId, 'PROCESS_CREATED', `Novo processo criado: ${payload.title} (${payload.number})`);
+        }
+    }
+
+    @OnEvent('process.won')
+    async handleProcessWon(payload: any) {
+        if (payload.clientId) {
+            await this.logActivity(payload.clientId, payload.tenantId, 'PROCESS_WON', `Processo "${payload.title}" marcado como concluído/ganho!`);
+        }
+    }
+
+    // === Helper: Activity Logging ===
+    async logActivity(clientId: string, tenantId: string, type: string, description: string, metadata?: any, userId?: string) {
+        return this.prisma.clientActivity.create({
+            data: {
+                clientId,
+                tenantId,
+                type,
+                description,
+                metadata: metadata || {},
+                userId,
+            },
+        });
     }
 }
