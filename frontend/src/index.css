@@ -55,7 +55,6 @@
   h5,
   h6 {
     @apply font-sans font-bold tracking-tight;
-    color: var(--app-text-main);
   }
 
   input,

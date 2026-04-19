@@ -282,7 +282,7 @@ export default function DashboardLayout() {
             <aside
                 className={cn(
                     "hidden md:flex flex-col z-20 transition-all duration-300 flex-shrink-0",
-                    "bg-gradient-to-b from-slate-800 to-blue-900",
+                    "bg-[#0B1120] border-r border-white/[0.05]",
                     collapsed ? "w-20" : "w-72"
                 )}
             >
@@ -402,7 +402,7 @@ export default function DashboardLayout() {
                 {!collapsed && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
-                            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-slate-700/50">
+                            <div className="relative bg-[#172554] rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-white/10">
                                 {/* Robot Icon Background */}
                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
                                     <svg
@@ -442,8 +442,8 @@ export default function DashboardLayout() {
                 </div>
             </aside>
 
-            {/* Right Side - Header + Main Content - Blue gradient background so curved corner shows blue */}
-            <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-slate-800 to-blue-900 relative overflow-hidden">
+            {/* Right Side - Header + Main Content */}
+            <div className="flex-1 flex flex-col h-full bg-[#050B18] relative overflow-hidden">
                 {/* Desktop Header - Dark blue gradient matching sidebar */}
                 {!isFullScreenPage && (
                     <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0">

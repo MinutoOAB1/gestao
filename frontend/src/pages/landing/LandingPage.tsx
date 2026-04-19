@@ -14,12 +14,12 @@ function Navbar() {
     const navigate = useNavigate();
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-900 dark:bg-slate-100 rounded-xl flex items-center justify-center shadow-md">
+                        <div className="w-10 h-10 bg-[#0B1120] dark:bg-slate-100 rounded-xl flex items-center justify-center shadow-md">
                             <Scale className="w-5 h-5 text-white dark:text-slate-900" />
                         </div>
                         <span className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
@@ -47,13 +47,13 @@ function Navbar() {
                     <div className="hidden md:flex items-center gap-3">
                         <button
                             onClick={() => navigate('/login')}
-                            className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium hover:text-blue-600 transition-colors"
+                            className="px-4 py-2 text-[#0B1120] dark:text-slate-300 font-medium hover:text-blue-600 transition-colors"
                         >
                             Entrar
                         </button>
                         <button
                             onClick={() => navigate('/register')}
-                            className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-sm"
+                            className="px-5 py-2.5 bg-[#0B1120] dark:bg-white text-white dark:text-[#0B1120] font-medium rounded-lg hover:bg-[#1e293b] dark:hover:bg-slate-100 transition-all shadow-sm"
                         >
                             Começar Grátis
                         </button>
@@ -100,13 +100,13 @@ function HeroSection() {
         <section className="relative pt-24 md:pt-32 pb-16 md:pb-24 overflow-hidden">
             {/* Background Gradient */}
             {/* Subtle Texture/Background */}
-            <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950" />
+            <div className="absolute inset-0 bg-slate-50 dark:bg-[#050B18]" />
             <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-4xl mx-auto">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-medium mb-8 shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-medium mb-8 shadow-sm">
                         <Sparkles size={14} className="text-blue-600" />
                         Software de Gestão Jurídica de Alta Performance
                     </div>
@@ -129,7 +129,8 @@ function HeroSection() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
                         <button
                             onClick={() => navigate('/register')}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg group"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-[#0B1120] dark:bg-white text-white dark:text-[#0B1120] font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg group"
+                        >
                         >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -158,7 +159,7 @@ function HeroSection() {
 
                 {/* Hero Video/Dashboard Preview */}
                 <div className="mt-16 relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-slate-950 to-transparent z-10 pointer-events-none" style={{ top: '80%' }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-[#050B18] to-transparent z-10 pointer-events-none" style={{ top: '80%' }} />
                     <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-700">
                         {/* Local Video Player */}
                         <video
@@ -231,7 +232,7 @@ function FeaturesSection() {
     ];
 
     return (
-        <section id="features" className="py-20 md:py-28 bg-white dark:bg-slate-900">
+        <section id="features" className="py-20 md:py-28 bg-white dark:bg-[#0B1120]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-20">
@@ -248,7 +249,8 @@ function FeaturesSection() {
                     {features.map((feature, idx) => (
                         <div
                             key={idx}
-                            className="group p-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
+                            className="group p-8 bg-white dark:bg-[#0B1120] rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
+                        >
                         >
                             <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center mb-6 border border-slate-200 dark:border-slate-700">
                                 <feature.icon size={24} />
@@ -277,7 +279,7 @@ function StatsSection() {
     ];
 
     return (
-        <section className="py-20 bg-slate-900 dark:bg-slate-950">
+        <section className="py-20 bg-[#0B1120] dark:bg-[#050B18]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, idx) => (
@@ -355,7 +357,7 @@ function PricingSection() {
     ];
 
     return (
-        <section id="pricing" className="py-20 md:py-28 bg-slate-50 dark:bg-slate-950">
+        <section id="pricing" className="py-20 md:py-28 bg-slate-50 dark:bg-[#050B18]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
@@ -373,9 +375,10 @@ function PricingSection() {
                         <div
                             key={idx}
                             className={`relative p-8 rounded-2xl border transition-all ${plan.popular
-                                ? 'bg-white dark:bg-slate-900 border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                                ? 'bg-white dark:bg-[#0B1120] border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10'
+                                : 'bg-white dark:bg-[#0B1120] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                                 }`}
+                        >
                         >
                             {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full">
@@ -453,7 +456,7 @@ function TestimonialsSection() {
     ];
 
     return (
-        <section id="testimonials" className="py-20 md:py-28 bg-white dark:bg-slate-900">
+        <section id="testimonials" className="py-20 md:py-28 bg-white dark:bg-[#0B1120]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
@@ -504,11 +507,11 @@ function CTASection() {
     const navigate = useNavigate();
 
     return (
-        <section className="py-24 md:py-32 bg-slate-900 dark:bg-slate-950 relative overflow-hidden">
+        <section className="py-24 md:py-32 bg-[#0B1120] dark:bg-[#050B18] relative overflow-hidden">
             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:32px_32px]" />
 
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-6">
                     Pronto para transformar seu escritório?
                 </h2>
                 <p className="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
@@ -517,7 +520,7 @@ function CTASection() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <button
                         onClick={() => navigate('/register')}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-5 bg-white text-slate-900 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all group"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-5 bg-white text-[#0B1120] font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all group"
                     >
                         Criar Minha Conta
                         <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -534,7 +537,7 @@ function CTASection() {
 // Footer
 function Footer() {
     return (
-        <footer id="contact" className="py-16 bg-slate-900 dark:bg-slate-950 text-slate-400">
+        <footer id="contact" className="py-16 bg-[#050B18] dark:bg-[#030712] text-slate-400">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
                     {/* Company */}
@@ -609,7 +612,7 @@ export default function LandingPage() {
     }, [isAuthenticated, navigate]);
 
     return (
-        <div className="min-h-screen bg-white dark:bg-slate-900">
+        <div className="min-h-screen bg-white dark:bg-[#0B1120]">
             <Navbar />
             <HeroSection />
             <FeaturesSection />
