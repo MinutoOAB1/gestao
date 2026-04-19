@@ -561,7 +561,7 @@ export class AuthService {
     return {
       userId: user.id,
       userName: user.name,
-      quotaGb: user.storageQuotaGb || 10,
+      quotaGb: user.storageQuotaGb || 1,
       quotaMb,
       usedMb,
       usedGb: parseFloat((usedMb / 1024).toFixed(2)),

@@ -5,7 +5,7 @@ import { BrandLogo } from '../../components/ui/BrandLogo';
 import {
     Scale, FileText, Users, DollarSign, Calendar, Shield,
     Check, ArrowRight, Menu, X, Sparkles,
-    BarChart3, Zap, Lock, Globe
+    BarChart3, Zap, Lock, Globe, Clock, MessageSquare, Folder
 } from 'lucide-react';
 
 // Navbar Component
@@ -145,7 +145,7 @@ function HeroSection() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
                             <Check size={18} className="text-green-500" />
-                            14 dias grátis
+                            7 dias grátis
                         </div>
                         <div className="flex items-center gap-2">
                             <Check size={18} className="text-green-500" />
@@ -188,39 +188,57 @@ function FeaturesSection() {
         {
             icon: FileText,
             title: 'Gestão de Processos',
-            description: 'Acompanhe todos os seus processos com Kanban intuitivo, prazos e alertas automáticos.',
+            description: 'Liste, filtre e acompanhe todos os processos. Visualize em modo Kanban, registre movimentações, prazos, notas e checklists de cada caso.',
             color: 'blue'
         },
         {
             icon: Users,
-            title: 'CRM Jurídico',
-            description: 'Gerencie clientes, histórico de atendimentos e documentos em um único lugar.',
+            title: 'CRM de Clientes',
+            description: 'Cadastre clientes com histórico completo, tags, notas, registros de atendimento, documentos vinculados e funil de conversão.',
             color: 'purple'
         },
         {
             icon: DollarSign,
             title: 'Controle Financeiro',
-            description: 'Honorários, despesas, repasses e relatórios financeiros completos.',
+            description: 'Gerencie receitas, despesas, honorários e repasses. Suporte a lançamentos recorrentes e parcelados com controle de status de pagamento.',
             color: 'green'
         },
         {
             icon: Calendar,
-            title: 'Agenda Inteligente',
-            description: 'Audiências, reuniões e prazos sincronizados com alertas por email e push.',
+            title: 'Agenda Jurídica',
+            description: 'Cadastre audiências, reuniões e prazos com alertas automáticos, responsáveis e checklist de tarefas vinculados a cada evento.',
             color: 'orange'
         },
         {
             icon: Shield,
             title: 'Análise de Contratos com IA',
-            description: 'Inteligência artificial para analisar riscos e cláusulas em contratos.',
+            description: 'Envie um contrato e a IA identifica cláusulas de risco, atribui pontuação de segurança e sugere melhorias com explicações detalhadas.',
             color: 'red'
         },
         {
-            icon: BarChart3,
-            title: 'Relatórios e Métricas',
-            description: 'Dashboards com métricas de performance e produtividade do escritório.',
+            icon: Folder,
+            title: 'Gestão de Documentos',
+            description: 'Organize arquivos em pastas com controle de acesso por perfil, auditoria de alterações e upload direto na plataforma.',
             color: 'teal'
-        }
+        },
+        {
+            icon: FileText,
+            title: 'Modelos de Documentos',
+            description: 'Crie e edite modelos de petições e contratos com variáveis dinâmicas. Exporte em DOCX com cabeçalho e rodapé personalizados.',
+            color: 'indigo'
+        },
+        {
+            icon: Clock,
+            title: 'Timesheet',
+            description: 'Registre horas trabalhadas por processo com cronômetro integrado. Acompanhe o tempo faturável e gere relatórios de produtividade.',
+            color: 'yellow'
+        },
+        {
+            icon: MessageSquare,
+            title: 'Chat da Equipe',
+            description: 'Comunicação interna em tempo real com canais por processo e mensagens diretas entre os membros do escritório.',
+            color: 'pink'
+        },
     ];
 
     const colorClasses: Record<string, string> = {
@@ -230,7 +248,11 @@ function FeaturesSection() {
         orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
         red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
         teal: 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400',
+        indigo: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
+        yellow: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400',
+        pink: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
     };
+
 
     return (
         <section id="features" className="py-20 md:py-28 bg-white dark:bg-slate-900">
@@ -307,31 +329,36 @@ function PricingSection() {
     const navigate = useNavigate();
     const plans = [
         {
-            name: 'Starter',
-            price: 'R$ 47',
+            name: 'Solo',
+            price: 'R$ 59',
             period: '/mês',
             description: 'Ideal para advogados autônomos',
             features: [
-                'Até 50 processos',
-                'Até 100 clientes',
+                '1 usuário incluso',
+                'Processos e clientes ilimitados',
                 'Agenda e prazos',
-                'Relatórios básicos',
+                'Controle financeiro',
+                'Gestão de documentos',
+                '1 GB de armazenamento',
                 'Suporte por email',
             ],
             cta: 'Começar Grátis',
             popular: false
         },
         {
-            name: 'Profissional',
-            price: 'R$ 99',
+            name: 'Escritório',
+            price: 'R$ 129',
             period: '/mês',
-            description: 'Para escritórios em crescimento',
+            description: 'Para escritórios com até 5 usuários',
             features: [
-                'Processos ilimitados',
-                'Clientes ilimitados',
-                'Módulo financeiro completo',
+                'Até 5 usuários',
+                'Processos e clientes ilimitados',
+                'Financeiro completo com recorrência',
                 'Análise de contratos com IA',
-                'Integrações avançadas',
+                'Modelos e editor de documentos',
+                'Timesheet por processo',
+                'Chat interno da equipe',
+                '5 GB de armazenamento',
                 'Suporte prioritário',
             ],
             cta: 'Começar Grátis',
@@ -341,14 +368,14 @@ function PricingSection() {
             name: 'Enterprise',
             price: 'Sob consulta',
             period: '',
-            description: 'Para grandes escritórios',
+            description: 'Para grandes escritórios e redes',
             features: [
-                'Tudo do Profissional',
-                'Multi-escritório',
-                'API personalizada',
-                'SLA garantido',
-                'Gerente de conta dedicado',
-                'Treinamento presencial',
+                'Usuários ilimitados',
+                'Tudo do plano Escritório',
+                'Armazenamento personalizado',
+                'Onboarding dedicado',
+                'Gerente de conta exclusivo',
+                'Integrações sob demanda',
             ],
             cta: 'Falar com Vendas',
             popular: false
@@ -364,7 +391,7 @@ function PricingSection() {
                         Planos para todos os tamanhos
                     </h2>
                     <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Escolha o plano ideal para o seu escritório. Todos incluem 14 dias de teste grátis.
+                        Escolha o plano ideal para o seu escritório. Todos incluem 7 dias de teste grátis.
                     </p>
                 </div>
 

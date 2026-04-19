@@ -30,7 +30,7 @@ export class UserFilesService {
 
         // Check user quota
         const userUsedMb = user.usedStorageMb || 0;
-        const userQuotaMb = (user.storageQuotaGb || 10) * 1024;
+        const userQuotaMb = (user.storageQuotaGb || 1) * 1024;
         if (userUsedMb + fileSizeMb > userQuotaMb) {
             return {
                 allowed: false,
@@ -40,7 +40,7 @@ export class UserFilesService {
 
         // Check tenant quota
         const tenantUsedMb = tenant.usedStorageMb || 0;
-        const tenantQuotaMb = (tenant.storageQuotaGb || 30) * 1024;
+        const tenantQuotaMb = (tenant.storageQuotaGb || 3) * 1024;
         if (tenantUsedMb + fileSizeMb > tenantQuotaMb) {
             return {
                 allowed: false,
@@ -154,15 +154,15 @@ export class UserFilesService {
             return {
                 user: {
                     usedGb: ((user?.usedStorageMb || 0) / 1024).toFixed(2),
-                    quotaGb: user?.storageQuotaGb || 10,
+                    quotaGb: user?.storageQuotaGb || 1,
                     usedMb: user?.usedStorageMb || 0,
-                    percentUsed: Math.round(((user?.usedStorageMb || 0) / ((user?.storageQuotaGb || 10) * 1024)) * 100),
+                    percentUsed: Math.round(((user?.usedStorageMb || 0) / ((user?.storageQuotaGb || 1) * 1024)) * 100),
                 },
                 tenant: {
                     usedGb: ((tenant?.usedStorageMb || 0) / 1024).toFixed(2),
-                    quotaGb: tenant?.storageQuotaGb || 30,
+                    quotaGb: tenant?.storageQuotaGb || 3,
                     usedMb: tenant?.usedStorageMb || 0,
-                    percentUsed: Math.round(((tenant?.usedStorageMb || 0) / ((tenant?.storageQuotaGb || 30) * 1024)) * 100),
+                    percentUsed: Math.round(((tenant?.usedStorageMb || 0) / ((tenant?.storageQuotaGb || 3) * 1024)) * 100),
                     maxUsers: tenant?.maxUsers || 3,
                 },
                 fileCount,
@@ -171,8 +171,8 @@ export class UserFilesService {
             this.logger.error(`Failed to get storage stats: ${error.message}`);
             // Return default values on error
             return {
-                user: { usedGb: '0.00', quotaGb: 10, usedMb: 0, percentUsed: 0 },
-                tenant: { usedGb: '0.00', quotaGb: 30, usedMb: 0, percentUsed: 0, maxUsers: 3 },
+                user: { usedGb: '0.00', quotaGb: 1, usedMb: 0, percentUsed: 0 },
+                tenant: { usedGb: '0.00', quotaGb: 3, usedMb: 0, percentUsed: 0, maxUsers: 3 },
                 fileCount: 0,
             };
         }

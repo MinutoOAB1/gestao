@@ -15,7 +15,7 @@ model Tenant {
   slug              String                @unique
   createdAt         DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
-  storageQuotaGb    Int                   @default(30)
+  storageQuotaGb    Int                   @default(3)
   usedStorageMb     Int                   @default(0)
   maxUsers          Int                   @default(3)
   aiAnalysisLogs    AiAnalysisLog[]
@@ -60,7 +60,7 @@ model User {
   twoFactorEnabled      Boolean           @default(false)
   permissions           String?
   tenantId              String
-  storageQuotaGb        Int               @default(10)
+  storageQuotaGb        Int               @default(1)
   usedStorageMb         Int               @default(0)
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
