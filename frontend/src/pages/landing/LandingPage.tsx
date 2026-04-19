@@ -282,7 +282,7 @@ function StatsSection() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, idx) => (
                         <div key={idx} className="text-center">
-                            <div className="text-3xl md:text-5xl font-bold text-white mb-3">
+                            <div className="text-3xl md:text-5xl font-bold !text-white mb-3">
                                 {stat.value}
                             </div>
                             <div className="text-slate-400 text-sm uppercase tracking-widest font-medium">
@@ -557,7 +557,7 @@ function Footer() {
 
                     {/* Product */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Produto</h4>
+                        <h4 className="!text-white font-semibold mb-4">Produto</h4>
                         <ul className="space-y-2 text-sm">
                             <li><a href="#features" className="hover:text-white transition-colors">Recursos</a></li>
                             <li><a href="#pricing" className="hover:text-white transition-colors">Preços</a></li>
@@ -568,7 +568,7 @@ function Footer() {
 
                     {/* Company */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Empresa</h4>
+                        <h4 className="!text-white font-semibold mb-4">Empresa</h4>
                         <ul className="space-y-2 text-sm">
                             <li><a href="#" className="hover:text-white transition-colors">Sobre</a></li>
                             <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
@@ -579,7 +579,7 @@ function Footer() {
 
                     {/* Legal */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Legal</h4>
+                        <h4 className="!text-white font-semibold mb-4">Legal</h4>
                         <ul className="space-y-2 text-sm">
                             <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
                             <li><a href="#" className="hover:text-white transition-colors">Termos</a></li>
