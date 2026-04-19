@@ -20,7 +20,6 @@ import {
     ChevronRight,
     Menu,
     Minimize2,
-    Star,
     ThumbsUp,
     ThumbsDown
 } from 'lucide-react';
