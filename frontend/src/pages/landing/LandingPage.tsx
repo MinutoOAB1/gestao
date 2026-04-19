@@ -19,10 +19,10 @@ function Navbar() {
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-blue-800 rounded-xl flex items-center justify-center shadow-lg shadow-slate-800/30">
-                            <Scale className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-slate-900 dark:bg-slate-100 rounded-xl flex items-center justify-center shadow-md">
+                            <Scale className="w-5 h-5 text-white dark:text-slate-900" />
                         </div>
-                        <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                        <span className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
                             Blue Adv
                         </span>
                     </div>
@@ -53,7 +53,7 @@ function Navbar() {
                         </button>
                         <button
                             onClick={() => navigate('/register')}
-                            className="px-5 py-2.5 bg-gradient-to-r from-slate-700 to-blue-800 hover:from-slate-600 hover:to-blue-700 text-white font-medium rounded-lg shadow-lg shadow-slate-800/25 transition-all hover:shadow-xl hover:shadow-slate-800/30"
+                            className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-medium rounded-lg hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-sm"
                         >
                             Começar Grátis
                         </button>
@@ -99,25 +99,23 @@ function HeroSection() {
     return (
         <section className="relative pt-24 md:pt-32 pb-16 md:pb-24 overflow-hidden">
             {/* Background Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950" />
-
-            {/* Decorative Blobs */}
-            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl" />
+            {/* Subtle Texture/Background */}
+            <div className="absolute inset-0 bg-slate-50 dark:bg-slate-950" />
+            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-4xl mx-auto">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium mb-6">
-                        <Sparkles size={16} />
-                        O software #1 para escritórios de advocacia
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-medium mb-8 shadow-sm">
+                        <Sparkles size={14} className="text-blue-600" />
+                        Software de Gestão Jurídica de Alta Performance
                     </div>
 
                     {/* Headline */}
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-tight mb-6">
-                        Gerencie seu escritório com{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                            inteligência e eficiência
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-8">
+                        A eficiência que o seu <br className="hidden md:block" />
+                        <span className="text-blue-600 dark:text-blue-500">
+                            escritório merece
                         </span>
                     </h1>
 
@@ -131,9 +129,9 @@ function HeroSection() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
                         <button
                             onClick={() => navigate('/register')}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-slate-700 to-blue-800 hover:from-slate-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-xl shadow-slate-800/25 transition-all hover:shadow-2xl hover:shadow-slate-800/30 group"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg group"
                         >
-                            Começar Teste Grátis
+                            Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                         <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
@@ -189,85 +187,59 @@ function FeaturesSection() {
             icon: FileText,
             title: 'Gestão de Processos',
             description: 'Liste, filtre e acompanhe todos os processos. Visualize em modo Kanban, registre movimentações, prazos, notas e checklists de cada caso.',
-            color: 'blue'
         },
         {
             icon: Users,
             title: 'CRM de Clientes',
             description: 'Cadastre clientes com histórico completo, tags, notas, registros de atendimento, documentos vinculados e funil de conversão.',
-            color: 'purple'
         },
         {
             icon: DollarSign,
             title: 'Controle Financeiro',
             description: 'Gerencie receitas, despesas, honorários e repasses. Suporte a lançamentos recorrentes e parcelados com controle de status de pagamento.',
-            color: 'green'
         },
         {
             icon: Calendar,
             title: 'Agenda Jurídica',
             description: 'Cadastre audiências, reuniões e prazos com alertas automáticos, responsáveis e checklist de tarefas vinculados a cada evento.',
-            color: 'orange'
         },
         {
             icon: Shield,
             title: 'Análise de Contratos com IA',
             description: 'Envie um contrato e a IA identifica cláusulas de risco, atribui pontuação de segurança e sugere melhorias com explicações detalhadas.',
-            color: 'red'
         },
         {
             icon: Folder,
             title: 'Gestão de Documentos',
             description: 'Organize arquivos em pastas com controle de acesso por perfil, auditoria de alterações e upload direto na plataforma.',
-            color: 'teal'
         },
         {
             icon: FileText,
             title: 'Modelos de Documentos',
             description: 'Crie e edite modelos de petições e contratos com variáveis dinâmicas. Exporte em DOCX com cabeçalho e rodapé personalizados.',
-            color: 'indigo'
         },
         {
             icon: Clock,
             title: 'Timesheet',
             description: 'Registre horas trabalhadas por processo com cronômetro integrado. Acompanhe o tempo faturável e gere relatórios de produtividade.',
-            color: 'yellow'
         },
         {
             icon: MessageSquare,
             title: 'Chat da Equipe',
             description: 'Comunicação interna em tempo real com canais por processo e mensagens diretas entre os membros do escritório.',
-            color: 'pink'
         },
     ];
-
-    const colorClasses: Record<string, string> = {
-        blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-        purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-        green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-        orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
-        red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-        teal: 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400',
-        indigo: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
-        yellow: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400',
-        pink: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
-    };
-
 
     return (
         <section id="features" className="py-20 md:py-28 bg-white dark:bg-slate-900">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium mb-4">
-                        <Zap size={16} />
-                        Recursos Poderosos
-                    </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                        Tudo que seu escritório precisa
+                <div className="text-center max-w-3xl mx-auto mb-20">
+                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+                        Tudo em um único lugar
                     </h2>
-                    <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Uma plataforma completa para modernizar sua prática jurídica e impressionar seus clientes.
+                    <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Desenvolvido especificamente para as necessidades da advocacia moderna.
                     </p>
                 </div>
 
@@ -276,10 +248,10 @@ function FeaturesSection() {
                     {features.map((feature, idx) => (
                         <div
                             key={idx}
-                            className="group p-6 md:p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 transition-all hover:shadow-xl"
+                            className="group p-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
                         >
-                            <div className={`w-14 h-14 rounded-xl ${colorClasses[feature.color]} flex items-center justify-center mb-5`}>
-                                <feature.icon size={28} />
+                            <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center mb-6 border border-slate-200 dark:border-slate-700">
+                                <feature.icon size={24} />
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
                                 {feature.title}
@@ -305,15 +277,15 @@ function StatsSection() {
     ];
 
     return (
-        <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-700">
+        <section className="py-20 bg-slate-900 dark:bg-slate-950">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, idx) => (
                         <div key={idx} className="text-center">
-                            <div className="text-3xl md:text-4xl font-black text-white mb-2">
+                            <div className="text-3xl md:text-5xl font-bold text-white mb-3">
                                 {stat.value}
                             </div>
-                            <div className="text-blue-200 font-medium">
+                            <div className="text-slate-400 text-sm uppercase tracking-widest font-medium">
                                 {stat.label}
                             </div>
                         </div>
@@ -400,9 +372,9 @@ function PricingSection() {
                     {plans.map((plan, idx) => (
                         <div
                             key={idx}
-                            className={`relative p-8 rounded-2xl border-2 transition-all ${plan.popular
-                                ? 'bg-white dark:bg-slate-800 border-blue-500 shadow-xl shadow-blue-500/10 scale-105'
-                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-blue-400'
+                            className={`relative p-8 rounded-2xl border transition-all ${plan.popular
+                                ? 'bg-white dark:bg-slate-900 border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                                 }`}
                         >
                             {plan.popular && (
@@ -439,9 +411,9 @@ function PricingSection() {
 
                             <button
                                 onClick={() => navigate('/register')}
-                                className={`w-full py-3 rounded-xl font-semibold transition-all ${plan.popular
-                                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                className={`w-full py-4 rounded-xl font-semibold transition-all ${plan.popular
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                                     }`}
                             >
                                 {plan.cta}
@@ -532,10 +504,8 @@ function CTASection() {
     const navigate = useNavigate();
 
     return (
-        <section className="py-20 md:py-28 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 relative overflow-hidden">
-            {/* Decorative */}
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        <section className="py-24 md:py-32 bg-slate-900 dark:bg-slate-950 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:32px_32px]" />
 
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
@@ -544,16 +514,16 @@ function CTASection() {
                 <p className="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
                     Junte-se a mais de 500 escritórios que já estão usando o Blue Adv para crescer com eficiência.
                 </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <button
                         onClick={() => navigate('/register')}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white text-blue-700 font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all group"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-5 bg-white text-slate-900 font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all group"
                     >
-                        Começar Teste Grátis
+                        Criar Minha Conta
                         <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button className="w-full sm:w-auto px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors">
-                        Agendar Demonstração
+                    <button className="w-full sm:w-auto px-10 py-5 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/5 transition-colors">
+                        Falar com Consultor
                     </button>
                 </div>
             </div>
