@@ -75,7 +75,7 @@ export default function RegisterPage() {
                 companyName: `Escritório de ${formData.firstName}`
             });
             login(res.data.access_token, res.data.user);
-            navigate('/');
+            navigate('/app');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Erro ao criar conta. Tente novamente.');
         } finally {

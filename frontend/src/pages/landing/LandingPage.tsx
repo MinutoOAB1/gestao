@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import {
     Scale, FileText, Users, DollarSign, Calendar, Shield,
@@ -601,6 +602,15 @@ function Footer() {
 
 // Main Landing Page Component
 export default function LandingPage() {
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/app');
+        }
+    }, [isAuthenticated, navigate]);
+
     return (
         <div className="min-h-screen bg-white dark:bg-slate-900">
             <Navbar />

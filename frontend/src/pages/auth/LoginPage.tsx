@@ -60,7 +60,7 @@ export default function LoginPage() {
             }
 
             login(res.data.access_token, res.data.user);
-            navigate('/');
+            navigate('/app');
         } catch (err: any) {
             const serverMessage = err.response?.data?.message;
             const finalMessage = Array.isArray(serverMessage) ? serverMessage[0] : serverMessage;

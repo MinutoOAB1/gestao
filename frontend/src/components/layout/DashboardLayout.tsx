@@ -55,7 +55,7 @@ const SidebarItem = memo(({ icon: Icon, label, path, collapsed }: { icon: any, l
 const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const active = location.pathname === '/analise-ia' || location.pathname.startsWith('/analise-ia');
+    const active = location.pathname === '/app/analise-ia' || location.pathname.startsWith('/app/analise-ia');
     const [expanded, setExpanded] = useState(false);
     const [documentAnalyses, setDocumentAnalyses] = useState<Array<{ id: string; label: string; timestamp: Date; score: number; contractText: string; analysis: any }>>([]);
 
@@ -85,12 +85,12 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
     const handleLoadDocument = (doc: typeof documentAnalyses[0]) => {
         // Store the selected document to load
         localStorage.setItem('ia-load-document', JSON.stringify(doc));
-        navigate('/analise-ia');
+        navigate('/app/analise-ia');
     };
 
     if (collapsed) {
         return (
-            <Link to="/analise-ia">
+            <Link to="/app/analise-ia">
                 <div 
                     title="IA Análise"
                     className={cn(
@@ -114,7 +114,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                 {/* Click on icon + text navigates to page */}
                 <div
                     className="flex items-center gap-3 flex-1"
-                    onClick={() => navigate('/analise-ia')}
+                    onClick={() => navigate('/app/analise-ia')}
                 >
                     <Shield size={20} className={cn("transition-fast", active && "scale-110")} />
                     <span className="font-medium text-sm tracking-wide">IA Análise</span>
@@ -137,7 +137,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                         className="overflow-hidden"
                     >
                         {/* Quick access to main page */}
-                        <Link to="/analise-ia">
+                        <Link to="/app/analise-ia">
                             <div className="flex items-center gap-2 px-4 py-2 ml-6 text-xs text-white/70 hover:text-white transition-colors">
                                 <Plus size={12} />
                                 Nova Análise
@@ -219,15 +219,15 @@ const BottomNavItem = memo(({ icon: Icon, label, path, isMain = false, onClick }
 
 // Mobile drawer menu items (pages not in bottom nav)
 const DRAWER_MENU_ITEMS = [
-    { icon: Users, label: 'Clientes', path: '/clientes' },
-    { icon: ClipboardList, label: 'Kanban', path: '/processos/kanban' },
-    { icon: ClipboardList, label: 'Contratos', path: '/contratos' },
-    { icon: Calendar, label: 'Agenda', path: '/agenda' },
-    { icon: Folder, label: 'Meus Arquivos', path: '/documentos' },
-    { icon: FileText, label: 'Modelos', path: '/modelos' },
-    { icon: Users, label: 'Usuários', path: '/usuarios' },
-    { icon: User, label: 'Meu Perfil', path: '/perfil' },
-    { icon: Clock, label: 'Timesheet', path: '/timesheet' },
+    { icon: Users, label: 'Clientes', path: '/app/clientes' },
+    { icon: ClipboardList, label: 'Kanban', path: '/app/processos/kanban' },
+    { icon: ClipboardList, label: 'Contratos', path: '/app/contratos' },
+    { icon: Calendar, label: 'Agenda', path: '/app/agenda' },
+    { icon: Folder, label: 'Meus Arquivos', path: '/app/documentos' },
+    { icon: FileText, label: 'Modelos', path: '/app/modelos' },
+    { icon: Users, label: 'Usuários', path: '/app/usuarios' },
+    { icon: User, label: 'Meu Perfil', path: '/app/perfil' },
+    { icon: Clock, label: 'Timesheet', path: '/app/timesheet' },
 ];
 
 
@@ -251,7 +251,7 @@ export default function DashboardLayout() {
     const [teamMembers, setTeamMembers] = useState<Array<{ id: string, name: string, avatar: string | null, role: string }>>([]);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
-    const [processExpanded, setProcessExpanded] = useState(location.pathname.startsWith('/processos'));
+    const [processExpanded, setProcessExpanded] = useState(location.pathname.startsWith('/app/processos'));
     const pathSegments = location.pathname.split('/').filter(Boolean);
 
     // Fetch team members
@@ -324,19 +324,19 @@ export default function DashboardLayout() {
                 <div className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
                     {/* Módulos Principais */}
                     <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2", collapsed && "hidden")}>Principal</p>
-                    <SidebarItem icon={Home} label="Início" path="/" collapsed={collapsed} />
+                    <SidebarItem icon={Home} label="Início" path="/app" collapsed={collapsed} />
                     {/* Processos - expandable with Lista and Kanban */}
                     <div>
                         <div
                             className={cn(
                                 "group flex items-center gap-3 px-3 py-3 mx-2 rounded-xl cursor-pointer transition-fast relative overflow-hidden",
-                                location.pathname.startsWith('/processos')
+                                location.pathname.startsWith('/app/processos')
                                     ? "bg-white/20 text-white border border-white/20"
                                     : "text-white/70 hover:bg-white/10 hover:text-white"
                             )}
                         >
-                            <div className="flex items-center gap-3 flex-1" onClick={() => navigate('/processos')}>
-                                <FileText size={20} className={cn("transition-fast", location.pathname.startsWith('/processos') && "scale-110")} />
+                            <div className="flex items-center gap-3 flex-1" onClick={() => navigate('/app/processos')}>
+                                <FileText size={20} className={cn("transition-fast", location.pathname.startsWith('/app/processos') && "scale-110")} />
                                 {!collapsed && <span className="font-medium text-sm tracking-wide">Processos</span>}
                             </div>
                             {!collapsed && (
@@ -356,13 +356,13 @@ export default function DashboardLayout() {
                                     exit={{ opacity: 0, height: 0 }}
                                     className="overflow-hidden"
                                 >
-                                    <Link to="/processos">
-                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-xs transition-colors rounded-lg", location.pathname === '/processos' ? 'text-white font-bold bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5')}>
+                                    <Link to="/app/processos">
+                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-xs transition-colors rounded-lg", location.pathname === '/app/processos' ? 'text-white font-bold bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5')}>
                                             <FileText size={12} /> Lista
                                         </div>
                                     </Link>
-                                    <Link to="/processos/kanban">
-                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-xs transition-colors rounded-lg", location.pathname === '/processos/kanban' ? 'text-white font-bold bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5')}>
+                                    <Link to="/app/processos/kanban">
+                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-xs transition-colors rounded-lg", location.pathname === '/app/processos/kanban' ? 'text-white font-bold bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5')}>
                                             <ClipboardList size={12} /> Kanban
                                         </div>
                                     </Link>
@@ -370,38 +370,38 @@ export default function DashboardLayout() {
                             )}
                         </AnimatePresence>
                     </div>
-                    <SidebarItem icon={Users} label="Clientes" path="/clientes" collapsed={collapsed} />
+                    <SidebarItem icon={Users} label="Clientes" path="/app/clientes" collapsed={collapsed} />
 
                     <div className="my-2 border-t border-white/[0.06] mx-4"></div>
 
                     {/* Jurídico & Gestão */}
                     <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Jurídico</p>
-                    <SidebarItem icon={ClipboardList} label="Contratos" path="/contratos" collapsed={collapsed} />
-                    <SidebarItem icon={Folder} label="Meus Arquivos" path="/documentos" collapsed={collapsed} />
-                    <SidebarItem icon={FileText} label="Modelos" path="/modelos" collapsed={collapsed} />
+                    <SidebarItem icon={ClipboardList} label="Contratos" path="/app/contratos" collapsed={collapsed} />
+                    <SidebarItem icon={Folder} label="Meus Arquivos" path="/app/documentos" collapsed={collapsed} />
+                    <SidebarItem icon={FileText} label="Modelos" path="/app/modelos" collapsed={collapsed} />
 
                     <div className="my-2 border-t border-white/[0.06] mx-4"></div>
 
                     {/* Operacional */}
                     <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Operacional</p>
-                    <SidebarItem icon={DollarSign} label="Financeiro" path="/financeiro" collapsed={collapsed} />
-                    <SidebarItem icon={Calendar} label="Agenda" path="/agenda" collapsed={collapsed} />
-                    <SidebarItem icon={Clock} label="Timesheet" path="/timesheet" collapsed={collapsed} />
+                    <SidebarItem icon={DollarSign} label="Financeiro" path="/app/financeiro" collapsed={collapsed} />
+                    <SidebarItem icon={Calendar} label="Agenda" path="/app/agenda" collapsed={collapsed} />
+                    <SidebarItem icon={Clock} label="Timesheet" path="/app/timesheet" collapsed={collapsed} />
 
                     <div className="my-2 border-t border-white/[0.06] mx-4"></div>
 
                     {/* IA & Configurações */}
                     <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>IA & Config</p>
                     <SidebarItemWithHistory collapsed={collapsed} />
-                    <SidebarItem icon={Users} label="Usuários" path="/usuarios" collapsed={collapsed} />
-                    <SidebarItem icon={User} label="Meu Perfil" path="/perfil" collapsed={collapsed} />
-                    <SidebarItem icon={Settings} label="Ajustes" path="/configuracoes" collapsed={collapsed} />
+                    <SidebarItem icon={Users} label="Usuários" path="/app/usuarios" collapsed={collapsed} />
+                    <SidebarItem icon={User} label="Meu Perfil" path="/app/perfil" collapsed={collapsed} />
+                    <SidebarItem icon={Settings} label="Ajustes" path="/app/configuracoes" collapsed={collapsed} />
                 </div>
 
                 {/* IA Jurídica Card - only show when not collapsed */}
                 {!collapsed && (
                     <div className="px-4 py-3">
-                        <Link to="/analise-ia">
+                        <Link to="/app/analise-ia">
                             <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-slate-700/50">
                                 {/* Robot Icon Background */}
                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
@@ -506,7 +506,7 @@ export default function DashboardLayout() {
                                 {/* Timer Button - Shows running state */}
                                 {timer.isRunning ? (
                                     <button
-                                        onClick={() => navigate('/timesheet')}
+                                        onClick={() => navigate('/app/timesheet')}
                                         className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30 transition-colors animate-pulse"
                                         title={timer.processTitle || timer.description || 'Timer rodando'}
                                     >
@@ -522,7 +522,7 @@ export default function DashboardLayout() {
                                     </button>
                                 ) : (
                                     <button
-                                        onClick={() => navigate('/timesheet')}
+                                        onClick={() => navigate('/app/timesheet')}
                                         className="p-2.5 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
                                         title="Timesheet"
                                     >
@@ -547,7 +547,7 @@ export default function DashboardLayout() {
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
                     <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/10 bg-slate-800/80 backdrop-blur-md">
-                        <div className="flex items-center gap-3.5" onClick={() => navigate('/perfil')}>
+                        <div className="flex items-center gap-3.5" onClick={() => navigate('/app/perfil')}>
                             <div className="w-11 h-11 rounded-full bg-white/20 overflow-hidden flex items-center justify-center ring-2 ring-white/10 shadow-lg transition-transform active:scale-95">
                                 {user?.avatar ? (
                                     <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
@@ -583,7 +583,7 @@ export default function DashboardLayout() {
                         )}>
                             {!isFullScreenPage && pathSegments.length > 0 && (
                                 <div className="flex items-center gap-2 mb-6 text-sm">
-                                    <Link to="/" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Dashboard</Link>
+                                    <Link to="/app" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Dashboard</Link>
                                     {pathSegments.map((segment, idx) => (
                                         <div key={idx} className="flex items-center gap-2">
                                             <ChevronRight size={14} className="text-slate-400" />
@@ -620,10 +620,10 @@ export default function DashboardLayout() {
 
             {/* Mobile Bottom Nav */}
             <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-app-card border-t border-app-stroke flex items-center justify-between px-2 z-50 pb-safe">
-                <BottomNavItem icon={Home} label="Início" path="/" />
-                <BottomNavItem icon={FileText} label="Processos" path="/processos" />
-                <BottomNavItem icon={Plus} label="" path="/processos/novo" isMain />
-                <BottomNavItem icon={DollarSign} label="Finanças" path="/financeiro" />
+                <BottomNavItem icon={Home} label="Início" path="/app" />
+                <BottomNavItem icon={FileText} label="Processos" path="/app/processos" />
+                <BottomNavItem icon={Plus} label="" path="/app/processos/novo" isMain />
+                <BottomNavItem icon={DollarSign} label="Finanças" path="/app/financeiro" />
                 <BottomNavItem icon={MoreHorizontal} label="Mais" path="#" onClick={() => setIsMobileDrawerOpen(true)} />
             </div>
 
@@ -667,7 +667,7 @@ export default function DashboardLayout() {
                                 ))}
                                 {/* IA Análise in drawer */}
                                 <Link
-                                    to="/analise-ia"
+                                    to="/app/analise-ia"
                                     onClick={() => setIsMobileDrawerOpen(false)}
                                     className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-emerald-500/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                 >
@@ -678,7 +678,7 @@ export default function DashboardLayout() {
                                 </Link>
                                 {/* Settings in drawer too */}
                                 <Link
-                                    to="/configuracoes"
+                                    to="/app/configuracoes"
                                     onClick={() => setIsMobileDrawerOpen(false)}
                                     className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-app-input transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                 >

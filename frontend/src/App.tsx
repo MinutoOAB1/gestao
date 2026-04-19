@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import { NotificationProvider } from './context/NotificationContext';
@@ -52,6 +52,12 @@ const PageLoader = () => (
   </div>
 );
 
+// Component to handle root path redirection
+const HomeHandler = () => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/app" /> : <LandingPage />;
+};
+
 function App() {
   return (
     <ThemeProvider>
@@ -71,9 +77,10 @@ function App() {
                           <Route path="/register" element={<RegisterPage />} />
                           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+                          <Route path="/" element={<HomeHandler />} />
                           <Route path="/landing" element={<LandingPage />} />
 
-                          <Route path="/" element={
+                          <Route path="/app" element={
                             <PrivateRoute>
                               <DashboardLayout />
                             </PrivateRoute>
@@ -103,7 +110,7 @@ function App() {
                             <Route path="configuracoes" element={<SettingsPage />} />
                           </Route>
 
-                          <Route path="*" element={<Navigate to="/" replace />} />
+                          <Route path="*" element={<Navigate to="/app" replace />} />
                         </Routes>
                       </ErrorBoundary>
                     </Suspense>
