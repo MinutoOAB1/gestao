@@ -1,14 +1,23 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "api/server.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/server.ts"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/((?!api/|assets/|favicon.ico|manifest.json|logo192.png|logo512.png).*)",
       "destination": "/index.html"
     }
   ]
