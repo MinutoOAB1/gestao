@@ -1136,9 +1136,15 @@ export default function FinancialListPage() {
                                 <FinancialMobileRow 
                                     key={record.id} 
                                     record={record} 
-                                    onEdit={handleEdit} 
-                                    onDelete={handleDelete}
-                                    onSync={fetchData}
+                                    expandedGroups={expandedGroups}
+                                    toggleGroup={toggleGroup}
+                                    handleEdit={handleEdit} 
+                                    handleDelete={handleDelete}
+                                    deleteConfirm={deleteConfirm}
+                                    setDeleteConfirm={setDeleteConfirm}
+                                    isOverdue={isOverdue}
+                                    getDateLabel={getDateLabel}
+                                    setActiveNoteRecord={setActiveNoteRecord}
                                     setSelectedClientForInvoice={setSelectedClientForInvoice}
                                     setIsInvoiceModalOpen={setIsInvoiceModalOpen}
                                 />
@@ -1171,9 +1177,12 @@ export default function FinancialListPage() {
                                                 record={record} 
                                                 expandedGroups={expandedGroups} 
                                                 toggleGroup={toggleGroup} 
-                                                onEdit={handleEdit} 
-                                                onDelete={handleDelete}
-                                                onSync={fetchData}
+                                                handleEdit={handleEdit} 
+                                                handleDelete={handleDelete}
+                                                deleteConfirm={deleteConfirm}
+                                                setDeleteConfirm={setDeleteConfirm}
+                                                isOverdue={isOverdue}
+                                                setActiveNoteRecord={setActiveNoteRecord}
                                                 setSelectedClientForInvoice={setSelectedClientForInvoice}
                                                 setIsInvoiceModalOpen={setIsInvoiceModalOpen}
                                             />
@@ -1942,7 +1951,7 @@ const FinancialTableRow = memo(({
     setSelectedClientForInvoice, setIsInvoiceModalOpen
 }: any) => {
     const isGroup = record._isGroupHeader === true;
-    const isExpanded = isGroup && expandedGroups.has(record.id);
+    const isExpanded = isGroup && expandedGroups?.has(record.id);
 
     const getDateLabel = (dateStr: string) => {
         if (!dateStr || dateStr.length < 10) return 'Data Inválida';
