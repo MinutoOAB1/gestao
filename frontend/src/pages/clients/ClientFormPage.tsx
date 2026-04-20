@@ -167,9 +167,10 @@ export default function ClientFormPage() {
                 addToast('Lead salvo com sucesso', 'success');
             }
             navigate(isEditMode ? `/app/clientes/${id}` : '/app/clientes');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao salvar:', error);
-            addToast('Erro ao salvar.', 'error');
+            const errorMessage = error.response?.data?.message || 'Erro ao salvar o cliente.';
+            addToast(errorMessage, 'error');
         } finally {
             setLoading(false);
         }

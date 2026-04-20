@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -55,11 +55,15 @@ export class ClientsService {
             };
         }
 
-        const client = await this.prisma.client.create({ data, include: { tags: true } });
-        
-        await this.logActivity(client.id, tenantId, 'CLIENT_CREATED', `Cliente ${client.name} cadastrado na plataforma.`);
-        
-        return client;
+        try {
+            const client = await this.prisma.client.create({ data, include: { tags: true } });
+            await this.logActivity(client.id, tenantId, 'CLIENT_CREATED', `Cliente ${client.name} cadastrado na plataforma.`);
+            return client;
+        } catch (error: any) {
+            console.error('ERROR SAVING CLIENT:', error);
+            // Handle specific Prisma errors or throw a general one with the message
+            throw new BadRequestException(`Erro ao salvar no banco de dados: ${error.message}`);
+        }
     }
 
     findAll(tenantId: string, take = 50, skip = 0) {
