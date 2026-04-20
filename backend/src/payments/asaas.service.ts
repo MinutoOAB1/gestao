@@ -12,7 +12,8 @@ export class AsaasService {
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
   ) {
-    const apiKey = this.configService.get<string>('ASAAS_API_KEY');
+    const apiKey = this.configService.get<string>('ASAAS_API_KEY')?.replace(/"/g, '').trim();
+    this.logger.log(`Inicializando AsaasService com chave: ${apiKey ? apiKey.substring(0, 10) + '...' : 'NÃO ENCONTRADA'}`);
     this.api = axios.create({
       baseURL: 'https://api.asaas.com/v3',
       headers: {
