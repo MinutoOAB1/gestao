@@ -1194,6 +1194,8 @@ export default function FinancialListPage() {
                                             setDeleteConfirm={setDeleteConfirm}
                                             isOverdue={isOverdue}
                                             setActiveNoteRecord={setActiveNoteRecord}
+                                            setSelectedClientForInvoice={setSelectedClientForInvoice}
+                                            setIsInvoiceModalOpen={setIsInvoiceModalOpen}
                                         />
                                     ))
                                 ) : (
@@ -1219,6 +1221,8 @@ export default function FinancialListPage() {
                                     isOverdue={isOverdue}
                                     getDateLabel={getDateLabel}
                                     setActiveNoteRecord={setActiveNoteRecord}
+                                    setSelectedClientForInvoice={setSelectedClientForInvoice}
+                                    setIsInvoiceModalOpen={setIsInvoiceModalOpen}
                                 />
                             ))
                         ) : (
@@ -1976,7 +1980,8 @@ export default function FinancialListPage() {
 
 
 const FinancialTableRow = memo(({
-    record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, setActiveNoteRecord
+    record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, setActiveNoteRecord,
+    setSelectedClientForInvoice, setIsInvoiceModalOpen
 }: any) => {
     const isGroup = record._isGroupHeader === true;
     const isExpanded = isGroup && expandedGroups.has(record.id);
@@ -2195,7 +2200,8 @@ const FinancialTableRow = memo(({
 });
 
 const FinancialMobileRow = memo(({
-    record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, getDateLabel, setActiveNoteRecord
+    record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, getDateLabel, setActiveNoteRecord,
+    setSelectedClientForInvoice, setIsInvoiceModalOpen
 }: any) => {
     const isGroup = record._isGroupHeader === true;
     const isExpanded = isGroup && expandedGroups.has(record.id);
@@ -2233,6 +2239,23 @@ const FinancialMobileRow = memo(({
                 {!isGroup && record.status === 'PENDING' && (
                     <div className="flex gap-2 mt-2 pt-2 border-t border-app-stroke/50">
                         <button onClick={(e) => { e.stopPropagation(); handleEdit(record); }} className={clsx("flex-1 py-2 text-xs font-medium rounded-lg transition-colors text-center", record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-primary/10 text-primary")}>{record.type === 'INCOME' ? 'Marcar Recebido' : 'Marcar Pago'}</button>
+                        {record.type === 'INCOME' && record.clientId && (
+                            <button 
+                                onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    setSelectedClientForInvoice({
+                                        id: record.clientId, 
+                                        name: record.client?.name || 'Cliente',
+                                        amount: record.amount,
+                                        financialRecordId: record.id
+                                    }); 
+                                    setIsInvoiceModalOpen(true); 
+                                }}
+                                className="px-3 py-2 bg-emerald-500/10 text-emerald-500 rounded-lg flex items-center justify-center"
+                            >
+                                <QrCode size={16} />
+                            </button>
+                        )}
                         {deleteConfirm === record.id ? (<div className="flex gap-1"><button onClick={() => handleDelete(record.id)} className="px-3 py-2 bg-red-500 text-white text-xs font-medium rounded-lg">Confirmar</button><button onClick={() => setDeleteConfirm(null)} className="px-3 py-2 bg-app-stroke text-app-text-muted text-xs font-medium rounded-lg">Não</button></div>) : (<button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(record.id); }} className="p-2 text-app-text-muted hover:text-red-500 rounded-lg transition-colors" title="Apagar"><Trash2 size={16} /></button>)}
                     </div>
                 )}
