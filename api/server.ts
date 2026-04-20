@@ -2,7 +2,24 @@
 if (typeof global !== 'undefined') {
   if (typeof global.DOMMatrix === 'undefined') global.DOMMatrix = class DOMMatrix {} as any;
   if (typeof global.Path2D === 'undefined') global.Path2D = class Path2D {} as any;
-  if (typeof global.window === 'undefined') global.window = global as any;
+  
+  if (typeof global.window === 'undefined') {
+    global.window = global as any;
+  }
+  
+  if (typeof (global.window as any).location === 'undefined') {
+    (global.window as any).location = { 
+      href: 'https://localhost', 
+      origin: 'https://localhost', 
+      protocol: 'https:', 
+      host: 'localhost', 
+      hostname: 'localhost', 
+      pathname: '/', 
+      search: '', 
+      hash: '' 
+    };
+  }
+
   if (typeof global.document === 'undefined') {
     global.document = {
       createElement: () => ({ getContext: () => ({}) }),
@@ -10,6 +27,7 @@ if (typeof global !== 'undefined') {
       documentElement: { style: {} },
       querySelector: () => null,
       addEventListener: () => {},
+      location: (global.window as any).location,
     } as any;
   }
   if (typeof global.navigator === 'undefined') {
