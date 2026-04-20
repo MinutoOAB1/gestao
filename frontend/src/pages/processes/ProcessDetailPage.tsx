@@ -133,7 +133,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
                 </div>
                 <div className="flex items-center gap-2">
                     <button
-                        onClick={() => navigate(`/processos/${id}/editar`)}
+                        onClick={() => navigate(`/app/processos/${id}/editar`)}
                         className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
                     >
                         <Edit size={18} />
@@ -223,7 +223,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
                         {process.client ? (
                             <div
                                 className="flex items-center gap-3 cursor-pointer hover:bg-app-stroke/20 -mx-2 px-2 py-2 rounded-lg transition-colors"
-                                onClick={() => navigate(`/clientes/${process.client?.id}`)}
+                                onClick={() => navigate(`/app/clientes/${process.client?.id}`)}
                             >
                                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                                     <span className="text-primary font-bold text-lg">

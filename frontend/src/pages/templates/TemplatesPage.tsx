@@ -116,7 +116,7 @@ export default function TemplatesPage() {
 
     // Open editor - Navigate to DocumentEditor page
     const openEditor = (template: Template) => {
-        navigate(`/modelos/${template.id}`);
+        navigate(`/app/modelos/${template.id}`);
     };
 
     // Handle DOCX file upload

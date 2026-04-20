@@ -477,7 +477,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                     
                     <div className="flex items-center gap-2">
                         <button 
-                            onClick={() => navigate(`/clientes/${id}/editar`)}
+                            onClick={() => navigate(`/app/clientes/${id}/editar`)}
                             className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl text-sm font-medium transition-all hover:shadow-md"
                         >
                             <Edit2 size={16} />
@@ -743,7 +743,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                     {processes.map((proc: any) => (
-                                        <div key={proc.id} onClick={() => navigate(`/processos/${proc.id}`)} className="group p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 rounded-xl hover:border-blue-500/50 cursor-pointer transition-all">
+                                        <div key={proc.id} onClick={() => navigate(`/app/processos/${proc.id}`)} className="group p-4 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 rounded-xl hover:border-blue-500/50 cursor-pointer transition-all">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div>
                                                     <h4 className="font-semibold text-sm line-clamp-1 group-hover:text-blue-500 transition-colors">{proc.title}</h4>

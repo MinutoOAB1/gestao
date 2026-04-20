@@ -478,7 +478,7 @@ export default function DocumentEditorPage() {
                 isFullscreen ? "rounded-none border-x-0 border-t-0 bg-white dark:bg-app-card" : "z-20 rounded-[2rem] shadow-sm"
             )}>
                 <div className="flex items-center gap-2 text-app-text-muted text-sm font-medium pl-16">
-                    <button onClick={() => navigate('/modelos')} className="hover:text-primary transition-colors">
+                    <button onClick={() => navigate('/app/modelos')} className="hover:text-primary transition-colors">
                         Modelos
                     </button>
                     <span className="text-app-text-label">/</span>
