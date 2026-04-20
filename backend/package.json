@@ -43,6 +43,7 @@
     "compression": "^1.8.1",
     "docxtemplater": "^3.67.6",
     "express": "^4.19.2",
+    "googleapis": "^171.4.0",
     "mammoth": "^1.11.0",
     "nodemailer": "^7.0.12",
     "passport": "^0.7.0",

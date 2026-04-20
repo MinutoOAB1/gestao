@@ -103,13 +103,16 @@ export default function SettingsPage() {
     const [showUnsavedModal, setShowUnsavedModal] = useState(false);
     const [cnpjError, setCnpjError] = useState('');
     const [phoneError, setPhoneError] = useState('');
+    const [googleConnected, setGoogleConnected] = useState(false);
+    const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
 
-    // Fetch user profile to check 2FA status
+    // Fetch user profile and google status
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const response = await api.get('/auth/profile');
                 setUser2FAEnabled(response.data.twoFactorEnabled || false);
+                setGoogleConnected(response.data.googleCalendarConnected || false);
             } catch (error) {
                 console.error('Error fetching profile:', error);
             }
@@ -252,6 +255,7 @@ export default function SettingsPage() {
         { id: 'general', label: 'Geral', icon: Globe },
         { id: 'notifications', label: 'Notificações', icon: Bell },
         { id: 'security', label: 'Segurança & Login', icon: Lock },
+        { id: 'integrations', label: 'Integrações', icon: LayoutGrid },
         { id: 'billing', label: 'Faturamento', icon: LayoutGrid },
     ];
 
@@ -296,7 +300,13 @@ export default function SettingsPage() {
                     >
                         <User size={18} /> Equipe & Permissões
                     </button>
-                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-fast touch-manipulation">
+                    <button 
+                        onClick={() => setActiveTab('integrations')}
+                        className={clsx(
+                            "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-fast touch-manipulation",
+                            activeTab === 'integrations' ? "bg-primary text-white" : "text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30"
+                        )}
+                    >
                         <LayoutGrid size={18} /> Integrações
                     </button>
                 </div>
@@ -592,6 +602,96 @@ export default function SettingsPage() {
                                             className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
                                         >
                                             <Download size={16} /> Exportar Arquivo Estruturado (JSON)
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {/* INTEGRATIONS TAB */}
+                    {activeTab === 'integrations' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <section>
+                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
+                                    <LayoutGrid size={20} className="text-primary" /> Integrações Disponíveis
+                                </h2>
+                                <p className="text-sm text-app-text-muted mb-6">Conecte sua plataforma jurídica com as melhores ferramentas do mercado.</p>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {/* Google Calendar */}
+                                    <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col hover:border-primary/50 transition-all group">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                                <Globe size={24} className="text-primary" />
+                                            </div>
+                                            <span className={clsx(
+                                                "text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full",
+                                                googleConnected ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-app-stroke text-app-text-muted"
+                                            )}>
+                                                {googleConnected ? 'Ativo' : 'Inativo'}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-base font-bold text-app-text-main mb-1">Google Calendar</h3>
+                                        <p className="text-xs text-app-text-muted mb-6 leading-relaxed">
+                                            Sincronize automaticamente suas audiências e prazos com sua agenda pessoal do Google.
+                                        </p>
+                                        
+                                        <div className="mt-auto">
+                                            {googleConnected ? (
+                                                <button 
+                                                    onClick={async () => {
+                                                        if(confirm('Deseja realmente desconectar sua agenda do Google?')) {
+                                                            try {
+                                                                await api.delete('/google-calendar/disconnect');
+                                                                setGoogleConnected(false);
+                                                                addToast('Google Calendar desconectado!', 'success');
+                                                            } catch (err) {
+                                                                addToast('Erro ao desconectar.', 'error');
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="w-full py-2.5 rounded-xl border border-red-500/30 text-red-500 text-xs font-bold hover:bg-red-500/5 transition-colors"
+                                                >
+                                                    Desconectar Conta
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    disabled={isConnectingGoogle}
+                                                    onClick={async () => {
+                                                        setIsConnectingGoogle(true);
+                                                        try {
+                                                            const response = await api.get('/google-calendar/auth-url');
+                                                            window.location.href = response.data.url;
+                                                        } catch (err) {
+                                                            addToast('Erro ao iniciar conexão.', 'error');
+                                                            setIsConnectingGoogle(false);
+                                                        }
+                                                    }}
+                                                    className="w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all"
+                                                >
+                                                    {isConnectingGoogle ? 'Iniciando...' : 'Conectar Agora'}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Google Drive (Placeholder) */}
+                                    <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col opacity-60 grayscale">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center">
+                                                <Camera size={24} className="text-primary" />
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-app-stroke text-app-text-muted">
+                                                Em breve
+                                            </span>
+                                        </div>
+                                        <h3 className="text-base font-bold text-app-text-main mb-1">Google Drive</h3>
+                                        <p className="text-xs text-app-text-muted mb-6 leading-relaxed">
+                                            Armazenamento em nuvem para arquivos e petições integrados aos processos.
+                                        </p>
+                                        <button disabled className="w-full py-2.5 rounded-xl bg-app-stroke text-app-text-muted text-xs font-bold cursor-not-allowed">
+                                            Indisponível
                                         </button>
                                     </div>
                                 </div>

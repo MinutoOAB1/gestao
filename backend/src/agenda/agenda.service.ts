@@ -7,6 +7,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { OnEvent } from '@nestjs/event-emitter';
 
 import { AiService } from '../ai/ai.service';
+import { GoogleCalendarService } from '../google-calendar/google-calendar.service';
 
 @Injectable()
 export class AgendaService {
@@ -15,7 +16,8 @@ export class AgendaService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
-    private aiService: AiService
+    private aiService: AiService,
+    private googleCalendarService: GoogleCalendarService
   ) { }
 
   // Create event with optional assignees
@@ -96,6 +98,17 @@ export class AgendaService {
         } catch (error) {
           console.error(`Erro ao criar notificação para ${user.id}:`, error);
         }
+      }
+    }
+
+    // Sync with Google Calendar if user is connected
+    if (userId) {
+      const googleEventId = await this.googleCalendarService.upsertEvent(userId, event);
+      if (googleEventId) {
+        await this.prisma.event.update({
+          where: { id: event.id },
+          data: { googleEventId }
+        });
       }
     }
 
@@ -278,6 +291,22 @@ export class AgendaService {
     }
 
     // If assignees were updated, re-fetch to get fresh data; otherwise return directly
+    // Sync with Google Calendar
+    const eventToSync = assigneeIds !== undefined ? await this.prisma.event.findFirst({
+        where: { id, tenantId },
+        include: { assignees: true }
+    }) : updated;
+
+    if (eventToSync && eventToSync.createdById) {
+      const googleEventId = await this.googleCalendarService.upsertEvent(eventToSync.createdById, eventToSync);
+      if (googleEventId && googleEventId !== eventToSync.googleEventId) {
+        await this.prisma.event.update({
+          where: { id },
+          data: { googleEventId }
+        });
+      }
+    }
+
     if (assigneeIds !== undefined) {
       return this.prisma.event.findFirst({
         where: { id, tenantId },
@@ -333,6 +362,11 @@ export class AgendaService {
 
     if (!existing) {
       throw new Error('Event not found');
+    }
+
+    // Delete from Google Calendar if sync'd
+    if (existing.createdById && existing.googleEventId) {
+      await this.googleCalendarService.deleteEvent(existing.createdById, existing.googleEventId);
     }
 
     return this.prisma.event.delete({

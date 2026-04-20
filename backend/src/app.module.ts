@@ -32,6 +32,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TenantMiddleware } from './prisma/tenant.middleware';
 import { HealthController } from './health/health.controller';
+import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 
 
 @Module({
@@ -67,6 +68,7 @@ import { HealthController } from './health/health.controller';
     UserFilesModule,
     BackupModule,
     PaymentsModule,
+    GoogleCalendarModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

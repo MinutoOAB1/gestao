@@ -73,6 +73,8 @@ model User {
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
   processComments       ProcessComment[]
   timeEntries           TimeEntry[]
+  googleRefreshToken    String?
+  googleCalendarConnected Boolean           @default(false)
   tenant                Tenant            @relation(fields: [tenantId], references: [id])
   userFiles             UserFile[]
 }
@@ -421,6 +423,7 @@ model Event {
   clientId        String?
   clientName      String?
   status          String               @default("ATIVO")
+  googleEventId   String?              @unique
   tenant          Tenant               @relation(fields: [tenantId], references: [id])
   assignees       EventAssignee[]
   checklistItems  EventChecklistItem[]
