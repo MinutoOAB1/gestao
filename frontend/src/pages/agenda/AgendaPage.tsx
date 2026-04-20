@@ -877,7 +877,7 @@ export default function AgendaPage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
+                            transition={{ duration: 0.1 }}
                             className="w-full"
                         >
                             {view === 'month' && (
@@ -963,7 +963,7 @@ export default function AgendaPage() {
                                         })}
                                     </div>
                                 </>
-                            )}                   )}
+                            )}
 
                             {view === 'week' && (
                                 <div className="flex flex-col h-[calc(100vh-280px)] min-h-[600px] border border-app-stroke rounded-xl bg-app-bg overflow-hidden relative">
