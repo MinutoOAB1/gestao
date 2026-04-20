@@ -58,8 +58,8 @@ interface Event {
     date?: Date;
 }
 
-const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-const DAYS_SHORT = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+const DAYS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const DAYS_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const EVENT_TYPES = [
     { key: 'all', label: 'Todos', color: 'gray' },
     { key: 'hearing', label: 'Audiências', color: 'blue' },
@@ -570,8 +570,7 @@ export default function AgendaPage() {
     // Calendar calculations
     const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
     const getFirstDayOfMonth = (year: number, month: number) => {
-        let day = new Date(year, month, 1).getDay();
-        return day === 0 ? 6 : day - 1;
+        return new Date(year, month, 1).getDay();
     };
 
     const calendarDays = useMemo(() => {
@@ -639,14 +638,14 @@ export default function AgendaPage() {
     // Week calculation
     const weekDates = useMemo(() => {
         const today = new Date(currentYear, currentMonth, selectedDate);
-        const dayOfWeek = today.getDay() || 7;
-        const monday = new Date(today);
-        monday.setDate(today.getDate() - dayOfWeek + 1);
+        const dayOfWeek = today.getDay();
+        const sunday = new Date(today);
+        sunday.setDate(today.getDate() - dayOfWeek);
 
         const dates = [];
         for (let i = 0; i < 7; i++) {
-            const d = new Date(monday);
-            d.setDate(monday.getDate() + i);
+            const d = new Date(sunday);
+            d.setDate(sunday.getDate() + i);
             dates.push(d);
         }
         return dates;
@@ -720,15 +719,17 @@ export default function AgendaPage() {
 
                 {/* Header */}
                 <div className="p-4 border-b border-app-stroke flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <button onClick={goToPrevMonth} className="p-1.5 rounded-lg hover:bg-app-stroke/30 text-app-text-main"><ChevronLeft size={20} /></button>
-                            <h2 className="text-xl font-bold text-app-text-main capitalize min-w-[180px] text-center">
-                                {getMonthName(currentMonth)} {currentYear}
-                            </h2>
-                            <button onClick={goToNextMonth} className="p-1.5 rounded-lg hover:bg-app-stroke/30 text-app-text-main"><ChevronRight size={20} /></button>
+                    <div className="flex-1 flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-app-text-main capitalize">
+                            {getMonthName(currentMonth)} {currentYear}
+                        </h2>
+                        <div className="flex items-center gap-4">
+                            <button onClick={goToToday} className="text-sm font-semibold text-app-text-muted hover:text-primary transition-colors">Hoje</button>
+                            <div className="flex items-center gap-1">
+                                <button onClick={goToPrevMonth} className="p-2 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronLeft size={24} /></button>
+                                <button onClick={goToNextMonth} className="p-2 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronRight size={24} /></button>
+                            </div>
                         </div>
-                        <button onClick={goToToday} className="text-sm text-app-text-muted hover:text-app-text-main border border-app-stroke px-2 py-1 rounded">Hoje</button>
                     </div>
 
                     <div className="flex items-center gap-2 bg-app-bg p-1 rounded-lg border border-app-stroke">
@@ -920,113 +921,94 @@ export default function AgendaPage() {
                         >
                             {view === 'month' && (
                                 <>
-                                    <div className="grid grid-cols-7 mb-1">
-                                        {DAYS.map(day => (
-                                            <div key={day} className="text-center text-[11px] font-semibold text-app-text-muted uppercase tracking-wider py-2">
+                                    <div className="grid grid-cols-7 mb-4">
+                                        {DAYS_SHORT.map(day => (
+                                            <div key={day} className="text-center text-[13px] font-bold text-app-text-muted uppercase tracking-widest py-2">
                                                 {day}
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="grid grid-cols-7 gap-px bg-app-stroke/60 border border-app-stroke rounded-xl overflow-hidden">
+                                    <div className="grid grid-cols-7 gap-y-4">
                                         {calendarDays.map((day, idx) => {
                                             const dayEvents = day ? (eventsByDay.get(day) || []) : [];
                                             const isToday = day === new Date().getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear();
                                             const isSelected = day === selectedDate;
 
                                             return (
-                                            <div
-                                                key={idx}
-                                                onClick={() => {
-                                                    if (day) {
-                                                        setSelectedDate(day);
-                                                        setIsSidebarOpenMobile(true);
-                                                    }
-                                                }}
-                                                className={clsx(
-                                                    "min-h-[120px] p-1.5 transition-colors cursor-pointer flex flex-col",
-                                                    !day ? "bg-app-bg/30" : "bg-app-bg hover:bg-app-stroke/10",
-                                                    isSelected && !isToday && "bg-primary/5 ring-1 ring-inset ring-primary/20",
-                                                    isToday && "bg-primary/[0.04]"
-                                                )}
-                                            >
-                                                {day && (
-                                                    <>
-                                                        {/* Day Number - top left, clean */}
-                                                        <div className="flex items-center justify-between mb-1">
-                                                            <span className={clsx(
-                                                                "w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold transition-all",
-                                                                isToday
-                                                                    ? "bg-primary text-white shadow-md shadow-primary/30"
-                                                                    : isSelected
-                                                                        ? "text-primary font-extrabold"
-                                                                        : "text-app-text-main"
-                                                            )}>
-                                                                {day}
-                                                            </span>
-                                                            {dayEvents.length > 0 && !isToday && (
-                                                                <span className="text-[9px] text-app-text-muted font-medium bg-app-stroke/40 rounded-full px-1.5 py-0.5">
-                                                                    {dayEvents.length}
+                                                <div
+                                                    key={idx}
+                                                    onClick={() => {
+                                                        if (day) {
+                                                            setSelectedDate(day);
+                                                            setIsSidebarOpenMobile(true);
+                                                        }
+                                                    }}
+                                                    className={clsx(
+                                                        "relative aspect-[3/4] sm:aspect-[4/5] flex flex-col items-center justify-start pt-2 cursor-pointer transition-all group",
+                                                        !day && "opacity-0 pointer-events-none"
+                                                    )}
+                                                >
+                                                    {day && (
+                                                        <>
+                                                            {/* Background Squircle - Premium feel */}
+                                                            <div className="relative w-full flex flex-col items-center">
+                                                                <AnimatePresence>
+                                                                    {(isToday || isSelected) && (
+                                                                        <motion.div
+                                                                            layoutId="dayHighlight"
+                                                                            initial={{ opacity: 0, scale: 0.8 }}
+                                                                            animate={{ opacity: 1, scale: 1 }}
+                                                                            exit={{ opacity: 0, scale: 0.8 }}
+                                                                            className={clsx(
+                                                                                "absolute inset-0 -top-2 w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-[24px] sm:rounded-[32px] z-0 shadow-xl",
+                                                                                isToday ? "bg-[#FF2D55] shadow-[#FF2D55]/30" : "bg-[#FFB380] shadow-[#FFB380]/20"
+                                                                            )}
+                                                                        />
+                                                                    )}
+                                                                </AnimatePresence>
+
+                                                                {/* Hover highlight */}
+                                                                {!isToday && !isSelected && (
+                                                                    <div className="absolute inset-0 -top-2 w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-[24px] sm:rounded-[32px] bg-app-stroke/20 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
+                                                                )}
+
+                                                                {/* Day Number */}
+                                                                <span className={clsx(
+                                                                    "relative text-lg sm:text-2xl font-bold z-10 transition-colors duration-300 mb-1",
+                                                                    isToday ? "text-white" : isSelected ? "text-slate-900" : "text-app-text-main group-hover:text-primary"
+                                                                )}>
+                                                                    {day}
                                                                 </span>
-                                                            )}
-                                                        </div>
 
-                                                        {/* Event Pills - compact, stacked, never overlap */}
-                                                        <div className="flex-1 flex flex-col gap-[3px] min-w-0">
-                                                            {dayEvents.slice(0, 2).map(event => {
-                                                                const isDeadlineOrHearing = ['deadline', 'hearing'].includes(event.type) && !event.completed;
-                                                                // Determine pill color
-                                                                const pillColor = event.completed ? 'bg-app-stroke/40 text-app-text-muted'
-                                                                    : event.color === 'red' || event.type === 'deadline' ? 'bg-red-500/15 text-red-600 dark:text-red-400'
-                                                                    : event.color === 'blue' || event.type === 'hearing' ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
-                                                                    : event.color === 'green' || event.type === 'meeting' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                                                                    : event.color === 'amber' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                                                                    : event.color === 'purple' || event.type === 'personal' ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400'
-                                                                    : 'bg-app-stroke/30 text-app-text-main';
+                                                                {/* Today Indicator Ring (optional, like reference day 20) */}
+                                                                {isToday && (
+                                                                    <div className="relative z-10 w-2 h-2 rounded-full border-2 border-white mb-2" />
+                                                                )}
 
-                                                                const dotColor = event.completed ? 'bg-gray-400'
-                                                                    : event.color === 'red' || event.type === 'deadline' ? 'bg-red-500'
-                                                                    : event.color === 'blue' || event.type === 'hearing' ? 'bg-blue-500'
-                                                                    : event.color === 'green' || event.type === 'meeting' ? 'bg-emerald-500'
-                                                                    : event.color === 'amber' ? 'bg-amber-500'
-                                                                    : event.color === 'purple' || event.type === 'personal' ? 'bg-purple-500'
-                                                                    : 'bg-gray-400';
-
-                                                                return (
-                                                                    <div
-                                                                        key={event.id}
-                                                                        onClick={(e) => handleEditClick(event, e)}
-                                                                        className={clsx(
-                                                                            "flex items-center gap-1 px-1.5 py-[3px] rounded-md text-[10px] font-medium transition-all hover:brightness-95 cursor-pointer min-w-0 shrink-0",
-                                                                            pillColor,
-                                                                            event.completed && "line-through opacity-60",
-                                                                            isDeadlineOrHearing && "ring-1 ring-red-400/40 font-bold",
-                                                                            conflictIds.has(event.id) && !event.completed && "ring-2 ring-red-500 animate-[pulse_2s_ease-in-out_infinite]"
+                                                                {/* Event Dots - Minimalist */}
+                                                                {!isToday && dayEvents.length > 0 && (
+                                                                    <div className="relative z-10 flex gap-1 mt-1">
+                                                                        {dayEvents.slice(0, 3).map((event, eIdx) => {
+                                                                            const dotColor = event.completed ? 'bg-app-text-muted'
+                                                                                : event.color === 'red' || event.type === 'deadline' ? 'bg-red-500'
+                                                                                : event.color === 'blue' || event.type === 'hearing' ? 'bg-blue-500'
+                                                                                : event.color === 'green' || event.type === 'meeting' ? 'bg-emerald-500'
+                                                                                : event.color === 'amber' ? 'bg-amber-500'
+                                                                                : event.color === 'purple' || event.type === 'personal' ? 'bg-purple-500'
+                                                                                : 'bg-gray-400';
+                                                                            return (
+                                                                                <div key={event.id} className={clsx("w-1.5 h-1.5 rounded-full", dotColor)} />
+                                                                            );
+                                                                        })}
+                                                                        {dayEvents.length > 3 && (
+                                                                            <div className="w-1.5 h-1.5 rounded-full bg-app-text-muted opacity-50" />
                                                                         )}
-                                                                        title={`${event.time} - ${event.title}${isDeadlineOrHearing ? ' ⚠' : ''}`}
-                                                                    >
-                                                                        <span className={clsx("w-1.5 h-1.5 rounded-full shrink-0", dotColor, isDeadlineOrHearing && "animate-pulse")} />
-                                                                        <span className="shrink-0 opacity-70">{event.time}</span>
-                                                                        <span className="truncate min-w-0">{event.title}</span>
-                                                                        {event.priority === 'URGENT' && <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse shrink-0 ml-auto" />}
                                                                     </div>
-                                                                );
-                                                            })}
-                                                            {dayEvents.length > 2 && (
-                                                                <button 
-                                                                    className="text-[10px] font-bold text-primary hover:underline text-left px-1.5 py-0.5 hover:bg-primary/5 rounded transition-colors shrink-0"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setSelectedDate(day!);
-                                                                        setIsSidebarOpenMobile(true);
-                                                                    }}
-                                                                >
-                                                                    +{dayEvents.length - 2} mais
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </div>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
                                             );
                                         })}
                                     </div>
