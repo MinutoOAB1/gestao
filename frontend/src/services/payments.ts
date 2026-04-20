@@ -18,5 +18,15 @@ export const paymentsService = {
   getStatus: async (id: string) => {
     const response = await api.get(`/payments/${id}/status`);
     return response.data;
+  },
+
+  list: async () => {
+    const response = await api.get('/payments');
+    return response.data;
+  },
+
+  cancel: async (id: string) => {
+    const response = await api.post(`/payments/${id}/cancel`);
+    return response.data;
   }
 };

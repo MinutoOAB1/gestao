@@ -23,6 +23,18 @@ export class PaymentsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get()
+  async listInvoices(@Request() req) {
+    return this.asaasService.findAllInvoices(req.user.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/cancel')
+  async cancelInvoice(@Request() req, @Param('id') id: string) {
+    return this.asaasService.cancelPayment(id, req.user.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id/status')
   async getStatus(@Param('id') id: string) {
     return this.asaasService.syncPaymentStatus(id);
@@ -31,7 +43,7 @@ export class PaymentsController {
   // Public webhook for Asaas
   @Post('webhook')
   async handleWebhook(@Body() body: any) {
-    const paymentId = body.event?.payment?.id || body.payment?.id;
+    const paymentId = body.event?.payment?.id || body.payment?.id || body.paymentId;
     if (paymentId) {
       return this.asaasService.syncPaymentStatus(paymentId);
     }

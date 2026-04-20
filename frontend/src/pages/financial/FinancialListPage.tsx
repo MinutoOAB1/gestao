@@ -8,6 +8,7 @@ import { Protect } from '../../components/auth/Protect';
 import { useToast } from '../../context/ToastContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { GenerateInvoiceModal } from '../../components/financial/GenerateInvoiceModal';
+import { InvoiceManagementTab } from '../../components/financial/InvoiceManagementTab';
 
 interface FinancialRecord {
     id: string;
@@ -143,7 +144,7 @@ export default function FinancialListPage() {
     const [dateFilterStart, setDateFilterStart] = useState('');
     const [dateFilterEnd, setDateFilterEnd] = useState('');
     const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '1A'>('1M');
-    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses'>('transactions');
+    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices'>('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isReconModalOpen, setIsReconModalOpen] = useState(false);
     const [bankBalance, setBankBalance] = useState('');
@@ -1086,124 +1087,98 @@ export default function FinancialListPage() {
             </div>
 
             {/* Tabs Row */}
-            <div className="flex border-b border-app-stroke mb-4 overflow-x-auto custom-scrollbar">
-                <button
-                    onClick={() => setActiveTab('transactions')}
-                    className={clsx(
-                        "px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
-                        activeTab === 'transactions' ? "border-primary text-primary" : "border-transparent text-app-text-muted hover:text-app-text-main"
-                    )}
-                >
-                    Controle de Entradas e Saídas
-                </button>
-                <button
-                    onClick={() => setActiveTab('repasses')}
-                    className={clsx(
-                        "px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
-                        activeTab === 'repasses' ? "border-primary text-primary" : "border-transparent text-app-text-muted hover:text-app-text-main"
-                    )}
-                >
-                    Planilha de Honorários (Repasses)
-                </button>
+            <div className="flex border-b border-app-stroke mb-8">
+                <div className="flex flex-wrap items-center gap-2">
+                    <button
+                        onClick={() => setActiveTab('transactions')}
+                        className={clsx(
+                            "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
+                            activeTab === 'transactions'
+                                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
+                        )}
+                    >
+                        Transações
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('invoices')}
+                        className={clsx(
+                            "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                            activeTab === 'invoices'
+                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
+                        )}
+                    >
+                        <QrCode size={14} />
+                        Cobranças Emitidas
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('repasses')}
+                        className={clsx(
+                            "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
+                            activeTab === 'repasses'
+                                ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20"
+                                : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
+                        )}
+                    >
+                        Repasses / Parcerias
+                    </button>
+                </div>
             </div>
 
-            {/* Transactions Table */}
-            {activeTab === 'transactions' && (
-                <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden">
-                    <div className="p-5 border-b border-app-stroke">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <h3 className="text-lg font-bold text-app-text-main">Controle de Parcelas & Transações</h3>
-                            <div className="flex flex-wrap gap-2">
-                                <div className="relative">
-                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-app-text-muted" />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar parcela..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pl-9 pr-4 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-main outline-none focus:border-primary transition-colors w-40 sm:w-48"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-1 bg-app-bg border border-app-stroke rounded-lg px-2 py-1">
-                                    <input 
-                                        type="date" 
-                                        value={dateFilterStart}
-                                        onChange={e => setDateFilterStart(e.target.value)}
-                                        className="bg-transparent text-sm text-app-text-main outline-none w-[110px]"
-                                        title="Data Inicial"
-                                    />
-                                    <span className="text-app-text-muted text-xs">até</span>
-                                    <input 
-                                        type="date" 
-                                        value={dateFilterEnd}
-                                        onChange={e => setDateFilterEnd(e.target.value)}
-                                        className="bg-transparent text-sm text-app-text-main outline-none w-[110px]"
-                                        title="Data Final"
-                                    />
-                                </div>
-                                <select
-                                    value={statusFilter}
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="px-3 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                >
-                                    <option value="all">Todos os Status</option>
-                                    <option value="pending">Pendentes</option>
-                                    <option value="paid">Pagos</option>
-                                    <option value="overdue">Atrasados</option>
-                                </select>
-                                <button 
-                                    onClick={() => { setDateFilterStart(''); setDateFilterEnd(''); setStatusFilter('all'); setSearchQuery(''); }}
-                                    className="flex items-center gap-2 px-3 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-muted hover:text-app-text-main transition-colors"
-                                    title="Limpar todos os filtros"
-                                >
-                                    Limpar
-                                </button>
-                                <button className="flex items-center gap-2 px-3 py-2 bg-app-bg border border-app-stroke rounded-lg text-sm text-app-text-muted hover:text-app-text-main transition-colors">
-                                    <Filter size={14} />
-                                    Filtros
-                                </button>
+            {/* Content Area */}
+            {activeTab === 'transactions' ? (
+                <div className="space-y-6">
+                    {/* Summary View Mobile */}
+                    <div className="md:hidden flex flex-col gap-3">
+                        {groupedRecords.length > 0 ? (
+                            groupedRecords.map((record) => (
+                                <FinancialMobileRow 
+                                    key={record.id} 
+                                    record={record} 
+                                    onEdit={handleEdit} 
+                                    onDelete={handleDelete}
+                                    onSync={fetchData}
+                                    setSelectedClientForInvoice={setSelectedClientForInvoice}
+                                    setIsInvoiceModalOpen={setIsInvoiceModalOpen}
+                                />
+                            ))
+                        ) : (
+                            <div className="bg-app-card p-10 text-center rounded-2xl border border-app-stroke">
+                                <p className="text-app-text-muted">Nenhuma transação encontrada para os filtros aplicados.</p>
                             </div>
-                        </div>
+                        )}
                     </div>
 
-                    <div className="overflow-x-auto hidden md:block">
-                        <table className="w-full">
-                            <thead className="bg-app-bg/80 backdrop-blur-sm border-b border-app-stroke sticky top-0 z-10">
+                    {/* Full Table Desktop */}
+                    <div className="hidden md:block bg-app-card border border-app-stroke rounded-[2rem] overflow-hidden shadow-sm">
+                        <table className="w-full text-left border-collapse">
+                            <thead className="bg-app-bg/50">
                                 <tr>
-                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Vencimento</th>
-                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Descrição / Contrato</th>
-                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Cliente</th>
-                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Categoria / Parceiro</th>
-                                    <th className="px-5 py-3 text-center text-xs font-medium text-app-text-muted uppercase tracking-wider">Comprovante</th>
-                                    <th className="px-5 py-3 text-left text-xs font-medium text-app-text-muted uppercase tracking-wider">Status</th>
-                                    <th className="px-5 py-3 text-right text-xs font-medium text-app-text-muted uppercase tracking-wider">Valor</th>
-                                    <th className="px-5 py-3 text-right text-xs font-medium text-app-text-muted uppercase tracking-wider"></th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke w-10">#</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Descrição / Categoria</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Data</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-right">Valor</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-right">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-app-stroke/40">
+                            <tbody>
                                 {groupedRecords.length > 0 ? (
                                     groupedRecords.map((record) => (
-                                        <FinancialTableRow
-                                            key={record.id}
-                                            record={record}
-                                            expandedGroups={expandedGroups}
-                                            toggleGroup={toggleGroup}
-                                            handleEdit={handleEdit}
-                                            handleDelete={handleDelete}
-                                            deleteConfirm={deleteConfirm}
-                                            setDeleteConfirm={setDeleteConfirm}
-                                            isOverdue={isOverdue}
-                                            setActiveNoteRecord={setActiveNoteRecord}
+                                        <FinancialTableRow 
+                                            key={record.id} 
+                                            record={record} 
+                                            expandedGroups={expandedGroups} 
+                                            toggleGroup={toggleGroup} 
+                                            onEdit={handleEdit} 
+                                            onDelete={handleDelete}
+                                            onSync={fetchData}
                                             setSelectedClientForInvoice={setSelectedClientForInvoice}
                                             setIsInvoiceModalOpen={setIsInvoiceModalOpen}
                                         />
                                     ))
                                 ) : (
-                                    <tr><td colSpan={8} className="px-5 py-12 text-center text-app-text-muted">Nenhuma transação encontrada.</td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
 
                     {/* Mobile Transaction Cards */}
                     <div className="md:hidden divide-y divide-app-stroke">

@@ -95,7 +95,7 @@ export class AsaasService {
         data: {
           asaasId: asaasPayment.id,
           amount: data.amount,
-          status: 'PENDING',
+          status: this.mapAsaasStatus(asaasPayment.status),
           dueDate: new Date(data.dueDate),
           paymentLink: asaasPayment.invoiceUrl,
           invoiceUrl: asaasPayment.invoiceUrl,
@@ -126,15 +126,54 @@ export class AsaasService {
     }
   }
 
+  async findAllInvoices(tenantId: string) {
+    return this.prisma.invoice.findMany({
+      where: { tenantId },
+      include: {
+        client: {
+          select: { name: true, email: true }
+        },
+        financialRecord: {
+          select: { description: true, category: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async cancelPayment(asaasId: string, tenantId: string) {
+    try {
+      // Cancel in Asaas
+      await this.api.delete(`/payments/${asaasId}`);
+
+      // Update in our database
+      return this.prisma.invoice.update({
+        where: { asaasId, tenantId },
+        data: { status: 'CANCELLED' }
+      });
+    } catch (error) {
+      this.logger.error(`Erro ao cancelar cobrança: ${error.message}`);
+      throw new BadRequestException(`Erro ao cancelar no Asaas: ${error.response?.data?.errors?.[0]?.description || error.message}`);
+    }
+  }
+
   async syncPaymentStatus(asaasId: string) {
     try {
       const response = await this.api.get(`/payments/${asaasId}`);
       const status = this.mapAsaasStatus(response.data.status);
       
-      await this.prisma.invoice.update({
+      const invoice = await this.prisma.invoice.update({
         where: { asaasId },
         data: { status },
       });
+
+      // If paid, also update the financial record
+      if (status === 'PAID' && invoice.financialRecordId) {
+        await this.prisma.financialRecord.update({
+          where: { id: invoice.financialRecordId },
+          data: { status: 'PAID' }
+        });
+      }
 
       return status;
     } catch (error) {
@@ -147,9 +186,14 @@ export class AsaasService {
       'PENDING': 'PENDING',
       'RECEIVED': 'PAID',
       'CONFIRMED': 'PAID',
+      'RECEIVED_IN_CASH': 'PAID',
       'OVERDUE': 'OVERDUE',
       'DELETED': 'CANCELLED',
       'REFUNDED': 'CANCELLED',
+      'CANCELLED': 'CANCELLED',
+      'CHARGEBACK_REQUESTED': 'CANCELLED',
+      'CHARGEBACK_DISPUTE': 'CANCELLED',
+      'AWAITING_RISK_ANALYSIS': 'PENDING',
     };
     return map[asaasStatus] || 'PENDING';
   }
