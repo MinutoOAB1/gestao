@@ -710,6 +710,7 @@ export default function AgendaPage() {
             .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
     }, [filteredEvents, currentMonth, currentYear]);
 
+    return (
         <div className="flex flex-col md:flex-row h-full w-full p-2 sm:p-4 gap-4 bg-app-bg overflow-hidden">
             {notification && <NotificationToast event={notification} onDismiss={() => setNotification(null)} />}
 
@@ -1004,7 +1005,6 @@ export default function AgendaPage() {
                                         <div className="grid grid-cols-7">
                                             {weekDates.map((_, idx) => (
                                                 <div key={idx} className="border-r border-app-stroke min-h-[30px] p-1">
-                                                    {/* Espaço para eventos do dia todo futuramente */}
                                                 </div>
                                             ))}
                                         </div>
@@ -1020,7 +1020,7 @@ export default function AgendaPage() {
                                         }} 
                                         className="flex-1 overflow-y-auto custom-scrollbar relative"
                                     >
-                                        <div className="grid grid-cols-[60px_1fr] min-h-[1440px]"> {/* 24 hours * 60px/hour */}
+                                        <div className="grid grid-cols-[60px_1fr] min-h-[1440px]">
                                             {/* Time Axis */}
                                             <div className="border-r border-app-stroke bg-app-card relative z-10">
                                                 {Array.from({ length: 24 }).map((_, hour) => (
@@ -1034,14 +1034,9 @@ export default function AgendaPage() {
 
                                             {/* Grid Content */}
                                             <div className="grid grid-cols-7 relative">
-                                                {/* Hover effect for columns & lines */}
-                                                {/* Horizontal Lines */}
+                                                {/* Lines */}
                                                 {Array.from({ length: 24 }).map((_, hour) => (
                                                     <div key={`line-${hour}`} className="absolute w-full h-[1px] bg-app-stroke pointer-events-none z-0" style={{ top: `${hour * 60}px` }} />
-                                                ))}
-                                                {/* Half-hour Lines */}
-                                                {Array.from({ length: 24 }).map((_, hour) => (
-                                                    <div key={`halfline-${hour}`} className="absolute w-full h-[1px] bg-app-stroke/30 border-dashed pointer-events-none z-0" style={{ top: `${hour * 60 + 30}px` }} />
                                                 ))}
                                                 
                                                 {/* Vertical Columns */}
@@ -1052,84 +1047,43 @@ export default function AgendaPage() {
                                                     });
 
                                                     return (
-                                                        <div 
-                                                            key={`col-${dayIdx}`} 
-                                                            className="relative border-r border-app-stroke h-[1440px] hover:bg-app-stroke/5 transition-colors group"
-                                                            onDragOver={(e) => e.preventDefault()}
-                                                            onDrop={(e) => handleEventDrop(e, date)}
-                                                        >
-                                                            {/* Render events as absolute positioned blocks */}
+                                                        <div key={dayIdx} className="relative border-r border-app-stroke h-full">
                                                             {dayEvents.map(event => {
-                                                                const isConflict = conflictIds.has(event.id);
-                                                                const startDate = new Date(event.start);
-                                                                const endDate = event.end ? new Date(event.end) : new Date(startDate.getTime() + 60 * 60 * 1000); // default 1 hour visual
-                                                                
-                                                                const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
-                                                                const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
-                                                                let durationMinutes = endMinutes - startMinutes;
-                                                                
-                                                                if (durationMinutes <= 0) durationMinutes = 60; 
-
-                                                                const topOffset = startMinutes; // 1px por minuto
-                                                                const heightPixels = durationMinutes;
+                                                                const start = new Date(event.start);
+                                                                const end = new Date(event.end || event.start);
+                                                                const startHour = start.getHours() + start.getMinutes() / 60;
+                                                                const endHour = end.getHours() + end.getMinutes() / 60;
+                                                                const duration = Math.max(0.5, endHour - startHour);
+                                                                const topOffset = startHour * 60;
+                                                                const heightPixels = duration * 60;
 
                                                                 return (
                                                                     <div 
                                                                         key={event.id}
-                                                                        draggable={!event.completed}
-                                                                        onDragStart={(e) => {
-                                                                            e.dataTransfer.setData('text/plain', event.id);
-                                                                            e.dataTransfer.effectAllowed = 'move';
-                                                                        }}
                                                                         onClick={(e) => handleEditClick(event, e)}
                                                                         className={clsx(
-                                                                            "absolute left-1 right-1 p-1 sm:p-1.5 rounded-md border-l-[3px] shadow-sm cursor-pointer hover:brightness-95 transition-all overflow-hidden z-10 flex flex-col gap-0.5",
-                                                                            event.completed ? "bg-app-stroke/30 border-app-stroke text-app-text-muted opacity-70 border-l-slate-400" : `bg-white dark:bg-slate-800 border border-app-stroke`,
-                                                                            !event.completed && event.color === 'red' ? "border-l-red-500 bg-red-50/50 dark:bg-red-500/10" :
-                                                                            !event.completed && event.color === 'blue' ? "border-l-blue-500 bg-blue-50/50 dark:bg-blue-500/10" :
-                                                                            !event.completed && event.color === 'green' ? "border-l-green-500 bg-green-50/50 dark:bg-green-500/10" :
-                                                                            !event.completed && event.color === 'amber' ? "border-l-amber-500 bg-amber-50/50 dark:bg-amber-500/10" :
-                                                                            !event.completed && event.color === 'purple' ? "border-l-purple-500 bg-purple-50/50 dark:bg-purple-500/10" :
-                                                                            !event.completed && event.type === 'hearing' ? "border-l-blue-500" :
-                                                                            !event.completed && event.type === 'deadline' ? "border-l-red-600" :
-                                                                            !event.completed && event.type === 'meeting' ? "border-l-emerald-500" :
-                                                                            !event.completed && event.type === 'personal' ? "border-l-stone-500" : "",
-                                                                            event.priority === 'URGENT' && "ring-1 ring-red-500",
-                                                                            isConflict && !event.completed && "ring-2 ring-red-500 animate-[pulse_2s_ease-in-out_infinite]",
-                                                                            ['deadline', 'hearing'].includes(event.type) && !event.completed && "pt-3.5" // Add padding to fit banner
+                                                                            "absolute left-1 right-1 rounded-lg p-2 overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-white/50 shadow-md group border-l-4",
+                                                                            event.completed ? "bg-app-stroke/40 border-l-slate-400 grayscale" : 
+                                                                            event.type === 'hearing' ? "bg-blue-500/15 border-l-blue-500 hover:bg-blue-500/25" :
+                                                                            event.type === 'deadline' ? "bg-red-500/15 border-l-red-500 hover:bg-red-500/25" :
+                                                                            event.type === 'meeting' ? "bg-emerald-500/15 border-l-emerald-500 hover:bg-emerald-500/25" :
+                                                                            "bg-purple-500/15 border-l-purple-500 hover:bg-purple-500/25"
                                                                         )}
                                                                         style={{ top: `${topOffset}px`, height: `${heightPixels}px`, minHeight: '28px' }}
                                                                     >
-                                                                        {/* Red Highlight Banner for Urgent/Deadlines */}
-                                                                        {['deadline', 'hearing'].includes(event.type) && !event.completed && (
-                                                                            <div className="absolute top-0 left-0 right-0 bg-red-600 text-white text-[7px] font-bold uppercase text-center py-[1px] shadow-sm z-10 tracking-widest bg-gradient-to-r from-red-600 to-red-500">
-                                                                                {event.type === 'deadline' ? 'Prazo Fatal' : 'Audiência'}
-                                                                            </div>
-                                                                        )}
                                                                         <div className="flex justify-between items-start gap-1">
-                                                                            <span className={clsx("font-bold text-[9px] sm:text-[10px] leading-tight truncate", event.completed ? "line-through text-app-text-muted" : "text-app-text-main")}>
+                                                                            <span className={clsx("font-bold text-[9px] leading-tight truncate", event.completed ? "line-through text-app-text-muted" : "text-app-text-main")}>
                                                                                 {event.time} 
-                                                                                {event.completed && <CheckCircle2 size={10} className="inline ml-1 mb-0.5 text-green-500"/>}
                                                                             </span>
-                                                                            {event.priority === 'URGENT' && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse mt-1 shrink-0" />}
                                                                         </div>
-                                                                        
-                                                                        <div className={clsx("text-[10px] sm:text-[11px] font-semibold leading-tight line-clamp-1 sm:line-clamp-2 truncate", event.completed ? "text-app-text-muted" : "text-app-text-main")}>
+                                                                        <div className={clsx("text-[10px] font-semibold leading-tight line-clamp-2 truncate", event.completed ? "text-app-text-muted" : "text-app-text-main")}>
                                                                             {event.title}
                                                                         </div>
-                                                                        
-                                                                        {/* Extra details only if enough height to fit */}
-                                                                        {heightPixels > 50 && (event.clientName || event.processNumber) && (
-                                                                            <div className="mt-auto pt-1 flex flex-col gap-0.5 text-[8px] sm:text-[9px] text-app-text-muted whitespace-nowrap overflow-hidden hidden sm:flex">
-                                                                                {event.clientName && <span className="truncate flex items-center gap-1"><Users size={8} className="shrink-0"/> {event.clientName}</span>}
-                                                                                {event.processNumber && <span className="truncate flex items-center gap-1 text-primary"><FileText size={8} className="shrink-0"/> {event.processNumber}</span>}
-                                                                            </div>
-                                                                        )}
                                                                     </div>
-                                                                )
+                                                                );
                                                             })}
                                                         </div>
-                                                    )
+                                                    );
                                                 })}
                                             </div>
                                         </div>

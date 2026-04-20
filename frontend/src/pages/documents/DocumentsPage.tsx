@@ -672,7 +672,7 @@ export default function DocumentsPage() {
                                     initial={{ opacity: 0, scale: 0.98 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.98 }}
-                                    transition={{ duration: 0.2 }}
+                                    transition={{ duration: 0.12 }}
                                     className="h-full"
                                 >
                                     <DndContext onDragEnd={handleDragEnd}>
@@ -692,7 +692,7 @@ export default function DocumentsPage() {
                                     initial={{ opacity: 0, y: 15 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -15 }}
-                                    transition={{ duration: 0.2 }}
+                                    transition={{ duration: 0.12 }}
                                     className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
                                 >
                                     {filteredFiles.map(file => (
@@ -824,7 +824,7 @@ export default function DocumentsPage() {
                                     initial={{ opacity: 0, x: -15 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 15 }}
-                                    transition={{ duration: 0.2 }}
+                                    transition={{ duration: 0.12 }}
                                     className="bg-app-card border border-app-stroke rounded-xl overflow-hidden shadow-sm"
                                 >
                                     <table className="w-full text-left text-xs">

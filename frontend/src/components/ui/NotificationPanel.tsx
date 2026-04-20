@@ -205,7 +205,7 @@ export default function NotificationPanel() {
                                                             key={notification.id}
                                                             initial={{ opacity: 0, x: 20 }}
                                                             animate={{ opacity: 1, x: 0 }}
-                                                            transition={{ duration: 0.2, delay: idx * 0.05 }}
+                                                            transition={{ duration: 0.12, delay: idx * 0.05 }}
                                                             onClick={() => handleNotificationClick(notification)}
                                                             className={clsx(
                                                                 "p-4 flex gap-3 cursor-pointer transition-colors relative",
