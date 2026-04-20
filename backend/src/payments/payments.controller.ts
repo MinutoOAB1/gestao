@@ -14,6 +14,7 @@ export class PaymentsController {
     dueDate: string;
     description: string;
     billingType: 'BOLETO' | 'PIX' | 'CREDIT_CARD';
+    financialRecordId?: string;
   }) {
     return this.asaasService.createPayment({
       ...data,

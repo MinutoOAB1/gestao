@@ -64,6 +64,7 @@ export class AsaasService {
     description: string;
     billingType: 'BOLETO' | 'PIX' | 'CREDIT_CARD';
     tenantId: string;
+    financialRecordId?: string;
   }) {
     const asaasCustomerId = await this.getOrCreateCustomer(data.clientId, data.tenantId);
 
@@ -93,6 +94,7 @@ export class AsaasService {
           paymentMethod: data.billingType,
           clientId: data.clientId,
           tenantId: data.tenantId,
+          financialRecordId: data.financialRecordId,
         },
       });
 

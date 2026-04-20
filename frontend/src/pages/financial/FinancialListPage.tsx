@@ -148,7 +148,7 @@ export default function FinancialListPage() {
     const [isReconModalOpen, setIsReconModalOpen] = useState(false);
     const [bankBalance, setBankBalance] = useState('');
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-    const [selectedClientForInvoice, setSelectedClientForInvoice] = useState<{id: string, name: string} | undefined>();
+    const [selectedClientForInvoice, setSelectedClientForInvoice] = useState<{id: string, name: string, amount?: number, financialRecordId?: string} | undefined>();
 
     const [newTransaction, setNewTransaction] = useState<NewTransaction>({
         type: 'INCOME',
@@ -1964,6 +1964,9 @@ export default function FinancialListPage() {
                 onClose={() => setIsInvoiceModalOpen(false)}
                 clientId={selectedClientForInvoice?.id}
                 clientName={selectedClientForInvoice?.name}
+                defaultAmount={selectedClientForInvoice?.amount}
+                financialRecordId={selectedClientForInvoice?.financialRecordId}
+                clients={clients}
             />
         </div>
     );
@@ -2131,6 +2134,24 @@ const FinancialTableRow = memo(({
                                     )}
                                 >
                                     {record.type === 'INCOME' ? 'Receber' : 'Pagar'}
+                                </button>
+                            )}
+                            {record.status === 'PENDING' && record.type === 'INCOME' && record.clientId && (
+                                <button
+                                    onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        setSelectedClientForInvoice({
+                                            id: record.clientId, 
+                                            name: record.client?.name || 'Cliente',
+                                            amount: record.amount,
+                                            financialRecordId: record.id
+                                        }); 
+                                        setIsInvoiceModalOpen(true); 
+                                    }}
+                                    className="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20 text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center gap-1"
+                                    title="Gerar Cobrança Asaas (PIX/Boleto)"
+                                >
+                                    <QrCode size={12} /> Cobrança
                                 </button>
                             )}
                             {record.status === 'PAID' && (

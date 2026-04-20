@@ -6,6 +6,7 @@ export interface GeneratePaymentData {
   dueDate: string;
   description: string;
   billingType: 'BOLETO' | 'PIX' | 'CREDIT_CARD';
+  financialRecordId?: string;
 }
 
 export const paymentsService = {
