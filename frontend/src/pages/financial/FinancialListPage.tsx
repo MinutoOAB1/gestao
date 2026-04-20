@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
-import { Plus, TrendingUp, TrendingDown, Download, Search, Filter, RefreshCw, Paperclip, AlertTriangle, Building, Users, DollarSign, Trash2, Calendar, MessageSquare, Info, CheckCircle2, Hourglass, Repeat } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, Download, Search, Filter, RefreshCw, Paperclip, AlertTriangle, Building, Users, DollarSign, Trash2, Calendar, MessageSquare, Info, CheckCircle2, Hourglass, Repeat, QrCode, ExternalLink, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { clsx } from 'clsx';
@@ -7,6 +7,7 @@ import Modal from '../../components/ui/Modal';
 import { Protect } from '../../components/auth/Protect';
 import { useToast } from '../../context/ToastContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { GenerateInvoiceModal } from '../../components/financial/GenerateInvoiceModal';
 
 interface FinancialRecord {
     id: string;
@@ -146,6 +147,8 @@ export default function FinancialListPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isReconModalOpen, setIsReconModalOpen] = useState(false);
     const [bankBalance, setBankBalance] = useState('');
+    const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+    const [selectedClientForInvoice, setSelectedClientForInvoice] = useState<{id: string, name: string} | undefined>();
 
     const [newTransaction, setNewTransaction] = useState<NewTransaction>({
         type: 'INCOME',
@@ -780,6 +783,18 @@ export default function FinancialListPage() {
                         >
                             <Download size={16} />
                             Relatórios
+                        </button>
+                    </Protect>
+                    <Protect roles={['ADMIN', 'LAWYER']}>
+                        <button
+                            onClick={() => {
+                                setSelectedClientForInvoice(undefined);
+                                setIsInvoiceModalOpen(true);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-sm font-bold hover:bg-emerald-500/20 transition-colors"
+                        >
+                            <QrCode size={16} />
+                            Emitir Cobrança
                         </button>
                     </Protect>
                     <Protect roles={['ADMIN', 'LAWYER']}>
@@ -1943,7 +1958,14 @@ export default function FinancialListPage() {
                     </div>
                 </div>
             </Modal>
-        </div >
+            {/* Asaas Invoice Modal */}
+            <GenerateInvoiceModal 
+                isOpen={isInvoiceModalOpen}
+                onClose={() => setIsInvoiceModalOpen(false)}
+                clientId={selectedClientForInvoice?.id}
+                clientName={selectedClientForInvoice?.name}
+            />
+        </div>
     );
 }
 
@@ -2025,6 +2047,28 @@ const FinancialTableRow = memo(({
                             </span>
                         )}
                         {record.paymentMethod && <span className="text-[10px] px-2 py-0.5 rounded-full bg-app-stroke/50 text-app-text-muted shrink-0 flex items-center gap-1.5 border border-app-stroke" title="Método de Pagamento"><DollarSign size={10} /> {record.paymentMethod}</span>}
+                        {record.invoices && record.invoices.length > 0 && (
+                            <div className="flex gap-1 items-center">
+                                {record.invoices[0].paymentMethod === 'PIX' ? (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1">
+                                        <QrCode size={10} /> PIX
+                                    </span>
+                                ) : (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center gap-1">
+                                        <FileText size={10} /> Boleto
+                                    </span>
+                                )}
+                                <a 
+                                    href={record.invoices[0].invoiceUrl} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="p-1 text-app-text-muted hover:text-blue-500 transition-colors"
+                                    title="Ver Fatura"
+                                >
+                                    <ExternalLink size={12} />
+                                </a>
+                            </div>
+                        )}
                         {!isGroup && record.isUrgent && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500/20 text-red-500 rounded-full shrink-0 animate-pulse">URGENTE</span>}
                     </p>
                     {record.client && <p className="text-xs text-app-text-muted mt-0.5 max-w-[200px] truncate">Cli: {record.client.name}</p>}

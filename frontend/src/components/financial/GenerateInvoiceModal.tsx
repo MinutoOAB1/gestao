@@ -1,0 +1,246 @@
+import React, { useState } from 'react';
+import { 
+  X, 
+  CreditCard, 
+  QrCode, 
+  FileText, 
+  DollarSign, 
+  Calendar,
+  CheckCircle2,
+  AlertCircle,
+  Copy,
+  ExternalLink,
+  Loader2
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { clsx } from 'clsx';
+import { paymentsService, GeneratePaymentData } from '../../services/payments';
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  clientId?: string;
+  clientName?: string;
+  defaultAmount?: number;
+}
+
+export const GenerateInvoiceModal: React.FC<Props> = ({ 
+  isOpen, 
+  onClose, 
+  clientId, 
+  clientName,
+  defaultAmount 
+}) => {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<any>(null);
+
+  const [formData, setFormData] = useState<Partial<GeneratePaymentData>>({
+    clientId,
+    amount: defaultAmount || 0,
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    description: '',
+    billingType: 'PIX'
+  });
+
+  const handleGenerate = async () => {
+    if (!formData.clientId || !formData.amount || !formData.dueDate) {
+      setError('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await paymentsService.generate(formData as GeneratePaymentData);
+      setResult(res);
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Falha ao gerar cobrança. Verifique os dados do cliente (CPF/CNPJ e Telefone são obrigatórios no Asaas).');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    // Could add a toast here
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#0c0e17]/80 backdrop-blur-md">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        className="bg-white dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 w-full max-w-[500px] rounded-[32px] shadow-2xl overflow-hidden relative"
+      >
+        <button 
+          onClick={onClose}
+          className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="p-8">
+          {!success ? (
+            <>
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
+                  <DollarSign size={24} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Emitir Cobrança</h2>
+                  <p className="text-xs text-slate-500 font-medium">Asaas • PIX & Boleto</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Client Info */}
+                <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-1">Pagador</span>
+                  <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{clientName || 'Cliente não selecionado'}</p>
+                </div>
+
+                {/* Amount & Date */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Valor (R$)</label>
+                    <div className="relative">
+                      <DollarSign size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input 
+                        type="number" 
+                        value={formData.amount}
+                        onChange={(e) => setFormData({...formData, amount: parseFloat(e.target.value)})}
+                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all"
+                        placeholder="0,00"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Vencimento</label>
+                    <div className="relative">
+                      <Calendar size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input 
+                        type="date" 
+                        value={formData.dueDate}
+                        onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Método de Pagamento</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={() => setFormData({...formData, billingType: 'PIX'})}
+                      className={clsx(
+                        "flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
+                        formData.billingType === 'PIX' 
+                          ? "bg-blue-500/10 border-blue-500 text-blue-500 shadow-lg shadow-blue-500/10" 
+                          : "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-500"
+                      )}
+                    >
+                      <QrCode size={20} />
+                      <div>
+                        <p className="text-xs font-black uppercase">PIX</p>
+                        <p className="text-[8px] opacity-70">Instantâneo</p>
+                      </div>
+                    </button>
+                    <button 
+                      onClick={() => setFormData({...formData, billingType: 'BOLETO'})}
+                      className={clsx(
+                        "flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
+                        formData.billingType === 'BOLETO' 
+                          ? "bg-blue-500/10 border-blue-500 text-blue-500 shadow-lg shadow-blue-500/10" 
+                          : "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-500"
+                      )}
+                    >
+                      <FileText size={20} />
+                      <div>
+                        <p className="text-xs font-black uppercase">Boleto</p>
+                        <p className="text-[8px] opacity-70">Até 3 dias úteis</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Descrição</label>
+                  <textarea 
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-4 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all resize-none h-20"
+                    placeholder="Ex: Honorários Advocatícios - Processo X..."
+                  />
+                </div>
+
+                {error && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex gap-3 text-red-500">
+                    <AlertCircle size={16} className="shrink-0" />
+                    <p className="text-[10px] font-bold leading-relaxed">{error}</p>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleGenerate}
+                  disabled={loading}
+                  className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+                >
+                  {loading ? <Loader2 className="animate-spin" size={18} /> : 'Gerar Cobrança Agora'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 mx-auto mb-6">
+                <CheckCircle2 size={48} />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase">Sucesso!</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 font-medium">Cobrança gerada com sucesso no Asaas.</p>
+
+              {formData.billingType === 'PIX' && result?.pixQrCode && (
+                <div className="mb-8 p-6 bg-slate-50 dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800">
+                  <img 
+                    src={`data:image/png;base64,${result.pixQrCode}`} 
+                    alt="PIX QR Code" 
+                    className="w-48 h-48 mx-auto mb-4 rounded-xl shadow-lg"
+                  />
+                  <button 
+                    onClick={() => copyToClipboard(result.pixText)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-black uppercase text-slate-600 dark:text-slate-400 mx-auto hover:text-blue-500 transition-all"
+                  >
+                    <Copy size={14} /> Copiar Chave PIX
+                  </button>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <a 
+                  href={result?.invoiceUrl} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="w-full py-4 bg-slate-900 dark:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                >
+                  <ExternalLink size={16} /> Abrir Link de Pagamento
+                </a>
+                <button 
+                  onClick={onClose}
+                  className="w-full py-4 bg-transparent text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-slate-900 dark:hover:text-white transition-all"
+                >
+                  Concluído
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+};

@@ -276,10 +276,10 @@ export default function DashboardHome() {
     const displayUpcomingEvents = useMemo(() => data.upcomingEvents || [], [data.upcomingEvents]);
     const displayRecentClients = useMemo(() => data.recentClients || [], [data.recentClients]);
 
-    const handleNovoProcesso = useCallback(() => navigate('/processos/novo'), [navigate]);
-    const handleNovoCliente = useCallback(() => navigate('/clientes/novo'), [navigate]);
-    const handleAgendar = useCallback(() => navigate('/agenda'), [navigate]);
-    const handleHonorarios = useCallback(() => navigate('/financeiro/novo'), [navigate]);
+    const handleNovoProcesso = useCallback(() => navigate('/app/processos/novo'), [navigate]);
+    const handleNovoCliente = useCallback(() => navigate('/app/clientes/novo'), [navigate]);
+    const handleAgendar = useCallback(() => navigate('/app/agenda'), [navigate]);
+    const handleHonorarios = useCallback(() => navigate('/app/financeiro/novo'), [navigate]);
 
     if (loading) {
         return <DashboardSkeleton />;
@@ -309,7 +309,7 @@ export default function DashboardHome() {
                 <div className="flex justify-between items-center mb-4 px-2">
                     <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
                     <motion.button
-                        onClick={() => navigate('/financeiro')}
+                        onClick={() => navigate('/app/financeiro')}
                         className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
@@ -362,9 +362,9 @@ export default function DashboardHome() {
             {/* Stats Cards - use productivity stats for accurate totals */}
             <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 sm:gap-4">
                 {[
-                    { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10', path: '/clientes' },
-                    { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-indigo-500', bg: 'bg-indigo-500/10', path: '/processos' },
-                    { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/agenda' }
+                    { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10', path: '/app/clientes' },
+                    { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-indigo-500', bg: 'bg-indigo-500/10', path: '/app/processos' },
+                    { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/app/agenda' }
                 ].map((stat, i) => (
                     <motion.div
                         key={i}
@@ -468,7 +468,7 @@ export default function DashboardHome() {
                                 </div>
                             </div>
                             <motion.button
-                                onClick={() => navigate('/financeiro')}
+                                onClick={() => navigate('/app/financeiro')}
                                 className="text-xs text-red-400 font-medium hover:text-red-300 transition-colors"
                                 whileHover={{ scale: 1.05 }}
                             >
@@ -566,7 +566,7 @@ export default function DashboardHome() {
                     <div className="flex justify-between items-center mb-4 px-2">
                         <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
                         <motion.button
-                            onClick={() => navigate('/clientes')}
+                            onClick={() => navigate('/app/clientes')}
                             className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
@@ -593,7 +593,7 @@ export default function DashboardHome() {
                                     <div
                                         key={client.id || i}
                                         className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-primary/5 group"
-                                        onClick={() => navigate(`/clientes/${client.id}`)}
+                                        onClick={() => navigate(`/app/clientes/${client.id}`)}
                                     >
                                         <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarGrad} flex items-center justify-center shrink-0 shadow-md shadow-black/10`}>
                                             <span className="text-white font-bold text-sm">

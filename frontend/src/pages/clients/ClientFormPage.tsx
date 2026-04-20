@@ -166,7 +166,7 @@ export default function ClientFormPage() {
                 await api.post('/clients', formData);
                 addToast('Lead salvo com sucesso', 'success');
             }
-            navigate(isEditMode ? `/clientes/${id}` : '/clientes');
+            navigate(isEditMode ? `/app/clientes/${id}` : '/app/clientes');
         } catch (error) {
             console.error('Erro ao salvar:', error);
             addToast('Erro ao salvar.', 'error');
@@ -191,7 +191,7 @@ export default function ClientFormPage() {
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
                 <button
-                    onClick={() => navigate('/clientes')}
+                    onClick={() => navigate('/app/clientes')}
                     className="p-2 hover:bg-app-stroke/50 rounded-full text-app-text-muted transition-colors"
                 >
                     <ArrowLeft size={20} />
@@ -680,7 +680,7 @@ export default function ClientFormPage() {
                     <div className="flex gap-3">
                         <button
                             type="button"
-                            onClick={() => navigate('/clientes')}
+                            onClick={() => navigate('/app/clientes')}
                             className="px-6 py-2.5 border border-app-stroke rounded-lg text-app-text-muted font-medium hover:bg-app-stroke/30 transition-colors"
                             disabled={loading}
                         >

@@ -273,7 +273,7 @@ export default function ClientListPage() {
                         Relatório PDF
                     </button>
                     <button
-                        onClick={() => navigate('/clientes/novo')}
+                        onClick={() => navigate('/app/clientes/novo')}
                         className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-lg bg-primary text-white flex items-center justify-center gap-2 hover:bg-primary-dark transition-fast shadow-lg shadow-primary/20 fixed bottom-20 right-4 z-40 md:static md:px-4 md:py-2 touch-manipulation no-tap-highlight active:scale-95"
                     >
                         <Plus size={24} className="md:w-5 md:h-5" />
@@ -386,7 +386,7 @@ export default function ClientListPage() {
                                                 <motion.tr
                                                     key={client.id}
                                                     variants={itemVariants}
-                                                    onClick={() => navigate(`/clientes/${client.id}`)}
+                                                    onClick={() => navigate(`/app/clientes/${client.id}`)}
                                                     className="group hover:bg-app-stroke/10 transition-colors cursor-pointer"
                                                 >
                                                     <td className="px-4 py-2.5 text-center">
@@ -504,7 +504,7 @@ export default function ClientListPage() {
                                     <motion.div
                                         key={client.id}
                                         variants={itemVariants}
-                                        onClick={() => navigate(`/clientes/${client.id}`)}
+                                        onClick={() => navigate(`/app/clientes/${client.id}`)}
                                         className="bg-app-card border border-app-stroke rounded-xl p-4 active:bg-app-stroke/10 transition-colors cursor-pointer"
                                     >
                                         <div className="flex items-start justify-between gap-3 mb-3">

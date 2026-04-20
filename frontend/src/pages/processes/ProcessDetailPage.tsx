@@ -55,7 +55,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
             setProcess(response.data);
         } catch (error) {
             console.error('Erro ao buscar processo:', error);
-            navigate('/processos');
+            navigate('/app/processos');
         } finally {
             setLoading(false);
         }
@@ -69,7 +69,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
         try {
             await api.delete(`/processes/${process.id}`);
             addToast('Processo apagado com sucesso!', 'success');
-            navigate('/processos');
+            navigate('/app/processos');
         } catch (error) {
             console.error('Erro ao apagar processo:', error);
             addToast('Erro ao apagar processo. Verifique as permissões.', 'error');
@@ -110,7 +110,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
                 <div className="flex items-center gap-4">
                     {!isDrawer && (
                         <button
-                            onClick={() => navigate('/processos')}
+                            onClick={() => navigate('/app/processos')}
                             className="p-2 rounded-lg bg-app-card border border-app-stroke hover:bg-app-stroke/50 transition-colors"
                         >
                             <ArrowLeft size={20} className="text-app-text-main" />

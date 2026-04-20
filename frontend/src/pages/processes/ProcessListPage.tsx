@@ -96,14 +96,14 @@ export default function ProcessListPage() {
                     </div>
                     <div className="flex gap-3">
                         <button
-                            onClick={() => navigate('/processos/kanban')}
+                            onClick={() => navigate('/app/processos/kanban')}
                             className="hidden md:flex bg-app-card border border-app-stroke text-app-text-main px-4 py-2 rounded-lg items-center gap-2 hover:bg-app-stroke/50 transition-colors"
                         >
                             <Layout size={20} />
                             Quadro
                         </button>
                         <button
-                            onClick={() => navigate('/processos/novo')}
+                            onClick={() => navigate('/app/processos/novo')}
                             className="hidden md:flex bg-primary text-white px-4 py-2 rounded-lg items-center gap-2 hover:bg-primary-dark transition-colors"
                         >
                             <Plus size={20} />
@@ -167,7 +167,7 @@ export default function ProcessListPage() {
                                     proc={proc} 
                                     isSelected={selectedProcessId === proc.id}
                                     onSelect={() => setSelectedProcessId(selectedProcessId === proc.id ? null : proc.id)}
-                                    onNavigate={() => navigate(`/processos/${proc.id}`)} 
+                                    onNavigate={() => navigate(`/app/processos/${proc.id}`)} 
                                 />
                             ))}
                         </motion.div>
@@ -181,7 +181,7 @@ export default function ProcessListPage() {
                     <SelectedProcessSidebar 
                         processId={selectedProcessId} 
                         onClose={() => setSelectedProcessId(null)} 
-                        onNavigate={(id) => navigate(`/processos/${id}`)}
+                        onNavigate={(id) => navigate(`/app/processos/${id}`)}
                     />
                 )}
             </AnimatePresence>

@@ -28,6 +28,7 @@ import { EmailModule } from './email/email.module';
 import { AuditModule } from './audit/audit.module';
 import { UserFilesModule } from './user-files/user-files.module';
 import { BackupModule } from './backup/backup.module';
+import { PaymentsModule } from './payments/payments.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { TenantMiddleware } from './prisma/tenant.middleware';
 import { HealthController } from './health/health.controller';
@@ -65,6 +66,7 @@ import { HealthController } from './health/health.controller';
     SettingsModule,
     UserFilesModule,
     BackupModule,
+    PaymentsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

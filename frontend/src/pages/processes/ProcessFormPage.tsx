@@ -56,7 +56,7 @@ export default function ProcessFormPage() {
         } catch (error) {
             console.error('Erro ao carregar processo:', error);
             addToast('Erro ao carregar processo', 'error');
-            navigate('/processos');
+            navigate('/app/processos');
         } finally {
             setLoadingProcess(false);
         }
@@ -96,7 +96,7 @@ export default function ProcessFormPage() {
                 await api.post('/processes', payload);
                 addToast('Processo criado com sucesso!', 'success');
             }
-            navigate('/processos');
+            navigate('/app/processos');
         } catch (error) {
             console.error('Erro ao salvar processo:', error);
             addToast('Erro ao salvar processo. Verifique os dados.', 'error');
@@ -117,7 +117,7 @@ export default function ProcessFormPage() {
         <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
                 <button
-                    onClick={() => navigate('/processos')}
+                    onClick={() => navigate('/app/processos')}
                     className="p-2 hover:bg-white/10 rounded-full text-app-text-muted transition-colors"
                 >
                     <ArrowLeft size={20} />
@@ -219,7 +219,7 @@ export default function ProcessFormPage() {
                                 Nenhum cliente cadastrado.{' '}
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/clientes/novo')}
+                                    onClick={() => navigate('/app/clientes/novo')}
                                     className="text-primary hover:underline"
                                 >
                                     Cadastrar cliente
@@ -286,7 +286,7 @@ export default function ProcessFormPage() {
                 <div className="flex justify-end gap-3 pt-4">
                     <button
                         type="button"
-                        onClick={() => navigate('/processos')}
+                        onClick={() => navigate('/app/processos')}
                         className="px-6 py-2.5 border border-app-stroke rounded-lg text-white font-medium hover:bg-white/5 transition-colors"
                         disabled={loading}
                     >

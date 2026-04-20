@@ -228,7 +228,10 @@ export class FinancialService {
         const records = await this.prisma.financialRecord.findMany({
             where: { tenantId },
             orderBy: { date: 'desc' },
-            include: { client: true },
+            include: { 
+                client: true,
+                invoices: true 
+            },
             take,
             skip,
         });

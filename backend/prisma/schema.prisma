@@ -38,6 +38,7 @@ model Tenant {
   settings          TenantSettings?
   timeEntries       TimeEntry[]
   users             User[]
+  invoices          Invoice[]
 }
 
 model User {
@@ -211,6 +212,7 @@ model Client {
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
   status           String                @default("ATIVO")
+  asaasCustomerId  String?
   customFields     Json?
   tenant           Tenant                @relation(fields: [tenantId], references: [id])
   checklistItems   ClientChecklistItem[]
@@ -221,6 +223,7 @@ model Client {
   financialRecords FinancialRecord[]
   processes        Process[]
   activities       ClientActivity[]
+  invoices         Invoice[]
 }
 
 model ClientActivity {
@@ -311,6 +314,29 @@ model FinancialRecord {
   notes              String?
   client             Client?   @relation(fields: [clientId], references: [id])
   tenant             Tenant    @relation(fields: [tenantId], references: [id])
+  invoices           Invoice[]
+}
+
+model Invoice {
+  id               String   @id @default(uuid())
+  asaasId          String   @unique
+  amount           Float
+  status           String   // PENDING, PAID, OVERDUE, CANCELLED
+  dueDate          DateTime
+  paymentLink      String?
+  invoiceUrl       String?
+  bankSlipUrl      String?
+  pixQrCode        String?
+  pixText          String?
+  paymentMethod    String   @default("BOLETO")
+  clientId         String
+  financialRecordId String?
+  tenantId         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  client           Client   @relation(fields: [clientId], references: [id])
+  financialRecord  FinancialRecord? @relation(fields: [financialRecordId], references: [id])
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
 }
 
 model Folder {
@@ -505,6 +531,7 @@ model TenantSettings {
   deadlineReminders  Boolean @default(true)
   twoFactor          Boolean @default(false)
   loginAlerts        Boolean @default(true)
+  asaasApiKey        String?
   tenantId           String  @unique
   letterheadUrl      String?
   tenant             Tenant  @relation(fields: [tenantId], references: [id])

@@ -864,7 +864,7 @@ export default function KanbanPage() {
                     {/* View Toggles */}
                     <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 overflow-x-auto max-w-full">
                         <button
-                            onClick={() => navigate('/processos')}
+                            onClick={() => navigate('/app/processos')}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg transition-colors whitespace-nowrap"
                         >
                             <List size={15} />
@@ -936,7 +936,7 @@ export default function KanbanPage() {
 
                         {/* Create Button */}
                         <button
-                            onClick={() => navigate('/processos/novo')}
+                            onClick={() => navigate('/app/processos/novo')}
                             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl shadow-sm transition-all active:scale-95 font-semibold text-sm min-h-[40px] touch-manipulation shrink-0 ml-auto sm:ml-0"
                         >
                             <Plus size={18} />

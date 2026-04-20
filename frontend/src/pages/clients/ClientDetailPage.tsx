@@ -89,14 +89,14 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
             const response = await api.get(`/clients/${id}/complete`);
             if (!response.data) {
                 addToast('Cliente não encontrado.', 'warning');
-                navigate('/clientes');
+                navigate('/app/clientes');
                 return;
             }
             setClient(response.data);
         } catch (error) {
             console.error('Error fetching client', error);
             addToast('Erro ao carregar cliente.', 'error');
-            navigate('/clientes');
+            navigate('/app/clientes');
         } finally {
             setLoading(false);
         }
@@ -163,7 +163,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
         try {
             await api.delete(`/clients/${id}`);
             addToast('Cliente excluído com sucesso.', 'success');
-            navigate('/clientes');
+            navigate('/app/clientes');
         } catch (error) {
             addToast('Erro ao excluir cliente.', 'error');
             console.error(error);
@@ -366,7 +366,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                 <h2 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">Cliente não encontrado</h2>
                 <p className="text-slate-500 mb-6 text-center max-w-md">O cliente procurado não existe ou você não possui acesso a ele.</p>
                 <button
-                    onClick={() => navigate('/clientes')}
+                    onClick={() => navigate('/app/clientes')}
                     className="px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
                 >
                     Voltar para Clientes
@@ -383,7 +383,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                     <div className="flex items-center gap-4">
                         {!isDrawer && (
                             <button
-                                onClick={() => navigate('/clientes')}
+                                onClick={() => navigate('/app/clientes')}
                                 className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                             >
                                 <ArrowLeft size={20} className="text-slate-500" />
@@ -667,7 +667,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                         <p className="text-2xl font-black text-rose-700 dark:text-rose-300">{formatCurrency(totalPendencies)}</p>
                                     </div>
                                 </div>
-                                <button onClick={() => navigate('/financeiro', { state: { clientId: client.id } })} className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-700 relative z-10 flex items-center justify-center gap-2">
+                                <button onClick={() => navigate('/app/financeiro', { state: { clientId: client.id } })} className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-700 relative z-10 flex items-center justify-center gap-2">
                                     Acessar Fluxo Completo <ChevronRight size={14} />
                                 </button>
                             </div>
@@ -729,7 +729,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     <Briefcase size={20} className="text-blue-500" />
                                     Processos ({processes.length})
                                 </h3>
-                                <button onClick={() => navigate('/processos/novo', { state: { clientId: client.id } })} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 rounded-md transition-colors" title="Novo Processo">
+                                <button onClick={() => navigate('/app/processos/novo', { state: { clientId: client.id } })} className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20 rounded-md transition-colors" title="Novo Processo">
                                     <Plus size={18} />
                                 </button>
                             </div>
@@ -738,7 +738,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     <div className="text-center py-12 px-4">
                                         <Briefcase size={40} className="mx-auto text-slate-300 dark:text-slate-700 mb-3" />
                                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Nenhum processo vinculado</p>
-                                        <button onClick={() => navigate('/processos/novo', { state: { clientId: client.id } })} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">Adicionar Processo</button>
+                                        <button onClick={() => navigate('/app/processos/novo', { state: { clientId: client.id } })} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">Adicionar Processo</button>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -804,7 +804,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     ))}
                                 </div>
                             )}
-                            <button onClick={() => navigate('/financeiro', { state: { clientId: client.id } })} className="w-full mt-4 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 relative z-10 flex items-center justify-center gap-2">
+                            <button onClick={() => navigate('/app/financeiro', { state: { clientId: client.id } })} className="w-full mt-4 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors border border-slate-200 dark:border-slate-700 relative z-10 flex items-center justify-center gap-2">
                                 Acessar Financeiro Completo <ChevronRight size={16} />
                             </button>
                         </div>

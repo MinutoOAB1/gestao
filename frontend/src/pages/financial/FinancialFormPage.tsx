@@ -66,7 +66,7 @@ export default function FinancialFormPage() {
             }
 
             await api.post('/financial', payload);
-            navigate('/financeiro');
+            navigate('/app/financeiro');
             addToast('Transação salva com sucesso', 'success');
         } catch (error) {
             console.error('Erro ao salvar transação:', error);
@@ -80,7 +80,7 @@ export default function FinancialFormPage() {
         <div className="max-w-2xl mx-auto">
             <div className="flex items-center gap-4 mb-6">
                 <button
-                    onClick={() => navigate('/financeiro')}
+                    onClick={() => navigate('/app/financeiro')}
                     className="p-2 hover:bg-legal-100 rounded-full text-legal-600 transition-colors"
                 >
                     <ArrowLeft size={20} />
@@ -254,7 +254,7 @@ export default function FinancialFormPage() {
                 <div className="flex justify-end gap-3 pt-4 border-t border-legal-100">
                     <button
                         type="button"
-                        onClick={() => navigate('/financeiro')}
+                        onClick={() => navigate('/app/financeiro')}
                         className="px-6 py-2 border border-legal-300 rounded-md text-legal-700 font-medium hover:bg-legal-50 transition-colors"
                         disabled={loading}
                     >
