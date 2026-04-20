@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import { PrismaService } from '../prisma/prisma.service';
@@ -26,8 +26,16 @@ export class AsaasService {
       where: { id: clientId },
     });
 
-    if (!client) throw new Error('Cliente não encontrado');
+    if (!client) throw new BadRequestException('Cliente não encontrado');
     if (client.asaasCustomerId) return client.asaasCustomerId;
+
+    // Validate mandatory fields for Asaas
+    if (!client.document) {
+      throw new BadRequestException('O cliente não possui CPF/CNPJ cadastrado. O Asaas exige este dado.');
+    }
+    if (!client.email) {
+      throw new BadRequestException('O cliente não possui e-mail cadastrado. O Asaas exige este dado.');
+    }
 
     // Create customer in Asaas
     try {
@@ -53,7 +61,7 @@ export class AsaasService {
       return asaasId;
     } catch (error) {
       this.logger.error(`Erro ao criar cliente no Asaas: ${error.response?.data?.errors?.[0]?.description || error.message}`);
-      throw new Error(`Erro Asaas: ${error.response?.data?.errors?.[0]?.description || 'Falha na comunicação'}`);
+      throw new BadRequestException(`Erro Asaas: ${error.response?.data?.errors?.[0]?.description || error.message || 'Falha na comunicação'}`);
     }
   }
 
@@ -113,7 +121,7 @@ export class AsaasService {
       return invoice;
     } catch (error) {
       this.logger.error(`Erro ao gerar cobrança no Asaas: ${error.response?.data?.errors?.[0]?.description || error.message}`);
-      throw new Error(`Erro Asaas: ${error.response?.data?.errors?.[0]?.description || 'Falha ao gerar cobrança'}`);
+      throw new BadRequestException(`Erro Asaas: ${error.response?.data?.errors?.[0]?.description || error.message || 'Falha ao gerar cobrança'}`);
     }
   }
 
