@@ -1164,52 +1164,36 @@ export default function FinancialListPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {groupedRecords.length > 0 ? (
-                                    groupedRecords.map((record) => (
-                                        <FinancialTableRow 
-                                            key={record.id} 
-                                            record={record} 
-                                            expandedGroups={expandedGroups} 
-                                            toggleGroup={toggleGroup} 
-                                            onEdit={handleEdit} 
-                                            onDelete={handleDelete}
-                                            onSync={fetchData}
-                                            setSelectedClientForInvoice={setSelectedClientForInvoice}
-                                            setIsInvoiceModalOpen={setIsInvoiceModalOpen}
-                                        />
-                                    ))
-                                ) : (
-
-                    {/* Mobile Transaction Cards */}
-                    <div className="md:hidden divide-y divide-app-stroke">
-                        {groupedRecords.length > 0 ? (
-                            groupedRecords.map((record) => (
-                                <FinancialMobileRow
-                                    key={record.id}
-                                    record={record}
-                                    expandedGroups={expandedGroups}
-                                    toggleGroup={toggleGroup}
-                                    handleEdit={handleEdit}
-                                    handleDelete={handleDelete}
-                                    deleteConfirm={deleteConfirm}
-                                    setDeleteConfirm={setDeleteConfirm}
-                                    isOverdue={isOverdue}
-                                    getDateLabel={getDateLabel}
-                                    setActiveNoteRecord={setActiveNoteRecord}
-                                    setSelectedClientForInvoice={setSelectedClientForInvoice}
-                                    setIsInvoiceModalOpen={setIsInvoiceModalOpen}
-                                />
-                            ))
-                        ) : (
-                            <div className="p-8 text-center text-app-text-muted">Nenhuma transação encontrada.</div>
-                        )}
+                                    {groupedRecords.length > 0 ? (
+                                        groupedRecords.map((record) => (
+                                            <FinancialTableRow 
+                                                key={record.id} 
+                                                record={record} 
+                                                expandedGroups={expandedGroups} 
+                                                toggleGroup={toggleGroup} 
+                                                onEdit={handleEdit} 
+                                                onDelete={handleDelete}
+                                                onSync={fetchData}
+                                                setSelectedClientForInvoice={setSelectedClientForInvoice}
+                                                setIsInvoiceModalOpen={setIsInvoiceModalOpen}
+                                            />
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={6} className="px-6 py-20 text-center text-app-text-muted font-medium">
+                                                Nenhum registro encontrado.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            )}
+                ) : activeTab === 'invoices' ? (
+                    <InvoiceManagementTab />
+                ) : (
+                    <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden mt-4">
 
-            {/* Repasses Table */}
-            {activeTab === 'repasses' && (
-                <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden mt-4">
                     <div className="p-5 border-b border-app-stroke flex justify-between items-center">
                         <div>
                             <h3 className="text-lg font-bold text-app-text-main">Repasses de Honorários</h3>
@@ -1303,8 +1287,7 @@ export default function FinancialListPage() {
                         </table>
                     </div>
                 </div>
-            )
-            }
+            )}
 
             {/* Transaction Modal */}
             <Modal
