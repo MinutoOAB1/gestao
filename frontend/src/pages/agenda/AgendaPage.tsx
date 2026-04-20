@@ -710,36 +710,35 @@ export default function AgendaPage() {
             .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
     }, [filteredEvents, currentMonth, currentYear]);
 
-    return (
-        <div className="flex flex-col md:flex-row h-full w-full p-4 sm:p-6 lg:p-8 gap-6 bg-app-bg overflow-hidden">
+        <div className="flex flex-col md:flex-row h-full w-full p-2 sm:p-4 gap-4 bg-app-bg overflow-hidden">
             {notification && <NotificationToast event={notification} onDismiss={() => setNotification(null)} />}
 
             {/* Main Calendar Area */}
-            <main className="flex-1 bg-app-card border border-app-stroke rounded-2xl flex flex-col overflow-hidden">
+            <main className="flex-1 bg-app-card border border-app-stroke rounded-xl flex flex-col overflow-hidden">
 
                 {/* Header */}
-                <div className="p-4 border-b border-app-stroke flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="p-3 border-b border-app-stroke flex flex-col md:flex-row justify-between items-center gap-3">
                     <div className="flex-1 flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-app-text-main capitalize">
+                        <h2 className="text-xl font-bold text-app-text-main capitalize">
                             {getMonthName(currentMonth)} {currentYear}
                         </h2>
-                        <div className="flex items-center gap-4">
-                            <button onClick={goToToday} className="text-sm font-semibold text-app-text-muted hover:text-primary transition-colors">Hoje</button>
+                        <div className="flex items-center gap-3">
+                            <button onClick={goToToday} className="text-xs font-semibold text-app-text-muted hover:text-primary transition-colors">Hoje</button>
                             <div className="flex items-center gap-1">
-                                <button onClick={goToPrevMonth} className="p-2 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronLeft size={24} /></button>
-                                <button onClick={goToNextMonth} className="p-2 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronRight size={24} /></button>
+                                <button onClick={goToPrevMonth} className="p-1.5 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronLeft size={20} /></button>
+                                <button onClick={goToNextMonth} className="p-1.5 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronRight size={20} /></button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-app-bg p-1 rounded-lg border border-app-stroke">
+                    <div className="flex items-center gap-1.5 bg-app-bg p-1 rounded-lg border border-app-stroke">
                         {(['day', 'week', 'month', 'list'] as const).map(v => (
                             <button
                                 key={v}
                                 onClick={() => setView(v)}
-                                className={clsx("px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1", view === v ? "bg-primary text-white" : "text-app-text-muted hover:text-app-text-main")}
+                                className={clsx("px-2.5 py-1 rounded text-[11px] font-medium transition-colors flex items-center gap-1", view === v ? "bg-primary text-white" : "text-app-text-muted hover:text-app-text-main")}
                             >
-                                {v === 'list' && <List size={14} />}
+                                {v === 'list' && <List size={12} />}
                                 {v === 'day' ? 'Dia' : v === 'week' ? 'Semana' : v === 'month' ? 'Mês' : 'Pauta'}
                             </button>
                         ))}
@@ -751,10 +750,10 @@ export default function AgendaPage() {
                                 onClick={() => setShowFilterMenu(!showFilterMenu)}
                                 className={clsx("p-2 border border-app-stroke rounded-lg transition-colors", typeFilter !== 'all' ? "text-primary bg-primary/10 border-primary/50" : "text-app-text-muted hover:text-app-text-main")}
                             >
-                                <Filter size={18} />
+                                <Filter size={16} />
                             </button>
                             {showFilterMenu && (
-                                <div className="absolute right-0 top-12 z-50 w-40 bg-app-card border border-app-stroke rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1">
+                                <div className="absolute right-0 top-10 z-50 w-40 bg-app-card border border-app-stroke rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1">
                                     {EVENT_TYPES.map(t => (
                                         <button
                                             key={t.key}
@@ -767,32 +766,26 @@ export default function AgendaPage() {
                                 </div>
                             )}
                         </div>
-                        <button onClick={() => setIsNewEventOpen(true)} className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
-                            <Plus size={18} /> Novo Evento
+                        <button onClick={() => setIsNewEventOpen(true)} className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors">
+                            <Plus size={16} /> Novo Evento
                         </button>
                     </div>
                 </div>
 
                 {/* ⚠ FULL-WIDTH RED BANNER: Prazos Fatais */}
                 {urgentDeadlines.length > 0 && (
-                    <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-4 py-2 flex items-center gap-3 overflow-hidden shadow-md shadow-red-500/20">
+                    <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-4 py-1.5 flex items-center gap-3 overflow-hidden shadow-md">
                         <div className="flex items-center gap-2 shrink-0">
-                            <span className="relative flex h-2.5 w-2.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
-                            </span>
-                            <AlertTriangle size={16} className="shrink-0" />
-                            <span className="text-xs font-extrabold uppercase tracking-wider shrink-0">Prazos Fatais</span>
-                            <span className="text-[10px] bg-white/20 rounded-full px-2 py-0.5 font-bold shrink-0">{urgentDeadlines.length}</span>
+                            <AlertTriangle size={14} className="shrink-0" />
+                            <span className="text-[10px] font-extrabold uppercase tracking-wider shrink-0">Prazos Fatais</span>
                         </div>
-                        <div className="h-4 w-px bg-white/30 shrink-0" />
-                        <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar pb-0.5">
+                        <div className="h-3 w-px bg-white/30 shrink-0" />
+                        <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar no-scrollbar scrollbar-hide pb-0">
                             {urgentDeadlines.map(event => {
                                 const eventDate = new Date(event.start);
                                 const today = new Date();
                                 const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
                                 const dateLabel = diffDays === 0 ? 'HOJE' : diffDays === 1 ? 'AMANHÃ' : `${eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`;
-                                const isUrgent = diffDays <= 2;
                                 return (
                                     <button
                                         key={event.id}
@@ -802,133 +795,101 @@ export default function AgendaPage() {
                                             setCurrentYear(eventDate.getFullYear());
                                             setIsSidebarOpenMobile(true);
                                         }}
-                                        className={clsx(
-                                            "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold whitespace-nowrap transition-all shrink-0 hover:scale-[1.02]",
-                                            isUrgent ? "bg-white/25 ring-1 ring-white/40" : "bg-white/10 hover:bg-white/20"
-                                        )}
+                                        className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/10 text-[10px] font-semibold whitespace-nowrap hover:bg-white/20 transition-all"
                                     >
-                                        <span className={clsx("font-extrabold uppercase", isUrgent && "animate-pulse")}>{dateLabel}</span>
+                                        <span className="font-extrabold">{dateLabel}</span>
                                         <span className="opacity-80">·</span>
-                                        <span className="truncate max-w-[180px]">{event.title}</span>
+                                        <span className="truncate max-w-[150px]">{event.title}</span>
                                     </button>
                                 );
                             })}
                         </div>
                     </div>
                 )}
+
                 {/* User Avatar Filter Bar */}
                 {teamMembers.length > 0 && (
-                    <div className="px-4 py-3 border-b border-app-stroke bg-app-bg/50">
-                        <div className="flex items-center gap-3">
-                            <span className="text-xs text-app-text-muted font-medium shrink-0">
-                                <Users size={14} className="inline mr-1" /> Filtrar por:
+                    <div className="px-4 py-2 border-b border-app-stroke bg-app-bg/50">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-app-text-muted font-medium shrink-0 uppercase tracking-wider">
+                                <Users size={12} className="inline mr-1" /> Filtrar:
                             </span>
-                            <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
-                                {/* All users option */}
+                            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
                                 <button
                                     onClick={() => setSelectedUserFilter('all')}
                                     className={clsx(
-                                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all shrink-0",
-                                        selectedUserFilter === 'all'
-                                            ? "bg-primary text-white shadow-lg shadow-primary/30"
-                                            : "bg-app-stroke/30 text-app-text-muted hover:bg-app-stroke/50"
+                                        "flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold transition-all shrink-0",
+                                        selectedUserFilter === 'all' ? "bg-primary text-white shadow-sm" : "bg-app-stroke/30 text-app-text-muted hover:bg-app-stroke/50"
                                     )}
                                 >
                                     Todos
                                 </button>
-
-                                {/* Individual user avatars */}
                                 {teamMembers.map(member => (
                                     <button
                                         key={member.id}
                                         onClick={() => setSelectedUserFilter(member.id)}
-                                        title={member.name}
                                         className={clsx(
-                                            "flex items-center gap-2 px-2 py-1 rounded-full transition-all shrink-0 border-2",
-                                            selectedUserFilter === member.id
-                                                ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
-                                                : "border-transparent hover:border-app-stroke hover:bg-app-stroke/20"
+                                            "flex items-center gap-1.5 px-1.5 py-0.5 rounded-full transition-all shrink-0 border",
+                                            selectedUserFilter === member.id ? "border-primary bg-primary/10" : "border-transparent hover:bg-app-stroke/20"
                                         )}
                                     >
                                         <div className={clsx(
-                                            "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 transition-transform",
-                                            selectedUserFilter === member.id ? "scale-110 ring-2 ring-primary ring-offset-2 ring-offset-app-card" : "",
+                                            "w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0",
                                             member.role === 'ADMIN' ? "bg-gradient-to-br from-amber-500 to-orange-600" : "bg-gradient-to-br from-primary to-purple-600"
                                         )}>
-                                            {member.avatar ? (
-                                                <img src={member.avatar} alt={member.name} className="w-full h-full rounded-full object-cover" />
-                                            ) : (
-                                                member.name.charAt(0).toUpperCase()
-                                            )}
+                                            {member.avatar ? <img src={member.avatar} className="w-full h-full rounded-full object-cover" /> : member.name.charAt(0)}
                                         </div>
-                                        <span className={clsx(
-                                            "text-xs font-medium max-w-[80px] truncate hidden md:block",
-                                            selectedUserFilter === member.id ? "text-primary" : "text-app-text-main"
-                                        )}>
+                                        <span className={clsx("text-[10px] font-medium hidden md:block", selectedUserFilter === member.id ? "text-primary" : "text-app-text-main")}>
                                             {member.name.split(' ')[0]}
                                         </span>
                                     </button>
                                 ))}
                             </div>
-
-                            {/* Clear filter */}
-                            {selectedUserFilter !== 'all' && (
-                                <button
-                                    onClick={() => setSelectedUserFilter('all')}
-                                    className="text-xs text-app-text-muted hover:text-primary ml-auto shrink-0"
-                                >
-                                    <X size={14} />
-                                </button>
-                            )}
                         </div>
                     </div>
                 )}
 
                 {/* Monthly Stats Dashboard */}
-                <div className="px-4 py-2.5 border-b border-app-stroke bg-app-bg/30 flex items-center gap-3 overflow-x-auto custom-scrollbar">
-                    <div className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-1.5 shrink-0">
-                        <Gavel size={14} className="text-blue-400" />
-                        <span className="text-xs font-bold text-blue-400">{monthlyStats.hearings}</span>
-                        <span className="text-[10px] text-blue-400/70">Audiências</span>
+                <div className="px-4 py-1.5 border-b border-app-stroke bg-app-bg/30 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+                    <div className="flex items-center gap-1.5 bg-blue-500/5 border border-blue-500/10 rounded-md px-2 py-1 shrink-0">
+                        <Gavel size={12} className="text-blue-400" />
+                        <span className="text-[11px] font-bold text-blue-400">{monthlyStats.hearings}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-1.5 shrink-0">
-                        <AlertTriangle size={14} className="text-red-400" />
-                        <span className="text-xs font-bold text-red-400">{monthlyStats.deadlines}</span>
-                        <span className="text-[10px] text-red-400/70">Prazos</span>
+                    <div className="flex items-center gap-1.5 bg-red-500/5 border border-red-500/10 rounded-md px-2 py-1 shrink-0">
+                        <AlertTriangle size={12} className="text-red-400" />
+                        <span className="text-[11px] font-bold text-red-400">{monthlyStats.deadlines}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5 shrink-0">
-                        <Users size={14} className="text-emerald-400" />
-                        <span className="text-xs font-bold text-emerald-400">{monthlyStats.meetings}</span>
-                        <span className="text-[10px] text-emerald-400/70">Reuniões</span>
+                    <div className="flex items-center gap-1.5 bg-emerald-500/5 border border-emerald-500/10 rounded-md px-2 py-1 shrink-0">
+                        <Users size={12} className="text-emerald-400" />
+                        <span className="text-[11px] font-bold text-emerald-400">{monthlyStats.meetings}</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-app-stroke/30 border border-app-stroke rounded-lg px-3 py-1.5 shrink-0 ml-auto">
-                        <CalendarIcon size={14} className="text-app-text-muted" />
-                        <span className="text-xs font-bold text-app-text-main">{monthlyStats.total}</span>
-                        <span className="text-[10px] text-app-text-muted">Total</span>
+                    <div className="flex items-center gap-1.5 bg-app-stroke/20 border border-app-stroke rounded-md px-2 py-1 shrink-0 ml-auto">
+                        <CalendarIcon size={12} className="text-app-text-muted" />
+                        <span className="text-[11px] font-bold text-app-text-main">{monthlyStats.total}</span>
                     </div>
                 </div>
 
                 {/* Calendar Content */}
-                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-2 sm:p-4 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
                         <motion.div
                             key={view + currentMonth + currentYear}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
                             className="w-full"
                         >
                             {view === 'month' && (
                                 <>
-                                    <div className="grid grid-cols-7 mb-4">
+                                    <div className="grid grid-cols-7 mb-2">
                                         {DAYS_SHORT.map(day => (
-                                            <div key={day} className="text-center text-[13px] font-bold text-app-text-muted uppercase tracking-widest py-2">
+                                            <div key={day} className="text-center text-[11px] font-bold text-app-text-muted uppercase tracking-widest py-1">
                                                 {day}
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="grid grid-cols-7 gap-y-4">
+                                    <div className="grid grid-cols-7 gap-y-1 sm:gap-y-2">
                                         {calendarDays.map((day, idx) => {
                                             const dayEvents = day ? (eventsByDay.get(day) || []) : [];
                                             const isToday = day === new Date().getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear();
@@ -944,76 +905,65 @@ export default function AgendaPage() {
                                                         }
                                                     }}
                                                     className={clsx(
-                                                        "relative aspect-[3/4] sm:aspect-[4/5] flex flex-col items-center justify-start pt-2 cursor-pointer transition-all group",
+                                                        "relative aspect-[1/1.2] flex flex-col items-center justify-start pt-1 cursor-pointer transition-all group",
                                                         !day && "opacity-0 pointer-events-none"
                                                     )}
                                                 >
                                                     {day && (
-                                                        <>
-                                                            {/* Background Squircle - Premium feel */}
-                                                            <div className="relative w-full flex flex-col items-center">
-                                                                <AnimatePresence>
-                                                                    {(isToday || isSelected) && (
-                                                                        <motion.div
-                                                                            layoutId="dayHighlight"
-                                                                            initial={{ opacity: 0, scale: 0.8 }}
-                                                                            animate={{ opacity: 1, scale: 1 }}
-                                                                            exit={{ opacity: 0, scale: 0.8 }}
-                                                                            className={clsx(
-                                                                                "absolute inset-0 -top-2 w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-[24px] sm:rounded-[32px] z-0 shadow-xl",
-                                                                                isToday ? "bg-[#FF2D55] shadow-[#FF2D55]/30" : "bg-[#FFB380] shadow-[#FFB380]/20"
-                                                                            )}
-                                                                        />
-                                                                    )}
-                                                                </AnimatePresence>
-
-                                                                {/* Hover highlight */}
-                                                                {!isToday && !isSelected && (
-                                                                    <div className="absolute inset-0 -top-2 w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-[24px] sm:rounded-[32px] bg-app-stroke/20 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-                                                                )}
-
-                                                                {/* Day Number */}
-                                                                <span className={clsx(
-                                                                    "relative text-lg sm:text-2xl font-bold z-10 transition-colors duration-300 mb-1",
-                                                                    isToday ? "text-white" : isSelected ? "text-slate-900" : "text-app-text-main group-hover:text-primary"
-                                                                )}>
-                                                                    {day}
-                                                                </span>
-
-                                                                {/* Today Indicator Ring (optional, like reference day 20) */}
-                                                                {isToday && (
-                                                                    <div className="relative z-10 w-2 h-2 rounded-full border-2 border-white mb-2" />
-                                                                )}
-
-                                                                {/* Event Dots - Minimalist */}
-                                                                {!isToday && dayEvents.length > 0 && (
-                                                                    <div className="relative z-10 flex gap-1 mt-1">
-                                                                        {dayEvents.slice(0, 3).map((event, eIdx) => {
-                                                                            const dotColor = event.completed ? 'bg-app-text-muted'
-                                                                                : event.color === 'red' || event.type === 'deadline' ? 'bg-red-500'
-                                                                                : event.color === 'blue' || event.type === 'hearing' ? 'bg-blue-500'
-                                                                                : event.color === 'green' || event.type === 'meeting' ? 'bg-emerald-500'
-                                                                                : event.color === 'amber' ? 'bg-amber-500'
-                                                                                : event.color === 'purple' || event.type === 'personal' ? 'bg-purple-500'
-                                                                                : 'bg-gray-400';
-                                                                            return (
-                                                                                <div key={event.id} className={clsx("w-1.5 h-1.5 rounded-full", dotColor)} />
-                                                                            );
-                                                                        })}
-                                                                        {dayEvents.length > 3 && (
-                                                                            <div className="w-1.5 h-1.5 rounded-full bg-app-text-muted opacity-50" />
+                                                        <div className="relative w-full flex flex-col items-center">
+                                                            <AnimatePresence>
+                                                                {(isToday || isSelected) && (
+                                                                    <motion.div
+                                                                        layoutId="dayHighlight"
+                                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                                        animate={{ opacity: 1, scale: 1 }}
+                                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                                        className={clsx(
+                                                                            "absolute inset-0 -top-1 w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-[14px] sm:rounded-[18px] z-0 shadow-lg",
+                                                                            isToday ? "bg-[#FF2D55] shadow-[#FF2D55]/30" : "bg-[#FFB380] shadow-[#FFB380]/20"
                                                                         )}
-                                                                    </div>
+                                                                    />
                                                                 )}
-                                                            </div>
-                                                        </>
+                                                            </AnimatePresence>
+
+                                                            {!isToday && !isSelected && (
+                                                                <div className="absolute inset-0 -top-1 w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-[14px] sm:rounded-[18px] bg-app-stroke/20 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
+                                                            )}
+
+                                                            <span className={clsx(
+                                                                "relative text-sm sm:text-lg font-bold z-10 transition-colors duration-200 mb-0.5",
+                                                                isToday ? "text-white" : isSelected ? "text-slate-900" : "text-app-text-main group-hover:text-primary"
+                                                            )}>
+                                                                {day}
+                                                            </span>
+
+                                                            {isToday && (
+                                                                <div className="relative z-10 w-1.5 h-1.5 rounded-full border border-white mb-1" />
+                                                            )}
+
+                                                            {!isToday && dayEvents.length > 0 && (
+                                                                <div className="relative z-10 flex gap-0.5 mt-0.5">
+                                                                    {dayEvents.slice(0, 3).map((event) => {
+                                                                        const dotColor = event.completed ? 'bg-app-text-muted'
+                                                                            : event.color === 'red' || event.type === 'deadline' ? 'bg-red-500'
+                                                                            : event.color === 'blue' || event.type === 'hearing' ? 'bg-blue-500'
+                                                                            : event.color === 'green' || event.type === 'meeting' ? 'bg-emerald-500'
+                                                                            : event.color === 'amber' ? 'bg-amber-500'
+                                                                            : event.color === 'purple' || event.type === 'personal' ? 'bg-purple-500'
+                                                                            : 'bg-gray-400';
+                                                                        return <div key={event.id} className={clsx("w-1 h-1 rounded-full", dotColor)} />;
+                                                                    })}
+                                                                    {dayEvents.length > 3 && <div className="w-1 h-1 rounded-full bg-app-text-muted opacity-50" />}
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </div>
                                             );
                                         })}
                                     </div>
                                 </>
-                            )}
+                            )}                   )}
 
                             {view === 'week' && (
                                 <div className="flex flex-col h-[calc(100vh-280px)] min-h-[600px] border border-app-stroke rounded-xl bg-app-bg overflow-hidden relative">
