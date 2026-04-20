@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Res, UseGuards, Delete, Req } from '@nestjs/common';
 import { GoogleCalendarService } from './google-calendar.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Response } from 'express';
 
 @Controller('google-calendar')
