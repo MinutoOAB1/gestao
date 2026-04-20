@@ -23,6 +23,7 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -38,6 +39,15 @@ export default function LoginPage() {
             setCurrentIndex((prev) => (prev + 1) % officeImages.length);
         }, 5000);
         return () => clearInterval(interval);
+    }, []);
+
+    // Load remembered email
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('remembered_email');
+        if (savedEmail) {
+            setEmail(savedEmail);
+            setRememberMe(true);
+        }
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -57,6 +67,12 @@ export default function LoginPage() {
                 setRequires2FA(true);
                 setLoading(false);
                 return;
+            }
+
+            if (rememberMe) {
+                localStorage.setItem('remembered_email', email);
+            } else {
+                localStorage.removeItem('remembered_email');
             }
 
             login(res.data.access_token, res.data.user);
@@ -278,7 +294,32 @@ export default function LoginPage() {
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-end">
+                                    <div className="flex items-center justify-between">
+                                        <label className="flex items-center gap-2 cursor-pointer group">
+                                            <div className="relative flex items-center justify-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={rememberMe}
+                                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                                    className="peer appearance-none w-5 h-5 border border-slate-300 dark:border-white/10 rounded-md bg-white dark:bg-white/5 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
+                                                />
+                                                <svg
+                                                    className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                >
+                                                    <polyline points="20 6 9 17 4 12" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                                                Lembrar-me
+                                            </span>
+                                        </label>
                                         <Link to="/forgot-password" className="text-sm text-blue-500 hover:text-blue-400 font-medium">
                                             Esqueci minha senha
                                         </Link>
