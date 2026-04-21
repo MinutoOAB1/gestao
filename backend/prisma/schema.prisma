@@ -37,6 +37,10 @@ model Tenant {
   templates         Template[]
   settings          TenantSettings?
   timeEntries       TimeEntry[]
+  plan              String                @default("FREE")
+  stripeCustomerId  String?               @unique
+  stripeSubscriptionId String?            @unique
+  subscriptionStatus String?               // active, past_due, canceled, etc.
   users             User[]
   invoices          Invoice[]
 }

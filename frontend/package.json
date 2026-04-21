@@ -16,6 +16,7 @@
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "5.19.1",
     "@sentry/node": "^10.36.0",
+    "@stripe/stripe-js": "^9.2.0",
     "@supabase/supabase-js": "^2.91.0",
     "@tanstack/react-virtual": "^3.13.13",
     "axios": "^1.13.2",

@@ -8,6 +8,8 @@ interface User {
     role: string;
     tenantId: string;
     avatar?: string | null;
+    plan?: string;
+    subscriptionStatus?: string;
 }
 
 interface AuthContextType {

@@ -372,7 +372,14 @@ function PricingSection() {
                             </ul>
 
                             <button
-                                onClick={() => navigate('/register')}
+                                onClick={() => {
+                                    const token = localStorage.getItem('token');
+                                    if (token) {
+                                        navigate('/app/faturamento');
+                                    } else {
+                                        navigate('/register');
+                                    }
+                                }}
                                 className="w-full py-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                             >
                                 {plan.cta}

@@ -37,6 +37,7 @@ const DocumentEditorPage = lazy(() => import('./pages/templates/DocumentEditorPa
 const UsersPage = lazy(() => import('./pages/users/UsersPage'));
 const TimesheetPage = lazy(() => import('./pages/timesheet/TimesheetPage'));
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
+const BillingPage = lazy(() => import('./pages/settings/BillingPage'));
 import GlobalAgendaNotifications from './components/notifications/GlobalAgendaNotifications';
 
 // Loading fallback component
@@ -106,6 +107,7 @@ function App() {
                             <Route path="timesheet" element={<TimesheetPage />} />
                             <Route path="perfil" element={<ProfilePage />} />
                             <Route path="configuracoes" element={<SettingsPage />} />
+                            <Route path="faturamento" element={<BillingPage />} />
                           </Route>
 
                           <Route path="*" element={<Navigate to="/app" replace />} />

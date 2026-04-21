@@ -57,7 +57,14 @@ export class AuthService {
       return {
         message: 'User registered successfully',
         access_token: this.jwtService.sign(payload),
-        user: { id: user.id, name: user.name, email: user.email, tenantId: user.tenantId },
+        user: { 
+          id: user.id, 
+          name: user.name, 
+          email: user.email, 
+          tenantId: user.tenantId,
+          plan: tenant.plan,
+          subscriptionStatus: tenant.subscriptionStatus 
+        },
       };
     });
   }
@@ -166,6 +173,8 @@ export class AuthService {
           tenantId: user.tenantId,
           avatar: user.avatar,
           twoFactorEnabled: user.twoFactorEnabled,
+          plan: user.tenant.plan,
+          subscriptionStatus: user.tenant.subscriptionStatus,
         },
       };
     });
@@ -334,11 +343,24 @@ export class AuthService {
         specialties: true,
         twoFactorEnabled: true,
         permissions: true,
-        createdAt: true
+        createdAt: true,
+        tenant: {
+          select: {
+            plan: true,
+            subscriptionStatus: true,
+          }
+        }
       }
     });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+    
+    // Flatten the tenant info into the user object for the frontend
+    const { tenant, ...userData } = user as any;
+    return {
+      ...userData,
+      plan: tenant?.plan,
+      subscriptionStatus: tenant?.subscriptionStatus
+    };
   }
 
   // Get all users for a tenant

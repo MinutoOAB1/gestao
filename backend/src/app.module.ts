@@ -33,6 +33,7 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { TenantMiddleware } from './prisma/tenant.middleware';
 import { HealthController } from './health/health.controller';
 import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 
 @Module({
@@ -69,6 +70,7 @@ import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
     BackupModule,
     PaymentsModule,
     GoogleCalendarModule,
+    SubscriptionsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

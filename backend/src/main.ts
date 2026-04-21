@@ -18,10 +18,16 @@ async function createServer() {
 
   const app = await NestFactory.create(AppModule, adapter, {
     logger: ['error', 'warn', 'log'],
+    rawBody: true,
   });
 
   app.use(compression());
-  app.use(express.json({ limit: '50mb' }));
+  app.use(express.json({ 
+    limit: '50mb',
+    verify: (req: any, res, buf) => {
+      req.rawBody = buf;
+    }
+  }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   app.enableCors({
@@ -49,9 +55,14 @@ export default async function handler(req: any, res: any) {
 // ============ Local Development Server ============
 if (!process.env.VERCEL) {
   async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { rawBody: true });
     app.use(compression());
-    app.use(express.json({ limit: '50mb' }));
+    app.use(express.json({ 
+    limit: '50mb',
+    verify: (req: any, res, buf) => {
+      req.rawBody = buf;
+    }
+  }));
     app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 

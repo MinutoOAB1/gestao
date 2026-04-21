@@ -3,6 +3,7 @@ import { Plus, Users, Calendar, Calculator, AlertTriangle, Gavel, FileText, Eye,
 import { motion } from 'framer-motion';
 import { DashboardSkeleton } from '../../components/ui/Skeleton';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import TeamPerformanceChart from '../../components/dashboard/TeamPerformanceChart';
 
@@ -181,6 +182,7 @@ interface ProductivityStats {
 
 export default function DashboardHome() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [data, setData] = useState<DashboardData>({
         totalIncome: 0,
         totalExpense: 0,
@@ -293,6 +295,31 @@ export default function DashboardHome() {
             className="space-y-5 px-1 sm:px-0 pb-24 md:pb-8"
         >
             <div className="pt-2"></div>
+            
+            {/* Subscription Notice */}
+            {user?.plan === 'FREE' && (
+                <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mx-2 mb-4 p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl text-white shadow-lg shadow-blue-500/20 flex flex-col sm:flex-row items-center justify-between gap-4"
+                >
+                    <div className="flex items-center gap-3 text-center sm:text-left">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                            <Zap size={20} className="text-white" />
+                        </div>
+                        <div>
+                            <p className="font-bold text-sm sm:text-base">Upgrade para o Adv Plus</p>
+                            <p className="text-xs text-white/80">Libere usuários ilimitados, IA de análise e muito mais por apenas R$ 47/mês.</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => navigate('/app/faturamento')}
+                        className="px-6 py-2 bg-white text-blue-600 font-bold rounded-xl text-sm hover:bg-blue-50 transition-colors shadow-sm active:scale-95"
+                    >
+                        Ver Detalhes
+                    </button>
+                </motion.div>
+            )}
             {/* Quick Actions Grid - prominent position */}
             <motion.div variants={itemVariants}>
                 <h2 className="text-lg font-bold text-app-text-main mb-3 px-2">Ações Rápidas</h2>
