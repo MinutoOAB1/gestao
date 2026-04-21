@@ -97,6 +97,40 @@ export class StripeService {
     }
   }
 
+  async verifySession(tenantId: string, sessionId: string) {
+    if (!sessionId) throw new Error('Session ID is required');
+
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+      
+      if (session.payment_status === 'paid' && session.metadata?.tenantId === tenantId) {
+        let plan = 'FREE';
+        let status = 'active';
+
+        // Optional: If you want to check if it's a subscription
+        if (session.subscription) {
+          plan = 'ADV_PLUS';
+          status = 'active';
+          
+          await this.prisma.tenant.update({
+            where: { id: tenantId },
+            data: {
+              stripeSubscriptionId: session.subscription as string,
+              subscriptionStatus: status,
+              plan: plan,
+            },
+          });
+        }
+        
+        return { success: true, plan };
+      }
+      return { success: false, reason: 'Payment not completed or tenant mismatch' };
+    } catch (error) {
+      console.error('Verify Session Error:', error);
+      throw new Error('Failed to verify session');
+    }
+  }
+
   async handleWebhook(signature: string, rawBody: Buffer) {
     const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET')!;
     let event: any;

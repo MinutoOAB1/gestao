@@ -14,6 +14,12 @@ export class SubscriptionsController {
     return this.stripeService.createCheckoutSession(req.user.tenantId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('verify')
+  async verifySession(@Request() req, @Body('sessionId') sessionId: string) {
+    return this.stripeService.verifySession(req.user.tenantId, sessionId);
+  }
+
   @Post('webhook')
   async handleWebhook(
     @Headers('stripe-signature') signature: string,

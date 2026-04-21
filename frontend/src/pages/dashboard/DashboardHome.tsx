@@ -271,6 +271,28 @@ export default function DashboardHome() {
                 console.log('[Dashboard] Performance chart notification sent!');
             }).catch(() => { });
         }
+        
+        // Handle Stripe Checkout return
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('session_id');
+        if (sessionId) {
+            console.log('Verifying Stripe Session:', sessionId);
+            api.post('/subscriptions/verify', { sessionId })
+                .then((res) => {
+                    if (res.data.success) {
+                        // Force refresh of the profile to update AuthContext state
+                        api.get('/auth/profile').then(profileRes => {
+                            if (profileRes.data) {
+                                // Since we don't have direct access to updateUser from here easily, 
+                                // forcing a reload is the safest way to ensure all components see the ADV_PLUS plan.
+                                window.history.replaceState({}, document.title, window.location.pathname);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error('Failed to verify session', err));
+        }
     }, [fetchDashboardData]);
 
     const percentChange = useMemo(() => data.balance > 0 ? '+12%' : '-5%', [data.balance]);
