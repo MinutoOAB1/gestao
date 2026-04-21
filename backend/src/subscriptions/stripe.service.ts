@@ -28,11 +28,18 @@ export class StripeService {
 
     if (!tenant) throw new Error('Tenant not found');
 
-    const user = tenant.users[0]; // Primary user
+    console.log(`[Stripe] Initiating checkout for Tenant: ${tenantId}`);
+
+    const user = tenant.users[0];
+    if (!user) {
+      console.error(`[Stripe] No users found for Tenant: ${tenantId}`);
+      throw new Error('Não foi possível encontrar um usuário administrador para este escritório.');
+    }
 
     let customerId = tenant.stripeCustomerId;
 
     if (!customerId) {
+      console.log(`[Stripe] Creating new customer for ${tenant.name} (${user.email})`);
       const customer = await this.stripe.customers.create({
         email: user.email,
         name: tenant.name,

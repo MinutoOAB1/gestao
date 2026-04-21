@@ -46,7 +46,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             }
         } else if (exception instanceof Error) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
-            message = 'Internal server error';
+            message = exception.message;
             error = 'Internal Server Error';
 
             // Log the full error for debugging

@@ -14,9 +14,10 @@ export default function BillingPage() {
         try {
             const { url } = await subscriptionsService.createCheckoutSession();
             window.location.href = url;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error starting checkout:', error);
-            addToast('Erro ao iniciar checkout. Tente novamente.', 'error');
+            const message = error.response?.data?.message || 'Erro ao iniciar checkout. Tente novamente.';
+            addToast(message, 'error');
         } finally {
             setLoading(false);
         }
