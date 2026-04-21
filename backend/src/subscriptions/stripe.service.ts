@@ -1,11 +1,11 @@
 import { Injectable, RawBodyRequest } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Stripe } from 'stripe';
+import Stripe from 'stripe';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class StripeService {
-  private stripe: Stripe;
+  private stripe: any;
 
   constructor(
     private configService: ConfigService,
@@ -64,6 +64,10 @@ export class StripeService {
       metadata: { tenantId },
     });
 
+    if (!session.url) {
+      throw new Error('Failed to create Stripe checkout session URL');
+    }
+
     return { url: session.url };
   }
 
@@ -96,7 +100,11 @@ export class StripeService {
   }
 
   private async handleSubscriptionCreated(session: any) {
-    const tenantId = session.metadata.tenantId;
+    const tenantId = session.metadata?.tenantId;
+    if (!tenantId) {
+      console.error('No tenantId found in session metadata');
+      return;
+    }
     const subscriptionId = session.subscription as string;
 
     const subscription = await this.stripe.subscriptions.retrieve(subscriptionId) as any;
