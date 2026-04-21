@@ -1,23 +1,26 @@
-import { Controller, Post, Body, UploadedFile, UseInterceptors, BadRequestException, Request, Get } from '@nestjs/common';
+import { Controller, Post, Body, UploadedFile, UseInterceptors, BadRequestException, Request, Get, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AiService } from './ai.service';
-// pdf-parse dynamic import delayed to avoid DOMMatrix startup crashes
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('ai')
 export class AiController {
     constructor(private readonly aiService: AiService) { }
 
     @Get('history')
     async getHistory(@Request() req) {
-        const tenantId = req.user?.tenantId || 'dev-tenant-001';
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.aiService.getHistory(tenantId);
     }
 
     @Post('analyze')
     async analyze(@Request() req, @Body() body: { contractText: string, expertMode?: string }) {
         console.log('[AI Controller] Recebida análise de texto. Especialista:', body.expertMode || 'Geral');
-        const tenantId = req.user?.tenantId || 'dev-tenant-001';
-        const userId = req.user?.id || 'dev-user-001';
+        const tenantId = req.user?.tenantId;
+        const userId = req.user?.id || req.user?.sub;
+        if (!tenantId || !userId) throw new UnauthorizedException('Authentication context incomplete');
 
         try {
             const result = await this.aiService.analyzeContract(body.contractText, tenantId, userId, 'Análise de Texto', body.expertMode);
@@ -50,8 +53,9 @@ export class AiController {
             throw new BadRequestException('Nenhum arquivo enviado');
         }
 
-        const tenantId = req.user?.tenantId || 'dev-tenant-001';
-        const userId = req.user?.id || 'dev-user-001';
+        const tenantId = req.user?.tenantId;
+        const userId = req.user?.id || req.user?.sub;
+        if (!tenantId || !userId) throw new UnauthorizedException('Authentication context incomplete');
 
         console.log('[AI Controller] Recebido arquivo:', file.originalname, 'Tipo:', file.mimetype, 'Tamanho:', file.size);
 
@@ -93,6 +97,6 @@ export class AiController {
             throw new BadRequestException(`Erro na análise de IA: ${error.message}`);
         }
     }
-
+    }
 }
 

@@ -1,33 +1,19 @@
-import { Controller, Get, Post, Body, Param, Delete, Request, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Request, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { TimesheetService } from './timesheet.service';
+import { AuthGuard } from '@nestjs/passport';
 
-const DEV_TENANT_ID = 'dev-tenant-001';
-
-// Helper to decode JWT payload
-function decodeJwtPayload(token: string): any {
-    try {
-        if (!token) return null;
-        const parts = token.replace('Bearer ', '').split('.');
-        if (parts.length !== 3) return null;
-        const payload = Buffer.from(parts[1], 'base64').toString('utf8');
-        return JSON.parse(payload);
-    } catch {
-        return null;
-    }
-}
-
+@UseGuards(AuthGuard('jwt'))
 @Controller('timesheet')
 export class TimesheetController {
     constructor(private readonly timesheetService: TimesheetService) { }
 
     @Post()
-    async create(@Headers('authorization') authHeader: string, @Body() createTimeEntryDto: any) {
-        const decoded = decodeJwtPayload(authHeader);
-        const tenantId = decoded?.tenantId || DEV_TENANT_ID;
-        const userId = decoded?.sub;
+    async create(@Request() req, @Body() createTimeEntryDto: any) {
+        const tenantId = req.user?.tenantId;
+        const userId = req.user?.sub || req.user?.id;
 
-        if (!userId) {
-            return { error: 'User not authenticated', success: false };
+        if (!tenantId || !userId) {
+            throw new UnauthorizedException('Authentication context incomplete');
         }
 
         try {
@@ -40,16 +26,16 @@ export class TimesheetController {
     }
 
     @Get()
-    findAll(@Headers('authorization') authHeader: string) {
-        const decoded = decodeJwtPayload(authHeader);
-        const tenantId = decoded?.tenantId || DEV_TENANT_ID;
+    findAll(@Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.timesheetService.findAll(tenantId);
     }
 
     @Delete(':id')
-    remove(@Headers('authorization') authHeader: string, @Param('id') id: string) {
-        const decoded = decodeJwtPayload(authHeader);
-        const tenantId = decoded?.tenantId || DEV_TENANT_ID;
+    remove(@Request() req, @Param('id') id: string) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.timesheetService.remove(id, tenantId);
     }
 }

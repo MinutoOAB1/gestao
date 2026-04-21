@@ -1,30 +1,16 @@
-import { Controller, Get, Request, Headers } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuthGuard } from '@nestjs/passport';
 
-const DEV_TENANT_ID = 'dev-tenant-001';
-
-// Helper to decode JWT payload
-function decodeJwtPayload(token: string): any {
-    try {
-        if (!token) return null;
-        const parts = token.replace('Bearer ', '').split('.');
-        if (parts.length !== 3) return null;
-        const payload = Buffer.from(parts[1], 'base64').toString('utf8');
-        return JSON.parse(payload);
-    } catch {
-        return null;
-    }
-}
-
+@UseGuards(AuthGuard('jwt'))
 @Controller('dashboard')
 export class DashboardController {
     constructor(private prisma: PrismaService) { }
 
     @Get('stats')
-    async getStats(@Request() req, @Headers('authorization') authHeader: string) {
-        // Extract tenantId from JWT if req.user is not populated
-        const decoded = decodeJwtPayload(authHeader || '');
-        const tenantId = req.user?.tenantId || decoded?.tenantId || DEV_TENANT_ID;
+    async getStats(@Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
 
         const now = new Date();
         const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -215,9 +201,9 @@ export class DashboardController {
     }
 
     @Get('team-performance')
-    async getTeamPerformance(@Request() req, @Headers('authorization') authHeader: string) {
-        const decoded = decodeJwtPayload(authHeader || '');
-        const tenantId = req.user?.tenantId || decoded?.tenantId || DEV_TENANT_ID;
+    async getTeamPerformance(@Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
 
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());

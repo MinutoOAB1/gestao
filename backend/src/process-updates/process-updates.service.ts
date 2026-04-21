@@ -6,7 +6,12 @@ export class ProcessUpdatesService {
     constructor(private prisma: PrismaService) { }
 
     // Create a new andamento
-    async create(processId: string, data: { description: string; type?: string; date?: Date; isImportant?: boolean; createdBy?: string }) {
+    async create(processId: string, data: { description: string; type?: string; date?: Date; isImportant?: boolean; createdBy?: string }, tenantId: string) {
+        // Verify process ownership
+        await this.prisma.process.findFirstOrThrow({
+            where: { id: processId, tenantId }
+        });
+
         return this.prisma.processUpdate.create({
             data: {
                 processId,
@@ -20,22 +25,33 @@ export class ProcessUpdatesService {
     }
 
     // Get all andamentos for a process
-    async findByProcess(processId: string) {
+    async findByProcess(processId: string, tenantId: string) {
         return this.prisma.processUpdate.findMany({
-            where: { processId },
+            where: { 
+                processId,
+                process: { tenantId }
+            },
             orderBy: { date: 'desc' },
         });
     }
 
     // Get a single andamento
-    async findOne(id: string) {
-        return this.prisma.processUpdate.findUnique({
-            where: { id },
+    async findOne(id: string, tenantId: string) {
+        return this.prisma.processUpdate.findFirst({
+            where: { 
+                id,
+                process: { tenantId }
+            },
         });
     }
 
     // Update andamento
-    async update(id: string, data: { description?: string; type?: string; date?: Date; isImportant?: boolean }) {
+    async update(id: string, data: { description?: string; type?: string; date?: Date; isImportant?: boolean }, tenantId: string) {
+        // Verify ownership before update
+        await this.prisma.processUpdate.findFirstOrThrow({
+            where: { id, process: { tenantId } }
+        });
+
         return this.prisma.processUpdate.update({
             where: { id },
             data,
@@ -43,7 +59,12 @@ export class ProcessUpdatesService {
     }
 
     // Delete andamento
-    async remove(id: string) {
+    async remove(id: string, tenantId: string) {
+        // Verify ownership before delete
+        await this.prisma.processUpdate.findFirstOrThrow({
+            where: { id, process: { tenantId } }
+        });
+
         return this.prisma.processUpdate.delete({
             where: { id },
         });

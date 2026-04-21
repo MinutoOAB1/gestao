@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Request, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { ProcessNotesService } from './process-notes.service';
+import { AuthGuard } from '@nestjs/passport';
 
-const DEV_TENANT_ID = 'dev-tenant-001';
-const DEV_USER_ID = 'dev-user-001';
-
+@UseGuards(AuthGuard('jwt'))
 @Controller('process-notes')
 export class ProcessNotesController {
     constructor(private readonly processNotesService: ProcessNotesService) { }
@@ -15,8 +14,10 @@ export class ProcessNotesController {
         @Body() body: { content: string; color?: string; isPinned?: boolean },
         @Request() req,
     ) {
-        const userId = req.user?.sub || DEV_USER_ID;
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        const userId = req.user?.sub || req.user?.id;
+        if (!tenantId || !userId) throw new UnauthorizedException('Authentication context incomplete');
+        
         const createdBy = req.user?.name || 'Sistema';
 
         return this.processNotesService.create(
@@ -29,14 +30,18 @@ export class ProcessNotesController {
 
     // Get all notes for a process
     @Get('process/:processId')
-    async findByProcess(@Param('processId') processId: string) {
-        return this.processNotesService.findByProcess(processId);
+    async findByProcess(@Param('processId') processId: string, @Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.processNotesService.findByProcess(processId, tenantId);
     }
 
     // Get single note
     @Get(':id')
-    async findOne(@Param('id') id: string) {
-        return this.processNotesService.findOne(id);
+    async findOne(@Param('id') id: string, @Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.processNotesService.findOne(id, tenantId);
     }
 
     // Update note
@@ -44,13 +49,18 @@ export class ProcessNotesController {
     async update(
         @Param('id') id: string,
         @Body() body: { content?: string; color?: string; isPinned?: boolean },
+        @Request() req
     ) {
-        return this.processNotesService.update(id, body);
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.processNotesService.update(id, body, tenantId);
     }
 
     // Delete note
     @Delete(':id')
-    async remove(@Param('id') id: string) {
-        return this.processNotesService.remove(id);
+    async remove(@Param('id') id: string, @Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.processNotesService.remove(id, tenantId);
     }
 }

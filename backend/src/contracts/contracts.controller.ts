@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
+import { AuthGuard } from '@nestjs/passport';
 
-const DEV_TENANT_ID = 'dev-tenant-001';
-
+@UseGuards(AuthGuard('jwt'))
 @Controller('contracts')
 export class ContractsController {
     constructor(private readonly contractsService: ContractsService) { }
@@ -16,25 +16,29 @@ export class ContractsController {
         value: number;
         clientId?: string;
     }, @Req() req: any) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.contractsService.create(createContractDto, tenantId);
     }
 
     @Get()
     findAll(@Query('status') status: string, @Req() req: any) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.contractsService.findAll(tenantId, status);
     }
 
     @Get('stats')
     getStats(@Req() req: any) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.contractsService.getStats(tenantId);
     }
 
     @Get(':id')
     findOne(@Param('id') id: string, @Req() req: any) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.contractsService.findOne(id, tenantId);
     }
 
@@ -47,13 +51,15 @@ export class ContractsController {
         value?: number;
         clientId?: string;
     }, @Req() req: any) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.contractsService.update(id, updateContractDto, tenantId);
     }
 
     @Delete(':id')
     remove(@Param('id') id: string, @Req() req: any) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.contractsService.remove(id, tenantId);
     }
 }

@@ -8,8 +8,8 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Role } from '../auth/roles.enum';
 
-// Development: Endpoints work without auth, using a default tenant
-const DEV_TENANT_ID = 'dev-tenant-001';
+// Strict Multi-tenancy enforcement
+import { UnauthorizedException } from '@nestjs/common';
 
 // Format currency for PDF
 const formatBRL = (value: number) => {
@@ -27,7 +27,8 @@ export class FinancialController {
     @Post()
     @Roles(Role.ADMIN, Role.LAWYER)
     create(@Request() req, @Body() createFinancialDto: CreateFinancialDto) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         const userId = req.user?.sub;
         const userName = req.user?.name;
         return this.financialService.create(createFinancialDto, tenantId, userId, userName);
@@ -35,13 +36,15 @@ export class FinancialController {
 
     @Get()
     findAll(@Request() req) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.financialService.findAll(tenantId);
     }
 
     @Get('stats')
     async getStats(@Request() req) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
 
         const [
             totals,
@@ -89,21 +92,24 @@ export class FinancialController {
     // Get urgent payments
     @Get('urgent')
     findUrgent(@Request() req) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.financialService.findUrgent(tenantId);
     }
 
     // Get upcoming payments (next 7 days)
     @Get('upcoming')
     findUpcoming(@Request() req) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.financialService.findUpcoming(tenantId);
     }
 
     // Get overdue payments
     @Get('overdue')
     findOverdue(@Request() req) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.financialService.findOverdue(tenantId);
     }
 
@@ -116,7 +122,8 @@ export class FinancialController {
         @Query('status') status?: string,
         @Query('search') search?: string
     ) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         const records = await this.financialService.findAll(tenantId);
 
         // Filter by date range, status and search query if provided
@@ -496,14 +503,16 @@ export class FinancialController {
 
     @Get(':id')
     findOne(@Request() req, @Param('id') id: string) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.financialService.findOne(id, tenantId);
     }
 
     @Patch(':id')
     @Roles(Role.ADMIN, Role.LAWYER)
     update(@Request() req, @Param('id') id: string, @Body() updateFinancialDto: UpdateFinancialDto) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         const userId = req.user?.sub;
         const userName = req.user?.name;
         return this.financialService.update(id, updateFinancialDto, tenantId, userId, userName);
@@ -512,7 +521,8 @@ export class FinancialController {
     @Delete(':id')
     @Roles(Role.ADMIN, Role.LAWYER)
     remove(@Request() req, @Param('id') id: string) {
-        const tenantId = req.user?.tenantId || DEV_TENANT_ID;
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         const userId = req.user?.sub;
         const userName = req.user?.name;
         return this.financialService.remove(id, tenantId, userId, userName);

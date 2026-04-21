@@ -17,6 +17,13 @@ export class ProcessNotesService {
         createdById?: string,
         tenantId?: string
     ) {
+        // Verify process ownership if tenantId is provided
+        if (tenantId) {
+            await this.prisma.process.findFirstOrThrow({
+                where: { id: processId, tenantId }
+            });
+        }
+
         // Create the note
         const note = await this.prisma.processNote.create({
             data: {
@@ -54,9 +61,12 @@ export class ProcessNotesService {
         return note;
     }
 
-    async findByProcess(processId: string) {
+    async findByProcess(processId: string, tenantId: string) {
         return this.prisma.processNote.findMany({
-            where: { processId },
+            where: { 
+                processId,
+                process: { tenantId }
+            },
             orderBy: [
                 { isPinned: 'desc' },  // Pinned notes first
                 { createdAt: 'desc' }, // Then by creation date
@@ -64,20 +74,33 @@ export class ProcessNotesService {
         });
     }
 
-    async findOne(id: string) {
-        return this.prisma.processNote.findUnique({
-            where: { id },
+    async findOne(id: string, tenantId: string) {
+        return this.prisma.processNote.findFirst({
+            where: { 
+                id,
+                process: { tenantId }
+            },
         });
     }
 
-    async update(id: string, data: { content?: string; color?: string; isPinned?: boolean }) {
+    async update(id: string, data: { content?: string; color?: string; isPinned?: boolean }, tenantId: string) {
+        // Verify ownership before update
+        await this.prisma.processNote.findFirstOrThrow({
+            where: { id, process: { tenantId } }
+        });
+
         return this.prisma.processNote.update({
             where: { id },
             data,
         });
     }
 
-    async remove(id: string) {
+    async remove(id: string, tenantId: string) {
+        // Verify ownership before delete
+        await this.prisma.processNote.findFirstOrThrow({
+            where: { id, process: { tenantId } }
+        });
+
         return this.prisma.processNote.delete({
             where: { id },
         });

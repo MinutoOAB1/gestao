@@ -22,24 +22,23 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       const tenantId = this.tenantContext.getTenantId();
       const bypass = this.tenantContext.isBypassed();
       
-      if (!bypass || tenantId) {
-        try {
-          // IMPORTANT: We use SET LOCAL so the setting only lasts for the current transaction.
-          // This is critical for connection poolers (PgBouncer/Supabase Pooler).
-          if (bypass) {
-            await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'on';");
-          } else {
-            await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'off';");
-          }
-
-          if (tenantId) {
-            await this.$executeRawUnsafe(`SET LOCAL app.current_tenant_id = '${tenantId}';`);
-          } else {
-            await this.$executeRawUnsafe("SET LOCAL app.current_tenant_id = '';");
-          }
-        } catch (error) {
-          console.error('RLS CONTEXT SETUP ERROR:', error.message);
+      // ALWAYS set the context, even if it's empty or bypassed, to prevent connection pool leakage.
+      try {
+        // IMPORTANT: We use SET LOCAL so the setting only lasts for the current transaction.
+        // This is critical for connection poolers (PgBouncer/Supabase Pooler).
+        if (bypass) {
+          await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'on';");
+        } else {
+          await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'off';");
         }
+
+        if (tenantId) {
+          await this.$executeRawUnsafe(`SET LOCAL app.current_tenant_id = '${tenantId}';`);
+        } else {
+          await this.$executeRawUnsafe("SET LOCAL app.current_tenant_id = '';");
+        }
+      } catch (error) {
+        console.error('RLS CONTEXT SETUP ERROR:', error.message);
       }
 
       return next(params);
