@@ -651,49 +651,61 @@ export default function AgendaPage() {
         return dates;
     }, [currentYear, currentMonth, selectedDate]);
 
-    const getEventColor = (type: string) => {
-        switch (type) {
-            case 'hearing':
-                return { 
-                    dot: 'bg-blue-500', 
-                    pill: 'bg-blue-500 text-white', 
-                    pillLight: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
-                    badge: 'bg-blue-500/10 text-blue-500 border-l-2 border-blue-500', 
-                    label: 'Audiência' 
-                };
-            case 'deadline':
-                return { 
-                    dot: 'bg-red-500', 
-                    pill: 'bg-red-500 text-white', 
-                    pillLight: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
-                    badge: 'bg-red-500/10 text-red-500 border-l-2 border-red-500', 
-                    label: 'Prazo Fatal' 
-                };
-            case 'meeting':
-                return { 
-                    dot: 'bg-emerald-500', 
-                    pill: 'bg-emerald-500 text-white', 
-                    pillLight: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
-                    badge: 'bg-emerald-500/10 text-emerald-500 border-l-2 border-emerald-500', 
-                    label: 'Reunião' 
-                };
-            case 'personal':
-                return { 
-                    dot: 'bg-purple-500', 
-                    pill: 'bg-purple-500 text-white', 
-                    pillLight: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
-                    badge: 'bg-purple-500/10 text-purple-500 border-l-2 border-purple-500', 
-                    label: 'Pessoal' 
-                };
-            default:
-                return { 
-                    dot: 'bg-slate-500', 
-                    pill: 'bg-slate-500 text-white', 
-                    pillLight: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/30 dark:text-slate-300 dark:border-slate-800',
-                    badge: 'bg-slate-500/10 text-slate-500 border-l-2 border-slate-500', 
-                    label: 'Evento' 
-                };
+    const getEventColor = (type: string, color?: string) => {
+        // Map specific colors or types to our theme
+        if (type === 'deadline' || color === 'red') {
+            return { 
+                dot: 'bg-red-500', 
+                pill: 'bg-red-500 text-white', 
+                pillLight: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
+                badge: 'bg-red-500/10 text-red-500 border-l-2 border-red-500', 
+                label: 'Prazo Fatal' 
+            };
         }
+        if (type === 'hearing' || color === 'blue') {
+            return { 
+                dot: 'bg-blue-500', 
+                pill: 'bg-blue-500 text-white', 
+                pillLight: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+                badge: 'bg-blue-500/10 text-blue-500 border-l-2 border-blue-500', 
+                label: 'Audiência' 
+            };
+        }
+        if (type === 'meeting' || color === 'emerald' || color === 'green') {
+            return { 
+                dot: 'bg-emerald-500', 
+                pill: 'bg-emerald-500 text-white', 
+                pillLight: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+                badge: 'bg-emerald-500/10 text-emerald-500 border-l-2 border-emerald-500', 
+                label: 'Reunião' 
+            };
+        }
+        if (type === 'personal' || color === 'purple') {
+            return { 
+                dot: 'bg-purple-500', 
+                pill: 'bg-purple-500 text-white', 
+                pillLight: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+                badge: 'bg-purple-500/10 text-purple-500 border-l-2 border-purple-500', 
+                label: 'Pessoal' 
+            };
+        }
+        if (color === 'amber' || color === 'orange') {
+            return { 
+                dot: 'bg-amber-500', 
+                pill: 'bg-amber-500 text-white', 
+                pillLight: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800',
+                badge: 'bg-amber-500/10 text-amber-500 border-l-2 border-amber-500', 
+                label: 'Importante' 
+            };
+        }
+
+        return { 
+            dot: 'bg-slate-500', 
+            pill: 'bg-slate-500 text-white', 
+            pillLight: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/30 dark:text-slate-300 dark:border-slate-800',
+            badge: 'bg-slate-500/10 text-slate-500 border-l-2 border-slate-500', 
+            label: 'Evento' 
+        };
     };
 
     // Monthly statistics
@@ -904,7 +916,7 @@ export default function AgendaPage() {
                 </div>
 
                 {/* Calendar Content */}
-                <div className="flex-1 overflow-y-auto p-2 sm:p-4 custom-scrollbar">
+                <div className="flex-1 flex flex-col min-h-0">
                     <AnimatePresence mode="popLayout">
                         <motion.div
                             key={view + currentMonth + currentYear}
@@ -912,7 +924,7 @@ export default function AgendaPage() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.1 }}
-                            className="w-full"
+                            className="flex-1 flex flex-col min-h-0"
                         >
                             {view === 'month' && (
                                 <div className="border border-app-stroke rounded-xl bg-app-bg overflow-hidden flex flex-col h-full">
@@ -970,7 +982,7 @@ export default function AgendaPage() {
                                                                         className={clsx(
                                                                             "text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded border truncate transition-all",
                                                                             event.completed ? "opacity-40 grayscale italic line-through bg-slate-100 border-slate-200 text-slate-500" : 
-                                                                            getEventColor(event.type).pillLight
+                                                                            getEventColor(event.type, event.color).pillLight
                                                                         )}
                                                                     >
                                                                         {event.time && <span className="font-bold mr-1">{event.time}</span>}
@@ -993,7 +1005,7 @@ export default function AgendaPage() {
                             )}
 
                             {view === 'week' && (
-                                <div className="flex flex-col h-[calc(100vh-280px)] min-h-[600px] border border-app-stroke rounded-xl bg-app-bg overflow-hidden relative">
+                                <div className="flex-1 flex flex-col border border-app-stroke rounded-xl bg-app-bg overflow-hidden relative min-h-0">
                                     {/* Header: Days */}
                                     <div className="grid grid-cols-[60px_1fr] border-b border-app-stroke bg-app-card sticky top-0 z-20 shrink-0">
                                         <div className="border-r border-app-stroke flex flex-col items-center justify-end pb-2">
@@ -1083,6 +1095,7 @@ export default function AgendaPage() {
                                                                 const topOffset = startHour * 60;
                                                                 const heightPixels = duration * 60;
 
+                                                                const eventStyles = getEventColor(event.type, event.color);
                                                                 return (
                                                                     <div 
                                                                         key={event.id}
@@ -1090,12 +1103,14 @@ export default function AgendaPage() {
                                                                         className={clsx(
                                                                             "absolute left-1 right-1 rounded-lg p-2 overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-white/50 shadow-md group border-l-4",
                                                                             event.completed ? "bg-app-stroke/40 border-l-slate-400 grayscale" : 
-                                                                            event.type === 'hearing' ? "bg-blue-500/15 border-l-blue-500 hover:bg-blue-500/25" :
-                                                                            event.type === 'deadline' ? "bg-red-500/15 border-l-red-500 hover:bg-red-500/25" :
-                                                                            event.type === 'meeting' ? "bg-emerald-500/15 border-l-emerald-500 hover:bg-emerald-500/25" :
-                                                                            "bg-purple-500/15 border-l-purple-500 hover:bg-purple-500/25"
+                                                                            eventStyles.pillLight.replace('text-', 'text-opacity-90 text-').replace('border-', 'border-l-') // Ensure border-l is prominent
                                                                         )}
-                                                                        style={{ top: `${topOffset}px`, height: `${heightPixels}px`, minHeight: '28px' }}
+                                                                        style={{ 
+                                                                            top: `${topOffset}px`, 
+                                                                            height: `${heightPixels}px`, 
+                                                                            minHeight: '28px',
+                                                                            borderLeftColor: !event.completed ? (eventStyles.dot.split('-')[1] === 'blue' ? '#3b82f6' : eventStyles.dot.split('-')[1] === 'red' ? '#ef4444' : eventStyles.dot.split('-')[1] === 'emerald' ? '#10b981' : eventStyles.dot.split('-')[1] === 'purple' ? '#a855f7' : '#64748b') : undefined
+                                                                        }}
                                                                     >
                                                                         <div className="flex justify-between items-start gap-1">
                                                                             <span className={clsx("font-bold text-[9px] leading-tight truncate", event.completed ? "line-through text-app-text-muted" : "text-app-text-main")}>
@@ -1137,7 +1152,7 @@ export default function AgendaPage() {
                                                 </button>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                        <span className={clsx("text-xs px-2 py-0.5 rounded-full font-medium shrink-0", getEventColor(event.type).badge)}>{getEventColor(event.type).label}</span>
+                                                        <span className={clsx("text-xs px-2 py-0.5 rounded-full font-medium shrink-0", getEventColor(event.type, event.color).badge)}>{getEventColor(event.type, event.color).label}</span>
                                                         <span className="text-xs text-app-text-muted shrink-0">{event.time}</span>
                                                         <span className={clsx("text-[10px] px-1.5 py-0.5 rounded-full font-medium ml-auto hidden sm:inline-block shrink-0", PRIORITY_STYLES[event.priority || 'MEDIUM'].bg, PRIORITY_STYLES[event.priority || 'MEDIUM'].text)}>
                                                             {PRIORITY_STYLES[event.priority || 'MEDIUM'].label}
@@ -1217,11 +1232,12 @@ export default function AgendaPage() {
                                                                     </button>
                                                                     <div className="flex flex-col">
                                                                         <span className="font-black text-lg text-app-text-main leading-none">{event.time}</span>
-                                                                        <span className={clsx("text-[10px] font-bold tracking-wider uppercase mt-1",
-                                                                            event.type === 'hearing' ? "text-slate-600" :
-                                                                                event.type === 'deadline' ? "text-red-600" :
-                                                                                    event.type === 'meeting' ? "text-slate-500" : "text-stone-500"
-                                                                        )}>{getEventColor(event.type).label}</span>
+                                                                        <span className={clsx(
+                                                                            "text-[10px] font-bold tracking-wider uppercase mt-1",
+                                                                            getEventColor(event.type, event.color).badge.split(' ')[1] // Get the text color class from badge
+                                                                        )}>
+                                                                            {getEventColor(event.type, event.color).label}
+                                                                        </span>
                                                                     </div>
                                                                     {isConflict && !event.completed && (
                                                                         <div title="Conflito de horários" className="ml-auto sm:ml-2 text-amber-500 bg-amber-500/10 p-1.5 rounded-lg">
