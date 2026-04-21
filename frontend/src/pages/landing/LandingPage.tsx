@@ -301,56 +301,23 @@ function PricingSection() {
     const navigate = useNavigate();
     const plans = [
         {
-            name: 'Solo',
-            price: 'R$ 59',
+            name: 'Adv Plus',
+            price: 'R$ 47',
             period: '/mês',
-            description: 'Ideal para advogados autônomos',
+            description: 'Acesso completo a todas as ferramentas do Blue Adv',
             features: [
-                '1 usuário incluso',
-                'Processos e clientes ilimitados',
-                'Agenda e prazos',
-                'Controle financeiro',
-                'Gestão de documentos',
-                '1 GB de armazenamento',
-                'Suporte por email',
-            ],
-            cta: 'Começar Grátis',
-            popular: false
-        },
-        {
-            name: 'Escritório',
-            price: 'R$ 129',
-            period: '/mês',
-            description: 'Para escritórios com até 5 usuários',
-            features: [
-                'Até 5 usuários',
+                'Usuários ilimitados',
                 'Processos e clientes ilimitados',
                 'Financeiro completo com recorrência',
                 'Análise de contratos com IA',
                 'Modelos e editor de documentos',
-                'Timesheet por processo',
-                'Chat interno da equipe',
-                '5 GB de armazenamento',
-                'Suporte prioritário',
+                'Agenda e prazos inteligentes',
+                'Timesheet e chat da equipe',
+                '10 GB de armazenamento',
+                'Suporte prioritário 24/7',
             ],
-            cta: 'Começar Grátis',
+            cta: 'Começar Agora',
             popular: true
-        },
-        {
-            name: 'Enterprise',
-            price: 'Sob consulta',
-            period: '',
-            description: 'Para grandes escritórios e redes',
-            features: [
-                'Usuários ilimitados',
-                'Tudo do plano Escritório',
-                'Armazenamento personalizado',
-                'Onboarding dedicado',
-                'Gerente de conta exclusivo',
-                'Integrações sob demanda',
-            ],
-            cta: 'Falar com Vendas',
-            popular: false
         }
     ];
 
@@ -360,38 +327,33 @@ function PricingSection() {
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                        Planos para todos os tamanhos
+                        Plano Único e Transparente
                     </h2>
                     <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Escolha o plano ideal para o seu escritório. Todos incluem 7 dias de teste grátis.
+                        Tenha acesso a todas as funcionalidades do Blue Adv por um preço fixo e justo. Sem letras miúdas.
                     </p>
                 </div>
 
                 {/* Pricing Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div className="flex justify-center max-w-md mx-auto">
                     {plans.map((plan, idx) => (
                         <div
                             key={idx}
-                            className={`relative p-8 rounded-2xl border transition-all ${plan.popular
-                                ? 'bg-white dark:bg-[#0B1120] border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10'
-                                : 'bg-white dark:bg-[#0B1120] border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
-                                }`}
+                            className="relative p-8 rounded-2xl border bg-white dark:bg-[#0B1120] border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10 w-full"
                         >
-                            {plan.popular && (
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full">
-                                    Mais Popular
-                                </div>
-                            )}
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full whitespace-nowrap">
+                                Oferta de Lançamento
+                            </div>
 
                             <div className="text-center mb-6">
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                                     {plan.name}
                                 </h3>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
                                     {plan.description}
                                 </p>
                                 <div className="flex items-baseline justify-center gap-1">
-                                    <span className="text-4xl font-black text-slate-900 dark:text-white">
+                                    <span className="text-5xl font-black text-slate-900 dark:text-white">
                                         {plan.price}
                                     </span>
                                     <span className="text-slate-500 dark:text-slate-400">
@@ -400,24 +362,25 @@ function PricingSection() {
                                 </div>
                             </div>
 
-                            <ul className="space-y-3 mb-8">
+                            <ul className="space-y-4 mb-8">
                                 {plan.features.map((feature, fidx) => (
                                     <li key={fidx} className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
                                         <Check size={18} className="text-green-500 flex-shrink-0" />
-                                        {feature}
+                                        <span className="text-sm font-medium">{feature}</span>
                                     </li>
                                 ))}
                             </ul>
 
                             <button
                                 onClick={() => navigate('/register')}
-                                className={`w-full py-4 rounded-xl font-semibold transition-all ${plan.popular
-                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-                                    }`}
+                                className="w-full py-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                             >
                                 {plan.cta}
                             </button>
+                            
+                            <p className="mt-4 text-center text-xs text-slate-400">
+                                7 dias de teste grátis • Cancele quando quiser
+                            </p>
                         </div>
                     ))}
                 </div>
