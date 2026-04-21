@@ -45,34 +45,41 @@ export class StripeService {
       });
     }
 
-    const session = await this.stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'brl',
-            product_data: {
-              name: 'Plano Adv Plus',
-              description: 'Acesso completo ao Blue Adv',
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'https://localhost:5173';
+    
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'brl',
+              product_data: {
+                name: 'Plano Adv Plus',
+                description: 'Acesso completo ao Blue Adv',
+              },
+              unit_amount: 4700, // R$ 47,00
+              recurring: { interval: 'month' },
             },
-            unit_amount: 4700, // R$ 47,00
-            recurring: { interval: 'month' },
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${this.configService.get('FRONTEND_URL')}/app?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${this.configService.get('FRONTEND_URL')}/app/billing`,
-      metadata: { tenantId },
-    });
+        ],
+        mode: 'subscription',
+        success_url: `${frontendUrl}/app?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontendUrl}/app/faturamento`,
+        metadata: { tenantId },
+      });
 
-    if (!session.url) {
-      throw new Error('Failed to create Stripe checkout session URL');
+      if (!session.url) {
+        throw new Error('Failed to create Stripe checkout session URL');
+      }
+
+      return { url: session.url };
+    } catch (error) {
+      console.error('Stripe Checkout Error:', error);
+      throw error;
     }
-
-    return { url: session.url };
   }
 
   async handleWebhook(signature: string, rawBody: Buffer) {
