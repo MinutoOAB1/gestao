@@ -11,6 +11,10 @@ datasource db {
 
 model Tenant {
   id                String                @id @default(uuid())
+  stripeCustomerId  String?               @unique
+  stripeSubscriptionId String?            @unique
+  subscriptionStatus String?               // active, past_due, canceled, etc.
+  plan              String                @default("FREE")
   name              String
   slug              String                @unique
   createdAt         DateTime              @default(now())
@@ -37,10 +41,6 @@ model Tenant {
   templates         Template[]
   settings          TenantSettings?
   timeEntries       TimeEntry[]
-  plan              String                @default("FREE")
-  stripeCustomerId  String?               @unique
-  stripeSubscriptionId String?            @unique
-  subscriptionStatus String?               // active, past_due, canceled, etc.
   users             User[]
   invoices          Invoice[]
 }

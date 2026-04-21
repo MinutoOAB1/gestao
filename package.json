@@ -54,7 +54,7 @@
     "express": "^4.19.2"
   },
   "scripts": {
-    "postinstall": "npx prisma generate --schema=backend/prisma/schema.prisma",
+    "postinstall": "rm -rf node_modules/@prisma/client && npx prisma generate --schema=backend/prisma/schema.prisma",
     "build": "npm run vercel-build",
     "vercel-build": "npm install && npm run build:backend && rm -rf api/nest-app && cp -r backend/dist/src api/nest-app && npm run build:frontend",
     "build:backend": "cd backend && npm install && npm run build",
