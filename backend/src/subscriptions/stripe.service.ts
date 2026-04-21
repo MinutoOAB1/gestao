@@ -1,6 +1,6 @@
 import { Injectable, RawBodyRequest } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Stripe from 'stripe';
+import { Stripe } from 'stripe';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class StripeService {
     private configService: ConfigService,
     private prisma: PrismaService,
   ) {
-    this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY'), {
+    this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY')!, {
       apiVersion: '2023-10-16' as any,
     });
   }
@@ -68,8 +68,8 @@ export class StripeService {
   }
 
   async handleWebhook(signature: string, rawBody: Buffer) {
-    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
-    let event: Stripe.Event;
+    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET')!;
+    let event: any;
 
     try {
       event = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
