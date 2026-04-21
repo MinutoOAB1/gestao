@@ -22,9 +22,11 @@ export class SubscriptionsController {
     if (!signature) {
       throw new BadRequestException('Missing stripe-signature header');
     }
+
+    if (!req.rawBody) {
+      throw new BadRequestException('Missing rawBody for stripe webhook');
+    }
     
-    // In NestJS, to get the raw body we need special configuration.
-    // Assuming the app is configured to provide rawBody.
-    return this.stripeService.handleWebhook(signature, req.rawBody);
+    return this.stripeService.handleWebhook(signature, req.rawBody as Buffer);
   }
 }

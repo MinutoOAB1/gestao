@@ -80,12 +80,12 @@ export class StripeService {
 
     switch (event.type) {
       case 'checkout.session.completed':
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = event.data.object as any;
         await this.handleSubscriptionCreated(session);
         break;
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as any;
         await this.handleSubscriptionUpdated(subscription);
         break;
       default:
@@ -95,11 +95,11 @@ export class StripeService {
     return { received: true };
   }
 
-  private async handleSubscriptionCreated(session: Stripe.Checkout.Session) {
+  private async handleSubscriptionCreated(session: any) {
     const tenantId = session.metadata.tenantId;
     const subscriptionId = session.subscription as string;
 
-    const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
+    const subscription = await this.stripe.subscriptions.retrieve(subscriptionId) as any;
 
     await this.prisma.tenant.update({
       where: { id: tenantId },
@@ -111,7 +111,7 @@ export class StripeService {
     });
   }
 
-  private async handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  private async handleSubscriptionUpdated(subscription: any) {
     const tenant = await this.prisma.tenant.findFirst({
       where: { stripeSubscriptionId: subscription.id },
     });
