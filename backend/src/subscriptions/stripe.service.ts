@@ -23,7 +23,15 @@ export class StripeService {
   async createCheckoutSession(tenantId: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: { id: tenantId },
-      include: { users: true },
+      select: {
+        id: true,
+        name: true,
+        stripeCustomerId: true,
+        users: {
+          take: 1,
+          select: { email: true }
+        }
+      }
     });
 
     if (!tenant) throw new Error('Tenant not found');

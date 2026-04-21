@@ -31,7 +31,7 @@ export class RecurringPaymentService {
                         lte: threeDaysAhead,
                     },
                 },
-                include: { client: true, tenant: { include: { users: true } } },
+                include: { client: true, tenant: { select: { users: { take: 1, select: { id: true, role: true } } } } },
             });
 
             // Send notifications for upcoming payments
@@ -70,7 +70,7 @@ export class RecurringPaymentService {
                         lt: today,
                     },
                 },
-                include: { client: true, tenant: { include: { users: true } } },
+                include: { client: true, tenant: { select: { users: { take: 1, select: { id: true, role: true } } } } },
             });
 
             // Send notifications for overdue payments (only once per day)
