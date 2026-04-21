@@ -654,15 +654,45 @@ export default function AgendaPage() {
     const getEventColor = (type: string) => {
         switch (type) {
             case 'hearing':
-                return { dot: 'bg-blue-500', badge: 'bg-blue-500/10 text-blue-500 border-l-2 border-blue-500', label: 'Audiência' };
+                return { 
+                    dot: 'bg-blue-500', 
+                    pill: 'bg-blue-500 text-white', 
+                    pillLight: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+                    badge: 'bg-blue-500/10 text-blue-500 border-l-2 border-blue-500', 
+                    label: 'Audiência' 
+                };
             case 'deadline':
-                return { dot: 'bg-red-500', badge: 'bg-red-500/10 text-red-500 border-l-2 border-red-500', label: 'Prazo Fatal' };
+                return { 
+                    dot: 'bg-red-500', 
+                    pill: 'bg-red-500 text-white', 
+                    pillLight: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
+                    badge: 'bg-red-500/10 text-red-500 border-l-2 border-red-500', 
+                    label: 'Prazo Fatal' 
+                };
             case 'meeting':
-                return { dot: 'bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-500 border-l-2 border-emerald-500', label: 'Reunião' };
+                return { 
+                    dot: 'bg-emerald-500', 
+                    pill: 'bg-emerald-500 text-white', 
+                    pillLight: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+                    badge: 'bg-emerald-500/10 text-emerald-500 border-l-2 border-emerald-500', 
+                    label: 'Reunião' 
+                };
             case 'personal':
-                return { dot: 'bg-purple-500', badge: 'bg-purple-500/10 text-purple-500 border-l-2 border-purple-500', label: 'Pessoal' };
+                return { 
+                    dot: 'bg-purple-500', 
+                    pill: 'bg-purple-500 text-white', 
+                    pillLight: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+                    badge: 'bg-purple-500/10 text-purple-500 border-l-2 border-purple-500', 
+                    label: 'Pessoal' 
+                };
             default:
-                return { dot: 'bg-gray-500', badge: 'bg-gray-500/10 text-gray-500 border-l-2 border-gray-500', label: 'Evento' };
+                return { 
+                    dot: 'bg-slate-500', 
+                    pill: 'bg-slate-500 text-white', 
+                    pillLight: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/30 dark:text-slate-300 dark:border-slate-800',
+                    badge: 'bg-slate-500/10 text-slate-500 border-l-2 border-slate-500', 
+                    label: 'Evento' 
+                };
         }
     };
 
@@ -732,14 +762,17 @@ export default function AgendaPage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 bg-app-bg p-1 rounded-lg border border-app-stroke">
+                    <div className="flex items-center gap-1 bg-app-bg p-1 rounded-lg border border-app-stroke shadow-sm">
                         {(['day', 'week', 'month', 'list'] as const).map(v => (
                             <button
                                 key={v}
                                 onClick={() => setView(v)}
-                                className={clsx("px-2.5 py-1 rounded text-[11px] font-medium transition-colors flex items-center gap-1", view === v ? "bg-primary text-white" : "text-app-text-muted hover:text-app-text-main")}
+                                className={clsx(
+                                    "px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 flex items-center gap-1.5", 
+                                    view === v ? "bg-primary text-white shadow-sm" : "text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/20"
+                                )}
                             >
-                                {v === 'list' && <List size={12} />}
+                                {v === 'list' && <List size={13} />}
                                 {v === 'day' ? 'Dia' : v === 'week' ? 'Semana' : v === 'month' ? 'Mês' : 'Pauta'}
                             </button>
                         ))}
@@ -882,19 +915,25 @@ export default function AgendaPage() {
                             className="w-full"
                         >
                             {view === 'month' && (
-                                <>
-                                    <div className="grid grid-cols-7 mb-2">
+                                <div className="border border-app-stroke rounded-xl bg-app-bg overflow-hidden flex flex-col h-full">
+                                    <div className="grid grid-cols-7 bg-app-card border-b border-app-stroke">
                                         {DAYS_SHORT.map(day => (
-                                            <div key={day} className="text-center text-[11px] font-bold text-app-text-muted uppercase tracking-widest py-1">
+                                            <div key={day} className="text-center text-[10px] font-bold text-app-text-muted uppercase tracking-widest py-3 border-r border-app-stroke last:border-r-0">
                                                 {day}
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="grid grid-cols-7 gap-y-1 sm:gap-y-2">
+                                    <div className="grid grid-cols-7 flex-1 auto-rows-fr">
                                         {calendarDays.map((day, idx) => {
                                             const dayEvents = day ? (eventsByDay.get(day) || []) : [];
                                             const isToday = day === new Date().getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear();
                                             const isSelected = day === selectedDate;
+                                            
+                                            // Sort events for the cell: uncompleted first, then by priority/time
+                                            const sortedDayEvents = [...dayEvents].sort((a, b) => {
+                                                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                                                return 0;
+                                            });
 
                                             return (
                                                 <div
@@ -906,64 +945,51 @@ export default function AgendaPage() {
                                                         }
                                                     }}
                                                     className={clsx(
-                                                        "relative aspect-[1/1.2] flex flex-col items-center justify-start pt-1 cursor-pointer transition-all group",
-                                                        !day && "opacity-0 pointer-events-none"
+                                                        "relative min-h-[100px] sm:min-h-[120px] p-1 border-r border-b border-app-stroke cursor-pointer transition-all hover:bg-app-stroke/5 group",
+                                                        (idx + 1) % 7 === 0 && "border-r-0",
+                                                        !day && "bg-app-stroke/5 pointer-events-none"
                                                     )}
                                                 >
                                                     {day && (
-                                                        <div className="relative w-full flex flex-col items-center">
-                                                            <AnimatePresence>
-                                                                {(isToday || isSelected) && (
-                                                                    <motion.div
-                                                                        layoutId="dayHighlight"
-                                                                        initial={{ opacity: 0, scale: 0.9 }}
-                                                                        animate={{ opacity: 1, scale: 1 }}
-                                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                        <>
+                                                            <div className="flex justify-end mb-1">
+                                                                <span className={clsx(
+                                                                    "w-6 h-6 flex items-center justify-center text-xs font-bold rounded-full transition-all",
+                                                                    isToday ? "bg-primary text-white shadow-sm ring-4 ring-primary/10" : 
+                                                                    isSelected ? "bg-slate-200 dark:bg-slate-700 text-app-text-main" : 
+                                                                    "text-app-text-muted group-hover:text-app-text-main"
+                                                                )}>
+                                                                    {day}
+                                                                </span>
+                                                            </div>
+
+                                                            <div className="space-y-1 overflow-hidden">
+                                                                {sortedDayEvents.slice(0, 4).map((event) => (
+                                                                    <div 
+                                                                        key={event.id}
                                                                         className={clsx(
-                                                                            "absolute inset-0 -top-1 w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-[14px] sm:rounded-[18px] z-0 shadow-lg",
-                                                                            isToday ? "bg-[#FF2D55] shadow-[#FF2D55]/30" : "bg-[#FFB380] shadow-[#FFB380]/20"
+                                                                            "text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded border truncate transition-all",
+                                                                            event.completed ? "opacity-40 grayscale italic line-through bg-slate-100 border-slate-200 text-slate-500" : 
+                                                                            getEventColor(event.type).pillLight
                                                                         )}
-                                                                    />
+                                                                    >
+                                                                        {event.time && <span className="font-bold mr-1">{event.time}</span>}
+                                                                        {event.title}
+                                                                    </div>
+                                                                ))}
+                                                                {dayEvents.length > 4 && (
+                                                                    <div className="text-[8px] font-bold text-app-text-muted text-center py-0.5 bg-app-stroke/20 rounded">
+                                                                        + {dayEvents.length - 4} mais
+                                                                    </div>
                                                                 )}
-                                                            </AnimatePresence>
-
-                                                            {!isToday && !isSelected && (
-                                                                <div className="absolute inset-0 -top-1 w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-[14px] sm:rounded-[18px] bg-app-stroke/20 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-                                                            )}
-
-                                                            <span className={clsx(
-                                                                "relative text-sm sm:text-lg font-bold z-10 transition-colors duration-200 mb-0.5",
-                                                                isToday ? "text-white" : isSelected ? "text-slate-900" : "text-app-text-main group-hover:text-primary"
-                                                            )}>
-                                                                {day}
-                                                            </span>
-
-                                                            {isToday && (
-                                                                <div className="relative z-10 w-1.5 h-1.5 rounded-full border border-white mb-1" />
-                                                            )}
-
-                                                            {!isToday && dayEvents.length > 0 && (
-                                                                <div className="relative z-10 flex gap-0.5 mt-0.5">
-                                                                    {dayEvents.slice(0, 3).map((event) => {
-                                                                        const dotColor = event.completed ? 'bg-app-text-muted'
-                                                                            : event.color === 'red' || event.type === 'deadline' ? 'bg-red-500'
-                                                                            : event.color === 'blue' || event.type === 'hearing' ? 'bg-blue-500'
-                                                                            : event.color === 'green' || event.type === 'meeting' ? 'bg-emerald-500'
-                                                                            : event.color === 'amber' ? 'bg-amber-500'
-                                                                            : event.color === 'purple' || event.type === 'personal' ? 'bg-purple-500'
-                                                                            : 'bg-gray-400';
-                                                                        return <div key={event.id} className={clsx("w-1 h-1 rounded-full", dotColor)} />;
-                                                                    })}
-                                                                    {dayEvents.length > 3 && <div className="w-1 h-1 rounded-full bg-app-text-muted opacity-50" />}
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                            </div>
+                                                        </>
                                                     )}
                                                 </div>
                                             );
                                         })}
                                     </div>
-                                </>
+                                </div>
                             )}
 
                             {view === 'week' && (
@@ -989,8 +1015,8 @@ export default function AgendaPage() {
                                                             isToday ? "border-b-primary bg-primary/5" : isSelected ? "border-b-app-text-muted bg-app-stroke/10" : "border-b-transparent hover:bg-app-stroke/5"
                                                         )}
                                                     >
-                                                        <p className={clsx("text-[10px] uppercase font-bold", isToday ? "text-primary" : "text-app-text-muted")}>{DAYS_SHORT[idx]}</p>
-                                                        <p className={clsx("text-2xl font-light", isToday ? "text-primary" : "text-app-text-main")}>{date.getDate()}</p>
+                                                        <p className={clsx("text-[10px] uppercase font-bold tracking-wider mb-0.5", isToday ? "text-primary" : "text-app-text-muted")}>{DAYS_SHORT[idx]}</p>
+                                                        <p className={clsx("text-xl font-bold", isToday ? "text-primary" : "text-app-text-main")}>{date.getDate()}</p>
                                                     </div>
                                                 );
                                             })}
