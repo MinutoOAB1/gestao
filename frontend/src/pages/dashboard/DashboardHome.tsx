@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Plus, Users, Calendar, Calculator, AlertTriangle, Gavel, FileText, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { Plus, Users, Calendar, Calculator, AlertTriangle, Gavel, FileText, Eye, EyeOff, ChevronRight, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DashboardSkeleton } from '../../components/ui/Skeleton';
 import { useNavigate } from 'react-router-dom';
@@ -253,6 +253,7 @@ export default function DashboardHome() {
             setLoading(false);
         }
     }, [navigate]);
+
     useEffect(() => {
         fetchDashboardData();
         

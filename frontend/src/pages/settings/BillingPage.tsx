@@ -6,7 +6,7 @@ import { useToast } from '../../context/ToastContext';
 
 export default function BillingPage() {
     const { user } = useAuth();
-    const { showToast } = useToast();
+    const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
 
     const handleCheckout = async () => {
@@ -16,7 +16,7 @@ export default function BillingPage() {
             window.location.href = url;
         } catch (error) {
             console.error('Error starting checkout:', error);
-            showToast('Erro ao iniciar checkout. Tente novamente.', 'error');
+            addToast('Erro ao iniciar checkout. Tente novamente.', 'error');
         } finally {
             setLoading(false);
         }
