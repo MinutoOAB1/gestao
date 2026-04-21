@@ -1,5 +1,6 @@
+import { Controller, Post, Body, Get, Request, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { SettingsService } from './settings.service';
 import { AuthGuard } from '@nestjs/passport';
-import { UnauthorizedException } from '@nestjs/common';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('settings')

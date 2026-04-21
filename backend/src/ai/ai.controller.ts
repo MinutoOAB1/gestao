@@ -97,6 +97,5 @@ export class AiController {
             throw new BadRequestException(`Erro na análise de IA: ${error.message}`);
         }
     }
-    }
 }
 
