@@ -27,14 +27,21 @@ export class ProcessesService {
       };
 
       const deadline = parseDate(createProcessDto.deadline);
-      const { deadline: _, ...restDto } = createProcessDto;
+      const { deadline: _, number: incomingNumber, ...restDto } = createProcessDto;
+      
+      const processData: any = {
+        ...restDto,
+        deadline,
+        tenantId,
+        status: createProcessDto.status || 'ACTIVE',
+      };
+      
+      if (incomingNumber !== undefined) {
+          processData.number = incomingNumber;
+      }
+
       const process = await this.prisma.process.create({
-        data: {
-          ...restDto,
-          deadline,
-          tenantId,
-          status: createProcessDto.status || 'ACTIVE',
-        },
+        data: processData,
       });
 
       // Emit event for AI analysis and ecosystem harmony
