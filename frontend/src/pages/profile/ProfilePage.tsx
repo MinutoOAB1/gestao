@@ -127,7 +127,7 @@ export default function ProfilePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-app-bg flex items-center justify-center">
+            <div className="min-h-screen bg-app-input flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4 animate-in fade-in duration-300">
                     <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-lg" />
                     <p className="text-app-text-muted font-bold tracking-wide">Carregando perfil...</p>
@@ -137,18 +137,18 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-app-bg">
+        <div className="min-h-screen bg-app-input">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 pb-32">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-app-text-muted hover:text-app-text mb-6 transition-colors"
+                    className="flex items-center gap-2 text-app-text-muted hover:text-app-text-main mb-6 transition-colors"
                 >
                     <ArrowLeft size={18} />
                     <span className="text-sm font-medium">Voltar</span>
                 </button>
 
                 <div className="mb-6">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-app-text">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-app-text-main">
                         Perfil do {getRoleLabel(user?.role || 'LAWYER')}
                     </h1>
                     <p className="text-app-text-muted mt-1 text-sm sm:text-base">
@@ -157,7 +157,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Profile Header Card with Cover */}
-                <div className="bg-app-card rounded-2xl shadow-sm border border-app-border mb-8 overflow-hidden">
+                <div className="bg-app-card rounded-2xl shadow-sm border border-app-stroke mb-8 overflow-hidden">
                     <div className="h-32 sm:h-48 bg-gradient-to-r from-primary/90 to-blue-600/90 relative">
                         {/* Decorative pattern */}
                         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="flex flex-col items-center sm:items-start flex-1 text-center sm:text-left mt-4 sm:mt-0 sm:pb-2">
-                                <h2 className="text-2xl sm:text-3xl font-black text-app-text tracking-tight">{formData.name || 'Seu Nome'}</h2>
+                                <h2 className="text-2xl sm:text-3xl font-black text-app-text-main tracking-tight">{formData.name || 'Seu Nome'}</h2>
                                 <p className="text-app-text-muted font-medium mt-1 text-sm sm:text-base">{getRoleLabel(user?.role || 'LAWYER')}</p>
                                 <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mt-4">
                                     {formData.oabNumber && (
@@ -216,14 +216,14 @@ export default function ProfilePage() {
 
                 {/* Premium Tabs */}
                 <div className="mb-8 overflow-x-auto scrollbar-hide">
-                    <div className="flex gap-2 min-w-max p-1 bg-app-card/50 backdrop-blur-sm rounded-xl border border-app-border inline-flex shadow-sm">
+                    <div className="flex gap-2 min-w-max p-1 bg-app-card/50 backdrop-blur-sm rounded-xl border border-app-stroke inline-flex shadow-sm">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`relative px-5 py-2.5 text-sm font-bold rounded-lg whitespace-nowrap transition-all duration-300 ${activeTab === tab.id
                                     ? 'text-primary bg-primary/10 shadow-sm'
-                                    : 'text-app-text-muted hover:text-app-text hover:bg-app-card'
+                                    : 'text-app-text-muted hover:text-app-text-main hover:bg-app-card'
                                     }`}
                             >
                                 {tab.label}
@@ -236,10 +236,10 @@ export default function ProfilePage() {
                 <div className="max-w-4xl pb-24">
                     {/* Personal Info Card */}
                     {activeTab === 'personal' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-border animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-border/60 mb-6">
+                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
                                 <div>
-                                    <h3 className="text-xl font-bold text-app-text">Informações Pessoais</h3>
+                                    <h3 className="text-xl font-bold text-app-text-main">Informações Pessoais</h3>
                                     <p className="text-sm text-app-text-muted mt-1">Atualize seus dados básicos e biografia.</p>
                                 </div>
                                 <div className="p-3 bg-primary/5 rounded-xl border border-primary/10">
@@ -248,43 +248,43 @@ export default function ProfilePage() {
                             </div>
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-app-text mb-2">Nome Completo</label>
+                                    <label className="block text-sm font-bold text-app-text-main mb-2">Nome Completo</label>
                                     <input
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                        className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">CPF</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">CPF</label>
                                         <input
                                             type="text"
                                             value={formData.cpf}
                                             onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
                                             placeholder="000.000.000-00"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Data de Nascimento</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Data de Nascimento</label>
                                         <input
                                             type="date"
                                             value={formData.birthDate}
                                             onChange={(e) => setFormData(prev => ({ ...prev, birthDate: e.target.value }))}
-                                            className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-app-text mb-2">Bio Profissional</label>
+                                    <label className="block text-sm font-bold text-app-text-main mb-2">Bio Profissional</label>
                                     <textarea
                                         value={formData.bio}
                                         onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                                         placeholder="Descreva sua experiência, currículo e especialidades..."
                                         rows={4}
-                                        className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm resize-y"
+                                        className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm resize-y"
                                     />
                                 </div>
                             </div>
@@ -293,10 +293,10 @@ export default function ProfilePage() {
 
                     {/* Contact Card */}
                     {activeTab === 'contact' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-border animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-border/60 mb-6">
+                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
                                 <div>
-                                    <h3 className="text-xl font-bold text-app-text">Contato & Endereço</h3>
+                                    <h3 className="text-xl font-bold text-app-text-main">Contato & Endereço</h3>
                                     <p className="text-sm text-app-text-muted mt-1">Onde clientes e equipe podem te encontrar.</p>
                                 </div>
                                 <div className="p-3 bg-primary/5 rounded-xl border border-primary/10">
@@ -305,21 +305,21 @@ export default function ProfilePage() {
                             </div>
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-app-text mb-2">Email Oficial</label>
+                                    <label className="block text-sm font-bold text-app-text-main mb-2">Email Oficial</label>
                                     <div className="relative">
                                         <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
                                         <input
                                             type="email"
                                             value={formData.email}
                                             disabled
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-bg/50 border border-app-border/50 text-app-text-muted text-sm font-medium cursor-not-allowed"
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input/50 border border-app-stroke/50 text-app-text-muted text-sm font-medium cursor-not-allowed"
                                         />
                                     </div>
                                     <p className="text-xs text-app-text-muted mt-2 ml-1">Para alterar o e-mail oficial procure o administrador.</p>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Telefone Comercial</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Telefone Comercial</label>
                                         <div className="relative">
                                             <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
                                             <input
@@ -327,12 +327,12 @@ export default function ProfilePage() {
                                                 value={formData.phone}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                                                 placeholder="(00) 0000-0000"
-                                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                             />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Celular / WhatsApp</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Celular / WhatsApp</label>
                                         <div className="relative">
                                             <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
                                             <input
@@ -340,13 +340,13 @@ export default function ProfilePage() {
                                                 value={formData.mobile}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
                                                 placeholder="(00) 00000-0000"
-                                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                             />
                                         </div>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-app-text mb-2">Endereço de Atendimento</label>
+                                    <label className="block text-sm font-bold text-app-text-main mb-2">Endereço de Atendimento</label>
                                     <div className="relative">
                                         <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
                                         <input
@@ -354,7 +354,7 @@ export default function ProfilePage() {
                                             value={formData.address}
                                             onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                                             placeholder="Rua, número, bairro, cidade - UF"
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                            className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -364,10 +364,10 @@ export default function ProfilePage() {
 
                     {/* Professional Card */}
                     {activeTab === 'professional' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-border animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-border/60 mb-6">
+                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
                                 <div>
-                                    <h3 className="text-xl font-bold text-app-text">Dados Profissionais</h3>
+                                    <h3 className="text-xl font-bold text-app-text-main">Dados Profissionais</h3>
                                     <p className="text-sm text-app-text-muted mt-1">Suas credenciais na OAB e áreas de expertise.</p>
                                 </div>
                                 <div className="p-3 bg-primary/5 rounded-xl border border-primary/10">
@@ -377,21 +377,21 @@ export default function ProfilePage() {
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Número da OAB</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Número da OAB</label>
                                         <input
                                             type="text"
                                             value={formData.oabNumber}
                                             onChange={(e) => setFormData(prev => ({ ...prev, oabNumber: e.target.value }))}
                                             placeholder="Ex: 123456"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm font-mono"
+                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Seccional (UF)</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Seccional (UF)</label>
                                         <select
                                             value={formData.oabState}
                                             onChange={(e) => setFormData(prev => ({ ...prev, oabState: e.target.value }))}
-                                            className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm cursor-pointer"
+                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm cursor-pointer"
                                         >
                                             {['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'].map(uf => (
                                                 <option key={uf} value={uf}>{uf}</option>
@@ -400,7 +400,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-app-text mb-3">Áreas de Atuação</label>
+                                    <label className="block text-sm font-bold text-app-text-main mb-3">Áreas de Atuação</label>
                                     <div className="flex flex-wrap gap-2.5">
                                         {formData.specialties.map((spec, i) => (
                                             <span key={i} className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary px-3.5 py-1.5 rounded-full text-sm font-bold shadow-sm">
@@ -413,7 +413,7 @@ export default function ProfilePage() {
                                                 </button>
                                             </span>
                                         ))}
-                                        <button className="inline-flex items-center gap-1.5 border-2 border-dashed border-app-border bg-app-bg text-app-text-muted px-4 py-1.5 rounded-full text-sm font-bold hover:border-primary hover:text-primary transition-colors shadow-sm">
+                                        <button className="inline-flex items-center gap-1.5 border-2 border-dashed border-app-stroke bg-app-input text-app-text-muted px-4 py-1.5 rounded-full text-sm font-bold hover:border-primary hover:text-primary transition-colors shadow-sm">
                                             + Adicionar Área
                                         </button>
                                     </div>
@@ -424,10 +424,10 @@ export default function ProfilePage() {
 
                     {/* Security Card */}
                     {activeTab === 'security' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-border animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-border/60 mb-6">
+                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
                                 <div>
-                                    <h3 className="text-xl font-bold text-app-text">Segurança da Conta</h3>
+                                    <h3 className="text-xl font-bold text-app-text-main">Segurança da Conta</h3>
                                     <p className="text-sm text-app-text-muted mt-1">Gerencie sua senha de acesso.</p>
                                 </div>
                                 <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
@@ -436,28 +436,28 @@ export default function ProfilePage() {
                             </div>
                             <div className="space-y-6">
                                 <div className="max-w-md">
-                                    <label className="block text-sm font-bold text-app-text mb-2">Senha Atual</label>
+                                    <label className="block text-sm font-bold text-app-text-main mb-2">Senha Atual</label>
                                     <input
                                         type="password"
                                         placeholder="••••••••••••"
-                                        className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm font-mono tracking-widest"
+                                        className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono tracking-widest"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Nova Senha</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Nova Senha</label>
                                         <input
                                             type="password"
                                             placeholder="Mínimo 8 caracteres"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-bold text-app-text mb-2">Confirmar Nova Senha</label>
+                                        <label className="block text-sm font-bold text-app-text-main mb-2">Confirmar Nova Senha</label>
                                         <input
                                             type="password"
                                             placeholder="Repetir nova senha"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-bg border border-app-border focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -468,7 +468,7 @@ export default function ProfilePage() {
                 
                 {/* Floating Bottom Bar (Glassmorphism) */}
                 <div className={cn(
-                    "fixed bottom-0 left-0 right-0 bg-app-card/80 backdrop-blur-md border-t border-app-border p-4 sm:p-5 flex items-center justify-between z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transition-all duration-300",
+                    "fixed bottom-0 left-0 right-0 bg-app-card/80 backdrop-blur-md border-t border-app-stroke p-4 sm:p-5 flex items-center justify-between z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transition-all duration-300",
                     collapsed ? "lg:left-20" : "lg:left-72"
                 )}>
                     {message ? (
@@ -487,7 +487,7 @@ export default function ProfilePage() {
                     <div className="flex gap-3 ml-auto">
                         <button
                             onClick={() => navigate(-1)}
-                            className="px-6 py-2.5 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text hover:bg-app-bg transition-colors"
+                            className="px-6 py-2.5 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
                         >
                             Cancelar
                         </button>

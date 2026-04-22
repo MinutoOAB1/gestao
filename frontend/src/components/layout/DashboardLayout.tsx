@@ -394,7 +394,6 @@ export default function DashboardLayout() {
                     <SidebarItem icon={Users} label="Usuários" path="/app/usuarios" collapsed={collapsed} />
                     <SidebarItem icon={User} label="Meu Perfil" path="/app/perfil" collapsed={collapsed} />
                     <SidebarItem icon={Settings} label="Ajustes" path="/app/configuracoes" collapsed={collapsed} />
-                    <SidebarItem icon={Shield} label="Faturamento" path="/app/faturamento" collapsed={collapsed} />
                 </div>
 
                 {/* IA Jurídica Card - only show when not collapsed */}

@@ -107,7 +107,6 @@ function App() {
                             <Route path="timesheet" element={<TimesheetPage />} />
                             <Route path="perfil" element={<ProfilePage />} />
                             <Route path="configuracoes" element={<SettingsPage />} />
-                            <Route path="faturamento" element={<BillingPage />} />
                           </Route>
 
                           <Route path="*" element={<Navigate to="/app" replace />} />

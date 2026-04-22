@@ -7,6 +7,7 @@ import TwoFactorModal from '../../components/settings/TwoFactorModal';
 import TeamPermissionsModal from '../../components/settings/TeamPermissionsModal';
 import Modal from '../../components/ui/Modal';
 import { useToast } from '../../context/ToastContext';
+import BillingPage from './BillingPage';
 
 // Settings storage key
 const SETTINGS_KEY = 'app_settings';
@@ -506,35 +507,7 @@ export default function SettingsPage() {
                                 </div>
                             </section>
 
-                            {/* Integrações */}
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
-                                    <LayoutGrid size={20} className="text-primary" /> Integrações Ativas
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    <IntegrationCard
-                                        icon={Globe}
-                                        name="Google Drive"
-                                        description="Sincronização automática de documentos e anexos de processos."
-                                        connected={true}
-                                        onConfigure={() => addToast('Configurar Google Drive - Em breve!', 'info')}
-                                    />
-                                    <IntegrationCard
-                                        icon={Smartphone}
-                                        name="Zoom"
-                                        description="Agendamento automático de videochamadas e links nas reuniões."
-                                        connected={true}
-                                        onConfigure={() => addToast('Configurar Zoom - Em breve!', 'info')}
-                                    />
-                                    <div className="border border-dashed border-app-stroke rounded-xl flex flex-col items-center justify-center p-6 hover:bg-app-stroke/20 transition-colors cursor-pointer group hover:border-primary/50">
-                                        <div className="w-10 h-10 rounded-full bg-app-card flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                                            <span className="text-app-text-main font-bold text-xl">+</span>
-                                        </div>
-                                        <h4 className="text-sm font-bold text-app-text-main">Adicionar Nova</h4>
-                                        <p className="text-xs text-app-text-muted">Explore mais apps</p>
-                                    </div>
-                                </div>
-                            </section>
+
 
                             {/* Backup de Dados */}
                             <section className="pb-8">
@@ -776,129 +749,7 @@ export default function SettingsPage() {
                     {/* BILLING TAB */}
                     {activeTab === 'billing' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            {/* Faturamento */}
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
-                                    <LayoutGrid size={20} className="text-primary" /> Seu Faturamento
-                                </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    
-                                    {/* Current Plan */}
-                                    <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-6 relative overflow-hidden">
-                                        <div className="absolute -top-4 -right-4 p-4 opacity-10 rotate-12">
-                                            <LayoutGrid size={120} />
-                                        </div>
-                                        <div className="relative z-10">
-                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary mb-4 border border-primary/30">
-                                                Plano Ativo
-                                            </span>
-                                            <h3 className="text-2xl font-black text-app-text-main mb-1">PRO ANUAL</h3>
-                                            <p className="text-sm text-app-text-muted mb-4">Acesso ilimitado à plataforma completa de gestão jurídica.</p>
-                                            
-                                            <div className="flex items-end gap-2 mb-6">
-                                                <span className="text-4xl font-black text-app-text-main">R$ 149</span>
-                                                <span className="text-sm font-medium text-app-text-muted mb-1.5">/mês*</span>
-                                            </div>
-
-                                            <button className="w-full bg-primary text-white font-bold rounded-lg py-3 shadow-lg shadow-primary/20 hover:bg-primary-dark transition-colors">
-                                                Gerenciar Assinatura
-                                            </button>
-                                            <p className="text-[10px] text-app-text-muted mt-3 text-center">*Faturado anualmente no valor de R$ 1.788,00</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Next Invoice & Payment */}
-                                    <div className="flex flex-col gap-4">
-                                        <div className="bg-app-bg border border-app-stroke rounded-xl p-5 flex items-center justify-between shadow-sm">
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                                    <p className="text-xs font-bold text-app-text-muted uppercase tracking-wider">Próxima Fatura</p>
-                                                </div>
-                                                <h4 className="text-xl font-black text-app-text-main">R$ 1.788,00</h4>
-                                                <p className="text-xs text-app-text-muted mt-0.5">Vence em 15/12/2026</p>
-                                            </div>
-                                            <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                                                <span className="text-emerald-500 font-bold text-sm">Ok</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-app-bg border border-app-stroke rounded-xl p-5 flex-1 flex flex-col justify-center shadow-sm">
-                                            <p className="text-xs font-bold text-app-text-muted uppercase tracking-wider mb-4">Forma de Pagamento Padrão</p>
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-14 h-9 bg-slate-800 rounded flex items-center justify-center text-white text-xs font-bold italic tracking-wider shadow-sm border border-slate-700">
-                                                    VISA
-                                                </div>
-                                                <div className="flex-1">
-                                                    <p className="text-sm font-bold text-app-text-main tracking-wider">• • • •  4242</p>
-                                                    <p className="text-xs text-app-text-muted font-medium mt-0.5">Expira em 10/28</p>
-                                                </div>
-                                                <button className="text-xs font-bold text-primary hover:text-primary-dark hover:underline transition-colors px-2 py-1 bg-primary/5 rounded">
-                                                    Editar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-base font-bold text-app-text-main">Histórico de Pagamentos</h2>
-                                    <button className="text-sm font-medium text-primary hover:underline">Ver todos</button>
-                                </div>
-                                <div className="bg-app-bg border border-app-stroke rounded-xl overflow-hidden shadow-sm">
-                                    <table className="w-full text-left text-sm">
-                                        <thead>
-                                            <tr className="border-b border-app-stroke bg-app-card/30">
-                                                <th className="font-semibold text-app-text-muted p-4 text-xs uppercase tracking-wider">Data</th>
-                                                <th className="font-semibold text-app-text-muted p-4 text-xs uppercase tracking-wider">Fatura</th>
-                                                <th className="font-semibold text-app-text-muted p-4 text-xs uppercase tracking-wider">Valor</th>
-                                                <th className="font-semibold text-app-text-muted p-4 text-xs uppercase tracking-wider">Status</th>
-                                                <th className="font-semibold text-app-text-muted p-4 text-right text-xs uppercase tracking-wider">Documento</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-app-stroke">
-                                            <tr className="hover:bg-app-card/30 transition-colors">
-                                                <td className="p-4 text-app-text-main font-medium">15 Dez 2025</td>
-                                                <td className="p-4 text-app-text-muted">Licença Anual - Pro</td>
-                                                <td className="p-4 text-app-text-main font-bold flex items-center gap-2">
-                                                    R$ 1.788,00
-                                                    <span className="w-14 h-5 inline-flex items-center justify-center bg-slate-800 rounded text-[10px] text-white italic tracking-wider">VISA</span>
-                                                </td>
-                                                <td className="p-4">
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Pago
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 text-right">
-                                                    <button className="text-primary hover:text-primary-dark font-medium px-3 py-1.5 bg-primary/5 rounded hover:bg-primary/10 transition-colors text-xs">
-                                                        Baixar NFe
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr className="hover:bg-app-card/30 transition-colors">
-                                                <td className="p-4 text-app-text-main font-medium">15 Dez 2024</td>
-                                                <td className="p-4 text-app-text-muted">Licença Anual - Pro</td>
-                                                <td className="p-4 text-app-text-main font-bold flex items-center gap-2">
-                                                    R$ 1.788,00
-                                                    <span className="w-14 h-5 inline-flex items-center justify-center bg-slate-800 rounded text-[10px] text-white italic tracking-wider">VISA</span>
-                                                </td>
-                                                <td className="p-4">
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Pago
-                                                    </span>
-                                                </td>
-                                                <td className="p-4 text-right">
-                                                    <button className="text-primary hover:text-primary-dark font-medium px-3 py-1.5 bg-primary/5 rounded hover:bg-primary/10 transition-colors text-xs">
-                                                        Baixar NFe
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
+                            <BillingPage />
                         </div>
                     )}
                 </div>
