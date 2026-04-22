@@ -151,12 +151,13 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-app-input">
-            <div className="px-6 sm:px-10 py-8 pb-32">
+        <div className="animate-in fade-in duration-500">
+            <div className="bg-app-card/40 dark:bg-app-input/20 backdrop-blur-md rounded-[2.5rem] border border-app-stroke/30 shadow-2xl overflow-hidden mb-12">
+                <div className="px-6 sm:px-10 py-10">
                 {/* Profile Header Banner */}
                 <div 
-                    className="rounded-2xl shadow-sm mb-8 overflow-hidden relative"
-                    style={{ backgroundColor: bannerColor, minHeight: '160px' }}
+                    className="rounded-[2rem] shadow-lg mb-10 overflow-hidden relative group/banner transition-all duration-500 hover:shadow-primary/10"
+                    style={{ backgroundColor: bannerColor, minHeight: '180px' }}
                 >
                     <div className="absolute top-4 right-4 z-20">
                         <label className="cursor-pointer bg-black/20 hover:bg-black/40 text-white px-3 py-2 rounded-lg backdrop-blur-sm transition-colors flex items-center gap-2">
@@ -195,9 +196,9 @@ export default function ProfilePage() {
                                 />
                             </div>
 
-                            <div className="flex flex-col text-left text-white drop-shadow-md flex-1">
-                                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{formData.name || 'Seu Nome'}</h2>
-                                <p className="font-medium mt-0.5 text-white/90 text-sm sm:text-base">{getRoleLabel(user?.role || 'LAWYER')}</p>
+                            <div className="flex flex-col text-left text-white drop-shadow-lg flex-1">
+                                <h2 className="text-3xl sm:text-4xl font-black tracking-tight">{formData.name || 'Seu Nome'}</h2>
+                                <p className="font-bold mt-1 text-white/90 text-sm sm:text-base bg-black/10 self-start px-3 py-1 rounded-full backdrop-blur-sm">{getRoleLabel(user?.role || 'LAWYER')}</p>
                             </div>
                         </div>
                     </div>
@@ -239,7 +240,7 @@ export default function ProfilePage() {
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                        className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -250,7 +251,7 @@ export default function ProfilePage() {
                                             value={formData.cpf}
                                             onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
                                             placeholder="000.000.000-00"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                     <div>
@@ -259,7 +260,7 @@ export default function ProfilePage() {
                                             type="date"
                                             value={formData.birthDate}
                                             onChange={(e) => setFormData(prev => ({ ...prev, birthDate: e.target.value }))}
-                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -270,7 +271,7 @@ export default function ProfilePage() {
                                         onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                                         placeholder="Descreva sua experiência, currículo e especialidades..."
                                         rows={4}
-                                        className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm resize-y"
+                                        className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm resize-y"
                                     />
                                 </div>
                             </div>
@@ -293,7 +294,7 @@ export default function ProfilePage() {
                                             type="email"
                                             value={formData.email}
                                             disabled
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input/50 border border-app-stroke/50 text-app-text-muted text-sm font-medium cursor-not-allowed"
+                                            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input/50 border border-app-stroke/50 text-app-text-muted text-sm font-medium cursor-not-allowed"
                                         />
                                     </div>
                                     <p className="text-xs text-app-text-muted mt-2 ml-1">Para alterar o e-mail oficial procure o administrador.</p>
@@ -308,7 +309,7 @@ export default function ProfilePage() {
                                                 value={formData.phone}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                                                 placeholder="(00) 0000-0000"
-                                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                                className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                             />
                                         </div>
                                     </div>
@@ -321,7 +322,7 @@ export default function ProfilePage() {
                                                 value={formData.mobile}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
                                                 placeholder="(00) 00000-0000"
-                                                className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                                className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                             />
                                         </div>
                                     </div>
@@ -335,7 +336,7 @@ export default function ProfilePage() {
                                             value={formData.address}
                                             onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                                             placeholder="Rua, número, bairro, cidade - UF"
-                                            className="w-full pl-12 pr-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -359,7 +360,7 @@ export default function ProfilePage() {
                                             value={formData.oabNumber}
                                             onChange={(e) => setFormData(prev => ({ ...prev, oabNumber: e.target.value }))}
                                             placeholder="Ex: 123456"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono"
+                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono"
                                         />
                                     </div>
                                     <div>
@@ -367,7 +368,7 @@ export default function ProfilePage() {
                                         <select
                                             value={formData.oabState}
                                             onChange={(e) => setFormData(prev => ({ ...prev, oabState: e.target.value }))}
-                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm cursor-pointer"
+                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm cursor-pointer"
                                         >
                                             {['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'].map(uf => (
                                                 <option key={uf} value={uf}>{uf}</option>
@@ -411,7 +412,7 @@ export default function ProfilePage() {
                                     <input
                                         type="password"
                                         placeholder="••••••••••••"
-                                        className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono tracking-widest"
+                                        className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono tracking-widest"
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -420,7 +421,7 @@ export default function ProfilePage() {
                                         <input
                                             type="password"
                                             placeholder="Mínimo 8 caracteres"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                     <div>
@@ -428,7 +429,7 @@ export default function ProfilePage() {
                                         <input
                                             type="password"
                                             placeholder="Repetir nova senha"
-                                            className="w-full px-4 py-3 rounded-xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -440,7 +441,7 @@ export default function ProfilePage() {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="px-8 py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center min-w-[160px]"
+                            className="px-8 py-3 rounded-2xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center min-w-[160px]"
                         >
                             {saving ? (
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
@@ -449,7 +450,7 @@ export default function ProfilePage() {
                         </button>
                         <button
                             onClick={() => navigate(-1)}
-                            className="px-8 py-3 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
+                            className="px-8 py-3 rounded-2xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
                         >
                             Cancelar
                         </button>
@@ -461,6 +462,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     );
 }
