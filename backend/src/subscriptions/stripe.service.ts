@@ -72,7 +72,7 @@ export class StripeService {
               currency: 'brl',
               product_data: {
                 name: 'Plano Adv Plus',
-                description: 'Acesso completo ao Blue Adv',
+                description: 'Acesso completo ao Blue Adv (7 dias de teste grátis)',
               },
               unit_amount: 4700, // R$ 47,00
               recurring: { interval: 'month' },
@@ -81,6 +81,9 @@ export class StripeService {
           },
         ],
         mode: 'subscription',
+        subscription_data: {
+          trial_period_days: 7,
+        },
         success_url: `${frontendUrl}/app?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${frontendUrl}/app/faturamento`,
         metadata: { tenantId },
@@ -103,7 +106,7 @@ export class StripeService {
     try {
       const session = await this.stripe.checkout.sessions.retrieve(sessionId);
       
-      if (session.payment_status === 'paid' && session.metadata?.tenantId === tenantId) {
+      if ((session.payment_status === 'paid' || session.payment_status === 'no_payment_required') && session.metadata?.tenantId === tenantId) {
         let plan = 'FREE';
         let status = 'active';
 
