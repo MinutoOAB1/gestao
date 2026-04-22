@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { NotificationsService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsGateway } from './notifications.gateway';
+import { NotificationsListener } from './notifications.listener';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Global()
@@ -14,7 +15,7 @@ import { PrismaModule } from '../prisma/prisma.module';
         }),
     ],
     controllers: [NotificationsController],
-    providers: [NotificationsService, NotificationsGateway],
+    providers: [NotificationsService, NotificationsGateway, NotificationsListener],
     exports: [NotificationsService, NotificationsGateway],
 })
 export class NotificationsModule { }

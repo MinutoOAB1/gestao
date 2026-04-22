@@ -4,7 +4,7 @@ import { UpdateFinancialDto } from './dto/update-financial.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditLogService, AuditAction } from '../audit/audit-log.service';
 import { PartnershipsService } from '../partnerships/partnerships.service';
-import { OnEvent } from '@nestjs/event-emitter';
+import { OnEvent, EventEmitter2 } from '@nestjs/event-emitter';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
@@ -13,7 +13,8 @@ export class FinancialService {
         private prisma: PrismaService,
         private auditLogService: AuditLogService,
         private partnershipsService: PartnershipsService,
-        private notificationsGateway: NotificationsGateway
+        private notificationsGateway: NotificationsGateway,
+        private eventEmitter: EventEmitter2
     ) { }
 
     // --- Aggregation Helpers ---
@@ -220,6 +221,15 @@ export class FinancialService {
                 createFinancialDto.partnerPercentage
             );
         }
+
+        this.eventEmitter.emit('financial.created', {
+            id: record.id,
+            type: record.type,
+            amount: record.amount,
+            description: record.description,
+            tenantId,
+            userId
+        });
 
         return record;
     }

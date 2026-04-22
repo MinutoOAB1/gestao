@@ -178,6 +178,14 @@ export class ProcessesService {
       }
     }
 
+      this.eventEmitter.emit('process.updated', {
+        processId: updated.id,
+        title: updated.title,
+        tenantId,
+        userId
+      });
+    }
+
     return updated;
   }
 
@@ -190,9 +198,18 @@ export class ProcessesService {
       await this.googleService.deleteEvent(userId, process.googleEventId);
     }
 
-    return this.prisma.process.delete({
+    const deleted = await this.prisma.process.delete({
       where: { id, tenantId },
     });
+
+    this.eventEmitter.emit('process.removed', {
+      processId: id,
+      title: process.title,
+      tenantId,
+      userId
+    });
+
+    return deleted;
   }
 
   // ─── Checklists ──────────────────────────────────────────

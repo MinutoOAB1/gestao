@@ -4,7 +4,7 @@ import { CreateAgendaDto } from './dto/create-agenda.dto';
 import { UpdateAgendaDto } from './dto/update-agenda.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { OnEvent } from '@nestjs/event-emitter';
+import { OnEvent, EventEmitter2 } from '@nestjs/event-emitter';
 
 import { AiService } from '../ai/ai.service';
 import { GoogleCalendarService } from '../google-calendar/google-calendar.service';
@@ -17,7 +17,8 @@ export class AgendaService {
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
     private aiService: AiService,
-    private googleCalendarService: GoogleCalendarService
+    private googleCalendarService: GoogleCalendarService,
+    private eventEmitter: EventEmitter2
   ) { }
 
   // Create event with optional assignees
@@ -111,6 +112,13 @@ export class AgendaService {
         });
       }
     }
+
+    this.eventEmitter.emit('agenda.created', {
+      eventId: event.id,
+      title: event.title,
+      tenantId,
+      userId
+    });
 
     return event;
   }
@@ -316,6 +324,12 @@ export class AgendaService {
         },
       });
     }
+    this.eventEmitter.emit('agenda.updated', {
+      eventId: updated.id,
+      title: updated.title,
+      tenantId
+    });
+
     return updated;
   }
 

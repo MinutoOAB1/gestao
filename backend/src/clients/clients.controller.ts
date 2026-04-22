@@ -24,10 +24,9 @@ export class ClientsController {
 
     @Post()
     create(@Request() req, @Body() createClientDto: CreateClientDto) {
-        console.log('Received POST /clients request');
         const tenantId = req.user?.tenantId;
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-        return this.clientsService.create(createClientDto, tenantId);
+        return this.clientsService.create(createClientDto, tenantId, req.user.sub);
     }
 
     @Get()
@@ -42,6 +41,21 @@ export class ClientsController {
         const tenantId = req.user?.tenantId;
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.clientsService.findOne(id, tenantId);
+    }
+
+    @Patch(':id')
+    update(@Request() req, @Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.clientsService.update(id, updateClientDto, tenantId, req.user.sub);
+    }
+
+    @Delete(':id')
+    @Roles(Role.ADMIN, Role.LAWYER)
+    remove(@Request() req, @Param('id') id: string) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.clientsService.remove(id, tenantId, req.user.sub);
     }
 
     // Get client with all related data (processes with updates, financial records)
@@ -134,19 +148,10 @@ export class ClientsController {
         return report;
     }
 
-    @Patch(':id')
-    update(@Request() req, @Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
-        const tenantId = req.user?.tenantId;
-        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-        return this.clientsService.update(id, updateClientDto, tenantId);
+        return this.clientsService.update(id, updateClientDto, tenantId, req.user.sub);
     }
 
-    @Delete(':id')
-    @Roles(Role.ADMIN, Role.LAWYER)
-    remove(@Request() req, @Param('id') id: string) {
-        const tenantId = req.user?.tenantId;
-        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-        return this.clientsService.remove(id, tenantId);
+        return this.clientsService.remove(id, tenantId, req.user.sub);
     }
 
     // === Status ===

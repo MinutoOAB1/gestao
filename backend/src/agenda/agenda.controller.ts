@@ -14,7 +14,7 @@ export class AgendaController {
   create(@Request() req, @Body() createAgendaDto: CreateAgendaDto) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    const userId = req.user?.id || req.user?.sub;
+    const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('User ID not found in session');
     const userName = req.user?.name || 'Sistema';
     return this.agendaService.create(createAgendaDto, tenantId, userId, userName);
@@ -33,7 +33,7 @@ export class AgendaController {
   findMyEvents(@Request() req) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    const userId = req.user?.id || req.user?.sub;
+    const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('User ID not found in session');
     return this.agendaService.findByUser(tenantId, userId);
   }
@@ -51,7 +51,7 @@ export class AgendaController {
   getDeadlines(@Request() req) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    const userId = req.user?.id;
+    const userId = req.user?.sub;
     return this.agendaService.getUpcomingDeadlines(tenantId, userId);
   }
 
@@ -63,15 +63,13 @@ export class AgendaController {
     return this.agendaService.findOne(id, tenantId);
   }
 
-  // Update event
   @Patch(':id')
   update(@Request() req, @Param('id') id: string, @Body() updateAgendaDto: UpdateAgendaDto) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    return this.agendaService.update(id, updateAgendaDto, tenantId);
+    return this.agendaService.update(id, updateAgendaDto, tenantId, req.user.sub);
   }
 
-  // Toggle completed status
   @Patch(':id/complete')
   toggleComplete(@Request() req, @Param('id') id: string) {
     const tenantId = req.user?.tenantId;
@@ -79,7 +77,6 @@ export class AgendaController {
     return this.agendaService.toggleComplete(id, tenantId);
   }
 
-  // Update assignee status (accept/decline)
   @Patch(':id/assignee-status')
   updateAssigneeStatus(
     @Request() req,
@@ -88,17 +85,16 @@ export class AgendaController {
   ) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    const userId = req.user?.id || req.user?.sub;
+    const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('User ID not found in session');
     return this.agendaService.updateAssigneeStatus(id, userId, body.status, tenantId);
   }
 
-  // Delete event
   @Delete(':id')
   remove(@Request() req, @Param('id') id: string) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    return this.agendaService.remove(id, tenantId);
+    return this.agendaService.remove(id, tenantId, req.user.sub);
   }
 
   // Add checklist item

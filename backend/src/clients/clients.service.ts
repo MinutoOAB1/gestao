@@ -2,11 +2,14 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { OnEvent } from '@nestjs/event-emitter';
+import { OnEvent, EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ClientsService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private eventEmitter: EventEmitter2
+    ) { }
 
     async create(createClientDto: CreateClientDto, tenantId: string) {
         // Sanitize: convert empty strings to null for optional fields
@@ -58,6 +61,14 @@ export class ClientsService {
         try {
             const client = await this.prisma.client.create({ data, include: { tags: true } });
             await this.logActivity(client.id, tenantId, 'CLIENT_CREATED', `Cliente ${client.name} cadastrado na plataforma.`);
+            
+            this.eventEmitter.emit('client.created', {
+                clientId: client.id,
+                name: client.name,
+                tenantId,
+                createdById: data.createdById // Need to ensure this is passed if available
+            });
+
             return client;
         } catch (error: any) {
             console.error('ERROR SAVING CLIENT:', error);
@@ -134,11 +145,19 @@ export class ClientsService {
             data.nextActionDate = parseDate(data.nextActionDate);
         }
 
-        return this.prisma.client.update({
+        const updated = await this.prisma.client.update({
             where: { id },
             data,
             include: { tags: { orderBy: { order: 'asc' } } },
         });
+
+        this.eventEmitter.emit('client.updated', {
+            clientId: updated.id,
+            name: updated.name,
+            tenantId
+        });
+
+        return updated;
     }
 
     async remove(id: string, tenantId: string) {
