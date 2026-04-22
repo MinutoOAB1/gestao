@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-import { User, Camera, Mail, Phone, MapPin, Shield, Save, X, BadgeCheck, Briefcase, ArrowLeft } from 'lucide-react';
+import { User, Camera, Mail, Phone, MapPin, Shield, Save, X, BadgeCheck, Briefcase, ArrowLeft, Palette } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -35,6 +35,20 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [activeTab, setActiveTab] = useState('personal');
+    const [bannerColor, setBannerColor] = useState('#0070FF');
+
+    useEffect(() => {
+        if (user?.id) {
+            const savedColor = localStorage.getItem(`profile_banner_color_${user.id}`);
+            if (savedColor) setBannerColor(savedColor);
+        }
+    }, [user?.id]);
+
+    useEffect(() => {
+        if (user?.id) {
+            localStorage.setItem(`profile_banner_color_${user.id}`, bannerColor);
+        }
+    }, [bannerColor, user?.id]);
 
     // Fetch profile data on mount
     useEffect(() => {
@@ -139,50 +153,39 @@ export default function ProfilePage() {
     return (
         <div className="min-h-screen bg-app-input">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 pb-32">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-app-text-muted hover:text-app-text-main mb-6 transition-colors"
+                {/* Profile Header Banner */}
+                <div 
+                    className="rounded-2xl shadow-sm mb-8 overflow-hidden relative"
+                    style={{ backgroundColor: bannerColor, minHeight: '160px' }}
                 >
-                    <ArrowLeft size={18} />
-                    <span className="text-sm font-medium">Voltar</span>
-                </button>
-
-                <div className="mb-6">
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-app-text-main">
-                        Perfil do {getRoleLabel(user?.role || 'LAWYER')}
-                    </h1>
-                    <p className="text-app-text-muted mt-1 text-sm sm:text-base">
-                        Gerencie suas informações pessoais, credenciais jurídicas e configurações de segurança.
-                    </p>
-                </div>
-
-                {/* Profile Header Card with Cover */}
-                <div className="bg-app-card rounded-2xl shadow-sm border border-app-stroke mb-8 overflow-hidden">
-                    <div className="h-32 sm:h-48 bg-gradient-to-r from-primary/90 to-blue-600/90 relative">
-                        {/* Decorative pattern */}
-                        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
+                    <div className="absolute top-4 right-4 z-20">
+                        <label className="cursor-pointer bg-black/20 hover:bg-black/40 text-white px-3 py-2 rounded-lg backdrop-blur-sm transition-colors flex items-center gap-2">
+                            <Palette size={16} />
+                            <span className="text-xs font-medium">Cor</span>
+                            <input 
+                                type="color" 
+                                value={bannerColor}
+                                onChange={(e) => setBannerColor(e.target.value)}
+                                className="opacity-0 w-0 h-0 absolute"
+                            />
+                        </label>
                     </div>
-                    <div className="px-4 sm:px-8 pb-6 sm:pb-8 relative">
-                        <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 sm:-mt-20 mb-4 sm:mb-0">
+                    
+                    <div className="absolute inset-0 flex items-center px-6 sm:px-10">
+                        <div className="flex items-center gap-6 z-10 w-full">
                             <div className="relative group cursor-pointer flex-shrink-0" onClick={handleAvatarClick}>
-                                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-app-card shadow-xl overflow-hidden bg-slate-200 dark:bg-slate-700 relative z-10">
+                                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white/20 shadow-xl overflow-hidden bg-slate-200 dark:bg-slate-700 relative z-10">
                                     {formData.avatar ? (
                                         <img src={formData.avatar} alt={formData.name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-4xl sm:text-5xl font-bold text-app-text-muted bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
+                                        <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-slate-400 bg-slate-100 dark:bg-slate-800">
                                             {formData.name?.charAt(0) || 'U'}
                                         </div>
                                     )}
                                 </div>
                                 <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20 m-1">
-                                    <Camera size={32} className="text-white drop-shadow-md" />
+                                    <Camera size={24} className="text-white drop-shadow-md" />
                                 </div>
-                                <button
-                                    className="absolute bottom-2 right-2 bg-primary text-white p-2.5 rounded-full shadow-lg hover:bg-blue-600 transition-transform hover:scale-110 z-30 ring-4 ring-app-card"
-                                    title="Editar foto"
-                                >
-                                    <Camera size={18} />
-                                </button>
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -192,39 +195,27 @@ export default function ProfilePage() {
                                 />
                             </div>
 
-                            <div className="flex flex-col items-center sm:items-start flex-1 text-center sm:text-left mt-4 sm:mt-0 sm:pb-2">
-                                <h2 className="text-2xl sm:text-3xl font-black text-app-text-main tracking-tight">{formData.name || 'Seu Nome'}</h2>
-                                <p className="text-app-text-muted font-medium mt-1 text-sm sm:text-base">{getRoleLabel(user?.role || 'LAWYER')}</p>
-                                <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mt-4">
-                                    {formData.oabNumber && (
-                                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-400/30 shadow-sm">
-                                            <BadgeCheck size={16} className="text-blue-600 dark:text-blue-400" /> OAB/{formData.oabState} {formData.oabNumber}
-                                        </span>
-                                    )}
-                                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30 shadow-sm">
-                                        <span className="relative flex h-2 w-2">
-                                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                        </span>
-                                        Disponível
-                                    </span>
-                                </div>
+                            <div className="flex flex-col text-left text-white drop-shadow-md flex-1">
+                                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{formData.name || 'Seu Nome'}</h2>
+                                <p className="font-medium mt-0.5 text-white/90 text-sm sm:text-base">{getRoleLabel(user?.role || 'LAWYER')}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Premium Tabs */}
-                <div className="mb-8 overflow-x-auto scrollbar-hide">
-                    <div className="flex gap-2 min-w-max p-1 bg-app-card/50 backdrop-blur-sm rounded-xl border border-app-stroke inline-flex shadow-sm">
+                {/* Minimalist Tabs */}
+                <div className="mb-8 border-b border-app-stroke/50">
+                    <div className="flex gap-6 overflow-x-auto scrollbar-hide px-2">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`relative px-5 py-2.5 text-sm font-bold rounded-lg whitespace-nowrap transition-all duration-300 ${activeTab === tab.id
-                                    ? 'text-primary bg-primary/10 shadow-sm'
-                                    : 'text-app-text-muted hover:text-app-text-main hover:bg-app-card'
-                                    }`}
+                                className={cn(
+                                    "px-1 py-4 text-sm font-bold whitespace-nowrap transition-all border-b-2 relative -bottom-px",
+                                    activeTab === tab.id
+                                        ? "text-primary border-primary"
+                                        : "text-app-text-muted border-transparent hover:text-app-text-main hover:border-app-stroke"
+                                )}
                             >
                                 {tab.label}
                             </button>
@@ -236,15 +227,10 @@ export default function ProfilePage() {
                 <div className="max-w-4xl pb-24">
                     {/* Personal Info Card */}
                     {activeTab === 'personal' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
-                                <div>
-                                    <h3 className="text-xl font-bold text-app-text-main">Informações Pessoais</h3>
-                                    <p className="text-sm text-app-text-muted mt-1">Atualize seus dados básicos e biografia.</p>
-                                </div>
-                                <div className="p-3 bg-primary/5 rounded-xl border border-primary/10">
-                                    <User size={24} className="text-primary" />
-                                </div>
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold text-app-text-main">Informações Pessoais</h3>
+                                <p className="text-sm text-app-text-muted mt-1">Atualize seus dados básicos e biografia.</p>
                             </div>
                             <div className="space-y-6">
                                 <div>
@@ -293,15 +279,10 @@ export default function ProfilePage() {
 
                     {/* Contact Card */}
                     {activeTab === 'contact' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
-                                <div>
-                                    <h3 className="text-xl font-bold text-app-text-main">Contato & Endereço</h3>
-                                    <p className="text-sm text-app-text-muted mt-1">Onde clientes e equipe podem te encontrar.</p>
-                                </div>
-                                <div className="p-3 bg-primary/5 rounded-xl border border-primary/10">
-                                    <Mail size={24} className="text-primary" />
-                                </div>
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold text-app-text-main">Contato & Endereço</h3>
+                                <p className="text-sm text-app-text-muted mt-1">Onde clientes e equipe podem te encontrar.</p>
                             </div>
                             <div className="space-y-6">
                                 <div>
@@ -364,15 +345,10 @@ export default function ProfilePage() {
 
                     {/* Professional Card */}
                     {activeTab === 'professional' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
-                                <div>
-                                    <h3 className="text-xl font-bold text-app-text-main">Dados Profissionais</h3>
-                                    <p className="text-sm text-app-text-muted mt-1">Suas credenciais na OAB e áreas de expertise.</p>
-                                </div>
-                                <div className="p-3 bg-primary/5 rounded-xl border border-primary/10">
-                                    <Briefcase size={24} className="text-primary" />
-                                </div>
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold text-app-text-main">Dados Profissionais</h3>
+                                <p className="text-sm text-app-text-muted mt-1">Suas credenciais na OAB e áreas de expertise.</p>
                             </div>
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -424,15 +400,10 @@ export default function ProfilePage() {
 
                     {/* Security Card */}
                     {activeTab === 'security' && (
-                        <div className="bg-app-card rounded-2xl p-6 sm:p-8 shadow-sm border border-app-stroke animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between pb-5 border-b border-app-stroke/60 mb-6">
-                                <div>
-                                    <h3 className="text-xl font-bold text-app-text-main">Segurança da Conta</h3>
-                                    <p className="text-sm text-app-text-muted mt-1">Gerencie sua senha de acesso.</p>
-                                </div>
-                                <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/20">
-                                    <Shield size={24} className="text-red-500" />
-                                </div>
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="mb-6">
+                                <h3 className="text-xl font-bold text-app-text-main">Segurança da Conta</h3>
+                                <p className="text-sm text-app-text-muted mt-1">Gerencie sua senha de acesso.</p>
                             </div>
                             <div className="space-y-6">
                                 <div className="max-w-md">
@@ -464,33 +435,8 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     )}
-                </div>
-                
-                {/* Floating Bottom Bar (Glassmorphism) */}
-                <div className={cn(
-                    "fixed bottom-0 left-0 right-0 bg-app-card/80 backdrop-blur-md border-t border-app-stroke p-4 sm:p-5 flex items-center justify-between z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transition-all duration-300",
-                    collapsed ? "lg:left-20" : "lg:left-72"
-                )}>
-                    {message ? (
-                        <div className={`text-sm font-bold flex items-center gap-2 ${message.type === 'success' ? 'text-emerald-500' : 'text-red-500'}`}>
-                            <span className="relative flex h-2.5 w-2.5">
-                              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${message.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
-                              <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${message.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
-                            </span>
-                            {message.text}
-                        </div>
-                    ) : (
-                        <div className="text-sm font-medium text-app-text-muted hidden sm:block">
-                            Última atualização de perfil: Hoje
-                        </div>
-                    )}
-                    <div className="flex gap-3 ml-auto">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="px-6 py-2.5 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
-                        >
-                            Cancelar
-                        </button>
+                    {/* Action Buttons */}
+                    <div className="mt-8 pt-6 border-t border-app-stroke/50 flex flex-col sm:flex-row items-center gap-4 sm:justify-start">
                         <button
                             onClick={handleSave}
                             disabled={saving}
@@ -498,11 +444,20 @@ export default function ProfilePage() {
                         >
                             {saving ? (
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                                <Save size={18} />
-                            )}
+                            ) : null}
                             Salvar Alterações
                         </button>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="px-6 py-2.5 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        {message && (
+                            <div className={`ml-auto text-sm font-bold flex items-center gap-2 ${message.type === 'success' ? 'text-emerald-500' : 'text-red-500'}`}>
+                                {message.text}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
