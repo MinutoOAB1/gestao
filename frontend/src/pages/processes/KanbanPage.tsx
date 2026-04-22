@@ -481,8 +481,8 @@ function AddCardModal({
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número (CNJ) *</label>
-                            <input type="text" value={formData.number} onChange={(e) => setFormData({ ...formData, number: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="0000000-00.0000.0.00.0000" required />
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número (CNJ)</label>
+                            <input type="text" value={formData.number} onChange={(e) => setFormData({ ...formData, number: e.target.value })} className="w-full px-4 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Opcional (Ex: 0000000-00.0000.0.00.0000)" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cliente vinculado</label>
@@ -643,30 +643,6 @@ export default function KanbanPage() {
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(value), 250);
     }, []);
-
-    // Synchronized top scrollbar
-    const topScrollRef = useRef<HTMLDivElement>(null);
-    const bottomScrollRef = useRef<HTMLDivElement>(null);
-    const [kanbanActualWidth, setKanbanActualWidth] = useState(0);
-
-    const handleScrollSync = (source: 'top' | 'bottom') => {
-        if (!topScrollRef.current || !bottomScrollRef.current) return;
-        
-        if (source === 'top') {
-            bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
-        } else {
-            topScrollRef.current.scrollLeft = bottomScrollRef.current.scrollLeft;
-        }
-    };
-
-    // We can't use columnProcessMap before it's calculated later in the file, 
-    // so we'll just track processes length and columns length to update the width.
-    useEffect(() => {
-        // Sync the dummy scrollbar width with the actual content dynamically
-        if (bottomScrollRef.current) {
-            setKanbanActualWidth(bottomScrollRef.current.scrollWidth);
-        }
-    }, [columns.length, processes.length]);
 
     useEffect(() => {
         fetchProcesses();
@@ -897,16 +873,16 @@ export default function KanbanPage() {
                     </div>
 
                     {/* Filters & Actions row on mobile */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-2 xl:pb-0 scrollbar-hide shrink-0 w-full xl:w-auto">
+                    <div className="flex flex-wrap items-center gap-2 xl:pb-0 shrink-0 w-full xl:w-auto">
                         <button
                             onClick={() => setFilters(prev => ({ ...prev, assignedToMe: !prev.assignedToMe }))}
-                            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors touch-manipulation min-h-[40px] whitespace-nowrap ${filters.assignedToMe
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors touch-manipulation min-h-[36px] sm:min-h-[40px] whitespace-nowrap flex-1 sm:flex-none justify-center ${filters.assignedToMe
                                 ? 'bg-indigo-100 text-indigo-700 border border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-700'
                                 : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 hover:border-indigo-400 hover:text-indigo-600'
                                 }`}
                         >
                             <Users size={15} />
-                            <span>Meus Processos</span>
+                            <span className="truncate">Meus Processos</span>
                         </button>
 
                         <button
@@ -946,15 +922,6 @@ export default function KanbanPage() {
                     </div>
                 </div>
             </header>
-            {/* Top Synchronized Scrollbar */}
-            <div 
-                ref={topScrollRef}
-                className="overflow-x-auto kanban-scrollbar shrink-0 w-full bg-[#F5F5F7] dark:bg-[#121212] border-b border-gray-200/50 dark:border-white/5 z-20 sticky top-0"
-                onScroll={() => handleScrollSync('top')}
-                style={{ WebkitOverflowScrolling: 'touch' }}
-            >
-                <div style={{ width: kanbanActualWidth || '100%', height: '1px' }}></div>
-            </div>
 
             {/* Kanban Board */}
             <DndContext
@@ -964,12 +931,10 @@ export default function KanbanPage() {
                 onDragEnd={handleDragEnd}
             >
                 <div 
-                    ref={bottomScrollRef}
-                    onScroll={() => handleScrollSync('bottom')}
-                    className="flex-1 overflow-x-auto overflow-y-hidden pt-4 px-4 pb-1 sm:pt-6 sm:px-6 sm:pb-1 scroll-smooth scrollbar-hide flex flex-col" 
+                    className="flex-1 overflow-x-auto overflow-y-hidden pt-4 px-4 pb-4 sm:pt-6 sm:px-6 sm:pb-6 scroll-smooth flex flex-col kanban-scrollbar" 
                     style={{ WebkitOverflowScrolling: 'touch' }}
                 >
-                    <div className="flex items-stretch gap-4 sm:gap-5 flex-1 h-full min-w-max">
+                    <div className="flex items-stretch gap-4 sm:gap-5 flex-1 h-full min-w-max pb-2">
                         {columns.map((column, index) => (
                             <DroppableColumn
                                 key={column.id}

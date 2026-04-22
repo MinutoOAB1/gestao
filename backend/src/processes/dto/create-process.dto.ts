@@ -1,5 +1,5 @@
 export class CreateProcessDto {
-    number: string;
+    number?: string;
     title: string;
     description?: string;
     status?: string;
