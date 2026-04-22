@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request, Headers, Req, BadRequestException } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Headers, Req, BadRequestException, Body } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RawBodyRequest } from '@nestjs/common';
