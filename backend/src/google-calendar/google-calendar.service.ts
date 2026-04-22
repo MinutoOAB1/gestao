@@ -5,27 +5,16 @@ import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
 export class GoogleCalendarService {
   private readonly logger = new Logger(GoogleCalendarService.name);
-  private getRedirectUri(): string {
-    if (process.env.FRONTEND_URL) {
-      const baseUrl = process.env.FRONTEND_URL.replace(/\/$/, '');
-      return `${baseUrl}/api/google-calendar/callback`;
-    }
-    return process.env.GOOGLE_REDIRECT_URI || '';
-  }
-
-  private getClient() {
-    return new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      this.getRedirectUri(),
-    );
-  }
+  private readonly oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI,
+  );
 
   constructor(private prisma: PrismaService) {}
 
   getAuthUrl(userId: string) {
-    const client = this.getClient();
-    return client.generateAuthUrl({
+    return this.oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: ['https://www.googleapis.com/auth/calendar.events'],
       state: userId,
@@ -35,8 +24,7 @@ export class GoogleCalendarService {
 
   async handleCallback(code: string, userId: string) {
     try {
-      const client = this.getClient();
-      const { tokens } = await client.getToken(code);
+      const { tokens } = await this.oauth2Client.getToken(code);
       
       if (tokens.refresh_token) {
         await this.prisma.user.update({
