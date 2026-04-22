@@ -152,7 +152,7 @@ export default function ProfilePage() {
 
     return (
         <div className="min-h-screen bg-app-input">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 pb-32">
+            <div className="px-6 sm:px-10 py-8 pb-32">
                 {/* Profile Header Banner */}
                 <div 
                     className="rounded-2xl shadow-sm mb-8 overflow-hidden relative"
@@ -436,20 +436,20 @@ export default function ProfilePage() {
                         </div>
                     )}
                     {/* Action Buttons */}
-                    <div className="mt-8 pt-6 border-t border-app-stroke/50 flex flex-col sm:flex-row items-center gap-4 sm:justify-start">
+                    <div className="mt-10 pt-8 border-t border-app-stroke/50 flex flex-col sm:flex-row items-center gap-4 sm:justify-start">
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-2"
+                            className="px-8 py-3 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center min-w-[160px]"
                         >
                             {saving ? (
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
                             ) : null}
                             Salvar Alterações
                         </button>
                         <button
                             onClick={() => navigate(-1)}
-                            className="px-6 py-2.5 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
+                            className="px-8 py-3 rounded-xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
                         >
                             Cancelar
                         </button>
