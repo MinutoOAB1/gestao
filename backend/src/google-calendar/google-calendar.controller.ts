@@ -10,7 +10,7 @@ export class GoogleCalendarController {
   @UseGuards(JwtAuthGuard)
   @Get('auth-url')
   getAuthUrl(@Req() req) {
-    return { url: this.googleService.getAuthUrl(req.user.id) };
+    return { url: this.googleService.getAuthUrl(req.user.sub) };
   }
 
   @Get('callback')
@@ -27,6 +27,6 @@ export class GoogleCalendarController {
   @UseGuards(JwtAuthGuard)
   @Delete('disconnect')
   disconnect(@Req() req) {
-    return this.googleService.disconnect(req.user.id);
+    return this.googleService.disconnect(req.user.sub);
   }
 }
