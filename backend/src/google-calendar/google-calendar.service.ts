@@ -26,18 +26,16 @@ export class GoogleCalendarService {
     try {
       const { tokens } = await this.oauth2Client.getToken(code);
       
+      const data: any = { googleCalendarConnected: true };
       if (tokens.refresh_token) {
-        await this.prisma.user.update({
-          where: { id: userId },
-          data: {
-            googleRefreshToken: tokens.refresh_token,
-            googleCalendarConnected: true,
-          },
-        });
-        return { success: true };
+        data.googleRefreshToken = tokens.refresh_token;
       }
       
-      throw new Error('Refresh token não recebido do Google');
+      await this.prisma.user.update({
+        where: { id: userId },
+        data,
+      });
+      return { success: true };
     } catch (error) {
       this.logger.error(`Erro no callback do Google: ${error.message}`);
       throw error;

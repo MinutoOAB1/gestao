@@ -173,6 +173,7 @@ export class AuthService {
           tenantId: user.tenantId,
           avatar: user.avatar,
           twoFactorEnabled: user.twoFactorEnabled,
+          googleCalendarConnected: user.googleCalendarConnected,
           plan: user.tenant.plan,
           subscriptionStatus: user.tenant.subscriptionStatus,
         },
@@ -342,6 +343,7 @@ export class AuthService {
         oabState: true,
         specialties: true,
         twoFactorEnabled: true,
+        googleCalendarConnected: true,
         permissions: true,
         createdAt: true,
         tenant: {

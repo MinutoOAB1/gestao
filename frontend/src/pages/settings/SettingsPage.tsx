@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
+import { useSearchParams } from 'react-router-dom';
 import api from '../../services/api';
 import TwoFactorModal from '../../components/settings/TwoFactorModal';
 import TeamPermissionsModal from '../../components/settings/TeamPermissionsModal';
@@ -107,19 +108,35 @@ export default function SettingsPage() {
     const [googleConnected, setGoogleConnected] = useState(false);
     const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
 
+    const [searchParams, setSearchParams] = useSearchParams();
+    
     // Fetch user profile and google status
+    const fetchProfile = async () => {
+        try {
+            const response = await api.get('/auth/profile');
+            setUser2FAEnabled(response.data.twoFactorEnabled || false);
+            setGoogleConnected(response.data.googleCalendarConnected || false);
+            console.log('Profile fetched, google status:', response.data.googleCalendarConnected);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await api.get('/auth/profile');
-                setUser2FAEnabled(response.data.twoFactorEnabled || false);
-                setGoogleConnected(response.data.googleCalendarConnected || false);
-            } catch (error) {
-                console.error('Error fetching profile:', error);
-            }
-        };
         fetchProfile();
     }, []);
+
+    // Check for google connection success in URL
+    useEffect(() => {
+        if (searchParams.get('google') === 'success') {
+            console.log('Google connection success detected, refreshing profile...');
+            fetchProfile();
+            // Clear the param
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('google');
+            setSearchParams(newParams);
+        }
+    }, [searchParams]);
 
     const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

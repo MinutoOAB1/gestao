@@ -3,12 +3,14 @@ import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { GoogleCalendarService } from '../google-calendar/google-calendar.service';
 
 @Injectable()
 export class ProcessesService {
   constructor(
     private prisma: PrismaService,
-    private eventEmitter: EventEmitter2
+    private eventEmitter: EventEmitter2,
+    private googleService: GoogleCalendarService,
   ) { }
 
   // ─── Process CRUD ────────────────────────────────────────
@@ -54,6 +56,27 @@ export class ProcessesService {
         createdById
       });
 
+      // Sync with Google Calendar if deadline exists and user is connected
+      if (createdById && process.deadline) {
+        try {
+          const googleEventId = await this.googleService.upsertEvent(createdById, {
+            title: `[PROCESSO] ${process.title}`,
+            description: `Número: ${process.number || 'N/A'}\n${process.description || ''}`,
+            start: process.deadline,
+            end: process.deadline,
+            type: 'DEADLINE',
+          });
+          if (googleEventId) {
+            await this.prisma.process.update({
+              where: { id: process.id },
+              data: { googleEventId } as any // Need to check if googleEventId exists in Process model
+            });
+          }
+        } catch (syncError) {
+          console.error('Failed to sync process deadline to Google:', syncError);
+        }
+      }
+
       return process;
     } catch (error) {
       console.error('Error creating process:', error);
@@ -93,7 +116,7 @@ export class ProcessesService {
     });
   }
 
-  async update(id: string, updateProcessDto: UpdateProcessDto, tenantId: string) {
+  async update(id: string, updateProcessDto: UpdateProcessDto, tenantId: string, userId?: string) {
     const data: any = { ...updateProcessDto };
 
     if (data.deadline) {
@@ -133,10 +156,40 @@ export class ProcessesService {
       });
     }
 
+    // Sync with Google Calendar if deadline exists and user is connected
+    if (updated.deadline && userId) {
+      try {
+        const googleEventId = await this.googleService.upsertEvent(userId, {
+          title: `[PROCESSO] ${updated.title}`,
+          description: `Número: ${updated.number || 'N/A'}\n${updated.description || ''}`,
+          start: updated.deadline,
+          end: updated.deadline,
+          type: 'DEADLINE',
+          googleEventId: updated.googleEventId,
+        });
+        if (googleEventId && googleEventId !== updated.googleEventId) {
+          await this.prisma.process.update({
+            where: { id: updated.id },
+            data: { googleEventId }
+          });
+        }
+      } catch (syncError) {
+        console.error('Failed to sync process deadline update to Google:', syncError);
+      }
+    }
+
     return updated;
   }
 
-  remove(id: string, tenantId: string) {
+  async remove(id: string, tenantId: string, userId?: string) {
+    const process = await this.prisma.process.findFirst({
+      where: { id, tenantId }
+    });
+
+    if (process && process.googleEventId && userId) {
+      await this.googleService.deleteEvent(userId, process.googleEventId);
+    }
+
     return this.prisma.process.delete({
       where: { id, tenantId },
     });

@@ -85,13 +85,13 @@ export class ProcessesController {
 
   @Patch(':id')
   update(@Request() req, @Param('id') id: string, @Body() updateProcessDto: UpdateProcessDto) {
-    return this.processesService.update(id, updateProcessDto, req.user.tenantId);
+    return this.processesService.update(id, updateProcessDto, req.user.tenantId, req.user.sub);
   }
 
   @Delete(':id')
   @Roles(Role.ADMIN, Role.LAWYER)
   remove(@Request() req, @Param('id') id: string) {
-    return this.processesService.remove(id, req.user.tenantId);
+    return this.processesService.remove(id, req.user.tenantId, req.user.sub);
   }
 
   // ─── Process sub-resources (:id/*) ───────────────────────
