@@ -1,13 +1,61 @@
 import { useState, useEffect, useCallback, memo, useMemo } from 'react';
-import { Plus, Users, Calendar, Calculator, AlertTriangle, Gavel, FileText, Eye, EyeOff, ChevronRight, Zap } from 'lucide-react';
+import { Plus, Users, Calendar, Calculator, AlertTriangle, Gavel, FileText, Eye, EyeOff, ChevronRight, Zap, Settings2, GripVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DashboardSkeleton } from '../../components/ui/Skeleton';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import TeamPerformanceChart from '../../components/dashboard/TeamPerformanceChart';
+import WeeklyAgenda from '../../components/dashboard/WeeklyAgenda';
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import WelcomeOverlay from '../../components/dashboard/WelcomeOverlay';
+
+// Sortable Block Component
+const SortableBlock = memo(({ id, children, isEditMode }: { id: string, children: React.ReactNode, isEditMode: boolean }) => {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !isEditMode });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 50 : 1,
+        opacity: isDragging ? 0.7 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} className={`relative ${isEditMode ? 'p-2 rounded-3xl bg-app-card/30 ring-2 ring-primary/30' : ''}`}>
+            {isEditMode && (
+                <div 
+                    {...attributes} 
+                    {...listeners} 
+                    className="absolute -top-3 -right-3 w-8 h-8 bg-app-card border border-app-stroke rounded-full shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing z-50 text-app-text-muted hover:text-primary transition-colors"
+                >
+                    <GripVertical size={16} />
+                </div>
+            )}
+            <div className={isEditMode ? 'pointer-events-none opacity-80' : ''}>
+                {children}
+            </div>
+        </div>
+    );
+});
 
 // Brazilian currency formatter
 const formatBRL = (value: number) => {
@@ -230,12 +278,7 @@ export default function DashboardHome() {
             const clients = clientsRes.data || [];
             const events = eventsRes.data || [];
 
-            const now = new Date();
-            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            const upcomingEvents = events
-                .filter((e: any) => new Date(e.start) >= now && new Date(e.start) <= nextWeek)
-                .sort((a: any, b: any) => new Date(a.start).getTime() - new Date(b.start).getTime())
-                .slice(0, 3);
+            const allEvents = events.sort((a: any, b: any) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
             setData({
                 totalIncome: stats?.pendingPayments || 0,
@@ -245,7 +288,7 @@ export default function DashboardHome() {
                 processesCount: stats?.totalProcesses || 0,
                 eventsCount: events.length,
                 recentClients: clients.slice(0, 3),
-                upcomingEvents
+                upcomingEvents: allEvents
             });
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
@@ -310,6 +353,270 @@ export default function DashboardHome() {
         return <DashboardSkeleton />;
     }
 
+    const [blocksOrder, setBlocksOrder] = useState<string[]>(() => {
+        const defaultBlocks = ['finance', 'stats', 'productivity', 'urgent', 'chart', 'agenda', 'clients'];
+        const saved = localStorage.getItem('dashboard_blocks_order');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && defaultBlocks.every(b => parsed.includes(b))) {
+                    return parsed;
+                }
+            } catch(e) {}
+        }
+        return defaultBlocks;
+    });
+    const [isEditMode, setIsEditMode] = useState(false);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            setBlocksOrder((items) => {
+                const oldIndex = items.indexOf(active.id as string);
+                const newIndex = items.indexOf(over.id as string);
+                const newOrder = arrayMove(items, oldIndex, newIndex);
+                localStorage.setItem('dashboard_blocks_order', JSON.stringify(newOrder));
+                return newOrder;
+            });
+        }
+    };
+
+    const renderBlock = (id: string) => {
+        switch(id) {
+            case 'finance':
+                return (
+                    <motion.div variants={itemVariants}>
+                        <div className="flex justify-between items-center mb-4 px-2">
+                            <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
+                            <button
+                                onClick={() => navigate('/app/financeiro')}
+                                className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
+                            >
+                                Ver tudo
+                            </button>
+                        </div>
+                        <div
+                            className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-6 relative overflow-hidden transition-colors hover:border-primary/20"
+                            style={{ boxShadow: premiumShadow }}
+                        >
+                            <button
+                                onClick={() => setIsFinanceHidden(!isFinanceHidden)}
+                                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 rounded-lg bg-gray-100 dark:bg-slate-700/50 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                                title={isFinanceHidden ? "Mostrar valores" : "Ocultar valores"}
+                            >
+                                {isFinanceHidden ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
+                            </button>
+
+                            <div className="relative z-10">
+                                <p className="text-xs sm:text-sm text-app-text-muted mb-1">Saldo Total</p>
+                                <div className="flex items-center gap-3">
+                                    <h3 className={`text-2xl sm:text-3xl font-bold text-app-text-main transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
+                                        {formatBRL(data.balance)}
+                                    </h3>
+                                    <span className={`${data.balance >= 0 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'} text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
+                                        {percentChange}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none">
+                                <MovingWaveChart />
+                            </div>
+
+                            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-app-stroke grid grid-cols-2 gap-4 sm:gap-8 relative z-10">
+                                <div>
+                                    <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Receitas</p>
+                                    <p className={`text-base sm:text-lg font-bold text-emerald-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalIncome)}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Despesas</p>
+                                    <p className={`text-base sm:text-lg font-bold text-red-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalExpense)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            case 'stats':
+                return (
+                    <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 sm:gap-4">
+                        {[
+                            { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10', path: '/app/clientes' },
+                            { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-indigo-500', bg: 'bg-indigo-500/10', path: '/app/processos' },
+                            { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/app/agenda' }
+                        ].map((stat, i) => (
+                            <div
+                                key={i}
+                                onClick={() => navigate(stat.path)}
+                                className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-all hover:border-primary/20 cursor-pointer touch-manipulation group"
+                                style={{ boxShadow: premiumShadow }}
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${stat.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
+                                        <stat.icon size={16} className={`sm:w-[18px] sm:h-[18px] ${stat.color}`} />
+                                    </div>
+                                    <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                                <p className="text-xl sm:text-2xl font-bold text-app-text-main">{stat.value}</p>
+                                <p className="text-[10px] sm:text-xs text-app-text-muted">{stat.label}</p>
+                            </div>
+                        ))}
+                    </motion.div>
+                );
+            case 'productivity':
+                return (
+                    <motion.div variants={itemVariants}>
+                        <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
+                        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-[#D4AF37]/20 to-app-card rounded-xl border border-[#D4AF37]/30 p-4 sm:p-5 transition-colors hover:border-[#D4AF37]/50 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#D4AF37]/10 rounded-full blur-2xl pointer-events-none" />
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center">
+                                        <Calculator size={20} className="text-[#D4AF37]" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[12px] sm:text-xs text-app-text-main font-semibold uppercase tracking-wider">A Receber</p>
+                                        <p className="text-[10px] text-[#D4AF37]/80 font-medium">Valores pendentes</p>
+                                    </div>
+                                </div>
+                                <p className="text-3xl sm:text-4xl font-black text-[#D4AF37] tracking-tight">{formatBRLCompact(productivity.pendingPayments)}</p>
+                            </div>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-red-500/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
+                                        <AlertTriangle size={16} className="text-red-500" />
+                                    </div>
+                                </div>
+                                <p className="text-xl sm:text-2xl font-bold text-red-500">{productivity.upcomingDeadlines}</p>
+                                <p className="text-[11px] sm:text-xs text-app-text-muted">Prazos</p>
+                            </div>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-slate-500/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-500/10 flex items-center justify-center">
+                                        <FileText size={16} className="text-slate-500 dark:text-slate-400" />
+                                    </div>
+                                </div>
+                                <p className="text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-300">{productivity.newProcesses}</p>
+                                <p className="text-[11px] sm:text-xs text-app-text-muted">Novos Process.</p>
+                            </div>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-teal-600/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-8 h-8 rounded-lg bg-teal-600/10 flex items-center justify-center">
+                                        <Users size={16} className="text-teal-600 dark:text-teal-400" />
+                                    </div>
+                                </div>
+                                <p className="text-xl sm:text-2xl font-bold text-teal-700 dark:text-teal-400">{productivity.activeClients}</p>
+                                <p className="text-[11px] sm:text-xs text-app-text-muted">Clientes Ativos</p>
+                            </div>
+                        </div>
+                    </motion.div>
+                );
+            case 'urgent':
+                return productivity.urgentPayments && productivity.urgentPayments.length > 0 ? (
+                    <motion.div variants={itemVariants}>
+                        <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-2xl p-5">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
+                                        <AlertTriangle size={20} className="text-red-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-app-text-main">Pagamentos Urgentes</h3>
+                                        <p className="text-xs text-app-text-muted">{productivity.urgentPayments.length} pagamento(s) marcado(s) como urgente</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => navigate('/app/financeiro')} className="text-xs text-red-400 font-medium hover:text-red-300 transition-colors">
+                                    Ver todos →
+                                </button>
+                            </div>
+                            <div className="space-y-2">
+                                {displayUrgentPayments.map((payment: any, i: number) => (
+                                    <div key={payment.id || i} className="bg-app-card/50 backdrop-blur-sm border border-app-stroke rounded-xl p-3 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-2 h-2 rounded-full ${payment.type === 'INCOME' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+                                            <div>
+                                                <p className="text-sm font-medium text-app-text-main">{payment.description}</p>
+                                                <p className="text-xs text-app-text-muted">
+                                                    Vence: {new Date(payment.date).toLocaleDateString('pt-BR')}
+                                                    {payment.totalInstallments > 1 && ` • Parcela ${payment.currentInstallment}/${payment.totalInstallments}`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span className={`text-sm font-bold ${payment.type === 'INCOME' ? 'text-green-500' : 'text-red-400'}`}>
+                                            {formatBRL(payment.amount)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : null;
+            case 'chart':
+                return (
+                    <motion.div variants={itemVariants}>
+                        <TeamPerformanceChart />
+                    </motion.div>
+                );
+            case 'agenda':
+                return (
+                    <motion.div variants={itemVariants}>
+                        <WeeklyAgenda events={displayUpcomingEvents} />
+                    </motion.div>
+                );
+            case 'clients':
+                return (
+                    <motion.div variants={itemVariants}>
+                        <div className="flex justify-between items-center mb-4 px-2">
+                            <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
+                            <button onClick={() => navigate('/app/clientes')} className="text-xs text-primary font-medium hover:text-primary-light transition-colors">
+                                Ver todos
+                            </button>
+                        </div>
+                        <div className="bg-app-card rounded-2xl border border-app-stroke divide-y divide-app-stroke/50 transition-colors hover:border-primary/20" style={{ boxShadow: premiumShadow }}>
+                            {displayRecentClients.length > 0 ? (
+                                displayRecentClients.map((client: any, i: number) => {
+                                    const colors = ['from-blue-500 to-blue-600', 'from-emerald-500 to-emerald-600', 'from-amber-500 to-amber-600', 'from-purple-500 to-purple-600', 'from-rose-500 to-rose-600'];
+                                    const avatarGrad = colors[i % colors.length];
+                                    const isNew = client.createdAt && (new Date().getTime() - new Date(client.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+                                    return (
+                                        <div key={client.id || i} className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-primary/5 group" onClick={() => navigate(`/app/clientes/${client.id}`)}>
+                                            <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarGrad} flex items-center justify-center shrink-0 shadow-md shadow-black/10`}>
+                                                <span className="text-white font-bold text-sm">{client.name?.charAt(0)?.toUpperCase() || 'C'}</span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className="text-sm font-semibold text-app-text-main truncate">{client.name}</h4>
+                                                    {isNew && <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Novo</span>}
+                                                </div>
+                                                <p className="text-xs text-app-text-muted truncate">{client.email || 'Sem email'}</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] text-app-text-muted">{new Date(client.createdAt).toLocaleDateString('pt-BR')}</span>
+                                                <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="p-6 text-center">
+                                    <p className="text-app-text-muted">Nenhum cliente cadastrado</p>
+                                    <button onClick={handleNovoCliente} className="text-primary text-sm font-medium mt-2 hover:underline transition-colors">
+                                        Cadastrar primeiro cliente
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                );
+            default:
+                return null;
+        }
+    };
+
     return (
         <motion.div
             variants={containerVariants}
@@ -317,7 +624,16 @@ export default function DashboardHome() {
             animate="visible"
             className="space-y-5 px-1 sm:px-0 pb-24 md:pb-8"
         >
-            <div className="pt-2"></div>
+            <div className="pt-2 flex items-center justify-between px-2">
+                <h1 className="text-2xl font-black text-app-text-main">Dashboard</h1>
+                <button
+                    onClick={() => setIsEditMode(!isEditMode)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${isEditMode ? 'bg-primary text-white shadow-md' : 'bg-app-card border border-app-stroke text-app-text-muted hover:text-app-text-main'}`}
+                >
+                    <Settings2 size={16} />
+                    {isEditMode ? 'Concluído' : 'Editar Layout'}
+                </button>
+            </div>
             
             {/* Subscription Notice */}
             {user?.plan === 'FREE' && (
@@ -343,341 +659,19 @@ export default function DashboardHome() {
                     </button>
                 </motion.div>
             )}
-            {/* Quick Actions Grid - prominent position */}
-            <motion.div variants={itemVariants}>
-                <h2 className="text-lg font-bold text-app-text-main mb-3 px-2">Ações Rápidas</h2>
-                <div className="grid grid-cols-4 gap-2 sm:gap-4 px-1 sm:px-2">
-                    <QuickAction icon={Plus} label="Processo" colorClass="bg-slate-700/10 text-slate-700 dark:bg-slate-300/10 dark:text-slate-300" onClick={handleNovoProcesso} />
-                    <QuickAction icon={Users} label="Cliente" colorClass="bg-stone-600/10 text-stone-600 dark:bg-stone-400/10 dark:text-stone-400" onClick={handleNovoCliente} />
-                    <QuickAction icon={Calendar} label="Agendar" colorClass="bg-indigo-700/10 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400" onClick={handleAgendar} />
-                    <QuickAction icon={Calculator} label="Honorários" colorClass="bg-teal-700/10 text-teal-700 dark:bg-teal-400/10 dark:text-teal-400" onClick={handleHonorarios} />
-                </div>
-            </motion.div>
 
-            {/* Resumo Financeiro Card */}
-            <motion.div variants={itemVariants}>
-                <div className="flex justify-between items-center mb-4 px-2">
-                    <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
-                    <motion.button
-                        onClick={() => navigate('/app/financeiro')}
-                        className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                    >
-                        Ver tudo
-                    </motion.button>
-                </div>
-                <div
-                    className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-6 relative overflow-hidden transition-colors hover:border-primary/20"
-                    style={{ boxShadow: premiumShadow }}
-                >
-                    {/* Privacy Toggle Button */}
-                    <button
-                        onClick={() => setIsFinanceHidden(!isFinanceHidden)}
-                        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 rounded-lg bg-gray-100 dark:bg-slate-700/50 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
-                        title={isFinanceHidden ? "Mostrar valores" : "Ocultar valores"}
-                    >
-                        {isFinanceHidden ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
-                    </button>
 
-                    <div className="relative z-10">
-                        <p className="text-xs sm:text-sm text-app-text-muted mb-1">Saldo Total</p>
-                        <div className="flex items-center gap-3">
-                            <h3 className={`text-2xl sm:text-3xl font-bold text-app-text-main transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
-                                {formatBRL(data.balance)}
-                            </h3>
-                            <span className={`${data.balance >= 0 ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'} text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
-                                {percentChange}
-                            </span>
-                        </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={blocksOrder} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-5">
+                        {blocksOrder.map(blockId => (
+                            <SortableBlock key={blockId} id={blockId} isEditMode={isEditMode}>
+                                {renderBlock(blockId)}
+                            </SortableBlock>
+                        ))}
                     </div>
-
-                    <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none">
-                        <MovingWaveChart />
-                    </div>
-
-                    <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-app-stroke grid grid-cols-2 gap-4 sm:gap-8 relative z-10">
-                        <div>
-                            <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Receitas</p>
-                            <p className={`text-base sm:text-lg font-bold text-emerald-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalIncome)}</p>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Despesas</p>
-                            <p className={`text-base sm:text-lg font-bold text-red-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalExpense)}</p>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-
-            {/* Stats Cards - use productivity stats for accurate totals */}
-            <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 sm:gap-4">
-                {[
-                    { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10', path: '/app/clientes' },
-                    { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-indigo-500', bg: 'bg-indigo-500/10', path: '/app/processos' },
-                    { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/app/agenda' }
-                ].map((stat, i) => (
-                    <motion.div
-                        key={i}
-                        onClick={() => navigate(stat.path)}
-                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-all hover:border-primary/20 cursor-pointer touch-manipulation group"
-                        style={{ boxShadow: premiumShadow }}
-                        whileHover={{ scale: 1.02, y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    >
-                        <div className="flex items-center justify-between mb-2">
-                            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${stat.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
-                                <stat.icon size={16} className={`sm:w-[18px] sm:h-[18px] ${stat.color}`} />
-                            </div>
-                            <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                        <p className="text-xl sm:text-2xl font-bold text-app-text-main">{stat.value}</p>
-                        <p className="text-[10px] sm:text-xs text-app-text-muted">{stat.label}</p>
-                    </motion.div>
-                ))}
-            </motion.div>
-
-            {/* Productivity Metrics - Clean style */}
-            <motion.div variants={itemVariants}>
-                <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                    {/* A Receber (Gold / Champagne) - DESTAQUE */}
-                    <div
-                        className="col-span-2 lg:col-span-2 bg-gradient-to-br from-[#D4AF37]/20 to-app-card rounded-xl border border-[#D4AF37]/30 p-4 sm:p-5 transition-colors hover:border-[#D4AF37]/50 relative overflow-hidden"
-                        style={{ boxShadow: premiumShadow }}
-                    >
-                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-[#D4AF37]/10 rounded-full blur-2xl pointer-events-none" />
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center">
-                                <Calculator size={20} className="text-[#D4AF37]" />
-                            </div>
-                            <div>
-                                <p className="text-[12px] sm:text-xs text-app-text-main font-semibold uppercase tracking-wider">A Receber</p>
-                                <p className="text-[10px] text-[#D4AF37]/80 font-medium">Valores pendentes</p>
-                            </div>
-                        </div>
-                        <p className="text-3xl sm:text-4xl font-black text-[#D4AF37] tracking-tight">{formatBRLCompact(productivity.pendingPayments)}</p>
-                    </div>
-
-                    {/* Prazos Vencendo (Keep Red) */}
-                    <div
-                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-red-500/20 flex flex-col justify-center"
-                        style={{ boxShadow: premiumShadow }}
-                    >
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-                                <AlertTriangle size={16} className="text-red-500" />
-                            </div>
-                        </div>
-                        <p className="text-xl sm:text-2xl font-bold text-red-500">{productivity.upcomingDeadlines}</p>
-                        <p className="text-[11px] sm:text-xs text-app-text-muted">Prazos</p>
-                    </div>
-
-                    {/* Processos Novos (Neutral Slate) */}
-                    <div
-                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-slate-500/20 flex flex-col justify-center"
-                        style={{ boxShadow: premiumShadow }}
-                    >
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-slate-500/10 flex items-center justify-center">
-                                <FileText size={16} className="text-slate-500 dark:text-slate-400" />
-                            </div>
-                        </div>
-                        <p className="text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-300">{productivity.newProcesses}</p>
-                        <p className="text-[11px] sm:text-xs text-app-text-muted">Novos Process.</p>
-                    </div>
-
-                    {/* Clientes Ativos (Teal / Formal Green) */}
-                    <div
-                        className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-teal-600/20 flex flex-col justify-center"
-                        style={{ boxShadow: premiumShadow }}
-                    >
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-lg bg-teal-600/10 flex items-center justify-center">
-                                <Users size={16} className="text-teal-600 dark:text-teal-400" />
-                            </div>
-                        </div>
-                        <p className="text-xl sm:text-2xl font-bold text-teal-700 dark:text-teal-400">{productivity.activeClients}</p>
-                        <p className="text-[11px] sm:text-xs text-app-text-muted">Clientes Ativos</p>
-                    </div>
-                </div>
-            </motion.div>
-
-            {/* Urgent Payments Alert Section */}
-            {productivity.urgentPayments && productivity.urgentPayments.length > 0 && (
-                <motion.div variants={itemVariants}>
-                    <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-2xl p-5">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
-                                    <AlertTriangle size={20} className="text-red-500" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-app-text-main">Pagamentos Urgentes</h3>
-                                    <p className="text-xs text-app-text-muted">{productivity.urgentPayments.length} pagamento(s) marcado(s) como urgente</p>
-                                </div>
-                            </div>
-                            <motion.button
-                                onClick={() => navigate('/app/financeiro')}
-                                className="text-xs text-red-400 font-medium hover:text-red-300 transition-colors"
-                                whileHover={{ scale: 1.05 }}
-                            >
-                                Ver todos →
-                            </motion.button>
-                        </div>
-                        <div className="space-y-2">
-                            {displayUrgentPayments.map((payment: any, i: number) => (
-                                <motion.div
-                                    key={payment.id || i}
-                                    className="bg-app-card/50 backdrop-blur-sm border border-app-stroke rounded-xl p-3 flex items-center justify-between"
-                                    whileHover={{ scale: 1.01 }}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-2 h-2 rounded-full ${payment.type === 'INCOME' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
-                                        <div>
-                                            <p className="text-sm font-medium text-app-text-main">{payment.description}</p>
-                                            <p className="text-xs text-app-text-muted">
-                                                Vence: {new Date(payment.date).toLocaleDateString('pt-BR')}
-                                                {payment.totalInstallments > 1 && ` • Parcela ${payment.currentInstallment}/${payment.totalInstallments}`}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <span className={`text-sm font-bold ${payment.type === 'INCOME' ? 'text-green-500' : 'text-red-400'}`}>
-                                        {formatBRL(payment.amount)}
-                                    </span>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </motion.div>
-            )}
-
-            {/* Team Performance Chart */}
-            <motion.div variants={itemVariants}>
-                <TeamPerformanceChart />
-            </motion.div>
-
-            {/* Próximos Prazos & Últimos Clientes - Side by Side */}
-            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {/* Próximos Prazos */}
-                <div>
-                    <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Próximos Prazos</h2>
-                    <div className="space-y-3">
-                        {displayUpcomingEvents.length > 0 ? (
-                            displayUpcomingEvents.map((event: any, i: number) => {
-                                const eventDate = new Date(event.start);
-                                const today = new Date();
-                                const diffDays = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-                                let type = 'info';
-                                let color = 'bg-slate-500 text-slate-500'; // Default Event
-
-                                if (diffDays <= 1) {
-                                    type = 'urgent';
-                                    color = 'bg-red-500 text-red-500'; 
-                                } else if (diffDays <= 3) {
-                                    type = 'warning';
-                                    color = 'bg-[#D4AF37] text-[#D4AF37]'; 
-                                } else {
-                                    type = 'info';
-                                    color = 'bg-emerald-500 text-emerald-500';
-                                }
-
-                                return (
-                                    <DeadlineCard
-                                        key={event.id || i}
-                                        type={type}
-                                        title={event.title}
-                                        subtitle={event.description || 'Sem descrição'}
-                                        time={eventDate.toLocaleString('pt-BR', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}
-                                        color={color}
-                                    />
-                                );
-                            })
-                        ) : (
-                            <div
-                                className="bg-app-card p-6 rounded-xl border border-app-stroke text-center transition-colors hover:border-primary/20"
-                                style={{ boxShadow: premiumShadow }}
-                            >
-                                <p className="text-app-text-muted">Nenhum evento nos próximos 7 dias</p>
-                                <button
-                                    onClick={handleAgendar}
-                                    className="text-primary text-sm font-medium mt-2 hover:underline transition-colors"
-                                >
-                                    Agendar novo evento
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div >
-
-                {/* Últimos Clientes */}
-                < div >
-                    <div className="flex justify-between items-center mb-4 px-2">
-                        <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
-                        <motion.button
-                            onClick={() => navigate('/app/clientes')}
-                            className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                        >
-                            Ver todos
-                        </motion.button>
-                    </div>
-                    <div
-                        className="bg-app-card rounded-2xl border border-app-stroke divide-y divide-app-stroke/50 transition-colors hover:border-primary/20"
-                        style={{ boxShadow: premiumShadow }}
-                    >
-                        {displayRecentClients.length > 0 ? (
-                            displayRecentClients.map((client: any, i: number) => {
-                                const colors = [
-                                    'from-blue-500 to-blue-600',
-                                    'from-emerald-500 to-emerald-600',
-                                    'from-amber-500 to-amber-600',
-                                    'from-purple-500 to-purple-600',
-                                    'from-rose-500 to-rose-600',
-                                ];
-                                const avatarGrad = colors[i % colors.length];
-                                const isNew = client.createdAt && (new Date().getTime() - new Date(client.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
-                                return (
-                                    <div
-                                        key={client.id || i}
-                                        className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-primary/5 group"
-                                        onClick={() => navigate(`/app/clientes/${client.id}`)}
-                                    >
-                                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarGrad} flex items-center justify-center shrink-0 shadow-md shadow-black/10`}>
-                                            <span className="text-white font-bold text-sm">
-                                                {client.name?.charAt(0)?.toUpperCase() || 'C'}
-                                            </span>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <h4 className="text-sm font-semibold text-app-text-main truncate">{client.name}</h4>
-                                                {isNew && <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Novo</span>}
-                                            </div>
-                                            <p className="text-xs text-app-text-muted truncate">{client.email || 'Sem email'}</p>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] text-app-text-muted">{new Date(client.createdAt).toLocaleDateString('pt-BR')}</span>
-                                            <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        </div>
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <div className="p-6 text-center">
-                                <p className="text-app-text-muted">Nenhum cliente cadastrado</p>
-                                <button
-                                    onClick={handleNovoCliente}
-                                    className="text-primary text-sm font-medium mt-2 hover:underline transition-colors"
-                                >
-                                    Cadastrar primeiro cliente
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div >
-            </motion.div >
+                </SortableContext>
+            </DndContext>
 
             {/* Welcome Floating Card */}
             <WelcomeOverlay 
