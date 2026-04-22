@@ -563,7 +563,7 @@ export default function DashboardLayout() {
                 )}
 
                 {/* THE CURVE: Main content with rounded-tl-[40px] creates the organic curved corner */}
-                <main className="flex-1 relative z-10 bg-slate-50 dark:bg-slate-950 rounded-tl-[40px] md:rounded-tl-[40px] shadow-[inset_2px_2px_8px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col pb-20 md:pb-0">
+                <main className="flex-1 relative z-10 bg-slate-50 dark:bg-slate-950 bg-dot-pattern text-slate-900/[0.05] dark:text-white/[0.02] rounded-tl-[40px] md:rounded-tl-[40px] shadow-[inset_2px_2px_8px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col pb-20 md:pb-0">
                     <div className={cn(
                         "flex-1 custom-scrollbar scroll-smooth",
                         !isFullScreenPage ? "p-4 sm:p-6 lg:p-8 overflow-y-auto" : "flex flex-col h-full overflow-hidden"

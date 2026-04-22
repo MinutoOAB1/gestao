@@ -97,6 +97,11 @@
   background-color: #2563eb; /* Blue 600 */
 }
 
+.bg-dot-pattern {
+  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 .dark .kanban-scrollbar::-webkit-scrollbar-track {
   background: rgba(30, 41, 59, 0.5); /* Slate 800 */
 }
