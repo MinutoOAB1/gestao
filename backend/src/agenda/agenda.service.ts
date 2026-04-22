@@ -551,7 +551,7 @@ export class AgendaService {
   }
 
   @OnEvent('process.created', { async: true })
-  async handleProcessCreated(payload: { processId: string, tenantId: string, title: string, description?: string, number: string, createdById?: string }) {
+  async handleProcessCreated(payload: { processId: string, tenantId: string, title: string, description?: string, number: string | null, createdById?: string }) {
     try {
       this.logger.log(`[AI Copilot] Analisando novo processo criado: ${payload.title}`);
       
@@ -580,7 +580,7 @@ export class AgendaService {
     }
   }
 
-  private async processSuggestedTasks(suggestedTasks: any[], context: { processId: string, tenantId: string, title: string, number: string, createdById?: string, clientId?: string }) {
+  private async processSuggestedTasks(suggestedTasks: any[], context: { processId: string, tenantId: string, title: string, number: string | null, createdById?: string, clientId?: string }) {
     if (!suggestedTasks || suggestedTasks.length === 0) return;
 
     this.logger.log(`[AI Copilot] Gerando ${suggestedTasks.length} sugestões para ${context.title}`);

@@ -217,7 +217,7 @@ export class AiService {
     address?: string;
     createdAt: string;
     processes: Array<{
-      number: string;
+      number?: string | null;
       title: string;
       status: string;
       area?: string;
@@ -259,7 +259,7 @@ export class AiService {
           date: u.date,
           description: u.description,
           type: u.type,
-          processNumber: p.number,
+          processNumber: p.number || 'N/A',
           processTitle: p.title
         });
       });
@@ -281,7 +281,7 @@ export class AiService {
 
       PROCESSOS (${clientData.processes.length} total, ${processosAtivos} ativos, ${processosEncerrados} encerrados):
       ${clientData.processes.map(p => `
-        - Nº ${p.number}: ${p.title}
+        - Nº ${p.number || 'N/A'}: ${p.title}
           Status: ${p.status} | Área: ${p.area || 'Cível'} | Vara: ${p.court || 'N/A'}
           Andamentos: ${(p.updates || []).length} registros
           ${p.updates && p.updates.length > 0 ? `Últimos: ${p.updates.slice(0, 5).map(u => `[${new Date(u.date).toLocaleDateString('pt-BR')}] ${u.type}: ${u.description}`).join(' | ')}` : 'Sem movimentações'}
@@ -298,7 +298,7 @@ export class AiService {
         "overallAnalysis": "Análise geral da situação jurídica do cliente em linguagem acessível (3-5 frases)",
         "processAnalyses": [
           {
-            "processNumber": "número do processo",
+            "processNumber": "número do processo ou N/A",
             "summary": "Resumo em linguagem simples do que está acontecendo neste processo (2-3 frases)",
             "nextSteps": "O que o cliente pode esperar como próximos passos (1-2 frases)",
             "riskLevel": "baixo" | "medio" | "alto",
@@ -331,8 +331,8 @@ export class AiService {
         greeting: `Prezado(a) ${clientData.name}, é com satisfação que apresentamos o relatório atualizado dos seus processos jurídicos.`,
         overallAnalysis: 'Sua situação jurídica está sendo acompanhada de perto pela nossa equipe.',
         processAnalyses: clientData.processes.map(p => ({
-          processNumber: p.number,
-          summary: `O processo ${p.number} está ${p.status === 'OPEN' || p.status === 'ACTIVE' ? 'em andamento' : 'encerrado'}.`,
+          processNumber: p.number || 'N/A',
+          summary: `O processo ${p.title} está ${p.status === 'OPEN' || p.status === 'ACTIVE' ? 'em andamento' : 'encerrado'}.`,
           nextSteps: 'Aguardando próximas movimentações.',
           riskLevel: 'medio',
           phase: 'instrucao'
@@ -366,7 +366,7 @@ export class AiService {
       processes: clientData.processes.map(p => {
         const analysis = aiAnalysis.processAnalyses?.find((a: any) => a.processNumber === p.number) || {};
         return {
-          number: p.number,
+          number: p.number || null,
           title: p.title,
           status: p.status,
           area: p.area || 'Cível',
