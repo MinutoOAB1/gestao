@@ -349,10 +349,6 @@ export default function DashboardHome() {
     const handleAgendar = useCallback(() => navigate('/app/agenda'), [navigate]);
     const handleHonorarios = useCallback(() => navigate('/app/financeiro/novo'), [navigate]);
 
-    if (loading) {
-        return <DashboardSkeleton />;
-    }
-
     const [blocksOrder, setBlocksOrder] = useState<string[]>(() => {
         const defaultBlocks = ['finance', 'stats', 'productivity', 'urgent', 'chart', 'agenda', 'clients'];
         const saved = localStorage.getItem('dashboard_blocks_order');
@@ -372,6 +368,12 @@ export default function DashboardHome() {
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
         useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
     );
+
+    if (loading) {
+        return <DashboardSkeleton />;
+    }
+
+
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
