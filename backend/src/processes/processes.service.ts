@@ -178,13 +178,12 @@ export class ProcessesService {
       }
     }
 
-      this.eventEmitter.emit('process.updated', {
-        processId: updated.id,
-        title: updated.title,
-        tenantId,
-        userId
-      });
-    }
+    this.eventEmitter.emit('process.updated', {
+      processId: updated.id,
+      title: updated.title,
+      tenantId,
+      userId
+    });
 
     return updated;
   }
@@ -202,12 +201,14 @@ export class ProcessesService {
       where: { id, tenantId },
     });
 
-    this.eventEmitter.emit('process.removed', {
-      processId: id,
-      title: process.title,
-      tenantId,
-      userId
-    });
+    if (process) {
+      this.eventEmitter.emit('process.removed', {
+        processId: id,
+        title: process.title,
+        tenantId,
+        userId
+      });
+    }
 
     return deleted;
   }

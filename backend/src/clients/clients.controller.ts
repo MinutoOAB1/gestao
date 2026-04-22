@@ -148,12 +148,6 @@ export class ClientsController {
         return report;
     }
 
-        return this.clientsService.update(id, updateClientDto, tenantId, req.user.sub);
-    }
-
-        return this.clientsService.remove(id, tenantId, req.user.sub);
-    }
-
     // === Status ===
     @Patch(':id/status')
     updateStatus(@Request() req, @Param('id') id: string, @Body('status') status: string) {

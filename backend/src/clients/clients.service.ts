@@ -11,7 +11,7 @@ export class ClientsService {
         private eventEmitter: EventEmitter2
     ) { }
 
-    async create(createClientDto: CreateClientDto, tenantId: string) {
+    async create(createClientDto: CreateClientDto, tenantId: string, userId?: string) {
         // Sanitize: convert empty strings to null for optional fields
         console.log('Creating client with data:', createClientDto);
         const data: any = { ...createClientDto, tenantId };
@@ -110,7 +110,7 @@ export class ClientsService {
         });
     }
 
-    async update(id: string, updateClientDto: UpdateClientDto, tenantId: string) {
+    async update(id: string, updateClientDto: UpdateClientDto, tenantId: string, userId?: string) {
         // Verify tenant ownership first
         const existing = await this.prisma.client.findFirst({ where: { id, tenantId } });
         if (!existing) {
@@ -160,15 +160,24 @@ export class ClientsService {
         return updated;
     }
 
-    async remove(id: string, tenantId: string) {
+    async remove(id: string, tenantId: string, userId?: string) {
         // Verify tenant ownership first
         const existing = await this.prisma.client.findFirst({ where: { id, tenantId } });
         if (!existing) {
             throw new Error('Cliente não encontrado');
         }
-        return this.prisma.client.delete({
+        const deleted = await this.prisma.client.delete({
             where: { id },
         });
+
+        this.eventEmitter.emit('client.removed', {
+            clientId: id,
+            name: existing.name,
+            tenantId,
+            userId
+        });
+
+        return deleted;
     }
 
     // === Status ===

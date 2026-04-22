@@ -228,7 +228,7 @@ export class AgendaService {
   }
 
   // Update event and assignees
-  async update(id: string, updateAgendaDto: UpdateAgendaDto, tenantId: string) {
+  async update(id: string, updateAgendaDto: UpdateAgendaDto, tenantId: string, userId?: string) {
     const existing = await this.prisma.event.findFirst({
       where: { id, tenantId }
     });
@@ -369,7 +369,7 @@ export class AgendaService {
   }
 
   // Delete event
-  async remove(id: string, tenantId: string) {
+  async remove(id: string, tenantId: string, userId?: string) {
     const existing = await this.prisma.event.findFirst({
       where: { id, tenantId }
     });
