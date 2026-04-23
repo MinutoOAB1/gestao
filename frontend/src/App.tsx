@@ -38,6 +38,8 @@ const UsersPage = lazy(() => import('./pages/users/UsersPage'));
 const TimesheetPage = lazy(() => import('./pages/timesheet/TimesheetPage'));
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
 const BillingPage = lazy(() => import('./pages/settings/BillingPage'));
+const TermsPage = lazy(() => import('./pages/legal/TermsPage'));
+const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage'));
 import GlobalAgendaNotifications from './components/notifications/GlobalAgendaNotifications';
 
 // Loading fallback component
@@ -78,6 +80,8 @@ function App() {
                           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
                           <Route path="/" element={<HomeHandler />} />
                           <Route path="/landing" element={<LandingPage />} />
+                          <Route path="/terms" element={<TermsPage />} />
+                          <Route path="/privacy" element={<PrivacyPage />} />
 
                           <Route path="/app" element={
                             <PrivateRoute>

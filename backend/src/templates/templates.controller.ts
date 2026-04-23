@@ -13,6 +13,8 @@ import {
     UploadedFiles,
     Res,
     BadRequestException,
+    UseGuards,
+    Req,
 } from '@nestjs/common';
 import { FileInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -20,39 +22,41 @@ import type { Response } from 'express';
 import { TemplatesService } from './templates.service';
 import { CreateTemplateDto, UpdateTemplateDto, FillTemplateDto } from './dto/template.dto';
 import { StorageService } from '../supabase/storage.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import * as path from 'path';
 import * as fs from 'fs';
 
 @Controller('templates')
+@UseGuards(JwtAuthGuard)
 export class TemplatesController {
     constructor(
         private readonly templatesService: TemplatesService,
         private readonly storageService: StorageService,
     ) { }
 
-    private getTenantId(headers: any): string {
-        return headers['x-tenant-id'] || 'dev-tenant-001';
+    private getTenantId(req: any): string {
+        return req.user?.tenantId || 'dev-tenant-001';
     }
 
     @Get()
     async findAll(
-        @Headers() headers: any,
+        @Req() req: any,
         @Query('category') category?: string,
         @Query('search') search?: string,
     ) {
-        const tenantId = this.getTenantId(headers);
+        const tenantId = this.getTenantId(req);
         return this.templatesService.findAll(tenantId, category, search);
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string, @Headers() headers: any) {
-        const tenantId = this.getTenantId(headers);
+    async findOne(@Param('id') id: string, @Req() req: any) {
+        const tenantId = this.getTenantId(req);
         return this.templatesService.findOne(id, tenantId);
     }
 
     @Get(':id/download')
-    async downloadFile(@Param('id') id: string, @Headers() headers: any, @Res() res: Response) {
-        const tenantId = this.getTenantId(headers);
+    async downloadFile(@Param('id') id: string, @Req() req: any, @Res() res: Response) {
+        const tenantId = this.getTenantId(req);
         const template = await this.templatesService.findOne(id, tenantId) as any;
         if (template?.docxPath) {
             // Check if it's a URL (Supabase) or local path
@@ -70,8 +74,8 @@ export class TemplatesController {
     }
 
     @Get(':id/file')
-    async getFile(@Param('id') id: string, @Headers() headers: any, @Res() res: Response) {
-        const tenantId = this.getTenantId(headers);
+    async getFile(@Param('id') id: string, @Req() req: any, @Res() res: Response) {
+        const tenantId = this.getTenantId(req);
         const template = await this.templatesService.findOne(id, tenantId) as any;
         if (template?.docxPath) {
             if (template.docxPath.startsWith('http')) {
@@ -91,8 +95,8 @@ export class TemplatesController {
 
     // Preview image
     @Get(':id/preview')
-    async getPreview(@Param('id') id: string, @Headers() headers: any, @Res() res: Response) {
-        const tenantId = this.getTenantId(headers);
+    async getPreview(@Param('id') id: string, @Req() req: any, @Res() res: Response) {
+        const tenantId = this.getTenantId(req);
         const template = await this.templatesService.findOne(id, tenantId) as any;
         if (template?.previewImagePath) {
             if (template.previewImagePath.startsWith('http')) {
@@ -118,8 +122,8 @@ export class TemplatesController {
     }
 
     @Post()
-    async create(@Body() dto: CreateTemplateDto, @Headers() headers: any) {
-        const tenantId = this.getTenantId(headers);
+    async create(@Body() dto: CreateTemplateDto, @Req() req: any) {
+        const tenantId = this.getTenantId(req);
         return this.templatesService.create(tenantId, dto);
     }
 
@@ -135,11 +139,11 @@ export class TemplatesController {
             }
         },
     }))
-    async uploadFile(@UploadedFile() file: Express.Multer.File, @Headers() headers: any) {
+    async uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
         if (!file) {
             throw new BadRequestException('Nenhum arquivo enviado');
         }
-        const tenantId = this.getTenantId(headers);
+        const tenantId = this.getTenantId(req);
         const result = await this.storageService.uploadFile('templates', file, tenantId);
         return {
             filename: file.originalname,
@@ -164,11 +168,11 @@ export class TemplatesController {
             fileSize: 5 * 1024 * 1024, // 5MB limit
         },
     }))
-    async uploadPreview(@UploadedFile() file: Express.Multer.File, @Headers() headers: any) {
+    async uploadPreview(@UploadedFile() file: Express.Multer.File, @Req() req: any) {
         if (!file) {
             throw new BadRequestException('Nenhum arquivo enviado');
         }
-        const tenantId = this.getTenantId(headers);
+        const tenantId = this.getTenantId(req);
         const result = await this.storageService.uploadFile('previews', file, tenantId);
         return {
             filename: file.originalname,
@@ -187,9 +191,9 @@ export class TemplatesController {
     }))
     async uploadComplete(
         @UploadedFiles() files: { docx?: Express.Multer.File[], preview?: Express.Multer.File[] },
-        @Headers() headers: any,
+        @Req() req: any,
     ) {
-        const tenantId = this.getTenantId(headers);
+        const tenantId = this.getTenantId(req);
         let docxResult: { filename: string; path: string } | null = null;
         let previewResult: { filename: string; path: string } | null = null;
 
@@ -219,15 +223,15 @@ export class TemplatesController {
     async update(
         @Param('id') id: string,
         @Body() dto: UpdateTemplateDto,
-        @Headers() headers: any,
+        @Req() req: any,
     ) {
-        const tenantId = this.getTenantId(headers);
+        const tenantId = this.getTenantId(req);
         return this.templatesService.update(id, tenantId, dto);
     }
 
     @Delete(':id')
-    async remove(@Param('id') id: string, @Headers() headers: any) {
-        const tenantId = this.getTenantId(headers);
+    async remove(@Param('id') id: string, @Req() req: any) {
+        const tenantId = this.getTenantId(req);
         return this.templatesService.remove(id, tenantId);
     }
 
@@ -235,9 +239,9 @@ export class TemplatesController {
     async fillTemplate(
         @Param('id') id: string,
         @Body() dto: FillTemplateDto,
-        @Headers() headers: any,
+        @Req() req: any,
     ) {
-        const tenantId = this.getTenantId(headers);
+        const tenantId = this.getTenantId(req);
         return this.templatesService.fillTemplate(id, tenantId, dto.variables);
     }
 }

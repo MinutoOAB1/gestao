@@ -159,12 +159,34 @@ export default function RegisterPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h1 className="text-3xl font-bold text-slate-900 mb-2">Crie sua conta</h1>
-                        <p className="text-slate-600 mb-8">
-                            Junte-se a milhares de advogados e transforme a gestão do seu escritório.
-                        </p>
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-slate-50/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-2xl">
+                                <div className="bg-white p-8 rounded-3xl shadow-2xl border border-blue-500/20 text-center max-w-sm transform hover:scale-105 transition-transform duration-300">
+                                    <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                        <Mail className="text-blue-600" size={32} />
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Em Breve</h2>
+                                    <p className="text-slate-600 text-sm mb-6 leading-relaxed">
+                                        O cadastro público está temporariamente desativado para novas adesões. 
+                                        Para acessar a plataforma, entre em contato com o administrador do seu escritório.
+                                    </p>
+                                    <div className="space-y-3">
+                                        <a href="mailto:contato@legalflow.com.br" className="block w-full py-3 px-4 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
+                                            Falar com Suporte
+                                        </a>
+                                        <Link to="/login" className="block w-full py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors">
+                                            Já tenho conta
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Crie sua conta</h1>
+                            <p className="text-slate-600 mb-8">
+                                Junte-se a milhares de advogados e transforme a gestão do seu escritório.
+                            </p>
+
+                            <form onSubmit={handleSubmit} className="space-y-4 opacity-50 grayscale pointer-events-none select-none">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
