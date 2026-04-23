@@ -987,8 +987,10 @@ export default function AgendaPage() {
                                                                 {sortedDayEvents.slice(0, 4).map((event) => (
                                                                     <div 
                                                                         key={event.id}
+                                                                        onClick={(e) => { e.stopPropagation(); handleViewClick(event, e); }}
                                                                         className={clsx(
-                                                                            "text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded border truncate transition-all",
+                                                                            "text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded border truncate cursor-pointer",
+                                                                            "transition-all duration-200 hover:scale-[1.05] hover:shadow-md hover:z-50",
                                                                             event.completed ? "opacity-40 grayscale italic line-through bg-slate-100 border-slate-200 text-slate-500" : 
                                                                             getEventColor(event.type, event.color).pillLight
                                                                         )}
@@ -1109,7 +1111,8 @@ export default function AgendaPage() {
                                                                         key={event.id}
                                                                         onClick={(e) => handleViewClick(event, e)}
                                                                         className={clsx(
-                                                                            "absolute left-1 right-1 rounded-lg p-2 overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-white/50 shadow-md group border-l-4",
+                                                                            "absolute left-1 right-1 rounded-lg p-2 overflow-hidden cursor-pointer shadow-md group border-l-4",
+                                                                            "transition-all duration-200 hover:scale-[1.02] hover:shadow-xl hover:z-30 hover:ring-2 hover:ring-primary/30",
                                                                             event.completed ? "bg-app-stroke/40 border-l-slate-400 grayscale" : 
                                                                             eventStyles.pillLight.replace('text-', 'text-opacity-90 text-').replace('border-', 'border-l-') // Ensure border-l is prominent
                                                                         )}
@@ -1401,6 +1404,9 @@ export default function AgendaPage() {
                                     )}
                                 </div>
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={(e) => handleViewClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Visualizar">
+                                        <Eye size={14} />
+                                    </button>
                                     <button onClick={(e) => handleEditClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Editar">
                                         <Edit3 size={14} />
                                     </button>
@@ -1445,6 +1451,9 @@ export default function AgendaPage() {
                                 </div>
                                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-app-stroke/50">
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
+                                        <button onClick={(e) => handleViewClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Visualizar">
+                                            <Eye size={14} />
+                                        </button>
                                         <button onClick={(e) => handleEditClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Editar">
                                             <Edit3 size={14} />
                                         </button>

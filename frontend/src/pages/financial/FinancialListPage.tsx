@@ -443,53 +443,126 @@ export default function FinancialListPage() {
             const { jsPDF } = await import('jspdf');
             const doc = new jsPDF();
             
+            // --- Design Constants ---
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+
+            // Background Decorative Element (Subtle side bar)
+            doc.setFillColor(59, 130, 246, 0.05); // primary light alpha
+            doc.rect(0, 0, 5, pageHeight, 'F');
+
             // Draw Logo
             if (settings?.logoUrl) {
-                const isPng = settings.logoUrl.includes('image/png');
-                doc.addImage(settings.logoUrl, isPng ? 'PNG' : 'JPEG', 15, 15, 30, 30);
+                try {
+                    const isPng = settings.logoUrl.includes('image/png') || settings.logoUrl.startsWith('data:image/png');
+                    doc.addImage(settings.logoUrl, isPng ? 'PNG' : 'JPEG', margin, margin, 35, 35);
+                } catch (e) {
+                    console.error('Error adding logo to PDF:', e);
+                }
             }
 
-            // Draw Office Details
-            doc.setFontSize(16);
+            // Draw Office Details (Header Right)
+            doc.setFontSize(14);
             doc.setFont('helvetica', 'bold');
-            doc.text(settings?.officeName || 'Escritório de Advocacia', 50, 20);
+            doc.setTextColor(30, 41, 59); // slate-800
+            doc.text(settings?.officeName || 'ESCRITÓRIO DE ADVOCACIA', pageWidth - margin, margin + 5, { align: 'right' });
+            
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 116, 139); // slate-500
+            doc.text(`CNPJ: ${settings?.cnpj || 'N/A'}`, pageWidth - margin, margin + 11, { align: 'right' });
+            doc.text(`Email: ${settings?.email || 'N/A'}`, pageWidth - margin, margin + 16, { align: 'right' });
+            if (settings?.phone) doc.text(`Tel: ${settings.phone}`, pageWidth - margin, margin + 21, { align: 'right' });
+
+            // Horizontal Separator
+            doc.setDrawColor(226, 232, 240); // slate-200
+            doc.line(margin, 60, pageWidth - margin, 60);
+
+            // Receipt Title & Number
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('RECIBO', margin, 75);
             
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
-            doc.text(`CNPJ: ${settings?.cnpj || 'N/A'}`, 50, 26);
-            doc.text(`Email: ${settings?.email || 'N/A'}`, 50, 32);
+            doc.setTextColor(148, 163, 184); // slate-400
+            doc.text(`Nº RECIBO: ${record.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 75, { align: 'right' });
 
-            // Draw Receipt Title
-            doc.setFontSize(22);
+            // Value Highlight Box
+            doc.setFillColor(248, 250, 252); // slate-50
+            doc.roundedRect(margin, 85, contentWidth, 25, 3, 3, 'F');
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139);
+            doc.text('VALOR DO PAGAMENTO', margin + 10, 95);
+            
+            doc.setFontSize(18);
             doc.setFont('helvetica', 'bold');
-            doc.text('RECIBO DE PAGAMENTO', 105, 55, { align: 'center' });
-
-            // Draw Value
-            doc.setFontSize(16);
+            doc.setTextColor(16, 185, 129); // emerald-500
             const valueStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(record.amount);
-            doc.text(`Valor: ${valueStr}`, 105, 70, { align: 'center' });
+            doc.text(valueStr, margin + 10, 104);
 
-            // Draw Body
+            // Main Content
+            const dateObj = new Date(record.date);
+            const dateStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const typeStr = record.type === 'INCOME' ? 'Recebemos de' : 'Pagamos a';
+            const clientName = record.client?.name || 'Cliente / Terceiro';
+
             doc.setFontSize(12);
             doc.setFont('helvetica', 'normal');
+            doc.setTextColor(71, 85, 105); // slate-600
             
-            const clientName = record.client?.name || 'Cliente';
-            const dateObj = new Date(record.date);
-            const dateStr = dateObj.toLocaleDateString('pt-BR');
-            const typeStr = record.type === 'INCOME' ? 'Recebemos de' : 'Pagamos a';
+            const introText = `${typeStr} ${clientName.toUpperCase()}, a quantia supra mencionada de ${valueStr}.`;
+            doc.text(introText, margin, 125, { maxWidth: contentWidth });
+
+            // Details Table-like layout
+            let y = 145;
+            const drawDetail = (label: string, value: string) => {
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(100, 116, 139);
+                doc.text(label, margin, y);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(30, 41, 59);
+                doc.text(value, margin + 40, y);
+                y += 10;
+            };
+
+            drawDetail('REFERENTE A:', record.description);
+            drawDetail('CATEGORIA:', record.category);
+            drawDetail('FORMA PGTO:', record.paymentMethod || 'Transferência / Pix');
+            drawDetail('STATUS:', record.status === 'PAID' ? 'LIQUIDADO' : 'PENDENTE');
+
+            // Date & Location
+            y += 10;
+            doc.setFontSize(11);
+            doc.text(`Emitido em ${dateStr}.`, margin, y);
+
+            // Signature Section
+            const sigY = 220;
+            doc.setDrawColor(203, 213, 225); // slate-300
+            doc.line(pageWidth / 2 - 40, sigY, pageWidth / 2 + 40, sigY);
             
-            const bodyText = `Referente a: ${record.description}\nCategoria: ${record.category}\nStatus: ${record.status === 'PAID' ? 'Pago' : 'Pendente'}\nData de Emissão: ${dateStr}`;
-
-            doc.text(`${typeStr}: ${clientName}`, 20, 90);
-            doc.text(bodyText, 20, 105, { maxWidth: 170 });
-
-            // Signature Line
-            doc.line(60, 160, 150, 160);
             doc.setFontSize(10);
-            doc.text(settings?.officeName || 'Assinatura', 105, 165, { align: 'center' });
+            doc.setFont('helvetica', 'bold');
+            doc.text(settings?.officeName?.toUpperCase() || 'RESPONSÁVEL', pageWidth / 2, sigY + 7, { align: 'center' });
+            
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(148, 163, 184);
+            doc.text('ESTE É UM DOCUMENTO DIGITAL EMITIDO PELO SISTEMA LEGALFLOW', pageWidth / 2, sigY + 15, { align: 'center' });
 
-            doc.save(`Recibo_${record.description.substring(0, 10)}.pdf`);
-            addToast('Recibo PDF gerado com sucesso!', 'success');
+            // Footer
+            doc.setFillColor(30, 41, 59);
+            doc.rect(0, pageHeight - 10, pageWidth, 10, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.text('Comprovante de Transação Financeira - Todos os direitos reservados', pageWidth / 2, pageHeight - 4, { align: 'center' });
+
+            doc.save(`Recibo_${record.description.replace(/\s+/g, '_').substring(0, 15)}.pdf`);
+            addToast('Recibo Profissional gerado com sucesso!', 'success');
         } catch (error) {
             console.error('Erro ao gerar recibo:', error);
             addToast('Erro ao gerar recibo PDF.', 'error');

@@ -479,7 +479,7 @@ export default function ClientListPage() {
                                                         ) : (
                                                             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                                 <button 
-                                                                    onClick={(e) => { e.stopPropagation(); navigate(`/app/processos?newProcess=true&clientId=${client.id}`); }}
+                                                                    onClick={(e) => { e.stopPropagation(); navigate(`/app/processos/kanban?newProcess=true&clientId=${client.id}`); }}
                                                                     className="p-1.5 rounded text-app-text-muted hover:text-primary hover:bg-primary/10 transition-all tooltip relative"
                                                                     title="Criar Processo"
                                                                 >
