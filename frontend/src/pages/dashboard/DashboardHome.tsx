@@ -298,6 +298,8 @@ export default function DashboardHome() {
         }
     }, [navigate]);
 
+    const { addNotification } = useNotifications();
+
     useEffect(() => {
         fetchDashboardData();
         
@@ -309,7 +311,6 @@ export default function DashboardHome() {
 
         // Send welcome notification once on first visit after update
         const notifSentKey = 'performance_chart_notif_sent_v2';
-        const { addNotification } = useNotifications();
         
         if (!localStorage.getItem(notifSentKey)) {
             // Recibos
@@ -360,7 +361,7 @@ export default function DashboardHome() {
                 })
                 .catch(err => console.error('Failed to verify session', err));
         }
-    }, [fetchDashboardData]);
+    }, [fetchDashboardData, addNotification]);
 
     const percentChange = useMemo(() => data.balance > 0 ? '+12%' : '-5%', [data.balance]);
 
