@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, Bell, X, Check, Circle, CheckCircle2, Users, MapPin, Trash2, Edit3, List, AlertTriangle, Gavel, FileText, MessageSquare } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, Bell, X, Check, Circle, CheckCircle2, Users, MapPin, Trash2, Edit3, List, AlertTriangle, Gavel, FileText, MessageSquare, Eye } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';

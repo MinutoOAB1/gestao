@@ -30,6 +30,7 @@ interface FinancialRecord {
     parentRecordId?: string | null;
     isUrgent?: boolean;
     notes?: string;
+    paymentMethod?: string;
 }
 
 interface Partner {
