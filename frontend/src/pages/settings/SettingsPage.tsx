@@ -31,6 +31,7 @@ interface Settings {
     emailNotifications: boolean;
     processUpdates: boolean;
     deadlineReminders: boolean;
+    logoUrl?: string;
 }
 
 const defaultSettings: Settings = {
@@ -148,8 +149,7 @@ export default function SettingsPage() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64 = reader.result as string;
-                setProfilePhoto(base64);
-                localStorage.setItem('profile_photo', base64);
+                updateSetting('logoUrl', base64);
             };
             reader.readAsDataURL(file);
         }
@@ -398,8 +398,8 @@ export default function SettingsPage() {
                                     <div className="flex flex-col md:flex-row gap-6">
                                         <div className="flex flex-col items-center gap-3">
                                             <label className="w-24 h-24 rounded-full bg-app-card border-2 border-dashed border-app-stroke flex items-center justify-center relative cursor-pointer hover:border-primary transition-colors group overflow-hidden">
-                                                {profilePhoto ? (
-                                                    <img src={profilePhoto} alt="Foto de perfil" className="w-full h-full object-cover" />
+                                                {settings.logoUrl ? (
+                                                    <img src={settings.logoUrl} alt="Logo do escritório" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <Camera size={24} className="text-app-text-muted group-hover:text-app-text-main" />
                                                 )}

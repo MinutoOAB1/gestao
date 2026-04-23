@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, Bell, X, Check, Circle, CheckCircle2, Users, MapPin, Trash2, Edit3, List, AlertTriangle, Gavel, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, Bell, X, Check, Circle, CheckCircle2, Users, MapPin, Trash2, Edit3, List, AlertTriangle, Gavel, FileText, MessageSquare } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
@@ -156,6 +156,7 @@ export default function AgendaPage() {
     // Modal State
     const [isNewEventOpen, setIsNewEventOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+    const [viewingEvent, setViewingEvent] = useState<Event | null>(null);
     const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
     const [newEvent, setNewEvent] = useState({
         title: '',
@@ -491,7 +492,14 @@ export default function AgendaPage() {
         }
     };
 
+    const handleViewClick = (event: Event, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        setViewingEvent(event);
+    };
+
     const handleEditClick = (event: Event, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        setViewingEvent(null);
         if (e) e.stopPropagation();
         setEditingEvent(event);
         setNewEvent({
@@ -1099,7 +1107,7 @@ export default function AgendaPage() {
                                                                 return (
                                                                     <div 
                                                                         key={event.id}
-                                                                        onClick={(e) => handleEditClick(event, e)}
+                                                                        onClick={(e) => handleViewClick(event, e)}
                                                                         className={clsx(
                                                                             "absolute left-1 right-1 rounded-lg p-2 overflow-hidden cursor-pointer transition-all hover:ring-2 hover:ring-white/50 shadow-md group border-l-4",
                                                                             event.completed ? "bg-app-stroke/40 border-l-slate-400 grayscale" : 
@@ -1218,7 +1226,7 @@ export default function AgendaPage() {
                                                                     isPast && !event.completed && "opacity-80",
                                                                     ['deadline', 'hearing'].includes(event.type) && !event.completed && "pt-7 sm:pt-6"
                                                                 )}
-                                                                onClick={(e) => handleEditClick(event, e)}
+                                                                onClick={(e) => handleViewClick(event, e)}
                                                             >
                                                                 {/* Red Highlight Banner */}
                                                                 {['deadline', 'hearing'].includes(event.type) && !event.completed && (
@@ -1460,6 +1468,84 @@ export default function AgendaPage() {
                     </button>
                 </div>
             </aside>
+
+            {/* Quick View Modal */}
+            <Modal
+                isOpen={!!viewingEvent}
+                onClose={() => setViewingEvent(null)}
+                title="Detalhes do Evento"
+                footer={
+                    <>
+                        <button onClick={() => setViewingEvent(null)} className="px-5 py-2 border border-app-stroke rounded-lg text-sm font-medium text-app-text-muted hover:bg-app-stroke/30 transition-colors">Fechar</button>
+                        <button onClick={() => viewingEvent && handleEditClick(viewingEvent)} className="px-6 py-2 rounded-lg text-sm font-medium bg-primary text-white flex items-center gap-2 hover:bg-primary/90 transition-colors">
+                            <Edit3 size={16} /> Editar
+                        </button>
+                    </>
+                }
+            >
+                {viewingEvent && (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 pb-4 border-b border-app-stroke">
+                            <div className={clsx("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", getEventColor(viewingEvent.type, viewingEvent.color).badge)}>
+                                {viewingEvent.type === 'deadline' ? <AlertTriangle size={24} /> : viewingEvent.type === 'hearing' ? <MessageSquare size={24} /> : <CalendarIcon size={24} />}
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-app-text-main leading-tight">{viewingEvent.title}</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className={clsx("text-xs px-2 py-0.5 rounded-full font-medium", getEventColor(viewingEvent.type, viewingEvent.color).badge)}>{getEventColor(viewingEvent.type, viewingEvent.color).label}</span>
+                                    {viewingEvent.completed && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium">Concluído</span>}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Início</p>
+                                <p className="text-sm font-medium text-app-text-main">{new Date(viewingEvent.start).toLocaleString('pt-BR')}</p>
+                            </div>
+                            {viewingEvent.end && (
+                                <div>
+                                    <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Fim</p>
+                                    <p className="text-sm font-medium text-app-text-main">{new Date(viewingEvent.end).toLocaleString('pt-BR')}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {viewingEvent.description && (
+                            <div>
+                                <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Descrição</p>
+                                <div className="p-3 bg-app-bg rounded-lg border border-app-stroke text-sm text-app-text-main whitespace-pre-wrap">
+                                    {viewingEvent.description}
+                                </div>
+                            </div>
+                        )}
+
+                        {(viewingEvent.clientName || viewingEvent.processNumber) && (
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-app-stroke">
+                                {viewingEvent.clientName && (
+                                    <div>
+                                        <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Cliente</p>
+                                        <p className="text-sm font-medium text-app-text-main">{viewingEvent.clientName}</p>
+                                    </div>
+                                )}
+                                {viewingEvent.processNumber && (
+                                    <div>
+                                        <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Processo</p>
+                                        <p className="text-sm font-medium text-app-text-main">{viewingEvent.processNumber}</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        
+                        {viewingEvent.location && (
+                            <div className="pt-4 border-t border-app-stroke">
+                                <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Localização</p>
+                                <p className="text-sm font-medium text-app-text-main">{viewingEvent.location}</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </Modal>
 
             <Modal 
                 isOpen={isNewEventOpen} 

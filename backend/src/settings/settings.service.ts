@@ -19,7 +19,7 @@ export class SettingsService {
         const {
             officeName, cnpj, email, website, language, timezone, dateFormat,
             emailNotifications, processUpdates, deadlineReminders,
-            twoFactor, loginAlerts
+            twoFactor, loginAlerts, logoUrl
         } = settings;
 
         return this.prisma.tenantSettings.upsert({
@@ -29,13 +29,13 @@ export class SettingsService {
             update: {
                 officeName, cnpj, email, website, language, timezone, dateFormat,
                 emailNotifications, processUpdates, deadlineReminders,
-                twoFactor, loginAlerts
+                twoFactor, loginAlerts, logoUrl
             },
             create: {
                 tenantId,
                 officeName, cnpj, email, website, language, timezone, dateFormat,
                 emailNotifications, processUpdates, deadlineReminders,
-                twoFactor, loginAlerts
+                twoFactor, loginAlerts, logoUrl
             }
         });
     }

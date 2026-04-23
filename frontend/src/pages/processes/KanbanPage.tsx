@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     DndContext,
     DragOverlay,
@@ -439,7 +439,7 @@ const DroppableColumn = memo(function DroppableColumn({
 // ─── Add Card Modal ────────────────────────────────────────
 
 function AddCardModal({
-    isOpen, columnId, onClose, onSave, teamMembers, clients,
+    isOpen, columnId, onClose, onSave, teamMembers, clients, initialClientId
 }: {
     isOpen: boolean;
     columnId: string;
@@ -447,10 +447,20 @@ function AddCardModal({
     onSave: (data: Partial<Process>) => void;
     teamMembers: Array<{ id: string, name: string, avatar?: string | null, role: string }>;
     clients: Array<{ id: string, name: string, email?: string }>;
+    initialClientId?: string;
 }) {
     const [formData, setFormData] = useState({
         title: '', number: '', description: '', area: 'Cível', deadline: '', assignedTo: '', clientId: '',
     });
+
+    useEffect(() => {
+        if (isOpen) {
+            setFormData(prev => ({
+                ...prev,
+                clientId: initialClientId || prev.clientId
+            }));
+        }
+    }, [isOpen, initialClientId]);
 
     if (!isOpen) return null;
 
@@ -598,6 +608,7 @@ function FilterModal({
 
 export default function KanbanPage() {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { addToast } = useToast();
     const [processes, setProcesses] = useState<Process[]>([]);
     const [columns, setColumns] = useState<Column[]>(() => {
@@ -622,6 +633,7 @@ export default function KanbanPage() {
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [showDeadlineFilter, setShowDeadlineFilter] = useState<'all' | 'today' | 'week' | 'overdue'>('all');
     const [modalOpen, setModalOpen] = useState(false);
+    const [initialClientId, setInitialClientId] = useState<string | undefined>();
     const [activeColumnId, setActiveColumnId] = useState<string>('novo');
     const [teamMembers, setTeamMembers] = useState<Array<{ id: string, name: string, avatar?: string | null, role: string }>>([]);
     const [clients, setClients] = useState<Array<{ id: string, name: string, email?: string }>>([]);
@@ -677,6 +689,20 @@ export default function KanbanPage() {
             console.error('Error fetching clients:', error);
         }
     };
+
+    useEffect(() => {
+        if (searchParams.get('newProcess') === 'true') {
+            const preClient = searchParams.get('clientId');
+            setInitialClientId(preClient || undefined);
+            setModalOpen(true);
+            
+            // Clear URL
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete('newProcess');
+            newParams.delete('clientId');
+            setSearchParams(newParams);
+        }
+    }, [searchParams, setSearchParams]);
 
     useEffect(() => {
         localStorage.setItem('kanban-columns', JSON.stringify(columns));
@@ -985,6 +1011,7 @@ export default function KanbanPage() {
                 onSave={handleSaveCard}
                 teamMembers={teamMembers}
                 clients={clients}
+                initialClientId={initialClientId}
             />
             <FilterModal
                 isOpen={showFilterModal}

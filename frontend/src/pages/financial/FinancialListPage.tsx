@@ -435,6 +435,67 @@ export default function FinancialListPage() {
         }
     }, [fetchData, addToast]);
 
+    const handleGenerateReceipt = useCallback(async (record: FinancialRecord) => {
+        try {
+            const settingsRes = await api.get('/settings');
+            const settings = settingsRes.data;
+
+            const { jsPDF } = await import('jspdf');
+            const doc = new jsPDF();
+            
+            // Draw Logo
+            if (settings?.logoUrl) {
+                const isPng = settings.logoUrl.includes('image/png');
+                doc.addImage(settings.logoUrl, isPng ? 'PNG' : 'JPEG', 15, 15, 30, 30);
+            }
+
+            // Draw Office Details
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text(settings?.officeName || 'Escritório de Advocacia', 50, 20);
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`CNPJ: ${settings?.cnpj || 'N/A'}`, 50, 26);
+            doc.text(`Email: ${settings?.email || 'N/A'}`, 50, 32);
+
+            // Draw Receipt Title
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text('RECIBO DE PAGAMENTO', 105, 55, { align: 'center' });
+
+            // Draw Value
+            doc.setFontSize(16);
+            const valueStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(record.amount);
+            doc.text(`Valor: ${valueStr}`, 105, 70, { align: 'center' });
+
+            // Draw Body
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            
+            const clientName = record.client?.name || 'Cliente';
+            const dateObj = new Date(record.date);
+            const dateStr = dateObj.toLocaleDateString('pt-BR');
+            const typeStr = record.type === 'INCOME' ? 'Recebemos de' : 'Pagamos a';
+            
+            const bodyText = `Referente a: ${record.description}\nCategoria: ${record.category}\nStatus: ${record.status === 'PAID' ? 'Pago' : 'Pendente'}\nData de Emissão: ${dateStr}`;
+
+            doc.text(`${typeStr}: ${clientName}`, 20, 90);
+            doc.text(bodyText, 20, 105, { maxWidth: 170 });
+
+            // Signature Line
+            doc.line(60, 160, 150, 160);
+            doc.setFontSize(10);
+            doc.text(settings?.officeName || 'Assinatura', 105, 165, { align: 'center' });
+
+            doc.save(`Recibo_${record.description.substring(0, 10)}.pdf`);
+            addToast('Recibo PDF gerado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao gerar recibo:', error);
+            addToast('Erro ao gerar recibo PDF.', 'error');
+        }
+    }, [addToast]);
+
     const handleEdit = useCallback((record: FinancialRecord) => {
         setEditingRecord(record);
         setNewTransaction({
@@ -1185,6 +1246,7 @@ export default function FinancialListPage() {
                                                 setActiveNoteRecord={setActiveNoteRecord}
                                                 setSelectedClientForInvoice={setSelectedClientForInvoice}
                                                 setIsInvoiceModalOpen={setIsInvoiceModalOpen}
+                                                handleGenerateReceipt={handleGenerateReceipt}
                                             />
                                         ))
                                     ) : (
@@ -1948,7 +2010,7 @@ export default function FinancialListPage() {
 
 const FinancialTableRow = memo(({
     record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, setActiveNoteRecord,
-    setSelectedClientForInvoice, setIsInvoiceModalOpen
+    setSelectedClientForInvoice, setIsInvoiceModalOpen, handleGenerateReceipt
 }: any) => {
     const isGroup = record._isGroupHeader === true;
     const isExpanded = isGroup && expandedGroups?.has(record.id);
@@ -2127,12 +2189,21 @@ const FinancialTableRow = memo(({
                                 </button>
                             )}
                             {record.status === 'PAID' && (
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
-                                    className="px-2 py-1.5 text-xs font-medium text-app-text-muted hover:text-white bg-app-bg hover:bg-app-stroke rounded-lg transition-colors border border-app-stroke"
-                                >
-                                    Editar
-                                </button>
+                                <>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleGenerateReceipt(record); }}
+                                        className="px-2 py-1.5 text-xs font-medium text-app-text-muted hover:text-white bg-app-bg hover:bg-app-stroke rounded-lg transition-colors border border-app-stroke flex items-center gap-1"
+                                        title="Gerar Recibo PDF"
+                                    >
+                                        <FileText size={12} /> Recibo
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
+                                        className="px-2 py-1.5 text-xs font-medium text-app-text-muted hover:text-white bg-app-bg hover:bg-app-stroke rounded-lg transition-colors border border-app-stroke"
+                                    >
+                                        Editar
+                                    </button>
+                                </>
                             )}
                             {deleteConfirm === record.id ? (
                                 <div className="flex items-center gap-1">

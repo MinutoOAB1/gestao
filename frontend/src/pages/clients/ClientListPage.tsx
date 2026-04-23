@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useDeferredValue } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Phone, Trash2, Printer } from 'lucide-react';
+import { Plus, Search, Phone, Trash2, Printer, Briefcase } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { clsx } from 'clsx';
@@ -477,10 +477,20 @@ export default function ClientListPage() {
                                                                 <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(null); }} className="px-2 py-0.5 bg-app-stroke text-app-text-main text-[10px] font-medium rounded hover:bg-app-stroke/80 transition-colors">Não</button>
                                                             </div>
                                                         ) : (
-                                                            <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(client.id); }}
-                                                                className="p-1.5 rounded text-app-text-muted hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all">
-                                                                <Trash2 size={14} />
-                                                            </button>
+                                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                                <button 
+                                                                    onClick={(e) => { e.stopPropagation(); navigate(`/app/processos?newProcess=true&clientId=${client.id}`); }}
+                                                                    className="p-1.5 rounded text-app-text-muted hover:text-primary hover:bg-primary/10 transition-all tooltip relative"
+                                                                    title="Criar Processo"
+                                                                >
+                                                                    <Briefcase size={14} />
+                                                                </button>
+                                                                <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(client.id); }}
+                                                                    className="p-1.5 rounded text-app-text-muted hover:text-red-500 hover:bg-red-500/10 transition-all tooltip relative"
+                                                                    title="Apagar Cliente">
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </div>
                                                         )}
                                                     </td>
                                                 </motion.tr>
@@ -575,9 +585,17 @@ export default function ClientListPage() {
                                                         <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(null); }} className="px-3 py-1 bg-app-stroke text-app-text-main text-[11px] font-bold rounded-lg">X</button>
                                                     </div>
                                                 ) : (
-                                                    <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(client.id); }} className="p-2 rounded-lg text-app-text-muted hover:text-red-500 hover:bg-red-500/10">
-                                                        <Trash2 size={18} />
-                                                    </button>
+                                                    <div className="flex items-center gap-3">
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); navigate(`/app/processos?newProcess=true&clientId=${client.id}`); }}
+                                                            className="p-2 bg-primary/10 text-primary rounded-xl"
+                                                        >
+                                                            <Briefcase size={18} />
+                                                        </button>
+                                                        <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(client.id); }} className="p-2 bg-red-500/10 text-red-500 rounded-xl">
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
