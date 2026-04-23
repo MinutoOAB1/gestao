@@ -333,6 +333,7 @@ export default function RegisterPage() {
                                 )}
                             </button>
                         </form>
+                        </div>
 
                         <p className="text-center text-slate-600 text-sm mt-8">
                             Já possui uma conta?{' '}
