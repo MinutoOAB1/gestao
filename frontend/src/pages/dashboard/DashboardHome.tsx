@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import TeamPerformanceChart from '../../components/dashboard/TeamPerformanceChart';
 import WeeklyAgenda from '../../components/dashboard/WeeklyAgenda';
+import { useNotifications } from '../../context/NotificationContext';
 
 import {
   DndContext,
@@ -307,12 +308,35 @@ export default function DashboardHome() {
         }
 
         // Send welcome notification once on first visit after update
-        const notifSentKey = 'performance_chart_notif_sent';
+        const notifSentKey = 'performance_chart_notif_sent_v2';
+        const { addNotification } = useNotifications();
+        
         if (!localStorage.getItem(notifSentKey)) {
-            api.post('/notifications/test').then(() => {
-                localStorage.setItem(notifSentKey, 'true');
-                console.log('[Dashboard] Performance chart notification sent!');
-            }).catch(() => { });
+            // Recibos
+            addNotification({
+                type: 'success',
+                title: 'Novo: Recibos com Logo',
+                message: 'Agora você pode carregar a logo do seu escritório nas configurações e gerar recibos PDF profissionais.',
+                link: '/app/settings'
+            });
+
+            // Conversão de Clientes
+            addNotification({
+                type: 'info',
+                title: 'Novo: Conversão de Clientes',
+                message: 'Crie processos judiciais diretamente da lista de clientes ou da tela de detalhes.',
+                link: '/app/clientes'
+            });
+
+            // Agenda Quick View
+            addNotification({
+                type: 'event',
+                title: 'Novo: Visualização Rápida',
+                message: 'Consulte detalhes de eventos na agenda com um clique sem precisar abrir o formulário de edição.',
+                link: '/app/agenda'
+            });
+
+            localStorage.setItem(notifSentKey, 'true');
         }
         
         // Handle Stripe Checkout return
