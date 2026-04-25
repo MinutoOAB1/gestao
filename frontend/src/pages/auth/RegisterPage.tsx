@@ -161,29 +161,28 @@ export default function RegisterPage() {
                     >
                         <div className="relative">
                             <div className="absolute inset-0 bg-slate-50/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-2xl">
-                                <div className="bg-white p-8 rounded-3xl shadow-2xl border border-black/10 text-center max-w-sm transform hover:scale-105 transition-transform duration-300">
-                                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                        <Mail className="text-black" size={32} />
+                                <div className="bg-white/90 backdrop-blur-md p-8 rounded-[2rem] shadow-2xl border border-primary/10 text-center max-w-sm transform hover:scale-[1.02] transition-all duration-500">
+                                    <div className="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-primary/10">
+                                        <Mail className="text-primary" size={32} />
                                     </div>
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Em Breve</h2>
-                                    <p className="text-slate-600 text-sm mb-6 leading-relaxed">
-                                        O cadastro público está temporariamente desativado para novas adesões. 
-                                        Para acessar a plataforma, entre em contato com o administrador do seu escritório.
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-2 font-display tracking-tight">Assinaturas Premium</h2>
+                                    <p className="text-slate-600 text-sm mb-8 leading-relaxed">
+                                        O cadastro público para o Advus está temporariamente restrito para garantir a exclusividade e performance dos nossos membros.
                                     </p>
-                                    <div className="space-y-3">
-                                        <a href="mailto:contato@advus.com.br" className="block w-full py-3 px-4 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-900 transition-colors">
-                                            Falar com Suporte
+                                    <div className="space-y-4">
+                                        <a href="mailto:contato@advus.com.br" className="block w-full py-3.5 px-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+                                            Entrar na Fila de Espera
                                         </a>
-                                        <Link to="/login" className="block w-full py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors">
-                                            Já tenho conta
+                                        <Link to="/login" className="block w-full py-3.5 px-4 bg-white text-primary border border-primary/20 rounded-xl font-semibold text-sm hover:bg-primary/5 transition-all">
+                                            Acessar Minha Conta
                                         </Link>
                                     </div>
                                 </div>
                             </div>
 
-                            <h1 className="text-3xl font-bold text-black dark:text-white mb-2 font-display">Crie sua conta</h1>
+                            <h1 className="text-3xl font-bold text-black dark:text-white mb-2 font-display tracking-tight">Crie sua conta no Advus</h1>
                             <p className="text-slate-600 mb-8">
-                                Junte-se a milhares de advogados e transforme a gestão do seu escritório.
+                                Junte-se à elite jurídica e transforme seu escritório em uma potência digital.
                             </p>
 
                             <form onSubmit={handleSubmit} className="space-y-4 opacity-50 grayscale pointer-events-none select-none">
@@ -199,7 +198,7 @@ export default function RegisterPage() {
                                         onChange={handleChange}
                                         placeholder="Seu nome"
                                         required
-                                        className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                                        className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-400"
                                     />
                                 </div>
                                 <div>
@@ -213,7 +212,7 @@ export default function RegisterPage() {
                                         onChange={handleChange}
                                         placeholder="Seu sobrenome"
                                         required
-                                        className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                                        className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-400"
                                     />
                                 </div>
                             </div>
@@ -228,9 +227,9 @@ export default function RegisterPage() {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        placeholder="exemplo@advocacia.com.br"
+                                        placeholder="exemplo@advus.com.br"
                                         required
-                                        className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-500"
+                                        className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-500"
                                     />
                                     <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
                                 </div>
@@ -249,7 +248,7 @@ export default function RegisterPage() {
                                             onChange={handleChange}
                                             placeholder="••••••••••"
                                             required
-                                            className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-500"
+                                            className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-500"
                                         />
                                         <button
                                             type="button"
@@ -272,7 +271,7 @@ export default function RegisterPage() {
                                             onChange={handleChange}
                                             placeholder="••••••••••"
                                             required
-                                            className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-500"
+                                            className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-500"
                                         />
                                         <button
                                             type="button"
@@ -286,23 +285,23 @@ export default function RegisterPage() {
                             </div>
 
                             <div 
-                                className="flex items-start gap-3 p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-blue-500/50 transition-all group"
+                                className="flex items-start gap-3 p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-primary/50 transition-all group"
                                 onClick={() => setAgreeTerms(!agreeTerms)}
                             >
                                 <div className="mt-0.5">
                                     {agreeTerms ? (
-                                        <CheckCircle2 className="text-blue-600" size={20} />
+                                        <CheckCircle2 className="text-primary" size={20} />
                                     ) : (
                                         <Circle className="text-slate-300 group-hover:text-slate-400" size={20} />
                                     )}
                                 </div>
                                 <label className="text-sm text-slate-600 cursor-pointer select-none">
                                     Concordo com os{' '}
-                                    <Link to="/terms" className="text-blue-600 font-medium hover:text-blue-500">
+                                    <Link to="/terms" className="text-primary font-medium hover:text-primary-light">
                                         Termos de Uso
                                     </Link>
                                     {' '}e a{' '}
-                                    <Link to="/privacy" className="text-blue-600 font-medium hover:text-blue-500">
+                                    <Link to="/privacy" className="text-primary font-medium hover:text-primary-light">
                                         Política de Privacidade
                                     </Link>.
                                 </label>
@@ -321,13 +320,13 @@ export default function RegisterPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-slate-700 to-blue-800 hover:from-slate-600 hover:to-blue-700 text-white font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-900/10"
+                                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                             >
                                 {loading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 ) : (
                                     <>
-                                        Cadastrar
+                                        Cadastrar Agora
                                         <ArrowRight size={18} />
                                     </>
                                 )}
@@ -335,10 +334,10 @@ export default function RegisterPage() {
                         </form>
                         </div>
 
-                        <p className="text-center text-slate-600 text-sm mt-8">
-                            Já possui uma conta?{' '}
-                            <Link to="/login" className="text-blue-500 font-medium hover:text-blue-400">
-                                Entrar agora
+                        <p className="text-center text-slate-600 text-sm mt-8 font-medium">
+                            Já possui uma conta premium?{' '}
+                            <Link to="/login" className="text-primary font-bold hover:text-primary-light transition-colors">
+                                Entrar no Advus
                             </Link>
                         </p>
                     </motion.div>

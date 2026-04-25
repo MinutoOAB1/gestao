@@ -74,11 +74,11 @@ export class EmailService {
         <style>
           body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
           .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 30px; text-align: center; }
+          .header { background: linear-gradient(135deg, #312e81, #1e1b4b); padding: 30px; text-align: center; }
           .header h1 { color: white; margin: 0; font-size: 24px; }
           .content { padding: 30px; }
           .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+          .button { display: inline-block; background: #312e81; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
           .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
           .warning { background: #fef3cd; border-left: 4px solid #f59e0b; padding: 12px; margin: 15px 0; font-size: 14px; color: #92400e; }
         </style>
@@ -99,7 +99,7 @@ export class EmailService {
             <p style="font-size: 12px; color: #94a3b8;">Se o botão não funcionar, copie e cole este link no navegador:<br>${resetUrl}</p>
           </div>
           <div class="footer">
-            Sistema Jurídico - Plataforma de Advocacia<br>
+            Advus - Gestão Jurídica Inteligente<br>
             Este é um e-mail automático, não responda.
           </div>
         </div>
@@ -109,7 +109,7 @@ export class EmailService {
 
     await this.sendEmail({
       to,
-      subject: '🔐 Redefinição de Senha - Sistema Jurídico',
+      subject: '🔐 Redefinição de Senha - Advus',
       html,
     });
   }
@@ -159,7 +159,7 @@ export class EmailService {
             </div>
           </div>
           <div class="footer">
-            Sistema Jurídico - Plataforma de Advocacia
+            Advus - Gestão Jurídica Inteligente
           </div>
         </div>
       </body>
@@ -168,7 +168,7 @@ export class EmailService {
 
     await this.sendEmail({
       to,
-      subject: '🔔 Novo Login Detectado - Sistema Jurídico',
+      subject: '🔔 Novo Login Detectado - Advus',
       html,
     });
   }
@@ -208,7 +208,7 @@ export class EmailService {
             ${options.actionUrl ? `<a href="${options.actionUrl}" class="button">${options.actionLabel || 'Ver Detalhes'}</a>` : ''}
           </div>
           <div class="footer">
-            Sistema Jurídico - Plataforma de Advocacia
+            Advus - Gestão Jurídica Inteligente
           </div>
         </div>
       </body>
@@ -264,7 +264,7 @@ export class EmailService {
             <a href="${this.getBaseUrl()}/agenda" class="button">Ver Agenda</a>
           </div>
           <div class="footer">
-            Sistema Jurídico - Plataforma de Advocacia
+            Advus - Gestão Jurídica Inteligente
           </div>
         </div>
       </body>
@@ -319,7 +319,7 @@ export class EmailService {
             <a href="${this.getBaseUrl()}/processos" class="button">Ver Processo</a>
           </div>
           <div class="footer">
-            Sistema Jurídico - Plataforma de Advocacia
+            Advus - Gestão Jurídica Inteligente
           </div>
         </div>
       </body>
@@ -368,7 +368,7 @@ export class EmailService {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎉 Bem-vindo ao Sistema Jurídico!</h1>
+            <h1>🎉 Bem-vindo ao Advus!</h1>
           </div>
           <div class="content">
             <p>Olá, <strong>${userName}</strong>!</p>
@@ -391,7 +391,7 @@ export class EmailService {
             <p style="font-size: 12px; color: #94a3b8;">Se o botão não funcionar, acesse: ${loginUrl}</p>
           </div>
           <div class="footer">
-            Sistema Jurídico - Plataforma de Advocacia<br>
+            Advus - Gestão Jurídica Inteligente<br>
             Este é um e-mail automático, não responda.
           </div>
         </div>
@@ -401,7 +401,7 @@ export class EmailService {
 
     await this.sendEmail({
       to,
-      subject: '🎉 Bem-vindo ao Sistema Jurídico - Suas Credenciais de Acesso',
+      subject: '🎉 Bem-vindo ao Advus - Suas Credenciais de Acesso',
       html,
     });
   }

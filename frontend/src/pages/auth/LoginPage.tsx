@@ -187,14 +187,14 @@ export default function LoginPage() {
                                 </button>
 
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 rounded-xl flex items-center justify-center">
-                                        <Shield className="text-blue-600 dark:text-blue-400" size={24} />
+                                    <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center">
+                                        <Shield className="text-primary dark:text-primary-light" size={24} />
                                     </div>
                                 </div>
 
-                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Verificação em Duas Etapas</h1>
+                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 font-display">Verificação em Duas Etapas</h1>
                                 <p className="text-slate-600 dark:text-slate-400 mb-8">
-                                    Digite o código de 6 dígitos do seu aplicativo autenticador.
+                                    Digite o código de 6 dígitos do seu aplicativo autenticador para garantir a segurança premium da sua conta.
                                 </p>
 
                                 <form onSubmit={handleSubmit} className="space-y-5">
@@ -210,7 +210,7 @@ export default function LoginPage() {
                                             required
                                             autoFocus
                                             maxLength={6}
-                                            className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-4 text-center text-2xl tracking-[0.5em] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-white/30 font-mono"
+                                            className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-4 text-center text-2xl tracking-[0.5em] rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary-light outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-white/30 font-mono"
                                         />
                                     </div>
 
@@ -227,7 +227,7 @@ export default function LoginPage() {
                                     <button
                                         type="submit"
                                         disabled={loading || twoFactorCode.length !== 6}
-                                        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                                     >
                                         {loading ? (
                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -248,9 +248,9 @@ export default function LoginPage() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                             >
-                                <h1 className="text-3xl font-bold text-black dark:text-white mb-2 font-display">Bem-vindo de volta</h1>
+                                <h1 className="text-3xl font-bold text-black dark:text-white mb-2 font-display tracking-tight">Bem-vindo ao Advus</h1>
                                 <p className="text-slate-600 dark:text-slate-400 mb-8">
-                                    Acesse sua conta para gerenciar seus processos.
+                                    Acesse sua plataforma de gestão jurídica premium.
                                 </p>
 
                                 <form onSubmit={handleSubmit} className="space-y-5">
@@ -263,9 +263,9 @@ export default function LoginPage() {
                                                 type="email"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                placeholder="exemplo@advocacia.com.br"
+                                                placeholder="exemplo@advus.com.br"
                                                 required
-                                                className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-500 dark:placeholder:text-white/30"
+                                                className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary-light outline-none transition-all placeholder:text-slate-500 dark:placeholder:text-white/30"
                                             />
                                             <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-white/40" size={20} />
                                         </div>
@@ -282,7 +282,7 @@ export default function LoginPage() {
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 placeholder="••••••••••"
                                                 required
-                                                className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-500 dark:placeholder:text-white/30"
+                                                className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary-light outline-none transition-all placeholder:text-slate-500 dark:placeholder:text-white/30"
                                             />
                                             <button
                                                 type="button"
@@ -301,7 +301,7 @@ export default function LoginPage() {
                                                     type="checkbox"
                                                     checked={rememberMe}
                                                     onChange={(e) => setRememberMe(e.target.checked)}
-                                                    className="peer appearance-none w-5 h-5 border border-slate-300 dark:border-white/10 rounded-md bg-white dark:bg-white/5 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
+                                                    className="peer appearance-none w-5 h-5 border border-slate-300 dark:border-white/10 rounded-md bg-white dark:bg-white/5 checked:bg-primary checked:border-primary transition-all cursor-pointer"
                                                 />
                                                 <svg
                                                     className="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"
@@ -320,7 +320,7 @@ export default function LoginPage() {
                                                 Lembrar-me
                                             </span>
                                         </label>
-                                        <Link to="/forgot-password" className="text-sm text-blue-500 hover:text-blue-400 font-medium">
+                                        <Link to="/forgot-password" className="text-sm text-primary hover:text-primary-light font-medium transition-colors">
                                             Esqueci minha senha
                                         </Link>
                                     </div>
@@ -338,7 +338,7 @@ export default function LoginPage() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                                     >
                                         {loading ? (
                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -353,7 +353,7 @@ export default function LoginPage() {
 
                                 <p className="text-center text-slate-600 dark:text-slate-400 text-sm mt-8">
                                     Ainda não tem uma conta?{' '}
-                                    <Link to="/register" className="text-blue-500 font-medium hover:text-blue-400">
+                                    <Link to="/register" className="text-primary font-medium hover:text-primary-light transition-colors">
                                         Cadastre-se agora
                                     </Link>
                                 </p>

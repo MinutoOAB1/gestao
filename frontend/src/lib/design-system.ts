@@ -10,12 +10,20 @@
 // ============================================
 
 export const colors = {
-    // Primary Brand
+    // Primary Brand - Premium Deep Indigo
     primary: {
-        DEFAULT: '#2563EB',
-        dark: '#1D4ED8',
-        light: '#60A5FA',
-        glow: 'rgba(37, 99, 235, 0.5)',
+        DEFAULT: '#312E81',
+        dark: '#1E1B4B',
+        light: '#4338CA',
+        glow: 'rgba(49, 46, 129, 0.4)',
+    },
+
+    // Accent Brand - Refined Gold
+    accent: {
+        DEFAULT: '#D4AF37',
+        dark: '#B8860B',
+        light: '#F4D03F',
+        glow: 'rgba(212, 175, 55, 0.3)',
     },
 
     // App Theme (CSS Variables)
@@ -31,27 +39,27 @@ export const colors = {
         },
     },
 
-    // Status Colors
+    // Status Colors - Sophisticated Tones
     status: {
         success: {
-            bg: 'rgba(34, 197, 94, 0.1)',
-            text: '#22C55E',
-            border: '#22C55E',
+            bg: 'rgba(5, 150, 105, 0.08)',
+            text: '#059669',
+            border: 'rgba(5, 150, 105, 0.2)',
         },
         warning: {
-            bg: 'rgba(234, 179, 8, 0.1)',
-            text: '#EAB308',
-            border: '#EAB308',
+            bg: 'rgba(217, 119, 6, 0.08)',
+            text: '#D97706',
+            border: 'rgba(217, 119, 6, 0.2)',
         },
         danger: {
-            bg: 'rgba(239, 68, 68, 0.1)',
-            text: '#EF4444',
-            border: '#EF4444',
+            bg: 'rgba(220, 38, 38, 0.08)',
+            text: '#DC2626',
+            border: 'rgba(220, 38, 38, 0.2)',
         },
         info: {
-            bg: 'rgba(59, 130, 246, 0.1)',
-            text: '#3B82F6',
-            border: '#3B82F6',
+            bg: 'rgba(37, 99, 235, 0.08)',
+            text: '#2563EB',
+            border: 'rgba(37, 99, 235, 0.2)',
         },
     },
 } as const;
@@ -67,6 +75,7 @@ export const spacing = {
     lg: '1.5rem',    // 24px
     xl: '2rem',      // 32px
     '2xl': '3rem',   // 48px
+    '3xl': '4rem',   // 64px
 } as const;
 
 // ============================================
@@ -75,8 +84,9 @@ export const spacing = {
 
 export const typography = {
     fontFamily: {
-        sans: '"Plus Jakarta Sans", sans-serif',
+        display: '"Plus Jakarta Sans", sans-serif',
         body: '"Inter", sans-serif',
+        serif: '"Cormorant Garamond", serif', // Added for that classic legal touch
     },
     fontSize: {
         xs: '0.75rem',    // 12px
@@ -85,46 +95,52 @@ export const typography = {
         lg: '1.125rem',   // 18px
         xl: '1.25rem',    // 20px
         '2xl': '1.5rem',  // 24px
-        '3xl': '1.875rem', // 30px
+        '3xl': '2rem',    // 32px
+        '4xl': '2.5rem',  // 40px
     },
     fontWeight: {
+        light: 300,
         normal: 400,
         medium: 500,
         semibold: 600,
         bold: 700,
+        black: 800,
     },
 } as const;
 
 // ============================================
-// BORDERS & RADIUS
+// BORDERS & RADIUS - More rounded for modern premium feel
 // ============================================
 
 export const borders = {
     radius: {
-        sm: '0.375rem',  // 6px
-        md: '0.5rem',    // 8px
-        lg: '0.75rem',   // 12px
-        xl: '1rem',      // 16px
-        '2xl': '1.5rem', // 24px
+        xs: '0.25rem',
+        sm: '0.5rem',
+        md: '0.75rem',
+        lg: '1rem',
+        xl: '1.25rem',
+        '2xl': '2rem',
         full: '9999px',
     },
     width: {
         DEFAULT: '1px',
         2: '2px',
+        3: '3px',
     },
 } as const;
 
 // ============================================
-// SHADOWS
+// SHADOWS - Layered shadows for depth
 // ============================================
 
 export const shadows = {
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+    sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    DEFAULT: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    md: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    lg: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    xl: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     glow: '0 0 20px -5px var(--tw-shadow-color)',
+    premium: '0 0 40px -10px rgba(49, 46, 129, 0.2)',
 } as const;
 
 // ============================================
@@ -134,13 +150,15 @@ export const shadows = {
 export const animations = {
     duration: {
         fast: '150ms',
-        normal: '200ms',
-        slow: '300ms',
+        normal: '250ms',
+        slow: '400ms',
+        gentle: '600ms',
     },
     easing: {
-        DEFAULT: 'ease-out',
-        in: 'ease-in',
-        inOut: 'ease-in-out',
+        DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        in: 'cubic-bezier(0.4, 0, 1, 1)',
+        out: 'cubic-bezier(0, 0, 0.2, 1)',
+        inOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
 } as const;
 
@@ -162,19 +180,21 @@ export const zIndex = {
 
 export const componentSizes = {
     button: {
-        sm: { height: '2rem', padding: '0.5rem 0.75rem', fontSize: '0.75rem' },
-        md: { height: '2.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' },
-        lg: { height: '3rem', padding: '0.75rem 1.5rem', fontSize: '1rem' },
+        sm: { height: '2.25rem', padding: '0 1rem', fontSize: '0.8125rem' },
+        md: { height: '2.75rem', padding: '0 1.5rem', fontSize: '0.875rem' },
+        lg: { height: '3.25rem', padding: '0 2rem', fontSize: '1rem' },
     },
     input: {
-        sm: { height: '2rem', padding: '0.5rem 0.75rem', fontSize: '0.75rem' },
-        md: { height: '2.5rem', padding: '0.5rem 1rem', fontSize: '0.875rem' },
-        lg: { height: '3rem', padding: '0.75rem 1rem', fontSize: '1rem' },
+        sm: { height: '2.25rem', padding: '0 0.875rem' },
+        md: { height: '2.75rem', padding: '0 1rem' },
+        lg: { height: '3.25rem', padding: '0 1.25rem' },
     },
     avatar: {
-        sm: '2rem',    // 32px
-        md: '2.5rem',  // 40px
-        lg: '3rem',    // 48px
-        xl: '4rem',    // 64px
+        xs: '1.5rem',
+        sm: '2rem',
+        md: '2.5rem',
+        lg: '3.5rem',
+        xl: '5rem',
     },
 } as const;
+

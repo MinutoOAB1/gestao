@@ -6,8 +6,8 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AiService {
   private readonly logger = new Logger(AiService.name);
   private readonly openRouterKey: string | undefined;
-  private readonly siteUrl = 'https://ia-juridica.app';
-  private readonly siteName = 'IA Jurídica Elite';
+  private readonly siteUrl = 'https://advus.com.br';
+  private readonly siteName = 'Advus AI Premium';
 
   constructor(
     private configService: ConfigService,

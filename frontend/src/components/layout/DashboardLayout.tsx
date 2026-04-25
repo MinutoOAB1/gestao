@@ -280,7 +280,7 @@ export default function DashboardLayout() {
             <aside
                 className={cn(
                     "hidden md:flex flex-col z-20 transition-all duration-300 flex-shrink-0",
-                    "bg-gradient-to-b from-[#0F172A] to-[#1E3A8A] border-r border-white/5",
+                    "bg-gradient-to-b from-primary-dark via-[#1E1B4B] to-black border-r border-white/5",
                     collapsed ? "w-20" : "w-72"
                 )}
             >
@@ -301,11 +301,11 @@ export default function DashboardLayout() {
                 {/* User Profile Card */}
                 <div className={cn("mx-3 mb-4 p-3 rounded-xl bg-white/[0.06] border border-white/[0.08]", collapsed && "mx-2 p-2")}>
                     <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-lg shadow-primary/20">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary via-primary-dark to-accent flex items-center justify-center shrink-0 ring-2 ring-white/10 shadow-lg shadow-primary/30">
                             {user?.avatar ? (
                                 <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
-                                <span className="text-white font-bold text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
+                                <span className="text-white font-black text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
                             )}
                         </div>
                         {!collapsed && (
@@ -400,24 +400,17 @@ export default function DashboardLayout() {
                 {!collapsed && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
-                            <div className="relative bg-black dark:bg-white/10 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-white/10">
-                                {/* Robot Icon Background */}
-                                <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="w-16 h-16 text-white dark:text-black"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth={1}
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-white dark:text-black font-bold text-sm mb-1 font-display">IA Jurídica</h3>
-                                <p className="text-white/50 dark:text-black/50 text-xs mb-3">Analise contratos em segundos.</p>
-                                <button className="px-4 py-1.5 bg-white dark:bg-black text-black dark:text-white rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">
-                                    Testar Agora
+                            <div className="relative bg-gradient-to-br from-primary/20 via-black/40 to-black/60 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-2xl transition-all border border-white/10 group-hover:border-accent/30">
+                                {/* Sparkle Effect */}
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-accent/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                                
+                                <h3 className="text-white font-bold text-sm mb-1 font-display tracking-tight flex items-center gap-2">
+                                    IA Jurídica Premium
+                                    <div className="w-2 h-2 bg-accent rounded-full animate-pulse shadow-[0_0_8px_rgba(212,175,55,0.8)]" />
+                                </h3>
+                                <p className="text-white/40 text-[11px] mb-4 leading-relaxed font-medium">Analise contratos complexos com precisão absoluta.</p>
+                                <button className="w-full py-2 bg-accent text-primary-dark rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-white transition-all shadow-lg shadow-accent/10">
+                                    Acessar Agora
                                 </button>
                             </div>
                         </Link>
@@ -440,8 +433,8 @@ export default function DashboardLayout() {
                 </div>
             </aside>
 
-            {/* Right Side - Header + Main Content - Dark background so curved corner shows dark */}
-            <div className="flex-1 flex flex-col h-full bg-[#0F172A] relative overflow-hidden">
+            {/* Right Side - Header + Main Content */}
+            <div className="flex-1 flex flex-col h-full bg-primary-dark relative overflow-hidden">
                 {/* Desktop Header - Glass effect */}
                 {!isFullScreenPage && (
                     <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-app-card border-b border-app-stroke">
@@ -505,7 +498,7 @@ export default function DashboardLayout() {
                                 {timer.isRunning ? (
                                     <button
                                         onClick={() => navigate('/app/timesheet')}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors"
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-accent text-primary-dark rounded-xl hover:bg-white transition-all shadow-lg shadow-accent/20"
                                         title={timer.processTitle || timer.description || 'Timer rodando'}
                                     >
                                         <Pause size={16} />

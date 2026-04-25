@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import {
-    Scale, FileText, Users, DollarSign, Calendar, Shield,
+    FileText, Users, DollarSign, Calendar, Shield,
     Check, ArrowRight, Menu, X, Sparkles,
-    BarChart3, Zap, Lock, Globe, Clock, MessageSquare, Folder
+    Globe, Clock, MessageSquare, Folder
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Navbar Component
 function Navbar() {
@@ -14,55 +15,47 @@ function Navbar() {
     const navigate = useNavigate();
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0B1120]/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-2xl border-b border-white/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16 md:h-20">
+                <div className="flex items-center justify-between h-20">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-md">
-                            <Scale className="w-5 h-5 text-white dark:text-black" />
-                        </div>
-                        <span className="text-xl font-bold text-black dark:text-white tracking-tight font-display">
-                            Advus
-                        </span>
+                        <BrandLogo variant="light" size="md" />
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center gap-8">
-                        <a href="#features" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                    <div className="hidden md:flex items-center gap-10">
+                        <a href="#features" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
                             Recursos
                         </a>
-                        <a href="#pricing" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
-                            Preços
+                        <a href="#pricing" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                            Assinatura
                         </a>
-                        <a href="#testimonials" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
-                            Depoimentos
-                        </a>
-                        <a href="#contact" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
-                            Contato
+                        <a href="#testimonials" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                            Ecossistema
                         </a>
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="hidden md:flex items-center gap-3">
+                    <div className="hidden md:flex items-center gap-6">
                         <button
                             onClick={() => navigate('/login')}
-                            className="px-4 py-2 text-[#0B1120] dark:text-slate-300 font-medium hover:text-blue-600 transition-colors"
+                            className="text-white/70 font-bold hover:text-white transition-colors text-sm"
                         >
-                            Entrar
+                            ENTRAR
                         </button>
                         <button
                             onClick={() => navigate('/register')}
-                            className="px-5 py-2.5 bg-[#0B1120] dark:bg-white text-white dark:text-[#0B1120] font-medium rounded-lg hover:bg-[#1e293b] dark:hover:bg-slate-100 transition-all shadow-sm"
+                            className="px-6 py-2.5 bg-accent text-primary-dark font-black rounded-xl hover:bg-white transition-all shadow-lg shadow-accent/10 text-xs uppercase tracking-tighter"
                         >
-                            Começar Grátis
+                            SOLICITAR ACESSO
                         </button>
                     </div>
 
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 text-slate-600 dark:text-slate-300"
+                        className="md:hidden p-2 text-white"
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -70,18 +63,17 @@ function Navbar() {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden py-4 border-t border-slate-200 dark:border-slate-800">
-                        <div className="flex flex-col gap-3">
-                            <a href="#features" className="py-2 text-slate-600 dark:text-slate-300 font-medium">Recursos</a>
-                            <a href="#pricing" className="py-2 text-slate-600 dark:text-slate-300 font-medium">Preços</a>
-                            <a href="#testimonials" className="py-2 text-slate-600 dark:text-slate-300 font-medium">Depoimentos</a>
-                            <a href="#contact" className="py-2 text-slate-600 dark:text-slate-300 font-medium">Contato</a>
-                            <div className="flex flex-col gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                                <button onClick={() => navigate('/login')} className="py-2.5 text-center text-slate-700 dark:text-slate-300 font-medium border border-slate-300 dark:border-slate-700 rounded-lg">
-                                    Entrar
+                    <div className="md:hidden py-6 border-t border-white/10 bg-black/90 backdrop-blur-3xl px-4 rounded-b-3xl">
+                        <div className="flex flex-col gap-5">
+                            <a href="#features" className="text-white/80 font-medium text-lg">Recursos</a>
+                            <a href="#pricing" className="text-white/80 font-medium text-lg">Assinatura</a>
+                            <a href="#testimonials" className="text-white/80 font-medium text-lg">Ecossistema</a>
+                            <div className="flex flex-col gap-3 pt-6 border-t border-white/10">
+                                <button onClick={() => navigate('/login')} className="py-4 text-center text-white font-bold border border-white/10 rounded-2xl">
+                                    ENTRAR
                                 </button>
-                                <button onClick={() => navigate('/register')} className="py-2.5 text-center bg-blue-600 text-white font-medium rounded-lg">
-                                    Começar Grátis
+                                <button onClick={() => navigate('/register')} className="py-4 text-center bg-accent text-primary-dark font-black rounded-2xl">
+                                    SOLICITAR ACESSO
                                 </button>
                             </div>
                         </div>
@@ -97,84 +89,120 @@ function HeroSection() {
     const navigate = useNavigate();
 
     return (
-        <section className="relative pt-24 md:pt-32 pb-16 md:pb-24 overflow-hidden">
-            {/* Background Gradient */}
-            {/* Subtle Texture/Background */}
-            <div className="absolute inset-0 bg-slate-50 dark:bg-[#050B18]" />
-            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
-
+        <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 overflow-hidden bg-primary-dark">
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/20 blur-[160px] rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent/5 blur-[140px] rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+            
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-4xl mx-auto">
+                <div className="text-center max-w-5xl mx-auto">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-xs font-medium mb-8 shadow-sm">
-                        <Sparkles size={14} className="text-blue-600" />
-                        Software de Gestão Jurídica de Alta Performance
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-accent rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-2xl backdrop-blur-md"
+                    >
+                        <Sparkles size={14} className="animate-pulse" />
+                        Inteligência Jurídica de Elite
+                    </motion.div>
 
                     {/* Headline */}
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-black dark:text-white tracking-tight leading-[1.1] mb-8">
-                        A eficiência que o seu <br className="hidden md:block" />
-                        <span className="text-black dark:text-gray-300">
-                            escritório merece
+                    <motion.h1 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-10 font-display"
+                    >
+                        A Nova Era da <br className="hidden md:block" />
+                        <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/40">
+                            Gestão Jurídica
                         </span>
-                    </h1>
+                    </motion.h1>
 
                     {/* Subheadline */}
-                    <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
-                        Processos, clientes, finanças e documentos em um só lugar.
-                        Simplifique sua rotina jurídica e aumente sua produtividade em até 40%.
-                    </p>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-lg md:text-2xl text-white/50 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
+                    >
+                        Transforme seu escritório em uma potência de alta performance com a plataforma de gestão mais sofisticada do mercado.
+                    </motion.p>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20"
+                    >
                         <button
                             onClick={() => navigate('/register')}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-lg group"
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all shadow-[0_20px_50px_rgba(212,175,55,0.15)] group uppercase tracking-widest text-sm"
                         >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </button>
-                        <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 text-black dark:text-white font-semibold rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
+                        <button className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md uppercase tracking-widest text-sm">
                             Ver Demonstração
                         </button>
-                    </div>
+                    </motion.div>
 
                     {/* Social Proof */}
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-slate-500 dark:text-slate-400">
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-[10px] font-black uppercase tracking-[0.2em] text-white/30"
+                    >
                         <div className="flex items-center gap-2">
-                            <Check size={18} className="text-green-500" />
-                            7 dias grátis
+                            <Check size={16} className="text-accent" />
+                            7 Dias de Experiência
                         </div>
                         <div className="flex items-center gap-2">
-                            <Check size={18} className="text-green-500" />
-                            Sem cartão de crédito
+                            <Check size={16} className="text-accent" />
+                            Assinatura Premium
                         </div>
                         <div className="flex items-center gap-2">
-                            <Check size={18} className="text-green-500" />
-                            Cancele quando quiser
+                            <Check size={16} className="text-accent" />
+                            Suporte 24/7 Concierge
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
 
-                {/* Hero Video/Dashboard Preview */}
-                <div className="mt-16 relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-[#050B18] to-transparent z-10 pointer-events-none" style={{ top: '80%' }} />
-                    <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-900/20 border border-slate-200 dark:border-slate-700">
-                        {/* Local Video Player */}
+                {/* Hero Dashboard Preview */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 1 }}
+                    className="mt-24 relative"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary-dark via-transparent to-transparent z-10 pointer-events-none" style={{ top: '60%' }} />
+                    <div className="relative rounded-[2.5rem] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-white/10 bg-black/40 backdrop-blur-md p-2">
                         <video
-                            className="w-full aspect-video object-cover"
+                            className="w-full rounded-[2.2rem] aspect-video object-cover"
                             autoPlay
                             muted
                             loop
                             playsInline
-                            controls
                             poster=""
                         >
                             <source src="/landingpage.mp4" type="video/mp4" />
-                            Seu navegador não suporta vídeos HTML5.
                         </video>
+                        {/* Glass Overlays */}
+                        <div className="absolute top-10 left-10 p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 hidden lg:block animate-bounce-slow">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center">
+                                    <Sparkles className="text-accent" />
+                                </div>
+                                <div>
+                                    <div className="text-white font-black text-xs uppercase tracking-widest">IA Jurídica</div>
+                                    <div className="text-white/40 text-[10px]">Análise de Risco 98%</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </motion.div>
             </div>
         </section>
     );
@@ -186,78 +214,66 @@ function FeaturesSection() {
         {
             icon: FileText,
             title: 'Gestão de Processos',
-            description: 'Liste, filtre e acompanhe todos os processos. Visualize em modo Kanban, registre movimentações, prazos, notas e checklists de cada caso.',
+            description: 'Acompanhe cada movimento processual com uma interface intuitiva e poderosa.',
         },
         {
             icon: Users,
             title: 'CRM de Clientes',
-            description: 'Cadastre clientes com histórico completo, tags, notas, registros de atendimento, documentos vinculados e funil de conversão.',
-        },
-        {
-            icon: DollarSign,
-            title: 'Controle Financeiro',
-            description: 'Gerencie receitas, despesas, honorários e repasses. Suporte a lançamentos recorrentes e parcelados com controle de status de pagamento.',
-        },
-        {
-            icon: Calendar,
-            title: 'Agenda Jurídica',
-            description: 'Cadastre audiências, reuniões e prazos com alertas automáticos, responsáveis e checklist de tarefas vinculados a cada evento.',
+            description: 'Gestão 360º de clientes com histórico completo e automação de atendimento.',
         },
         {
             icon: Shield,
-            title: 'Análise de Contratos com IA',
-            description: 'Envie um contrato e a IA identifica cláusulas de risco, atribui pontuação de segurança e sugere melhorias com explicações detalhadas.',
+            title: 'Inteligência Artificial',
+            description: 'Análise profunda de contratos e identificação de riscos com tecnologia de elite.',
         },
         {
-            icon: Folder,
-            title: 'Gestão de Documentos',
-            description: 'Organize arquivos em pastas com controle de acesso por perfil, auditoria de alterações e upload direto na plataforma.',
+            icon: DollarSign,
+            title: 'Finanças Premium',
+            description: 'Controle absoluto de honorários, despesas e fluxo de caixa com relatórios executivos.',
         },
         {
-            icon: FileText,
-            title: 'Modelos de Documentos',
-            description: 'Crie e edite modelos de petições e contratos com variáveis dinâmicas. Exporte em DOCX com cabeçalho e rodapé personalizados.',
-        },
-        {
-            icon: Clock,
-            title: 'Timesheet',
-            description: 'Registre horas trabalhadas por processo com cronômetro integrado. Acompanhe o tempo faturável e gere relatórios de produtividade.',
+            icon: Calendar,
+            title: 'Agenda Estratégica',
+            description: 'Prazos e audiências organizados de forma inteligente com notificações em tempo real.',
         },
         {
             icon: MessageSquare,
-            title: 'Chat da Equipe',
-            description: 'Comunicação interna em tempo real com canais por processo e mensagens diretas entre os membros do escritório.',
+            title: 'Ecossistema Advus',
+            description: 'Colaboração total entre sua equipe com chat integrado e gestão de arquivos em nuvem.',
         },
     ];
 
     return (
-        <section id="features" className="py-20 md:py-28 bg-white dark:bg-[#000000]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="features" className="py-32 md:py-48 bg-black relative">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(49,46,129,0.1),transparent_50%)]" />
+            
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h1 className="text-5xl md:text-7xl font-bold text-black dark:text-white mb-6 leading-tight tracking-tight font-display">
-                        Gestão Jurídica de <br />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-black to-neutral-500 dark:from-white dark:to-neutral-400">Próxima Geração</span>
-                    </h1>
-                    <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Desenvolvido especificamente para as necessidades da advocacia moderna.
+                <div className="text-center max-w-3xl mx-auto mb-32">
+                    <h2 className="text-accent font-black text-xs uppercase tracking-[0.3em] mb-6">Excelência Operacional</h2>
+                    <h3 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
+                        Recursos que <br />
+                        <span className="text-white/30">Definem o Futuro</span>
+                    </h3>
+                    <p className="text-xl text-white/40 leading-relaxed font-medium">
+                        Desenvolvido especificamente para as necessidades da advocacia de alta performance.
                     </p>
                 </div>
 
                 {/* Features Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {features.map((feature, idx) => (
                         <div
                             key={idx}
-                            className="group p-8 bg-white/50 backdrop-blur-md dark:bg-[#000000]/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
+                            className="group p-10 bg-white/[0.02] hover:bg-white/[0.04] rounded-[2.5rem] border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-2"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center mb-6 border border-slate-200 dark:border-slate-700">
-                                <feature.icon size={24} />
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.01] text-accent flex items-center justify-center mb-10 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                                <feature.icon size={28} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                            <h3 className="text-2xl font-black text-white mb-4 font-display uppercase tracking-tight">
                                 {feature.title}
                             </h3>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            <p className="text-white/40 leading-relaxed font-medium">
                                 {feature.description}
                             </p>
                         </div>
@@ -271,22 +287,22 @@ function FeaturesSection() {
 // Stats Section
 function StatsSection() {
     const stats = [
-        { value: '500+', label: 'Escritórios Ativos' },
-        { value: '50k+', label: 'Processos Gerenciados' },
-        { value: '99.9%', label: 'Uptime Garantido' },
-        { value: '24/7', label: 'Suporte Dedicado' },
+        { value: '500+', label: 'ESCRITÓRIOS DE ELITE' },
+        { value: 'R$ 2B+', label: 'VALORES GERENCIADOS' },
+        { value: '99.9%', label: 'DISPONIBILIDADE' },
+        { value: '24/7', label: 'CONCIERGE VIP' },
     ];
 
     return (
-        <section className="py-20 bg-[#000000] dark:bg-[#000000]">
+        <section className="py-32 bg-primary-dark">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, idx) => (
                         <div key={idx} className="text-center">
-                            <div className="text-3xl md:text-5xl font-bold !text-white mb-3">
+                            <div className="text-4xl md:text-6xl font-black text-white mb-4 font-display">
                                 {stat.value}
                             </div>
-                            <div className="text-slate-400 text-sm uppercase tracking-widest font-medium">
+                            <div className="text-accent text-[10px] font-black uppercase tracking-[0.3em]">
                                 {stat.label}
                             </div>
                         </div>
@@ -300,98 +316,69 @@ function StatsSection() {
 // Pricing Section
 function PricingSection() {
     const navigate = useNavigate();
-    const plans = [
-        {
-            name: 'Adv Plus',
-            price: 'R$ 47',
-            period: '/mês',
-            description: 'Acesso completo a todas as ferramentas do Advus',
-            features: [
-                'Usuários ilimitados',
-                'Processos e clientes ilimitados',
-                'Financeiro completo com recorrência',
-                'Análise de contratos com IA',
-                'Modelos e editor de documentos',
-                'Agenda e prazos inteligentes',
-                'Timesheet e chat da equipe',
-                '10 GB de armazenamento',
-                'Suporte prioritário 24/7',
-            ],
-            cta: 'Começar Agora',
-            popular: true
-        }
-    ];
-
+    
     return (
-        <section id="pricing" className="py-20 md:py-28 bg-slate-50 dark:bg-[#000000]">
+        <section id="pricing" className="py-32 md:py-48 bg-black relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                        Plano Único e Transparente
-                    </h2>
-                    <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Tenha acesso a todas as funcionalidades do Advus por um preço fixo e justo. Sem letras miúdas.
+                <div className="text-center max-w-3xl mx-auto mb-24">
+                    <h2 className="text-accent font-black text-xs uppercase tracking-[0.3em] mb-6">Início Imediato</h2>
+                    <h3 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
+                        Assinatura <br />
+                        <span className="text-white/30">Premium Advus</span>
+                    </h3>
+                    <p className="text-xl text-white/40 leading-relaxed font-medium">
+                        Acesso ilimitado ao ecossistema mais sofisticado do Brasil.
                     </p>
                 </div>
 
-                {/* Pricing Cards */}
-                <div className="flex justify-center max-w-md mx-auto">
-                    {plans.map((plan, idx) => (
-                        <div
-                            key={idx}
-                            className="relative p-8 rounded-2xl border bg-white/50 backdrop-blur-md dark:bg-[#000000]/50 border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10 w-full"
-                        >
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full whitespace-nowrap">
-                                Oferta de Lançamento
+                {/* Pricing Card */}
+                <div className="max-w-xl mx-auto">
+                    <div className="relative p-12 rounded-[3rem] border border-accent/30 bg-gradient-to-br from-primary-dark/80 to-black backdrop-blur-3xl shadow-[0_50px_100px_rgba(212,175,55,0.1)] overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-accent/20 blur-[60px] rounded-full translate-x-1/2 -translate-y-1/2" />
+                        
+                        <div className="text-center mb-12">
+                            <div className="inline-block px-4 py-1 bg-accent text-primary-dark text-[10px] font-black rounded-full uppercase tracking-widest mb-6">
+                                MAIS ESCOLHIDO
                             </div>
-
-                            <div className="text-center mb-6">
-                                <h2 className="text-2xl font-bold text-black dark:text-white mb-2 font-display">Gerenciamento de Processos</h2>
-                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                                    {plan.name}
-                                </h3>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
-                                    {plan.description}
-                                </p>
-                                <div className="flex items-baseline justify-center gap-1">
-                                    <span className="text-5xl font-black text-slate-900 dark:text-white">
-                                        {plan.price}
-                                    </span>
-                                    <span className="text-slate-500 dark:text-slate-400">
-                                        {plan.period}
-                                    </span>
-                                </div>
+                            <h3 className="text-4xl font-black text-white mb-4 font-display uppercase">ADV PLUS ELITE</h3>
+                            <div className="flex items-baseline justify-center gap-2">
+                                <span className="text-white/50 text-2xl font-bold italic line-through">R$ 147</span>
+                                <span className="text-6xl font-black text-white">R$ 47</span>
+                                <span className="text-white/40 font-bold uppercase tracking-widest text-sm">/mês</span>
                             </div>
-
-                            <ul className="space-y-4 mb-8">
-                                {plan.features.map((feature, fidx) => (
-                                    <li key={fidx} className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                        <Check size={18} className="text-green-500 flex-shrink-0" />
-                                        <span className="text-sm font-medium">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <button
-                                onClick={() => {
-                                    const token = localStorage.getItem('token');
-                                    if (token) {
-                                        navigate('/app/faturamento');
-                                    } else {
-                                        navigate('/register');
-                                    }
-                                }}
-                                className="w-full py-4 rounded-xl font-bold bg-black hover:bg-gray-900 text-white transition-all shadow-lg shadow-black/20 active:scale-95"
-                            >
-                                {plan.cta}
-                            </button>
-                            
-                            <p className="mt-4 text-center text-xs text-slate-400">
-                                7 dias de teste grátis • Cancele quando quiser
-                            </p>
                         </div>
-                    ))}
+
+                        <ul className="space-y-5 mb-12">
+                            {[
+                                'Usuários e Clientes Ilimitados',
+                                'Inteligência Artificial Ilimitada',
+                                'Financeiro Executivo Completo',
+                                'Ecossistema de Colaboração VIP',
+                                'Suporte Concierge 24/7',
+                                'Armazenamento Seguro em Nuvem',
+                                'Treinamento de Implantação'
+                            ].map((feature, idx) => (
+                                <li key={idx} className="flex items-center gap-4 text-white/70">
+                                    <div className="w-5 h-5 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
+                                        <Check size={12} className="text-primary-dark font-black" />
+                                    </div>
+                                    <span className="text-sm font-bold uppercase tracking-tight">{feature}</span>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <button
+                            onClick={() => navigate('/register')}
+                            className="w-full py-6 rounded-[1.5rem] font-black bg-accent hover:bg-white text-primary-dark transition-all shadow-2xl uppercase tracking-[0.2em] text-sm"
+                        >
+                            Solicitar Assinatura
+                        </button>
+                        
+                        <p className="mt-8 text-center text-[10px] text-white/30 font-black uppercase tracking-[0.1em]">
+                            Cancelamento simplificado • Upgrade imediato
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -402,65 +389,62 @@ function PricingSection() {
 function TestimonialsSection() {
     const testimonials = [
         {
-            name: 'Dr. Carlos Silva',
-            role: 'Advogado Tributarista',
-            company: 'Silva & Associados',
-            content: 'O Advus revolucionou nosso escritório. Reduzimos em 50% o tempo gasto com tarefas administrativas.',
+            name: 'Carlos Silva',
+            role: 'ADVOGADO SÊNIOR',
+            company: 'SILVA & ASSOC.',
+            content: 'O Advus redefiniu nossa cultura de produtividade. Não é apenas software, é vantagem competitiva.',
             avatar: 'CS'
         },
         {
-            name: 'Dra. Marina Costa',
-            role: 'Advogada Trabalhista',
-            company: 'Costa Advocacia',
-            content: 'A análise de contratos com IA é incrível! Economizo horas em cada contrato que preciso revisar.',
+            name: 'Marina Costa',
+            role: 'LEGAL DESIGNER',
+            company: 'COSTA HUB',
+            content: 'A experiência de usuário é impecável. Reflete exatamente o posicionamento premium que temos.',
             avatar: 'MC'
         },
         {
-            name: 'Dr. Roberto Mendes',
-            role: 'Sócio Fundador',
-            company: 'Mendes & Partners',
-            content: 'O módulo financeiro é completo e nos deu total controle sobre honorários e despesas do escritório.',
+            name: 'Roberto Mendes',
+            role: 'CEO',
+            company: 'MENDES GROUP',
+            content: 'A IA Jurídica do Advus é o nosso filtro mais confiável em auditorias complexas. Indispensável.',
             avatar: 'RM'
         }
     ];
 
     return (
-        <section id="testimonials" className="py-20 md:py-28 bg-white dark:bg-[#0B1120]">
+        <section id="testimonials" className="py-32 md:py-48 bg-primary-dark">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Section Header */}
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-                        O que nossos clientes dizem
-                    </h2>
-                    <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Veja como o Advus está transformando escritórios em todo o Brasil.
-                    </p>
+                <div className="text-center mb-24">
+                    <h2 className="text-accent font-black text-xs uppercase tracking-[0.3em] mb-6">Aprovação de Elite</h2>
+                    <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
+                        Depoimentos <br />
+                        <span className="text-white/30">de Quem Decide</span>
+                    </h3>
                 </div>
 
-                {/* Testimonials Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                     {testimonials.map((testimonial, idx) => (
                         <div
                             key={idx}
-                            className="p-6 md:p-8 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700"
+                            className="p-10 bg-white/[0.03] rounded-[2.5rem] border border-white/5 relative"
                         >
-                            <div className="flex items-center gap-4 mb-5">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                            <div className="flex items-center gap-5 mb-8">
+                                <div className="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center text-accent font-black border border-accent/20 text-xl">
                                     {testimonial.avatar}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-900 dark:text-white">
+                                    <h4 className="font-black text-white uppercase tracking-tight">
                                         {testimonial.name}
                                     </h4>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">
                                         {testimonial.role}
                                     </p>
                                 </div>
                             </div>
-                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                            <p className="text-white/60 leading-relaxed font-medium italic mb-6">
                                 "{testimonial.content}"
                             </p>
-                            <p className="mt-4 text-sm text-blue-600 dark:text-blue-400 font-medium">
+                            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
                                 {testimonial.company}
                             </p>
                         </div>
@@ -476,26 +460,26 @@ function CTASection() {
     const navigate = useNavigate();
 
     return (
-        <section className="py-24 md:py-32 bg-[#0B1120] dark:bg-[#050B18] relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:32px_32px]" />
-
+        <section className="py-32 md:py-48 bg-black relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#312E81_0%,transparent_70%)] opacity-20" />
+            
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold !text-white mb-6">
-                    Pronto para transformar seu escritório?
+                <h2 className="text-5xl md:text-7xl font-black text-white mb-10 tracking-tighter font-display leading-[0.9]">
+                    Sua Ascensão <br />
+                    <span className="text-accent">Começa Aqui.</span>
                 </h2>
-                <p className="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-                    Junte-se a mais de 500 escritórios que já estão usando o Advus para crescer com eficiência.
+                <p className="text-xl md:text-2xl text-white/50 mb-14 max-w-2xl mx-auto font-medium">
+                    Junte-se à elite da advocacia brasileira e experimente o poder da gestão Advus.
                 </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
                     <button
                         onClick={() => navigate('/register')}
-                        className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-5 bg-white text-[#0B1120] font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all group"
+                        className="w-full sm:w-auto px-14 py-6 bg-white text-primary-dark font-black rounded-2xl shadow-2xl hover:bg-accent transition-all uppercase tracking-widest text-sm"
                     >
-                        Criar Minha Conta
-                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        Criar Conta Premium
                     </button>
-                    <button className="w-full sm:w-auto px-10 py-5 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/5 transition-colors">
-                        Falar com Consultor
+                    <button className="w-full sm:w-auto px-14 py-6 border border-white/10 text-white font-black rounded-2xl hover:bg-white/5 transition-all uppercase tracking-widest text-sm backdrop-blur-md">
+                        Consultoria VIP
                     </button>
                 </div>
             </div>
@@ -506,63 +490,58 @@ function CTASection() {
 // Footer
 function Footer() {
     return (
-        <footer id="contact" className="py-16 bg-[#050B18] dark:bg-[#030712] text-slate-400">
+        <footer id="contact" className="py-24 bg-primary-dark border-t border-white/5 text-white/30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-                    {/* Company */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-16 mb-20">
                     <div className="col-span-2 md:col-span-1">
-                        <div className="flex items-center gap-3 mb-4">
-                            <BrandLogo variant="light" />
-                        </div>
-                        <p className="text-sm leading-relaxed mb-4">
-                            A plataforma completa para gestão de escritórios de advocacia.
+                        <BrandLogo variant="light" size="sm" className="mb-8" />
+                        <p className="text-xs font-medium leading-loose mb-8 max-w-xs">
+                            A plataforma definitiva para escritórios de advocacia que não aceitam nada menos que a excelência.
                         </p>
-                        <div className="flex gap-3">
-                            <a href="#" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors">
+                        <div className="flex gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-accent hover:text-primary-dark transition-all cursor-pointer border border-white/5">
                                 <Globe size={18} />
-                            </a>
-                            <a href="#" className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors">
-                                <Lock size={18} />
-                            </a>
+                            </div>
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-accent hover:text-primary-dark transition-all cursor-pointer border border-white/5">
+                                <Shield size={18} />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Product */}
                     <div>
-                        <h4 className="!text-white font-semibold mb-4">Produto</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#features" className="hover:text-white transition-colors">Recursos</a></li>
-                            <li><a href="#pricing" className="hover:text-white transition-colors">Preços</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Integrações</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+                        <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Tecnologia</h4>
+                        <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
+                            <li><a href="#features" className="hover:text-accent transition-colors">Recursos</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">IA Jurídica</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Segurança</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">API Dev</a></li>
                         </ul>
                     </div>
 
-                    {/* Company */}
                     <div>
-                        <h4 className="!text-white font-semibold mb-4">Empresa</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-white transition-colors">Sobre</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Carreiras</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Contato</a></li>
+                        <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Assinatura</h4>
+                        <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
+                            <li><a href="#pricing" className="hover:text-accent transition-colors">Planos Elite</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Concierge</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Treinamentos</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Upgrade</a></li>
                         </ul>
                     </div>
 
-                    {/* Legal */}
                     <div>
-                        <h4 className="!text-white font-semibold mb-4">Legal</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-white transition-colors">Privacidade</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">Termos</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">LGPD</a></li>
+                        <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Institucional</h4>
+                        <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
+                            <li><a href="#" className="hover:text-accent transition-colors">Sobre</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Privacidade</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">LGPD</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Termos</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-                    <p>© 2024 Advus. Todos os direitos reservados.</p>
-                    <p>Feito com ❤️ no Brasil</p>
+                <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+                    <p>© 2026 Advus Global. Todos os direitos reservados.</p>
+                    <p className="text-accent">Feito para a Elite</p>
                 </div>
             </div>
         </footer>
@@ -581,7 +560,7 @@ export default function LandingPage() {
     }, [isAuthenticated, navigate]);
 
     return (
-        <div className="min-h-screen bg-white dark:bg-[#0B1120]">
+        <div className="min-h-screen bg-black text-white selection:bg-accent selection:text-primary-dark">
             <Navbar />
             <HeroSection />
             <FeaturesSection />
