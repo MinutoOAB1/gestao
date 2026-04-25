@@ -10,7 +10,8 @@ import {
   AlertCircle,
   Copy,
   ExternalLink,
-  Loader2
+  Loader2,
+  Barcode
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -168,20 +169,14 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                       />
                     </div>
                   </div>
-                        className="w-full bg-app-bg border border-app-stroke rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-app-text-main outline-none focus:ring-2 ring-blue-500/20 transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Método de Pagamento</label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
-                      onClick={() => setPaymentMethod('PIX')}
-                      className={cn(
+                      onClick={() => setFormData({...formData, billingType: 'PIX'})}
+                      className={clsx(
                         "flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all",
-                        paymentMethod === 'PIX' ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-md" : "border-app-stroke hover:border-blue-300"
+                        formData.billingType === 'PIX' ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-md" : "border-app-stroke hover:border-blue-300"
                       )}
                     >
                       <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl flex items-center justify-center">
@@ -191,10 +186,10 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                     </button>
 
                     <button
-                      onClick={() => setPaymentMethod('BOLETO')}
-                      className={cn(
+                      onClick={() => setFormData({...formData, billingType: 'BOLETO'})}
+                      className={clsx(
                         "flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all",
-                        paymentMethod === 'BOLETO' ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-md" : "border-app-stroke hover:border-blue-300"
+                        formData.billingType === 'BOLETO' ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-md" : "border-app-stroke hover:border-blue-300"
                       )}
                     >
                       <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl flex items-center justify-center">
