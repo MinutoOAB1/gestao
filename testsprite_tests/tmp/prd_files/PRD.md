@@ -1,7 +1,7 @@
-# PRD - LegalFlow: Plataforma de Gestão Jurídica
+# PRD - Advus: Plataforma de Gestão Jurídica
 
 ## 1. Visão Geral do Produto
-O **LegalFlow** é uma solução SaaS (Software as a Service) projetada para modernizar a gestão de escritórios de advocacia no Brasil. A plataforma centraliza processos, clientes, documentos e finanças em uma interface intuitiva e responsiva.
+O **Advus** é uma solução SaaS (Software as a Service) projetada para modernizar a gestão de escritórios de advocacia no Brasil. A plataforma centraliza processos, clientes, documentos e finanças em uma interface intuitiva e responsiva.
 
 ## 2. Público-Alvo
 *   Advogados autônomos.

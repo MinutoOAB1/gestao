@@ -107,7 +107,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
             <div
                 className={cn(
                     "group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-fast relative",
-                    active ? "bg-white/20 text-white border border-white/20" : "text-white/70 hover:bg-white/10"
+                    active ? "bg-black/10 dark:bg-white/15 text-black dark:text-white border border-black/5 dark:border-white/10" : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/8 hover:text-black dark:hover:text-white"
                 )}
             >
                 {/* Click on icon + text navigates to page */}
@@ -137,7 +137,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                     >
                         {/* Quick access to main page */}
                         <Link to="/app/analise-ia">
-                            <div className="flex items-center gap-2 px-4 py-2 ml-6 text-xs text-white/70 hover:text-white transition-colors">
+                            <div className="flex items-center gap-2 px-4 py-2 ml-6 text-xs text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
                                 <Plus size={12} />
                                 Nova Análise
                             </div>
@@ -152,15 +152,15 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                                             key={doc.id}
                                             onClick={() => handleLoadDocument(doc)}
                                             className={cn(
-                                                "flex items-center gap-2 px-4 py-2 ml-6 text-xs cursor-pointer transition-all hover:bg-white/10 rounded-lg",
-                                                idx === 0 ? "text-white" : "text-white/70"
+                                                "flex items-center gap-2 px-4 py-2 ml-6 text-xs cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/10 rounded-lg",
+                                                idx === 0 ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
                                             )}
                                             style={{ opacity: 1 - (idx * 0.15) }}
                                         >
                                             <History size={10} />
                                             <div className="flex-1 truncate">
                                                 <p className="truncate font-medium">{doc.label}</p>
-                                                <p className="text-[9px] text-white/50">
+                                                <p className="text-[9px] text-black/40 dark:text-white/40">
                                                     {doc.timestamp.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })} • {doc.score}%
                                                 </p>
                                             </div>
@@ -168,10 +168,10 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                                     ))}
                                 </div>
                                 {/* Fade effect at bottom - matches dark blue sidebar */}
-                                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-800 to-transparent pointer-events-none" />
+                                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-black to-transparent pointer-events-none" />
                             </div>
                         ) : (
-                            <div className="px-4 py-2 ml-6 text-[10px] text-white/40 italic">
+                            <div className="px-4 py-2 ml-6 text-[10px] text-black/30 dark:text-white/30 italic">
                                 Nenhum documento analisado
                             </div>
                         )}
@@ -400,12 +400,12 @@ export default function DashboardLayout() {
                 {!collapsed && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
-                            <div className="relative bg-neutral-900 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-white/10">
+                            <div className="relative bg-black dark:bg-white/10 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-white/10">
                                 {/* Robot Icon Background */}
                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="w-16 h-16 text-white"
+                                        className="w-16 h-16 text-white dark:text-black"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -414,9 +414,9 @@ export default function DashboardLayout() {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <h3 className="text-white font-bold text-sm mb-1">IA Jurídica</h3>
-                                <p className="text-white/50 text-xs mb-3">Analise contratos em segundos.</p>
-                                <button className="px-4 py-1.5 bg-white text-black rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors">
+                                <h3 className="text-white dark:text-black font-bold text-sm mb-1 font-display">IA Jurídica</h3>
+                                <p className="text-white/50 dark:text-black/50 text-xs mb-3">Analise contratos em segundos.</p>
+                                <button className="px-4 py-1.5 bg-white dark:bg-black text-black dark:text-white rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity">
                                     Testar Agora
                                 </button>
                             </div>
@@ -483,14 +483,14 @@ export default function DashboardLayout() {
                                         </div>
                                     ))}
                                     {teamMembers.filter(m => m.id !== user?.id).length > 3 && (
-                                        <div className="w-9 h-9 rounded-full border-2 border-slate-700 bg-blue-500/80 flex items-center justify-center">
-                                            <span className="text-white text-xs font-bold">+{teamMembers.filter(m => m.id !== user?.id).length - 3}</span>
+                                        <div className="w-9 h-9 rounded-full border-2 border-black dark:border-white/20 bg-neutral-800 dark:bg-white/10 flex items-center justify-center">
+                                            <span className="text-white dark:text-white/80 text-xs font-bold">+{teamMembers.filter(m => m.id !== user?.id).length - 3}</span>
                                         </div>
                                     )}
                                 </div>
                                 {/* Current user avatar on top */}
                                 <div
-                                    className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center overflow-hidden bg-white/20 -ml-3 z-10 ring-2 ring-slate-800"
+                                    className="w-10 h-10 rounded-full border-2 border-black/10 dark:border-white/30 flex items-center justify-center overflow-hidden bg-black/5 dark:bg-white/20 -ml-3 z-10 ring-2 ring-white dark:ring-black"
                                     title={user?.name || 'Usuário'}
                                 >
                                     {user?.avatar ? (
@@ -659,10 +659,10 @@ export default function DashboardLayout() {
                                 <Link
                                     to="/app/analise-ia"
                                     onClick={() => setIsMobileDrawerOpen(false)}
-                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-emerald-500/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                        <Shield size={20} className="text-emerald-500" />
+                                    <div className="w-10 h-10 rounded-lg bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                                        <Shield size={20} className="text-black dark:text-white" />
                                     </div>
                                     <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">IA Análise</span>
                                 </Link>

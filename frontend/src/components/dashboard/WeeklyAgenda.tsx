@@ -72,7 +72,7 @@ export default function WeeklyAgenda({ events }: WeeklyAgendaProps) {
                             className={cn(
                                 "flex flex-col items-center justify-center min-w-[65px] h-[80px] rounded-[14px] border transition-all duration-200",
                                 active 
-                                    ? "bg-[#0095FF] border-[#0095FF] text-white shadow-lg shadow-blue-500/30 scale-105" 
+                                    ? "bg-black dark:bg-white border-black dark:border-white text-white dark:text-black shadow-lg shadow-black/20 scale-105" 
                                     : "bg-transparent border-app-stroke/60 text-app-text-muted hover:border-primary/40 hover:bg-app-input"
                             )}
                         >
@@ -105,7 +105,7 @@ export default function WeeklyAgenda({ events }: WeeklyAgendaProps) {
                                     <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 rounded-md text-[10px] font-bold uppercase tracking-wider">
                                         Pendente
                                     </span>
-                                    <span className="px-2.5 py-1 bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-md text-[10px] font-bold flex items-center gap-1.5">
+                                    <span className="px-2.5 py-1 bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60 rounded-md text-[10px] font-bold flex items-center gap-1.5">
                                         <CalendarIcon size={12} />
                                         Tarefa
                                     </span>
@@ -117,12 +117,12 @@ export default function WeeklyAgenda({ events }: WeeklyAgendaProps) {
                                         <CalendarIcon size={14} />
                                         <span className="font-medium">Data de Compromisso: {eventDate.toLocaleDateString('pt-BR')}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-red-500/90 font-medium">
+                                    <div className="flex items-center gap-2 text-black/50 dark:text-white/50 font-medium">
                                         <AlertTriangle size={14} />
                                         <span>Data fatal: {eventDate.toLocaleDateString('pt-BR')}</span>
                                     </div>
                                     {isOverdue && (
-                                        <div className="flex items-center gap-2 text-orange-500 font-medium">
+                                        <div className="flex items-center gap-2 text-black dark:text-white font-bold">
                                             <Clock size={14} />
                                             <span>Vencida há {Math.floor((new Date().getTime() - eventDate.getTime()) / (1000 * 60 * 60 * 24))} dias</span>
                                         </div>
