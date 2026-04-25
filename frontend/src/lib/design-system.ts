@@ -10,20 +10,20 @@
 // ============================================
 
 export const colors = {
-    // Primary Brand - Premium Deep Indigo
+    // Primary Brand - Electric Royal Blue (Synced with User Image)
     primary: {
-        DEFAULT: '#312E81',
-        dark: '#1E1B4B',
-        light: '#4338CA',
-        glow: 'rgba(49, 46, 129, 0.4)',
+        DEFAULT: '#4F73F5',
+        dark: '#3730A3',
+        light: '#6366F1',
+        glow: 'rgba(79, 115, 245, 0.4)',
     },
 
-    // Accent Brand - Refined Gold
+    // Accent Brand - Vibrant Violet (Harmonious with the Blue)
     accent: {
-        DEFAULT: '#D4AF37',
-        dark: '#B8860B',
-        light: '#F4D03F',
-        glow: 'rgba(212, 175, 55, 0.3)',
+        DEFAULT: '#6B5CE7',
+        dark: '#4338CA',
+        light: '#818CF8',
+        glow: 'rgba(107, 92, 231, 0.3)',
     },
 
     // App Theme (CSS Variables)
@@ -37,6 +37,13 @@ export const colors = {
             muted: 'var(--app-text-muted)',
             label: 'var(--app-text-label)',
         },
+    },
+
+    // Gradients - Synced with User Image
+    gradients: {
+        primary: 'linear-gradient(135deg, #4F73F5 0%, #6B5CE7 100%)',
+        premium: 'linear-gradient(135deg, #3730A3 0%, #4F73F5 100%)',
+        glass: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
     },
 
     // Status Colors - Sophisticated Tones
@@ -57,9 +64,9 @@ export const colors = {
             border: 'rgba(220, 38, 38, 0.2)',
         },
         info: {
-            bg: 'rgba(37, 99, 235, 0.08)',
-            text: '#2563EB',
-            border: 'rgba(37, 99, 235, 0.2)',
+            bg: 'rgba(79, 115, 245, 0.08)',
+            text: '#4F73F5',
+            border: 'rgba(79, 115, 245, 0.2)',
         },
     },
 } as const;
@@ -86,7 +93,7 @@ export const typography = {
     fontFamily: {
         display: '"Plus Jakarta Sans", sans-serif',
         body: '"Inter", sans-serif',
-        serif: '"Cormorant Garamond", serif', // Added for that classic legal touch
+        serif: '"Cormorant Garamond", serif', 
     },
     fontSize: {
         xs: '0.75rem',    // 12px
@@ -109,7 +116,7 @@ export const typography = {
 } as const;
 
 // ============================================
-// BORDERS & RADIUS - More rounded for modern premium feel
+// BORDERS & RADIUS
 // ============================================
 
 export const borders = {
@@ -130,7 +137,7 @@ export const borders = {
 } as const;
 
 // ============================================
-// SHADOWS - Layered shadows for depth
+// SHADOWS
 // ============================================
 
 export const shadows = {
@@ -140,7 +147,7 @@ export const shadows = {
     lg: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     xl: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     glow: '0 0 20px -5px var(--tw-shadow-color)',
-    premium: '0 0 40px -10px rgba(49, 46, 129, 0.2)',
+    premium: '0 0 40px -10px rgba(79, 115, 245, 0.2)',
 } as const;
 
 // ============================================
@@ -197,4 +204,3 @@ export const componentSizes = {
         xl: '5rem',
     },
 } as const;
-

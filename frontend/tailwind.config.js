@@ -33,32 +33,32 @@ export default {
                     }
                 },
                 primary: {
-                    DEFAULT: '#000000', // Sophisticated Black
-                    dark: '#000000',
-                    light: '#404040',
-                    glow: 'rgba(0, 0, 0, 0.1)',
-                    gold: '#D4D4D4',    // Platinum/Silver accent
+                    DEFAULT: '#4F73F5', 
+                    dark: '#3730A3',
+                    light: '#6366F1',
+                    glow: 'rgba(79, 115, 245, 0.2)',
+                    accent: '#6B5CE7',
                 },
                 status: {
                     urgent: {
-                        bg: 'rgba(0, 0, 0, 0.05)',
-                        text: '#000000',
-                        border: '#000000'
+                        bg: 'rgba(239, 68, 68, 0.05)',
+                        text: '#EF4444',
+                        border: '#EF4444'
                     },
                     warning: {
-                        bg: 'rgba(64, 64, 64, 0.05)',
-                        text: '#404040',
-                        border: '#404040'
+                        bg: 'rgba(245, 158, 11, 0.05)',
+                        text: '#F59E0B',
+                        border: '#F59E0B'
                     },
                     success: {
-                        bg: 'rgba(0, 0, 0, 0.05)',
-                        text: '#000000',
-                        border: '#000000'
+                        bg: 'rgba(16, 185, 129, 0.05)',
+                        text: '#10B981',
+                        border: '#10B981'
                     },
                     info: {
-                        bg: 'rgba(115, 115, 115, 0.05)',
-                        text: '#737373',
-                        border: '#737373'
+                        bg: 'rgba(79, 115, 245, 0.05)',
+                        text: '#4F73F5',
+                        border: '#4F73F5'
                     }
                 }
             },

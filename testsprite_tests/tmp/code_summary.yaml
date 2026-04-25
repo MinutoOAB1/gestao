@@ -1,82 +1,75 @@
 version: "2"
-type: backend
+type: frontend
 tech_stack:
+  - React
   - TypeScript
-  - NestJS
-  - Prisma
-  - SQLite (Dev) / PostgreSQL (Prod)
-  - Passport (JWT)
-  - Socket.io (Notifications)
+  - Vite
+  - Tailwind CSS
+  - Framer Motion
+  - Axios
+routes:
+  - path: /
+    file: src/pages/landing/LandingPage.tsx
+    auth_required: false
+    description: Public landing page with product information
+  - path: /login
+    file: src/pages/auth/LoginPage.tsx
+    auth_required: false
+    description: User login page
+  - path: /register
+    file: src/pages/auth/RegisterPage.tsx
+    auth_required: false
+    description: New user registration page
+  - path: /forgot-password
+    file: src/pages/auth/ForgotPasswordPage.tsx
+    auth_required: false
+    description: Password recovery request page
+  - path: /reset-password
+    file: src/pages/auth/ResetPasswordPage.tsx
+    auth_required: false
+    description: Final password reset page with token
+  - path: /app
+    file: src/components/layout/DashboardLayout.tsx
+    auth_required: true
+    description: Main dashboard entry point
 features:
-  - name: Authentication and User Management
-    description: Handles user registration, login, 2FA, and multi-tenant user management.
+  - name: Premium Landing Page
+    description: Visual landing page for Advus branding
     files:
-      - backend/src/auth/auth.controller.ts
-      - backend/src/auth/auth.service.ts
-    endpoints:
-      - method: POST
-        path: /auth/register
-        description: Register a new user and tenant
-        auth_required: false
-      - method: POST
-        path: /auth/login
-        description: Authenticate user and return JWT
-        auth_required: false
-      - method: GET
-        path: /auth/profile
-        description: Get logged-in user profile
-        auth_required: true
-      - method: GET
-        path: /auth/users
-        description: List users in the current tenant
-        auth_required: true
-  - name: Clients Management
-    description: CRUD operations for clients with multi-tenancy isolation.
+      - src/pages/landing/LandingPage.tsx
+    entry_route: /
+    user_interactions:
+      - Scroll through features
+      - Click CTA buttons to register
+  - name: User Authentication
+    description: Complete auth flow with login, register, and password recovery
     files:
-      - backend/src/clients/clients.controller.ts
-      - backend/src/clients/clients.service.ts
-    endpoints:
+      - src/pages/auth/LoginPage.tsx
+      - src/pages/auth/RegisterPage.tsx
+      - src/pages/auth/ForgotPasswordPage.tsx
+      - src/pages/auth/ResetPasswordPage.tsx
+    entry_route: /login
+    user_interactions:
+      - Fill login/register forms
+      - Submit credentials
+      - Follow password recovery link
+    api_calls:
       - method: POST
-        path: /clients
-        description: Create a new client
-        auth_required: true
-      - method: GET
-        path: /clients
-        description: List all clients for the tenant
-        auth_required: true
-      - method: GET
-        path: /clients/:id/complete
-        description: Get complete client data including processes and financial records
-        auth_required: true
-  - name: Financial Management
-    description: Management of income, expenses, and financial reporting.
-    files:
-      - backend/src/financial/financial.controller.ts
-      - backend/src/financial/financial.service.ts
-    endpoints:
+        endpoint: /auth/login
       - method: POST
-        path: /financial
-        description: Create a financial record
-        auth_required: true
-      - method: GET
-        path: /financial/stats
-        description: Get financial statistics (income, expense, profit)
-        auth_required: true
-      - method: GET
-        path: /financial/report/pdf
-        description: Generate an HTML/PDF financial report
-        auth_required: true
-  - name: Processes Management
-    description: Management of legal processes and status tracking.
+        endpoint: /auth/register
+      - method: POST
+        endpoint: /auth/forgot-password
+      - method: POST
+        endpoint: /auth/reset-password
+  - name: IA Jurídica Premium
+    description: AI analysis tool within the dashboard
     files:
-      - backend/src/processes/processes.controller.ts
-      - backend/src/processes/processes.service.ts
-    endpoints:
-      - method: GET
-        path: /processes
-        description: List all processes for the tenant
-        auth_required: true
-known_limitations:
-  - issue: "Strict Tenant ID check relies on req.user?.tenantId which must be populated by the AuthGuard and TenantMiddleware"
-    location: "backend/src/prisma/tenant.middleware.ts"
-    impact: "If middleware is bypassed, tenant isolation could be compromised"
+      - src/components/layout/DashboardLayout.tsx
+    entry_route: /app
+    user_interactions:
+      - Interact with AI widget
+    api_calls:
+      - method: POST
+        endpoint: /ai/chat
+known_limitations: []

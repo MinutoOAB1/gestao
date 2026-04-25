@@ -58,7 +58,7 @@ export default function BillingPage() {
                         <button
                             onClick={handleCheckout}
                             disabled={loading}
-                            className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50"
+                            className="flex items-center justify-center gap-2 px-8 py-4 bg-primary hover:opacity-90 text-white font-bold rounded-xl transition-all shadow-lg shadow-primary/20 active:scale-95 disabled:opacity-50"
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -77,7 +77,7 @@ export default function BillingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-app-card rounded-2xl border border-app-stroke p-6">
                     <h3 className="text-lg font-bold text-app-text-main mb-4 flex items-center gap-2">
-                        <ShieldCheck className="text-blue-500" size={20} />
+                        <ShieldCheck className="text-primary" size={20} />
                         O que está incluso no Adv Plus
                     </h3>
                     <ul className="space-y-3">
@@ -99,8 +99,8 @@ export default function BillingPage() {
                 </div>
 
                 <div className="bg-app-card rounded-2xl border border-app-stroke p-6 flex flex-col justify-center items-center text-center space-y-4">
-                    <div className="w-16 h-16 bg-blue-600/10 rounded-full flex items-center justify-center">
-                        <CreditCard className="text-blue-600" size={32} />
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                        <CreditCard className="text-primary" size={32} />
                     </div>
                     <div>
                         <h3 className="text-lg font-bold text-app-text-main">Preço Único e Justo</h3>

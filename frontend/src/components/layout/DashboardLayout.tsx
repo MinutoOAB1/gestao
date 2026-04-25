@@ -400,16 +400,16 @@ export default function DashboardLayout() {
                 {!collapsed && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
-                            <div className="relative bg-gradient-to-br from-primary/20 via-black/40 to-black/60 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-2xl transition-all border border-white/10 group-hover:border-accent/30">
+                            <div className="relative bg-gradient-to-br from-primary via-primary-dark to-black rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-2xl transition-all border border-white/10 group-hover:border-primary/30">
                                 {/* Sparkle Effect */}
-                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-accent/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
                                 
                                 <h3 className="text-white font-bold text-sm mb-1 font-display tracking-tight flex items-center gap-2">
                                     IA Jurídica Premium
-                                    <div className="w-2 h-2 bg-accent rounded-full animate-pulse shadow-[0_0_8px_rgba(212,175,55,0.8)]" />
+                                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(79,115,245,0.8)]" />
                                 </h3>
                                 <p className="text-white/40 text-[11px] mb-4 leading-relaxed font-medium">Analise contratos complexos com precisão absoluta.</p>
-                                <button className="w-full py-2 bg-accent text-primary-dark rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-white transition-all shadow-lg shadow-accent/10">
+                                <button className="w-full py-2 bg-primary text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-primary transition-all shadow-lg shadow-primary/10">
                                     Acessar Agora
                                 </button>
                             </div>
@@ -496,9 +496,9 @@ export default function DashboardLayout() {
                             <div className="flex items-center gap-3">
                                 {/* Timer Button - Shows running state */}
                                 {timer.isRunning ? (
-                                    <button
+                                        <button
                                         onClick={() => navigate('/app/timesheet')}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-accent text-primary-dark rounded-xl hover:bg-white transition-all shadow-lg shadow-accent/20"
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-xl hover:bg-white hover:text-primary transition-all shadow-lg shadow-primary/20"
                                         title={timer.processTitle || timer.description || 'Timer rodando'}
                                     >
                                         <Pause size={16} />

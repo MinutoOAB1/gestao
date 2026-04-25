@@ -1,21 +1,19 @@
 {
   "status": "commited",
-  "type": "backend",
+  "type": "frontend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:3000",
-  "backendAuthType": "basic token",
-  "backendUsername": "informacoesextras.01@gmail.com",
-  "backendPassword": "123456vv",
+  "localEndpoint": "http://localhost:5173",
+  "loginUser": "informacoesextras.01@gmail.com",
+  "loginPassword": "123456vv",
   "executionArgs": {
-    "projectName": "Antigravi-platadv",
+    "projectName": "gestao",
     "projectPath": "c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv",
     "testIds": [],
-    "additionalInstruction": "Important:\n1. Use POST /process-updates with processId in the body to add updates.\n2. Use GET /processes/filter for filtering.\n3. Use GET /financial/export/pdf for PDF reports.\n4. All client-related fields in login response are available in both camelCase and snake_case.\n5. Clients creation expects 201 Created.\n6. Ensure the JWT token from login is used in the Authorization header as 'Bearer <token>'.\n",
-    "serverMode": "production",
+    "additionalInstruction": "Frontend is running on port 5174. Backend is running on port 3000. Validate the new Advus branding (Indigo/Gold) and core flows (Login, Dashboard).",
+    "serverMode": "development",
     "envs": {
       "API_KEY": "sk-user-wzczV0JioCRer3xEAWcyQpeKCLLAyLGXZV9i11hYV0Eq12qy6nk7DWmJT6k9oRrY9acuRV3mpMGetUxV3cIyYek3E-mpIbKRb3Aor9bXPPEvhKaGSv9iRq766A7EDeD0W6Y"
     }
   },
-  "serverPort": 59059,
-  "proxy": "http://0669b0b0-1ba4-4139-bb52-76d9077a5e93:nbRJ1tKSwebwBKQfju85x3TrLIkStMB9@tun.testsprite.com:8080"
+  "serverPort": 53733
 }

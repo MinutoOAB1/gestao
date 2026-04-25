@@ -138,7 +138,7 @@ function HeroSection() {
                     >
                         <button
                             onClick={() => navigate('/register')}
-                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all shadow-[0_20px_50px_rgba(212,175,55,0.15)] group uppercase tracking-widest text-sm"
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl hover:bg-white hover:text-primary transition-all shadow-[0_20px_50px_rgba(79,115,245,0.15)] group uppercase tracking-widest text-sm"
                         >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

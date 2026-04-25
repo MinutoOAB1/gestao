@@ -1,0 +1,283 @@
+[
+  {
+    "id": "TC001",
+    "title": "Sign in successfully to access the dashboard",
+    "description": "Verifies an existing user can sign in with valid credentials and reach the dashboard.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the dashboard at /app"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Redirect unauthenticated user from dashboard route to login",
+    "description": "Verifies attempting to access the dashboard while logged out redirects the user to the login page or blocks access.",
+    "category": "Dashboard Access",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /app"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is blocked from the dashboard and prompted to log in"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Register then sign in to reach the dashboard",
+    "description": "Verifies a new user can register, then log in with the same credentials, and land on the dashboard.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Advus Auth User\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"advus.auth+{{RAND}}@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"ValidPass123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"advus.auth+{{RAND}}@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"ValidPass123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the dashboard at /app"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Access dashboard directly while authenticated",
+    "description": "Verifies an authenticated user can navigate directly to the dashboard route and see the dashboard overview and navigation.",
+    "category": "Dashboard Access",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /app"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard overview and core navigation are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Convert from landing page to successful account registration",
+    "description": "Verifies a visitor can review the landing page, navigate to registration, create an account, and see an account creation confirmation.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the features section"
+      },
+      {
+        "type": "action",
+        "description": "Click the call-to-action to create an account"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Advus Test User\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"advus.user+{{RAND}}@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"ValidPass123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an account creation confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Request password recovery from forgot-password",
+    "description": "Verifies a user can submit an email address on the forgot-password page and see a recovery request confirmation.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"recovery.user@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the recovery request form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password recovery confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Show required-field validation on registration from landing page",
+    "description": "Verifies a visitor can reach registration from the landing page and is prevented from submitting when required fields are missing.",
+    "category": "Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the main marketing content"
+      },
+      {
+        "type": "action",
+        "description": "Click the call-to-action to create an account"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify required-field validation errors are visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC008",
+    "title": "Prevent reset-password submission when confirmation does not match",
+    "description": "Verifies the reset-password form blocks submission when the new password and confirmation do not match.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"ValidPass123!\" into the new password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"DifferentPass123!\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset password form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password mismatch validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC009",
+    "title": "Reject sign-in with incorrect password",
+    "description": "Verifies the login form shows an invalid-credentials error when the password is incorrect.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"WrongPassword123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invalid-credentials error is visible"
+      }
+    ],
+    "priority": "Low"
+  }
+]

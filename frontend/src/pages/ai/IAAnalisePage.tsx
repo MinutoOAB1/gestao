@@ -523,7 +523,7 @@ export default function IAAnalisePage() {
                     </button>
                     <button
                         onClick={handleExportReport}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1053ff] text-white font-bold text-xs hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs hover:opacity-90 transition-all shadow-lg shadow-primary/20"
                     >
                         <Download size={16} /> PDF
                     </button>
@@ -532,11 +532,11 @@ export default function IAAnalisePage() {
 
             {!analysis && !isAnalyzing && !uploadOpen ? (
                 <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 rounded-[32px] p-12 text-center relative overflow-hidden group shadow-2xl">
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#1053ff]/5 to-transparent pointer-events-none" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1053ff]/10 rounded-full blur-[120px] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
 
                     <div className="relative z-10 space-y-8 max-w-2xl">
-                        <div className="w-24 h-24 bg-[#1053ff]/20 rounded-[32px] flex items-center justify-center text-[#1053ff] mb-8 mx-auto shadow-2xl shadow-blue-500/20 rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                        <div className="w-24 h-24 bg-primary/20 rounded-[32px] flex items-center justify-center text-primary mb-8 mx-auto shadow-2xl shadow-primary/20 rotate-12 group-hover:rotate-0 transition-transform duration-500">
                             <Shield size={48} fill="currentColor" />
                         </div>
                         <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight italic">
@@ -548,7 +548,7 @@ export default function IAAnalisePage() {
                         <div className="pt-4 flex justify-center">
                             <button
                                 onClick={() => setUploadOpen(true)}
-                                className="group/btn flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-[#1053ff] text-white font-bold text-sm hover:scale-105 transition-all shadow-lg shadow-blue-500/30 relative overflow-hidden"
+                                className="group/btn flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-primary text-white font-bold text-sm hover:scale-105 transition-all shadow-lg shadow-primary/30 relative overflow-hidden"
                             >
                                 <Plus size={18} />
                                 Começar Nova Auditoria
@@ -603,7 +603,7 @@ export default function IAAnalisePage() {
                             </div>
                         </div>
                         <textarea
-                            className="flex-1 p-6 bg-slate-50 dark:bg-[#0c0e17] border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-[#1053ff]/50 outline-none resize-none font-mono text-sm leading-relaxed"
+                            className="flex-1 p-6 bg-slate-50 dark:bg-[#0c0e17] border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 outline-none resize-none font-mono text-sm leading-relaxed"
                             placeholder="Cole o texto do contrato aqui ou faça upload de um arquivo .txt..."
                             value={contractText}
                             onChange={(e) => setContractText(e.target.value)}
@@ -620,7 +620,7 @@ export default function IAAnalisePage() {
                                 disabled={!contractText || isAnalyzing}
                                 className={clsx(
                                     "flex items-center gap-3 px-8 py-2 rounded-xl text-white font-bold transition-all disabled:opacity-50 min-w-[240px] justify-center",
-                                    isAnalyzing ? "bg-amber-600" : "bg-[#1053ff]"
+                                    isAnalyzing ? "bg-amber-600" : "bg-primary"
                                 )}
                             >
                                 {isAnalyzing ? (
@@ -789,13 +789,13 @@ export default function IAAnalisePage() {
                                         <motion.div 
                                             initial={{ opacity: 0, x: 20 }}
                                             animate={{ opacity: 1, x: 0 }}
-                                            className="w-[794px] flex-shrink-0 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 p-6 md:p-12 lg:p-16 shadow-2xl font-serif text-[15px] leading-[2] relative border-2 border-[#1053ff]/30"
+                                            className="w-[794px] flex-shrink-0 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 p-6 md:p-12 lg:p-16 shadow-2xl font-serif text-[15px] leading-[2] relative border-2 border-primary/30"
                                             style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top left' }}
                                         >
                                             <div className="absolute top-0 right-0 p-4">
                                                 <button onClick={() => setIsSplitView(false)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={20}/></button>
                                             </div>
-                                            <h4 className="text-[10px] font-black uppercase text-[#1053ff] mb-8 border-b border-[#1053ff]/20 pb-2 flex items-center gap-2">
+                                            <h4 className="text-[10px] font-black uppercase text-primary mb-8 border-b border-primary/20 pb-2 flex items-center gap-2">
                                                 <Zap size={12} fill="currentColor"/> Sugestão de Revisão Elite
                                             </h4>
                                             

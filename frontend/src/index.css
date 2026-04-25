@@ -73,15 +73,15 @@
   input:focus,
   select:focus,
   textarea:focus {
-    border-color: #000000;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.10);
+    border-color: #4F73F5;
+    box-shadow: 0 0 0 3px rgba(79, 115, 245, 0.15);
   }
 
   .light input:focus,
   .light select:focus,
   .light textarea:focus {
-    border-color: #000000;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    border-color: #4F73F5;
+    box-shadow: 0 0 0 3px rgba(79, 115, 245, 0.10);
   }
 
   button {
@@ -171,14 +171,14 @@
   border-color: var(--app-stroke) !important;
 }
 
-/* Light mode grayscale color fixes */
+/* Light mode color fixes - using the new brand blue */
 .light .text-blue-400,
 .light .text-blue-500 {
-  color: #000000 !important;
+  color: #4F73F5 !important;
 }
 
 .light .bg-blue-500\/10 {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgba(79, 115, 245, 0.08) !important;
 }
 
 /* Light mode shadow adjustments - stronger shadows for depth */

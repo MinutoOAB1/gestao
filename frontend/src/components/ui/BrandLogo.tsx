@@ -23,7 +23,7 @@ export function BrandLogo({ className = '', variant = 'dark', size = 'md', showT
 
     return (
         <div className={`flex items-center ${currentSize.gap} font-display select-none group ${className}`}>
-            <div className={`relative ${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-black shadow-xl shadow-primary/20 border border-white/10 group-hover:scale-105 transition-transform duration-500`}>
+            <div className={`relative ${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden bg-gradient-to-br from-primary via-accent to-primary-dark shadow-xl shadow-primary/20 border border-white/10 group-hover:scale-105 transition-transform duration-500`}>
                 {/* Decorative Elements */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1),transparent)]" />
                 <div className="absolute -right-1 -top-1 opacity-40 group-hover:opacity-100 transition-opacity">

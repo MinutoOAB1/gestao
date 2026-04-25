@@ -422,7 +422,7 @@ export default function DashboardHome() {
                             <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
                                 <button
                                 onClick={() => navigate('/app/financeiro')}
-                                className="text-xs text-black dark:text-white font-bold uppercase tracking-widest hover:underline transition-all"
+                                className="text-xs text-primary font-black uppercase tracking-widest hover:opacity-80 transition-all"
                             >
                                 Ver tudo
                             </button>
@@ -499,7 +499,7 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl border border-blue-500/20 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
+                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-primary via-primary-dark to-accent rounded-xl border border-white/10 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 dark:bg-black/10 rounded-full blur-2xl pointer-events-none" />
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
@@ -521,10 +521,10 @@ export default function DashboardHome() {
                                 <p className="text-xl sm:text-2xl font-bold text-app-text-main">{productivity.upcomingDeadlines}</p>
                                 <p className="text-[11px] sm:text-xs text-app-text-muted">Prazos</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-blue-500/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-primary/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                                        <FileText size={16} className="text-blue-500" />
+                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                        <FileText size={16} className="text-primary" />
                                     </div>
                                 </div>
                                 <p className="text-xl sm:text-2xl font-black text-app-text-main">{productivity.newProcesses}</p>
@@ -599,7 +599,7 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <div className="flex justify-between items-center mb-4 px-2">
                             <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
-                            <button onClick={() => navigate('/app/clientes')} className="text-xs text-black dark:text-white font-black uppercase tracking-widest hover:underline transition-all">
+                            <button onClick={() => navigate('/app/clientes')} className="text-xs text-primary font-black uppercase tracking-widest hover:opacity-80 transition-all">
                                 Ver todos
                             </button>
                         </div>
