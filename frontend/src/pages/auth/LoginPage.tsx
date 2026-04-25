@@ -248,7 +248,7 @@ export default function LoginPage() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                             >
-                                <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Bem-vindo de volta</h1>
+                                <h1 className="text-3xl font-bold text-black dark:text-white mb-2 font-display">Bem-vindo de volta</h1>
                                 <p className="text-slate-600 dark:text-slate-400 mb-8">
                                     Acesse sua conta para gerenciar seus processos.
                                 </p>

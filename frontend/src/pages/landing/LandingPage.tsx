@@ -22,7 +22,7 @@ function Navbar() {
                         <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-md">
                             <Scale className="w-5 h-5 text-white dark:text-black" />
                         </div>
-                        <span className="text-xl font-semibold text-black dark:text-white tracking-tight">
+                        <span className="text-xl font-bold text-black dark:text-white tracking-tight font-display">
                             Advus
                         </span>
                     </div>
@@ -231,13 +231,14 @@ function FeaturesSection() {
     ];
 
     return (
-        <section id="features" className="py-20 md:py-28 bg-white dark:bg-[#0B1120]">
+        <section id="features" className="py-20 md:py-28 bg-white dark:bg-[#000000]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-                        Tudo em um único lugar
-                    </h2>
+                    <h1 className="text-5xl md:text-7xl font-bold text-black dark:text-white mb-6 leading-tight tracking-tight font-display">
+                        Gestão Jurídica de <br />
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-black to-neutral-500 dark:from-white dark:to-neutral-400">Próxima Geração</span>
+                    </h1>
                     <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed">
                         Desenvolvido especificamente para as necessidades da advocacia moderna.
                     </p>
@@ -248,7 +249,7 @@ function FeaturesSection() {
                     {features.map((feature, idx) => (
                         <div
                             key={idx}
-                            className="group p-8 bg-white dark:bg-[#0B1120] rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
+                            className="group p-8 bg-white/50 backdrop-blur-md dark:bg-[#000000]/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all hover:shadow-lg"
                         >
                             <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-center mb-6 border border-slate-200 dark:border-slate-700">
                                 <feature.icon size={24} />
@@ -277,7 +278,7 @@ function StatsSection() {
     ];
 
     return (
-        <section className="py-20 bg-[#0B1120] dark:bg-[#050B18]">
+        <section className="py-20 bg-[#000000] dark:bg-[#000000]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, idx) => (
@@ -304,7 +305,7 @@ function PricingSection() {
             name: 'Adv Plus',
             price: 'R$ 47',
             period: '/mês',
-            description: 'Acesso completo a todas as ferramentas do Blue Adv',
+            description: 'Acesso completo a todas as ferramentas do Advus',
             features: [
                 'Usuários ilimitados',
                 'Processos e clientes ilimitados',
@@ -322,7 +323,7 @@ function PricingSection() {
     ];
 
     return (
-        <section id="pricing" className="py-20 md:py-28 bg-slate-50 dark:bg-[#050B18]">
+        <section id="pricing" className="py-20 md:py-28 bg-slate-50 dark:bg-[#000000]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">
@@ -330,7 +331,7 @@ function PricingSection() {
                         Plano Único e Transparente
                     </h2>
                     <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Tenha acesso a todas as funcionalidades do Blue Adv por um preço fixo e justo. Sem letras miúdas.
+                        Tenha acesso a todas as funcionalidades do Advus por um preço fixo e justo. Sem letras miúdas.
                     </p>
                 </div>
 
@@ -339,13 +340,14 @@ function PricingSection() {
                     {plans.map((plan, idx) => (
                         <div
                             key={idx}
-                            className="relative p-8 rounded-2xl border bg-white dark:bg-[#0B1120] border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10 w-full"
+                            className="relative p-8 rounded-2xl border bg-white/50 backdrop-blur-md dark:bg-[#000000]/50 border-blue-600 shadow-2xl shadow-blue-500/10 scale-105 z-10 w-full"
                         >
                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-semibold rounded-full whitespace-nowrap">
                                 Oferta de Lançamento
                             </div>
 
                             <div className="text-center mb-6">
+                                <h2 className="text-2xl font-bold text-black dark:text-white mb-2 font-display">Gerenciamento de Processos</h2>
                                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                                     {plan.name}
                                 </h3>
@@ -403,7 +405,7 @@ function TestimonialsSection() {
             name: 'Dr. Carlos Silva',
             role: 'Advogado Tributarista',
             company: 'Silva & Associados',
-            content: 'O Blue Adv revolucionou nosso escritório. Reduzimos em 50% o tempo gasto com tarefas administrativas.',
+            content: 'O Advus revolucionou nosso escritório. Reduzimos em 50% o tempo gasto com tarefas administrativas.',
             avatar: 'CS'
         },
         {
@@ -431,7 +433,7 @@ function TestimonialsSection() {
                         O que nossos clientes dizem
                     </h2>
                     <p className="text-lg text-slate-600 dark:text-slate-400">
-                        Veja como o Blue Adv está transformando escritórios em todo o Brasil.
+                        Veja como o Advus está transformando escritórios em todo o Brasil.
                     </p>
                 </div>
 
@@ -482,7 +484,7 @@ function CTASection() {
                     Pronto para transformar seu escritório?
                 </h2>
                 <p className="text-lg md:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-                    Junte-se a mais de 500 escritórios que já estão usando o Blue Adv para crescer com eficiência.
+                    Junte-se a mais de 500 escritórios que já estão usando o Advus para crescer com eficiência.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <button
@@ -559,7 +561,7 @@ function Footer() {
                 </div>
 
                 <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-                    <p>© 2024 Blue Adv. Todos os direitos reservados.</p>
+                    <p>© 2024 Advus. Todos os direitos reservados.</p>
                     <p>Feito com ❤️ no Brasil</p>
                 </div>
             </div>

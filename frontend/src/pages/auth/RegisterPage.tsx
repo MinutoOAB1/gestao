@@ -181,7 +181,7 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Crie sua conta</h1>
+                            <h1 className="text-3xl font-bold text-black dark:text-white mb-2 font-display">Crie sua conta</h1>
                             <p className="text-slate-600 mb-8">
                                 Junte-se a milhares de advogados e transforme a gestão do seu escritório.
                             </p>

@@ -30,8 +30,8 @@ const SidebarItem = memo(({ icon: Icon, label, path, collapsed }: { icon: any, l
                 className={cn(
                 "group flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden touch-manipulation no-tap-highlight",
                 active
-                    ? "bg-white/15 text-white shadow-lg shadow-white/5"
-                    : "text-white/60 hover:bg-white/8 hover:text-white active:bg-white/15"
+                    ? "bg-black/10 dark:bg-white/15 text-black dark:text-white shadow-md shadow-black/5"
+                    : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/8 hover:text-black dark:hover:text-white active:bg-black/10 dark:active:bg-white/15"
             )}>
                 {/* Active indicator bar */}
                 {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full shadow-md shadow-primary/50" />}
@@ -280,7 +280,7 @@ export default function DashboardLayout() {
             <aside
                 className={cn(
                     "hidden md:flex flex-col z-20 transition-all duration-300 flex-shrink-0",
-                    "bg-black border-r border-white/5",
+                    "bg-glass border-r border-white/10",
                     collapsed ? "w-20" : "w-72"
                 )}
             >
@@ -310,8 +310,8 @@ export default function DashboardLayout() {
                         </div>
                         {!collapsed && (
                             <div className="min-w-0 flex-1">
-                                <p className="text-[13px] font-semibold text-white truncate">{user?.name || 'Usuário'}</p>
-                                <p className="text-[10px] text-white/50 truncate uppercase tracking-wider font-medium">
+                                <p className="text-[13px] font-bold text-black dark:text-white truncate font-display">{user?.name || 'Usuário'}</p>
+                                <p className="text-[10px] text-black/50 dark:text-white/50 truncate uppercase tracking-wider font-semibold">
                                     {user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'LAWYER' ? 'Advogado(a)' : user?.role === 'INTERN' ? 'Estagiário(a)' : 'Parceiro(a)'}
                                 </p>
                             </div>
@@ -428,12 +428,12 @@ export default function DashboardLayout() {
                     <div className={cn("flex items-center gap-1", collapsed ? "justify-center" : "justify-end px-2")}>
                         <button
                             onClick={toggleTheme}
-                            className="text-white/50 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all"
+                            className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-all"
                             title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
                         >
                             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                         </button>
-                        <button onClick={logout} className="text-white/50 hover:text-red-400 p-2 rounded-lg hover:bg-white/10 transition-all" title="Sair do Sistema">
+                        <button onClick={logout} className="text-black/50 dark:text-white/50 hover:text-red-500 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-all" title="Sair do Sistema">
                             <LogOut size={16} />
                         </button>
                     </div>
@@ -442,23 +442,23 @@ export default function DashboardLayout() {
 
             {/* Right Side - Header + Main Content - Black background so curved corner shows black */}
             <div className="flex-1 flex flex-col h-full bg-black relative overflow-hidden">
-                {/* Desktop Header - Dark blue gradient matching sidebar */}
+                {/* Desktop Header - Glass effect */}
                 {!isFullScreenPage && (
-                    <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0">
+                    <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-glass border-b border-white/5">
                         {/* Search Bar - Replaced with Global Search Trigger to enforce ecosystem approach */}
                         <div className="flex-1 max-w-2xl relative">
                             <button
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-white/10 hover:bg-white/15 border border-white/5 rounded-xl text-white/50 hover:text-white/80 transition-all text-sm font-medium"
+                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/5 rounded-xl text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white/80 transition-all text-sm font-medium"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Search size={18} className="text-white/50 group-hover:text-white/80 transition-colors" />
+                                    <Search size={18} className="text-black/50 dark:text-white/50 group-hover:text-black dark:group-hover:text-white/80 transition-colors" />
                                     <span>Buscar processos, clientes, financeiro...</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                    <kbd className="px-2 py-1 bg-white/10 rounded-md text-[10px] font-bold tracking-widest uppercase border border-white/10 shadow-sm">Ctrl</kbd>
+                                    <kbd className="px-2 py-1 bg-black/5 dark:bg-white/10 rounded-md text-[10px] font-bold tracking-widest uppercase border border-black/10 dark:border-white/10 shadow-sm">Ctrl</kbd>
                                     <span className="text-xs">+</span>
-                                    <kbd className="px-2 py-1 bg-white/10 rounded-md text-[10px] font-bold tracking-widest uppercase border border-white/10 shadow-sm">K</kbd>
+                                    <kbd className="px-2 py-1 bg-black/5 dark:bg-white/10 rounded-md text-[10px] font-bold tracking-widest uppercase border border-black/10 dark:border-white/10 shadow-sm">K</kbd>
                                 </div>
                             </button>
                         </div>

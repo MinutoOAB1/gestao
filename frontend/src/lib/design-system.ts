@@ -1,5 +1,5 @@
 /**
- * Design System - Blue Adv
+ * Design System - Advus
  * 
  * Central design tokens for the application.
  * Import this file instead of hardcoding values.
