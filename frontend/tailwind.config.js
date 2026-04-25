@@ -13,12 +13,12 @@ export default {
             },
             colors: {
                 // Custom Kanban Palette
-                "background-light": "#f6f6f8",
-                "background-dark": "#101622",
-                "surface-light": "#ffffff",
-                "surface-dark": "#1e293b",
-                "column-light": "#f0f2f4",
-                "column-dark": "#1a2230",
+                "background-light": "#F8F8F8",
+                "background-dark": "#000000",
+                "surface-light": "#FFFFFF",
+                "surface-dark": "#0D0D0D",
+                "column-light": "#F2F2F2",
+                "column-dark": "#141414",
 
                 // Detailed App Palette
                 app: {
