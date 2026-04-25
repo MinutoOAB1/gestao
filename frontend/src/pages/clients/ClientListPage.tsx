@@ -52,20 +52,20 @@ interface Client {
 }
 
 const STATUS_MAP: Record<string, { label: string; bg: string; text: string; border: string }> = {
-    ATIVO: { label: 'Ativo', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
-    INATIVO: { label: 'Inativo', bg: 'bg-gray-500/10', text: 'text-gray-400', border: 'border-gray-500/20' },
-    SUSPENSO: { label: 'Suspenso', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20' },
+    ATIVO: { label: 'Ativo', bg: 'bg-black dark:bg-white text-white dark:text-black', text: 'text-black dark:text-white', border: 'border-black/20 dark:border-white/20' },
+    INATIVO: { label: 'Inativo', bg: 'bg-neutral-500/10', text: 'text-neutral-400', border: 'border-neutral-500/20' },
+    SUSPENSO: { label: 'Suspenso', bg: 'bg-neutral-800 text-white', text: 'text-white', border: 'border-neutral-800/20' },
 };
 
 const AVATAR_GRADIENTS = [
-    'from-rose-500 to-pink-600',
-    'from-blue-500 to-cyan-600',
-    'from-emerald-500 to-teal-600',
-    'from-violet-500 to-purple-600',
-    'from-amber-500 to-orange-600',
-    'from-indigo-500 to-blue-600',
-    'from-fuchsia-500 to-pink-600',
-    'from-cyan-500 to-blue-600'
+    'from-neutral-800 to-black',
+    'from-neutral-600 to-neutral-800',
+    'from-neutral-400 to-neutral-600',
+    'from-neutral-200 to-neutral-400',
+    'from-black to-neutral-800',
+    'from-neutral-700 to-neutral-900',
+    'from-neutral-500 to-neutral-700',
+    'from-neutral-300 to-neutral-500'
 ];
 
 const getAvatarGradient = (id: string = '') => {
@@ -176,18 +176,18 @@ export default function ClientListPage() {
                 <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">${c.demandType || '--'}</td>
                 <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">
                     <span style="padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;
-                        ${c.urgencyLevel === 'URGENTE' ? 'background:#fef2f2;color:#dc2626;' :
-                c.urgencyLevel === 'ALTA' ? 'background:#fff7ed;color:#ea580c;' :
-                    c.urgencyLevel === 'MEDIA' ? 'background:#fffbeb;color:#d97706;' :
-                        'background:#f0fdf4;color:#16a34a;'}">
+                        ${c.urgencyLevel === 'URGENTE' ? 'background:#000000;color:#ffffff;' :
+                c.urgencyLevel === 'ALTA' ? 'background:#18181b;color:#ffffff;' :
+                    c.urgencyLevel === 'MEDIA' ? 'background:#3f3f46;color:#ffffff;' :
+                        'background:#f4f4f5;color:#000000;'}">
                         ${c.urgencyLevel || '--'}
                     </span>
                 </td>
                 <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">
                     <span style="padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;
-                        ${c.status === 'ATIVO' ? 'background:#f0fdf4;color:#16a34a;' :
-                c.status === 'SUSPENSO' ? 'background:#fffbeb;color:#d97706;' :
-                    'background:#f3f4f6;color:#6b7280;'}">
+                        ${c.status === 'ATIVO' ? 'background:#000000;color:#ffffff;' :
+                c.status === 'SUSPENSO' ? 'background:#3f3f46;color:#ffffff;' :
+                    'background:#f3f4f6;color:#000000;'}">
                         ${(c.status || 'ATIVO')}
                     </span>
                 </td>
@@ -202,13 +202,13 @@ export default function ClientListPage() {
                 <style>
                     * { margin: 0; padding: 0; box-sizing: border-box; }
                     body { font-family: 'Segoe UI', Arial, sans-serif; color: #1f2937; padding: 40px; }
-                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #3b82f6; padding-bottom: 15px; }
-                    .header h1 { font-size: 22px; color: #1e3a5f; }
-                    .header .meta { font-size: 12px; color: #6b7280; text-align: right; }
+                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #000000; padding-bottom: 15px; }
+                    .header h1 { font-size: 22px; color: #000000; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+                    .header .meta { font-size: 12px; color: #3f3f46; text-align: right; }
                     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-                    thead th { background: #1e3a5f; color: white; padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+                    thead th { background: #000000; color: white; padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
                     tbody tr:nth-child(even) { background: #f9fafb; }
-                    tbody tr:hover { background: #eff6ff; }
+                    tbody tr:hover { background: #f3f4f6; }
                     .footer { margin-top: 30px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 15px; }
                     @media print { body { padding: 20px; } .no-print { display: none; } }
                 </style>
@@ -256,8 +256,8 @@ export default function ClientListPage() {
                             Gestão de Clientes
                             {hasAnyUrgent && (
                                 <span className="relative flex h-3 w-3">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black dark:bg-white opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-black dark:bg-white"></span>
                                 </span>
                             )}
                         </h1>
@@ -274,7 +274,7 @@ export default function ClientListPage() {
                     </button>
                     <button
                         onClick={() => navigate('/app/clientes/novo')}
-                        className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-lg bg-primary text-white flex items-center justify-center gap-2 hover:bg-primary-dark transition-fast shadow-lg shadow-primary/20 fixed bottom-20 right-4 z-40 md:static md:px-4 md:py-2 touch-manipulation no-tap-highlight active:scale-95"
+                        className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-lg bg-black dark:bg-white text-white dark:text-black flex items-center justify-center gap-2 hover:opacity-90 transition-fast shadow-lg shadow-black/20 fixed bottom-20 right-4 z-40 md:static md:px-4 md:py-2 touch-manipulation no-tap-highlight active:scale-95 font-bold"
                     >
                         <Plus size={24} className="md:w-5 md:h-5" />
                         <span className="hidden md:inline">Novo Cliente</span>
@@ -291,14 +291,14 @@ export default function ClientListPage() {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Buscar por nome ou CPF..."
-                        className="w-full bg-app-card border border-app-stroke text-white pl-11 pr-4 py-2.5 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-app-text-label text-sm"
+                        className="w-full bg-app-card border border-app-stroke text-white pl-11 pr-4 py-2.5 rounded-xl focus:ring-1 focus:ring-white focus:border-white outline-none transition-all placeholder:text-app-text-label text-sm"
                     />
                 </div>
                 <div className="flex gap-2">
                     <select
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
-                        className="bg-app-card border border-app-stroke text-app-text-main text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-primary"
+                        className="bg-app-card border border-app-stroke text-app-text-main text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-white"
                     >
                         <option value="all">Todos os Tipos</option>
                         <option value="PF">Pessoa Física (PF)</option>
@@ -307,7 +307,7 @@ export default function ClientListPage() {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-app-card border border-app-stroke text-app-text-main text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-primary"
+                        className="bg-app-card border border-app-stroke text-app-text-main text-xs rounded-xl px-3 py-2 outline-none focus:ring-1 focus:ring-white"
                     >
                         <option value="all">Todos os Status</option>
                         <option value="ATIVO">Ativos</option>
@@ -325,7 +325,7 @@ export default function ClientListPage() {
                         className={clsx(
                             "px-4 py-1.5 rounded-full text-[10px] font-bold transition-all whitespace-nowrap border shadow-sm",
                             selectedLetter === 'all'
-                                ? "bg-primary text-white border-primary shadow-primary/20"
+                                ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-black/20"
                                 : "bg-app-card text-app-text-muted hover:text-white border-app-stroke"
                         )}
                     >
@@ -338,7 +338,7 @@ export default function ClientListPage() {
                             className={clsx(
                                 "w-8 h-8 rounded-full text-[10px] font-bold transition-all shrink-0 flex items-center justify-center border shadow-sm",
                                 selectedLetter === letter
-                                    ? "bg-primary text-white border-primary shadow-primary/20"
+                                    ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-black/20"
                                     : "bg-app-card text-app-text-muted hover:text-white border-app-stroke"
                             )}
                         >
@@ -396,18 +396,18 @@ export default function ClientListPage() {
                                                             </div>
                                                             {urgent && (
                                                                 <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
-                                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black dark:bg-white opacity-75"></span>
+                                                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black dark:bg-white"></span>
                                                                 </span>
                                                             )}
                                                         </div>
                                                     </td>
                                                     <td className="px-4 py-2.5">
                                                         <div className="flex items-center gap-2">
-                                                            <div className={clsx("w-2 h-2 rounded-full shrink-0", client.status === 'ATIVO' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-500 opacity-50')} title={client.status}></div>
+                                                            <div className={clsx("w-2 h-2 rounded-full shrink-0", client.status === 'ATIVO' ? 'bg-black dark:bg-white shadow-[0_0_8px_rgba(0,0,0,0.5)]' : 'bg-neutral-500 opacity-50')} title={client.status}></div>
                                                             <div className="font-semibold text-app-text-main text-[13px] truncate max-w-[200px]">{client.name || 'Sem Nome'}</div>
                                                             {client._count && client._count.processes > 0 && (
-                                                                <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
+                                                                <span className="text-[10px] bg-black dark:bg-white text-white dark:text-black px-1.5 py-0.5 rounded-full font-bold">
                                                                     {client._count.processes}
                                                                 </span>
                                                             )}
@@ -433,16 +433,16 @@ export default function ClientListPage() {
                                                                 </span>
                                                             ))}
                                                             {client.demandType && (
-                                                                <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                                                                <span className="text-[9px] font-medium px-1.5 py-0.5 rounded bg-neutral-500/10 text-neutral-400 border border-neutral-500/20">
                                                                     {client.demandType}
                                                                 </span>
                                                             )}
                                                             {client.urgencyLevel && client.urgencyLevel !== 'BAIXA' && (
                                                                 <span className={clsx(
                                                                     "text-[9px] font-medium px-1.5 py-0.5 rounded border",
-                                                                    client.urgencyLevel === 'URGENTE' ? 'bg-red-500/10 text-red-500 border-red-500/30' :
-                                                                        client.urgencyLevel === 'ALTA' ? 'bg-orange-500/10 text-orange-500 border-orange-500/30' :
-                                                                            'bg-amber-500/10 text-amber-500 border-amber-500/30'
+                                                                    client.urgencyLevel === 'URGENTE' ? 'bg-black text-white border-black' :
+                                                                        client.urgencyLevel === 'ALTA' ? 'bg-neutral-800 text-white border-neutral-800' :
+                                                                            'bg-neutral-600 text-white border-neutral-600'
                                                                 )}>
                                                                     {client.urgencyLevel}
                                                                 </span>
@@ -473,20 +473,20 @@ export default function ClientListPage() {
                                                     <td className="px-4 py-2.5 text-center">
                                                         {deleteConfirm === client.id ? (
                                                             <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                                                <button onClick={(e) => handleDeleteClient(e, client.id)} className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-medium rounded hover:bg-red-600 transition-colors">Sim</button>
+                                                                <button onClick={(e) => handleDeleteClient(e, client.id)} className="px-2 py-0.5 bg-neutral-800 text-white text-[10px] font-medium rounded hover:bg-black transition-colors">Sim</button>
                                                                 <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(null); }} className="px-2 py-0.5 bg-app-stroke text-app-text-main text-[10px] font-medium rounded hover:bg-app-stroke/80 transition-colors">Não</button>
                                                             </div>
                                                         ) : (
                                                             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                                                                 <button 
                                                                     onClick={(e) => { e.stopPropagation(); navigate(`/app/processos/kanban?newProcess=true&clientId=${client.id}`); }}
-                                                                    className="p-1.5 rounded text-app-text-muted hover:text-primary hover:bg-primary/10 transition-all tooltip relative"
+                                                                    className="p-1.5 rounded text-app-text-muted hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 transition-all tooltip relative"
                                                                     title="Criar Processo"
                                                                 >
                                                                     <Briefcase size={14} />
                                                                 </button>
                                                                 <button onClick={(e) => { e.stopPropagation(); setDeleteConfirm(client.id); }}
-                                                                    className="p-1.5 rounded text-app-text-muted hover:text-red-500 hover:bg-red-500/10 transition-all tooltip relative"
+                                                                    className="p-1.5 rounded text-app-text-muted hover:text-neutral-900 hover:bg-neutral-900/10 transition-all tooltip relative"
                                                                     title="Apagar Cliente">
                                                                     <Trash2 size={14} />
                                                                 </button>
@@ -525,17 +525,17 @@ export default function ClientListPage() {
                                                     </div>
                                                     {urgent && (
                                                         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                                            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-500"></span>
+                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black dark:bg-white opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-black dark:bg-white"></span>
                                                         </span>
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className="flex items-center gap-2">
-                                                        <div className={clsx("w-2 h-2 rounded-full shrink-0", client.status === 'ATIVO' ? 'bg-emerald-500' : 'bg-slate-500 opacity-50')}></div>
+                                                        <div className={clsx("w-2 h-2 rounded-full shrink-0", client.status === 'ATIVO' ? 'bg-black dark:bg-white' : 'bg-neutral-500 opacity-50')}></div>
                                                         <h3 className="font-bold text-app-text-main text-[15px] truncate">{client.name || 'Sem Nome'}</h3>
                                                         {client._count && client._count.processes > 0 && (
-                                                            <span className="text-[10px] bg-primary text-white px-1.5 py-0.5 rounded-full font-bold">
+                                                            <span className="text-[10px] bg-black dark:bg-white text-white dark:text-black px-1.5 py-0.5 rounded-full font-bold">
                                                                 {client._count.processes}
                                                             </span>
                                                         )}
@@ -553,7 +553,7 @@ export default function ClientListPage() {
                                         <div className="space-y-2">
                                             {client.phone && (
                                                 <div className="flex items-center gap-2 text-[13px] text-app-text-muted bg-app-bg px-2.5 py-1.5 rounded-lg border border-app-stroke/50">
-                                                    <Phone size={14} className="text-primary" />
+                                                    <Phone size={14} className="text-black dark:text-white" />
                                                     {client.phone}
                                                 </div>
                                             )}
@@ -564,7 +564,7 @@ export default function ClientListPage() {
                                                     </span>
                                                 )}
                                                 {client.urgencyLevel && client.urgencyLevel !== 'BAIXA' && (
-                                                    <span className={clsx("text-[10px] font-medium px-2 py-0.5 rounded border", client.urgencyLevel === 'URGENTE' ? 'bg-red-500/10 text-red-500 border-red-500/30' : client.urgencyLevel === 'ALTA' ? 'bg-orange-500/10 text-orange-500 border-orange-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30')}>
+                                                    <span className={clsx("text-[10px] font-medium px-2 py-0.5 rounded border", client.urgencyLevel === 'URGENTE' ? 'bg-black text-white border-black' : client.urgencyLevel === 'ALTA' ? 'bg-neutral-800 text-white border-neutral-800' : 'bg-neutral-600 text-white border-neutral-600')}>
                                                         {client.urgencyLevel}
                                                     </span>
                                                 )}
@@ -588,7 +588,7 @@ export default function ClientListPage() {
                                                     <div className="flex items-center gap-3">
                                                         <button 
                                                             onClick={(e) => { e.stopPropagation(); navigate(`/app/processos?newProcess=true&clientId=${client.id}`); }}
-                                                            className="p-2 bg-primary/10 text-primary rounded-xl"
+                                                            className="p-2 bg-black/10 dark:bg-white/10 text-black dark:text-white rounded-xl"
                                                         >
                                                             <Briefcase size={18} />
                                                         </button>

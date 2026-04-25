@@ -41,12 +41,12 @@ const SortableBlock = memo(({ id, children, isEditMode }: { id: string, children
     };
 
     return (
-        <div ref={setNodeRef} style={style} className={`relative ${isEditMode ? 'p-2 rounded-3xl bg-app-card/30 ring-2 ring-primary/30' : ''}`}>
+        <div ref={setNodeRef} style={style} className={`relative ${isEditMode ? 'p-2 rounded-3xl bg-black/5 dark:bg-white/5 ring-2 ring-black dark:ring-white' : ''}`}>
             {isEditMode && (
                 <div 
                     {...attributes} 
                     {...listeners} 
-                    className="absolute -top-3 -right-3 w-8 h-8 bg-app-card border border-app-stroke rounded-full shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing z-50 text-app-text-muted hover:text-primary transition-colors"
+                    className="absolute -top-3 -right-3 w-8 h-8 bg-black dark:bg-white border border-black/10 dark:border-white/10 rounded-full shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing z-50 text-white dark:text-black hover:scale-110 transition-transform"
                 >
                     <GripVertical size={16} />
                 </div>
@@ -148,7 +148,7 @@ const QuickAction = memo(({ icon: Icon, label, colorClass, onClick }: any) => (
 
 const DeadlineCard = memo(({ type, title, subtitle, time, color }: any) => (
     <div
-        className="bg-app-card p-4 rounded-xl border border-app-stroke relative overflow-hidden flex items-center gap-4 cursor-pointer transition-colors hover:border-primary/20"
+        className="bg-app-card p-4 rounded-xl border border-app-stroke relative overflow-hidden flex items-center gap-4 cursor-pointer transition-colors hover:border-black/20 dark:hover:border-white/20"
         style={{ boxShadow: premiumShadow }}
     >
         <div className={`absolute left-0 top-0 bottom-0 w-1 ${color} transition-all duration-300`}></div>
@@ -420,15 +420,15 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <div className="flex justify-between items-center mb-4 px-2">
                             <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
-                            <button
+                                <button
                                 onClick={() => navigate('/app/financeiro')}
-                                className="text-xs text-primary font-medium hover:text-primary-light transition-colors"
+                                className="text-xs text-black dark:text-white font-bold uppercase tracking-widest hover:underline transition-all"
                             >
                                 Ver tudo
                             </button>
                         </div>
                         <div
-                            className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-6 relative overflow-hidden transition-colors hover:border-primary/20"
+                            className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-6 relative overflow-hidden transition-colors hover:border-black/20 dark:hover:border-white/20"
                             style={{ boxShadow: premiumShadow }}
                         >
                             <button
@@ -479,7 +479,7 @@ export default function DashboardHome() {
                             <div
                                 key={i}
                                 onClick={() => navigate(stat.path)}
-                                className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-all hover:border-primary/20 cursor-pointer touch-manipulation group"
+                                className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-all hover:border-black/20 dark:hover:border-white/20 cursor-pointer touch-manipulation group"
                                 style={{ boxShadow: premiumShadow }}
                             >
                                 <div className="flex items-center justify-between mb-2">
@@ -499,18 +499,18 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-black/5 to-app-card rounded-xl border border-black/10 p-4 sm:p-5 transition-colors hover:border-black/20 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
-                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-black/5 rounded-full blur-2xl pointer-events-none" />
+                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-black to-neutral-800 dark:from-white dark:to-neutral-200 rounded-xl border border-black/10 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
+                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 dark:bg-black/10 rounded-full blur-2xl pointer-events-none" />
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center">
-                                        <Calculator size={20} className="text-white dark:text-black" />
+                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-black flex items-center justify-center">
+                                        <Calculator size={20} className="text-black dark:text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-[12px] sm:text-xs text-app-text-main font-bold uppercase tracking-wider font-display">A Receber</p>
-                                        <p className="text-[10px] text-app-text-muted font-medium">Valores pendentes</p>
+                                        <p className="text-[12px] sm:text-xs text-white dark:text-black font-black uppercase tracking-widest font-display">A Receber</p>
+                                        <p className="text-[10px] text-white/60 dark:text-black/60 font-medium">Valores pendentes</p>
                                     </div>
                                 </div>
-                                <p className="text-3xl sm:text-4xl font-black text-black dark:text-white tracking-tight font-display">{formatBRLCompact(productivity.pendingPayments)}</p>
+                                <p className="text-3xl sm:text-4xl font-black text-white dark:text-black tracking-tight font-display">{formatBRLCompact(productivity.pendingPayments)}</p>
                             </div>
                             <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-black/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-2 mb-2">
@@ -527,8 +527,8 @@ export default function DashboardHome() {
                                         <FileText size={16} className="text-black dark:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-bold text-black dark:text-white">{productivity.newProcesses}</p>
-                                <p className="text-[11px] sm:text-xs text-app-text-muted">Novos Process.</p>
+                                <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{productivity.newProcesses}</p>
+                                <p className="text-[11px] sm:text-xs text-app-text-muted uppercase tracking-tighter font-bold">Novos Process.</p>
                             </div>
                             <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-black/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-2 mb-2">
@@ -536,8 +536,8 @@ export default function DashboardHome() {
                                         <Users size={16} className="text-black dark:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-bold text-black dark:text-white">{productivity.activeClients}</p>
-                                <p className="text-[11px] sm:text-xs text-app-text-muted">Clientes Ativos</p>
+                                <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{productivity.activeClients}</p>
+                                <p className="text-[11px] sm:text-xs text-app-text-muted uppercase tracking-tighter font-bold">Clientes Ativos</p>
                             </div>
                         </div>
                     </motion.div>
@@ -599,25 +599,25 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <div className="flex justify-between items-center mb-4 px-2">
                             <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
-                            <button onClick={() => navigate('/app/clientes')} className="text-xs text-primary font-medium hover:text-primary-light transition-colors">
+                            <button onClick={() => navigate('/app/clientes')} className="text-xs text-black dark:text-white font-black uppercase tracking-widest hover:underline transition-all">
                                 Ver todos
                             </button>
                         </div>
-                        <div className="bg-app-card rounded-2xl border border-app-stroke divide-y divide-app-stroke/50 transition-colors hover:border-primary/20" style={{ boxShadow: premiumShadow }}>
+                        <div className="bg-app-card rounded-2xl border border-app-stroke divide-y divide-app-stroke/50 transition-colors hover:border-black/10 dark:hover:border-white/10" style={{ boxShadow: premiumShadow }}>
                             {displayRecentClients.length > 0 ? (
                                 displayRecentClients.map((client: any, i: number) => {
                                     const colors = ['bg-black', 'bg-neutral-800', 'bg-neutral-600', 'bg-neutral-400', 'bg-neutral-200'];
                                     const avatarBg = colors[i % colors.length];
                                     const isNew = client.createdAt && (new Date().getTime() - new Date(client.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
                                     return (
-                                        <div key={client.id || i} className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-primary/5 group" onClick={() => navigate(`/app/clientes/${client.id}`)}>
+                                        <div key={client.id || i} className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5 group" onClick={() => navigate(`/app/clientes/${client.id}`)}>
                                             <div className={`w-10 h-10 rounded-full ${avatarBg} flex items-center justify-center shrink-0 shadow-md shadow-black/10`}>
                                                 <span className={`${avatarBg === 'bg-neutral-200' ? 'text-black' : 'text-white'} font-bold text-sm`}>{client.name?.charAt(0)?.toUpperCase() || 'C'}</span>
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2">
-                                                    <h4 className="text-sm font-semibold text-app-text-main truncate">{client.name}</h4>
-                                                    {isNew && <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Novo</span>}
+                                                    <h4 className="text-sm font-black text-app-text-main truncate">{client.name}</h4>
+                                                    {isNew && <span className="text-[9px] bg-black dark:bg-white text-white dark:text-black font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">Novo</span>}
                                                 </div>
                                                 <p className="text-xs text-app-text-muted truncate">{client.email || 'Sem email'}</p>
                                             </div>
@@ -655,10 +655,10 @@ export default function DashboardHome() {
                 <h1 className="text-2xl font-black text-app-text-main">Dashboard</h1>
                 <button
                     onClick={() => setIsEditMode(!isEditMode)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${isEditMode ? 'bg-primary text-white shadow-md' : 'bg-app-card border border-app-stroke text-app-text-muted hover:text-app-text-main'}`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-black uppercase tracking-widest transition-all ${isEditMode ? 'bg-black text-white dark:bg-white dark:text-black shadow-lg scale-105' : 'bg-app-card border border-app-stroke text-app-text-muted hover:text-app-text-main'}`}
                 >
                     <Settings2 size={16} />
-                    {isEditMode ? 'Concluído' : 'Editar Layout'}
+                    {isEditMode ? 'Concluído' : 'Layout'}
                 </button>
             </div>
             

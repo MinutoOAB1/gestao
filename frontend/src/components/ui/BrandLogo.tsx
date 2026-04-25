@@ -20,15 +20,15 @@ export function BrandLogo({ className = '', variant = 'dark', size = 'md' }: Bra
 
     return (
         <div className={`flex items-center gap-2.5 font-sans select-none ${className}`}>
-            <div className={`${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden bg-app-text-main`}>
+            <div className={`${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden bg-black shadow-lg shadow-black/20`}>
                 <Scale 
                     size={currentSize.icon} 
-                    className="text-app-bg" 
+                    className="text-white" 
                 />
             </div>
-            <div className={`flex items-baseline tracking-tight font-bold leading-none ${currentSize.text}`}>
-                <span className={isDarkBg ? 'text-white' : 'text-app-text-main'}>Adv</span>
-                <span className={isDarkBg ? 'text-white/70' : 'text-app-text-muted'}>us</span>
+            <div className={`flex items-baseline tracking-tighter font-black leading-none uppercase ${currentSize.text}`}>
+                <span className={isDarkBg ? 'text-black' : 'text-black'}>Adv</span>
+                <span className={isDarkBg ? 'text-black/50' : 'text-black/40'}>us</span>
             </div>
         </div>
     );

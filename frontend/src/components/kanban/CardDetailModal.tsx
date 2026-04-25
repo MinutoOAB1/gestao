@@ -76,18 +76,18 @@ interface CardDetailModalProps {
 // ─── Constants ──────────────────────────────
 
 const LABEL_COLORS = [
-    '#EF4444', '#F97316', '#F59E0B', '#22C55E', '#14B8A6',
-    '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#64748B',
+    '#000000', '#18181b', '#27272a', '#3f3f46', '#52525b',
+    '#71717a', '#a1a1aa', '#d4d4d8', '#e4e4e7', '#f4f4f5',
 ];
 
 const UPDATE_TYPE_ICONS: Record<string, { icon: any; color: string }> = {
-    'MOVIMENTO': { icon: FileText, color: 'text-gray-500' },
-    'DECISAO': { icon: FileText, color: 'text-amber-500' },
-    'SENTENCA': { icon: FileText, color: 'text-red-500' },
-    'DESPACHO': { icon: FileText, color: 'text-blue-500' },
-    'AUDIENCIA': { icon: Calendar, color: 'text-purple-500' },
-    'PRAZO': { icon: AlertTriangle, color: 'text-orange-500' },
-    'OUTRO': { icon: Clock, color: 'text-slate-500' },
+    'MOVIMENTO': { icon: FileText, color: 'text-neutral-500' },
+    'DECISAO': { icon: FileText, color: 'text-black dark:text-white' },
+    'SENTENCA': { icon: FileText, color: 'text-neutral-800 dark:text-neutral-200' },
+    'DESPACHO': { icon: FileText, color: 'text-neutral-600 dark:text-neutral-400' },
+    'AUDIENCIA': { icon: Calendar, color: 'text-neutral-900 dark:text-neutral-100' },
+    'PRAZO': { icon: AlertTriangle, color: 'text-neutral-400' },
+    'OUTRO': { icon: Clock, color: 'text-neutral-500' },
 };
 
 // ─── Main Component ────────────────────────────────────────
@@ -249,11 +249,15 @@ export default function CardDetailModal({
     const checklistProgress = totalChecklistItems > 0 ? Math.round((completedChecklistItems / totalChecklistItems) * 100) : 0;
 
     const areaColors: Record<string, string> = {
-        'Cível': 'bg-green-500', 'Civil': 'bg-green-500',
-        'Trabalhista': 'bg-blue-500', 'Penal': 'bg-red-500',
-        'Criminal': 'bg-orange-500', 'Previdenciário': 'bg-teal-500',
-        'Tributário': 'bg-gray-500', 'Família': 'bg-pink-500',
-        'Contratual': 'bg-emerald-500',
+        'Cível': 'bg-black dark:bg-white text-white dark:text-black',
+        'Civil': 'bg-black dark:bg-white text-white dark:text-black',
+        'Trabalhista': 'bg-neutral-800 text-white',
+        'Penal': 'bg-neutral-700 text-white',
+        'Criminal': 'bg-neutral-600 text-white',
+        'Previdenciário': 'bg-neutral-500 text-white',
+        'Tributário': 'bg-neutral-400 text-black',
+        'Família': 'bg-neutral-300 text-black',
+        'Contratual': 'bg-neutral-200 text-black',
     };
 
     // ─── Render ────────────────────────────────────────────
@@ -276,11 +280,11 @@ export default function CardDetailModal({
                                 <div className="flex-1">
                                     <div className="flex flex-wrap gap-2 mb-4">
                                         {process.labels.map(label => (
-                                            <span key={label.id} className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shadow-sm" style={{ backgroundColor: label.color + '20', color: label.color, border: `1px solid ${label.color}40` }}>
+                                            <span key={label.id} className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shadow-sm" style={{ backgroundColor: 'rgba(0,0,0,0.05)', color: '#000', border: `1px solid rgba(0,0,0,0.1)` }}>
                                                 {label.name}
                                             </span>
                                         ))}
-                                        <button onClick={() => setShowLabelPicker(!showLabelPicker)} className="text-[10px] font-bold px-2 py-0.5 rounded border border-dashed border-gray-300 dark:border-slate-700 text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all">
+                                        <button onClick={() => setShowLabelPicker(!showLabelPicker)} className="text-[10px] font-bold px-2 py-0.5 rounded border border-dashed border-gray-300 dark:border-slate-700 text-gray-400 hover:text-black dark:hover:text-white hover:border-black dark:hover:border-white transition-all">
                                             + ETIQUETA
                                         </button>
                                     </div>
@@ -290,15 +294,15 @@ export default function CardDetailModal({
                                             <input
                                                 value={titleDraft}
                                                 onChange={e => setTitleDraft(e.target.value)}
-                                                className="text-2xl font-black bg-white dark:bg-slate-800 p-2 rounded-xl border-2 border-blue-500 outline-none w-full text-gray-900 dark:text-white shadow-lg"
+                                                className="text-2xl font-black bg-white dark:bg-slate-800 p-2 rounded-xl border-2 border-neutral-900 dark:border-neutral-100 outline-none w-full text-gray-900 dark:text-white shadow-lg"
                                                 autoFocus
                                                 onKeyDown={e => e.key === 'Enter' && saveTitle()}
                                             />
-                                            <button onClick={saveTitle} className="p-2 bg-green-500 text-white rounded-xl shadow-lg hover:bg-green-600 transition-all"><Save size={20} /></button>
-                                            <button onClick={() => setEditingTitle(false)} className="p-2 bg-gray-200 dark:bg-slate-700 text-gray-500 rounded-xl hover:bg-gray-300 transition-all"><X size={20} /></button>
+                                            <button onClick={saveTitle} className="p-2 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-lg hover:opacity-90 transition-all"><Save size={20} /></button>
+                                            <button onClick={() => setEditingTitle(false)} className="p-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-500 rounded-xl hover:bg-neutral-300 transition-all"><X size={20} /></button>
                                         </div>
                                     ) : (
-                                        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 leading-tight tracking-tight cursor-pointer hover:text-blue-600 transition-colors" onClick={() => setEditingTitle(true)}>
+                                        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 leading-tight tracking-tight cursor-pointer hover:text-black dark:hover:text-white/80 transition-colors" onClick={() => setEditingTitle(true)}>
                                             {process.title}
                                         </h2>
                                     )}
@@ -340,7 +344,7 @@ export default function CardDetailModal({
                                     <button onClick={copyProcessNumber} className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 transition-all border border-gray-100 dark:border-slate-700 shadow-sm">
                                         <Copy size={14} /> COPIAR CNJ
                                     </button>
-                                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 transition-all border border-blue-100 dark:border-blue-900/30 shadow-sm">
+                                    <button className="flex items-center gap-2 px-4 py-2 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 rounded-xl text-xs font-bold text-black dark:text-white transition-all border border-black/10 dark:border-white/20 shadow-sm">
                                         <ExternalLink size={14} /> VER CLIENTE
                                     </button>
                                     <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-300 transition-all border border-gray-100 dark:border-slate-700 shadow-sm">
@@ -374,9 +378,9 @@ export default function CardDetailModal({
                                 <section>
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                                            <FileText size={18} className="text-blue-500" /> Memorial do Caso
+                                            <FileText size={18} className="text-black dark:text-white" /> Memorial do Caso
                                         </h3>
-                                        <button onClick={() => setEditingDesc(!editingDesc)} className="text-[10px] font-bold text-blue-500 bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-lg hover:bg-blue-500 hover:text-white transition-all">
+                                        <button onClick={() => setEditingDesc(!editingDesc)} className="text-[10px] font-bold text-black dark:text-white bg-black/5 dark:bg-white/10 px-3 py-1.5 rounded-lg hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all">
                                             {editingDesc ? 'CANCELAR' : 'EDITAR CONTEÚDO'}
                                         </button>
                                     </div>
@@ -389,7 +393,7 @@ export default function CardDetailModal({
                                                 autoFocus
                                             />
                                             <div className="flex justify-end">
-                                                <button onClick={saveDesc} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all flex items-center gap-2">
+                                                <button onClick={saveDesc} className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-xl shadow-lg shadow-black/20 hover:opacity-90 transition-all flex items-center gap-2">
                                                     <Save size={16} /> SALVAR ALTERAÇÕES
                                                 </button>
                                             </div>
@@ -405,9 +409,9 @@ export default function CardDetailModal({
                                 <section>
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                                            <CheckSquare size={18} className="text-green-500" /> Checklists de Execução
+                                            <CheckSquare size={18} className="text-black dark:text-white" /> Checklists de Execução
                                         </h3>
-                                        <button onClick={handleCreateChecklist} className="text-[10px] font-bold text-green-600 bg-green-50 dark:bg-green-900/30 px-3 py-1.5 rounded-lg hover:bg-green-500 hover:text-white transition-all">
+                                        <button onClick={handleCreateChecklist} className="text-[10px] font-bold text-black dark:text-white bg-black/5 dark:bg-white/10 px-3 py-1.5 rounded-lg hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all">
                                             + NOVO CHECKLIST
                                         </button>
                                     </div>
@@ -415,9 +419,9 @@ export default function CardDetailModal({
                                     {totalChecklistItems > 0 && (
                                         <div className="mb-6 flex items-center gap-4">
                                             <div className="flex-1 h-3 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-200 dark:border-slate-700 shadow-inner">
-                                                <div className="h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-700" style={{ width: `${checklistProgress}%` }} />
+                                                <div className="h-full bg-gradient-to-r from-neutral-800 to-black dark:from-neutral-200 dark:to-white transition-all duration-700" style={{ width: `${checklistProgress}%` }} />
                                             </div>
-                                            <span className="text-[11px] font-black text-green-600 dark:text-green-400 whitespace-nowrap">{checklistProgress}% CONCLUÍDO</span>
+                                            <span className="text-[11px] font-black text-black dark:text-white whitespace-nowrap">{checklistProgress}% CONCLUÍDO</span>
                                         </div>
                                     )}
 
@@ -433,9 +437,9 @@ export default function CardDetailModal({
                                                         <div key={item.id} className="flex items-center gap-3 group">
                                                             <button 
                                                                 onClick={() => toggleChecklistItem(item.id, item.completed)}
-                                                                className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 border-green-500 shdaow-sm shadow-green-500/30' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}
+                                                                className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${item.completed ? 'bg-black dark:bg-white border-black dark:border-white shadow-sm shadow-black/30' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}
                                                             >
-                                                                {item.completed && <span className="text-white text-[10px]">✓</span>}
+                                                                {item.completed && <span className="text-white dark:text-black text-[10px]">✓</span>}
                                                             </button>
                                                             <span className={`flex-1 text-sm ${item.completed ? 'text-gray-400 line-through decoration-2' : 'text-gray-700 dark:text-gray-300 font-medium'}`}>{item.text}</span>
                                                             <button onClick={() => handleDeleteChecklistItem(item.id)} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all"><Trash2 size={12} /></button>
@@ -452,11 +456,11 @@ export default function CardDetailModal({
                                                             autoFocus
                                                             onKeyDown={e => e.key === 'Enter' && handleAddChecklistItem(checklist.id)}
                                                         />
-                                                        <button onClick={() => handleAddChecklistItem(checklist.id)} className="p-2 bg-green-600 text-white rounded-xl shadow-md"><Plus size={16} /></button>
-                                                        <button onClick={() => setAddingChecklistItem(null)} className="p-2 bg-gray-200 dark:bg-slate-700 text-gray-500 rounded-xl"><X size={16} /></button>
+                                                        <button onClick={() => handleAddChecklistItem(checklist.id)} className="p-2 bg-black dark:bg-white text-white dark:text-black rounded-xl shadow-md"><Plus size={16} /></button>
+                                                        <button onClick={() => setAddingChecklistItem(null)} className="p-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-500 rounded-xl"><X size={16} /></button>
                                                     </div>
                                                 ) : (
-                                                    <button onClick={() => setAddingChecklistItem(checklist.id)} className="text-[11px] font-bold text-gray-400 hover:text-green-600 flex items-center gap-2 transition-colors">
+                                                    <button onClick={() => setAddingChecklistItem(checklist.id)} className="text-[11px] font-bold text-gray-400 hover:text-black dark:hover:text-white flex items-center gap-2 transition-colors">
                                                         <Plus size={14} /> ADICIONAR ITEM
                                                     </button>
                                                 )}
@@ -471,7 +475,7 @@ export default function CardDetailModal({
                                 <div className="space-y-10">
                                     {/* Activity Header */}
                                     <div className="flex items-center gap-2">
-                                        <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400">
+                                        <div className="p-2 bg-black/5 dark:bg-white/10 rounded-xl text-black dark:text-white">
                                             <MessageSquare size={18} />
                                         </div>
                                         <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider">Histórico de Atividades</h3>
@@ -481,7 +485,7 @@ export default function CardDetailModal({
                                     <div className="space-y-6">
                                         <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">COMENTÁRIOS E NOTAS</h4>
                                         <div className="flex items-start gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-black shadow-sm shrink-0">V</div>
+                                            <div className="w-8 h-8 rounded-full bg-neutral-800 dark:bg-neutral-200 flex items-center justify-center text-white dark:text-black text-xs font-black shadow-sm shrink-0">V</div>
                                             <div className="flex-1 group">
                                                 <textarea 
                                                     value={commentText}
@@ -533,7 +537,7 @@ export default function CardDetailModal({
                                                 );
                                             })}
                                             {process.updates.length > 8 && (
-                                                <button onClick={() => setShowAllUpdates(!showAllUpdates)} className="text-[10px] font-black text-blue-500 hover:underline">
+                                                <button onClick={() => setShowAllUpdates(!showAllUpdates)} className="text-[10px] font-black text-black dark:text-white hover:underline">
                                                     {showAllUpdates ? 'OCULTAR HISTÓRICO' : `VER MAIS ${process.updates.length - 8} REGISTROS`}
                                                 </button>
                                             )}
@@ -604,7 +608,7 @@ export default function CardDetailModal({
                                     />
                                 ))}
                             </div>
-                            <button onClick={handleCreateNewLabel} className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-xs font-black tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-500/20">CRIAR ETIQUETA</button>
+                            <button onClick={handleCreateNewLabel} className="w-full py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl text-xs font-black tracking-widest hover:opacity-90 shadow-lg shadow-black/20">CRIAR ETIQUETA</button>
                         </div>
                     </div>
                 )}

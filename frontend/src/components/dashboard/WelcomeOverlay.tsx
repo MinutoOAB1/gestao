@@ -51,7 +51,7 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                         className="relative w-full max-w-5xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10"
                     >
                         {/* Header with gradient - Fixed color to match platform Navy */}
-                        <div className="bg-gradient-to-br from-[#1E3A8A] to-[#172554] p-8 text-white relative">
+                        <div className="bg-gradient-to-br from-black to-neutral-800 dark:from-neutral-900 dark:to-black p-8 text-white relative">
                             <button
                                 onClick={onClose}
                                 className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -68,7 +68,7 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                     <Zap size={24} className="text-white ring-offset-2 animate-pulse" />
                                 </div>
                                 <h2 className="text-2xl font-black tracking-tight mb-1 uppercase">Bem-vindo de volta!</h2>
-                                <p className="text-indigo-100 font-medium">Olá, <span className="text-white font-bold">{userName}</span>. Aqui está o que mudou desde seu último acesso.</p>
+                                <p className="text-neutral-300 font-medium">Olá, <span className="text-white font-black">{userName}</span>. Aqui está o que mudou desde seu último acesso.</p>
                             </motion.div>
                         </div>
 
@@ -83,16 +83,16 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.3 }}
-                                            className="flex items-center gap-4 p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 group hover:shadow-md transition-all"
+                                            className="flex items-center gap-4 p-4 rounded-2xl bg-black dark:bg-white text-white dark:text-black group hover:scale-[1.02] transition-all shadow-lg"
                                         >
-                                            <div className="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:scale-110 transition-transform">
+                                            <div className="w-10 h-10 rounded-xl bg-white/20 dark:bg-black/20 text-white dark:text-black flex items-center justify-center group-hover:scale-110 transition-transform">
                                                 <AlertTriangle size={20} />
                                             </div>
                                             <div className="flex-1">
-                                                <p className="text-sm font-black text-red-900 dark:text-red-400 uppercase tracking-tighter">Prazos Urgentes</p>
-                                                <p className="text-xs text-red-700 dark:text-red-300 font-medium">{stats.deadlines} vencendo em breve</p>
+                                                <p className="text-sm font-black uppercase tracking-tighter">Prazos Urgentes</p>
+                                                <p className="text-xs opacity-70 font-medium">{stats.deadlines} vencendo em breve</p>
                                             </div>
-                                            <div className="text-xl font-black text-red-600">{stats.deadlines}</div>
+                                            <div className="text-xl font-black">{stats.deadlines}</div>
                                         </motion.div>
 
                                         {/* New Processes */}
@@ -100,16 +100,16 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.4 }}
-                                            className="flex items-center gap-4 p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 group hover:shadow-md transition-all"
+                                            className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 group hover:shadow-md transition-all"
                                         >
-                                            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                                            <div className="w-10 h-10 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                                                 <Clock size={20} />
                                             </div>
                                             <div className="flex-1">
-                                                <p className="text-sm font-black text-blue-900 dark:text-blue-400 uppercase tracking-tighter">Novos Processos</p>
-                                                <p className="text-xs text-blue-700 dark:text-blue-300 font-medium">{stats.newProcesses} recentemente</p>
+                                                <p className="text-sm font-black text-neutral-900 dark:text-neutral-100 uppercase tracking-tighter">Novos Processos</p>
+                                                <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">{stats.newProcesses} recentemente</p>
                                             </div>
-                                            <div className="text-xl font-black text-blue-600">{stats.newProcesses}</div>
+                                            <div className="text-xl font-black text-neutral-900 dark:text-neutral-100">{stats.newProcesses}</div>
                                         </motion.div>
 
                                         {/* New Comments/Mentions mini grid */}
@@ -118,20 +118,20 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: 0.5 }}
-                                                className="flex flex-col gap-2 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20"
+                                                className="flex flex-col gap-2 p-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700"
                                             >
-                                                <p className="text-[10px] font-black text-amber-900 dark:text-amber-400 uppercase tracking-widest">Comentários</p>
-                                                <div className="text-2xl font-black text-amber-600 leading-none">{stats.comments}</div>
+                                                <p className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">Comentários</p>
+                                                <div className="text-2xl font-black text-neutral-800 dark:text-neutral-200 leading-none">{stats.comments}</div>
                                             </motion.div>
 
                                             <motion.div 
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: 0.6 }}
-                                                className="flex flex-col gap-2 p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20"
+                                                className="flex flex-col gap-2 p-4 rounded-2xl bg-black dark:bg-white border border-black/10 dark:border-white/10"
                                             >
-                                                <p className="text-[10px] font-black text-indigo-900 dark:text-indigo-400 uppercase tracking-widest">Menções</p>
-                                                <div className="text-2xl font-black text-indigo-600 leading-none">{stats.mentions}</div>
+                                                <p className="text-[10px] font-black text-white dark:text-black opacity-60 uppercase tracking-widest">Menções</p>
+                                                <div className="text-2xl font-black text-white dark:text-black leading-none">{stats.mentions}</div>
                                             </motion.div>
                                         </div>
                                     </div>
@@ -143,7 +143,7 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                         <button 
                                             onClick={handleToggle}
                                             className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
-                                                dontShowAgain ? 'bg-primary border-primary text-white' : 'border-app-stroke bg-transparent'
+                                                dontShowAgain ? 'bg-black dark:bg-white border-black dark:border-white text-white dark:text-black' : 'border-app-stroke bg-transparent'
                                             }`}
                                         >
                                             {dontShowAgain && <Check size={14} strokeWidth={3} />}
@@ -214,8 +214,8 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                         </h3>
                                         <div className="grid grid-cols-1 gap-3">
                                             {stats.pendingActions.oldProcesses.map((proc, idx) => (
-                                                <div key={`p-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-orange-500/5 border border-orange-500/10">
-                                                    <div className="w-2 h-2 rounded-full bg-orange-500" />
+                                                <div key={`p-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                                                    <div className="w-2 h-2 rounded-full bg-black dark:bg-white" />
                                                     <div className="flex-1">
                                                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Atualizar Processo: {proc.title}</p>
                                                         <p className="text-[10px] text-slate-500">Sem andamentos há mais de 30 dias</p>
@@ -224,8 +224,8 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                                 </div>
                                             ))}
                                             {stats.pendingActions.incompleteClients.map((client, idx) => (
-                                                <div key={`c-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
-                                                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                                                <div key={`c-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700">
+                                                    <div className="w-2 h-2 rounded-full bg-neutral-400 dark:bg-neutral-500" />
                                                     <div className="flex-1">
                                                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Completar Cadastro: {client.name}</p>
                                                         <p className="text-[10px] text-slate-500">Falta e-mail ou telefone de contato</p>

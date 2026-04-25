@@ -30,16 +30,16 @@ const SidebarItem = memo(({ icon: Icon, label, path, collapsed }: { icon: any, l
                 className={cn(
                 "group flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden touch-manipulation no-tap-highlight",
                 active
-                    ? "bg-black/10 dark:bg-white/15 text-black dark:text-white shadow-md shadow-black/5"
-                    : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/8 hover:text-black dark:hover:text-white active:bg-black/10 dark:active:bg-white/15"
+                    ? "bg-black/5 dark:bg-black/10 text-black shadow-sm"
+                    : "text-black/50 hover:bg-black/5 hover:text-black active:bg-black/10"
             )}>
                 {/* Active indicator bar */}
-                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full shadow-md shadow-primary/50" />}
-                <div className={cn("p-1 rounded-lg transition-all duration-200", active ? "bg-white/10" : "group-hover:bg-white/5")}>
-                    <Icon size={18} className={cn("transition-all duration-200", active && "text-primary")} />
+                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-black rounded-r-full shadow-md shadow-black/50" />}
+                <div className={cn("p-1 rounded-lg transition-all duration-200", active ? "bg-black/5" : "group-hover:bg-black/5")}>
+                    <Icon size={18} className={cn("transition-all duration-200", active ? "text-black scale-110" : "text-black/60")} />
                 </div>
                 {!collapsed && (
-                    <span className={cn("font-medium text-[13px] tracking-wide", active && "font-semibold")}>
+                    <span className={cn("font-black text-[11px] uppercase tracking-widest", active ? "text-black" : "text-black/60")}>
                         {label}
                     </span>
                 )}
@@ -107,7 +107,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
             <div
                 className={cn(
                     "group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-fast relative",
-                    active ? "bg-black/10 dark:bg-white/15 text-black dark:text-white border border-black/5 dark:border-white/10" : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/8 hover:text-black dark:hover:text-white"
+                    active ? "bg-black/5 text-black border border-black/5" : "text-black/60 hover:bg-black/5 hover:text-black"
                 )}
             >
                 {/* Click on icon + text navigates to page */}
@@ -115,8 +115,8 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                     className="flex items-center gap-3 flex-1"
                     onClick={() => navigate('/app/analise-ia')}
                 >
-                    <Shield size={20} className={cn("transition-fast", active && "scale-110")} />
-                    <span className="font-medium text-sm tracking-wide">IA Análise</span>
+                    <Shield size={20} className={cn("transition-fast", active ? "text-black scale-110" : "text-black/60")} />
+                    <span className="font-black text-[11px] uppercase tracking-widest">IA Análise</span>
                 </div>
                 {/* Arrow only toggles dropdown */}
                 <button
@@ -137,7 +137,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                     >
                         {/* Quick access to main page */}
                         <Link to="/app/analise-ia">
-                            <div className="flex items-center gap-2 px-4 py-2 ml-6 text-xs text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors">
+                            <div className="flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest text-black/50 hover:text-black transition-colors">
                                 <Plus size={12} />
                                 Nova Análise
                             </div>
@@ -207,11 +207,11 @@ const BottomNavItem = memo(({ icon: Icon, label, path, isMain = false, onClick }
 
     return (
         <PrefetchLink to={path} className={cn(
-            "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[10px] touch-manipulation no-tap-highlight active:scale-95 transition-fast",
-            active && "bg-primary/10 rounded-xl"
+            "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[9px] touch-manipulation no-tap-highlight active:scale-95 transition-fast",
+            active && "bg-black/5 rounded-xl"
         )}>
-            <Icon size={22} fill={active ? "currentColor" : "none"} className={cn("transition-fast", active ? "text-primary" : "text-app-text-muted")} />
-            <span className={cn("transition-fast", active ? "text-primary font-bold" : "text-app-text-muted font-medium")}>{label}</span>
+            <Icon size={22} fill={active ? "black" : "none"} className={cn("transition-fast", active ? "text-black" : "text-black/40")} />
+            <span className={cn("transition-fast font-black uppercase tracking-widest", active ? "text-black" : "text-black/40")}>{label}</span>
         </PrefetchLink>
     )
 });
@@ -287,12 +287,12 @@ export default function DashboardLayout() {
                 <div className="p-5 flex items-center justify-between">
                     {!collapsed && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            <BrandLogo variant="light" />
+                            <BrandLogo variant="dark" />
                         </motion.div>
                     )}
                     <button
                         onClick={() => setCollapsed(!collapsed)}
-                        className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-1.5 rounded-lg text-black/40 hover:text-black hover:bg-black/5 transition-all"
                     >
                         <Menu size={18} />
                     </button>
@@ -310,8 +310,8 @@ export default function DashboardLayout() {
                         </div>
                         {!collapsed && (
                             <div className="min-w-0 flex-1">
-                                <p className="text-[13px] font-bold text-black dark:text-white truncate font-display">{user?.name || 'Usuário'}</p>
-                                <p className="text-[10px] text-black/50 dark:text-white/50 truncate uppercase tracking-wider font-semibold">
+                                <p className="text-[13px] font-black text-black truncate font-display uppercase tracking-wider">{user?.name || 'Usuário'}</p>
+                                <p className="text-[9px] text-black/40 truncate uppercase tracking-widest font-black">
                                     {user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'LAWYER' ? 'Advogado(a)' : user?.role === 'INTERN' ? 'Estagiário(a)' : 'Parceiro(a)'}
                                 </p>
                             </div>
@@ -321,7 +321,7 @@ export default function DashboardLayout() {
 
                 <div className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
                     {/* Módulos Principais */}
-                    <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2", collapsed && "hidden")}>Principal</p>
+                    <p className={cn("px-4 text-[9px] font-black text-black/30 uppercase tracking-widest mb-2", collapsed && "hidden")}>Principal</p>
                     <SidebarItem icon={Home} label="Início" path="/app" collapsed={collapsed} />
                     {/* Processos - expandable with Lista and Kanban */}
                     <div>
@@ -329,8 +329,8 @@ export default function DashboardLayout() {
                             className={cn(
                                 "group flex items-center gap-3 px-3 py-3 mx-2 rounded-xl cursor-pointer transition-fast relative overflow-hidden",
                                 location.pathname.startsWith('/app/processos')
-                                    ? "bg-white/20 text-white border border-white/20"
-                                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                                    ? "bg-black/5 text-black border border-black/5 shadow-sm"
+                                    : "text-black/60 hover:bg-black/5 hover:text-black"
                             )}
                         >
                             <div className="flex items-center gap-3 flex-1" onClick={() => navigate('/app/processos')}>
@@ -340,7 +340,7 @@ export default function DashboardLayout() {
                             {!collapsed && (
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setProcessExpanded(!processExpanded); }}
-                                    className="p-1 hover:bg-white/10 rounded transition-colors"
+                                    className="p-1 hover:bg-black/10 rounded transition-colors text-black/40"
                                 >
                                     <ChevronDown size={14} className={cn("transition-transform", processExpanded && "rotate-180")} />
                                 </button>
@@ -355,12 +355,12 @@ export default function DashboardLayout() {
                                     className="overflow-hidden"
                                 >
                                     <Link to="/app/processos">
-                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-xs transition-colors rounded-lg", location.pathname === '/app/processos' ? 'text-white font-bold bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5')}>
+                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest transition-colors rounded-lg", location.pathname === '/app/processos' ? 'text-black bg-black/5' : 'text-black/40 hover:text-black hover:bg-black/5')}>
                                             <FileText size={12} /> Lista
                                         </div>
                                     </Link>
                                     <Link to="/app/processos/kanban">
-                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-xs transition-colors rounded-lg", location.pathname === '/app/processos/kanban' ? 'text-white font-bold bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5')}>
+                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest transition-colors rounded-lg", location.pathname === '/app/processos/kanban' ? 'text-black bg-black/5' : 'text-black/40 hover:text-black hover:bg-black/5')}>
                                             <ClipboardList size={12} /> Kanban
                                         </div>
                                     </Link>
@@ -428,12 +428,12 @@ export default function DashboardLayout() {
                     <div className={cn("flex items-center gap-1", collapsed ? "justify-center" : "justify-end px-2")}>
                         <button
                             onClick={toggleTheme}
-                            className="text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-all"
+                            className="text-black/40 hover:text-black p-2 rounded-lg hover:bg-black/5 transition-all"
                             title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
                         >
                             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                         </button>
-                        <button onClick={logout} className="text-black/50 dark:text-white/50 hover:text-red-500 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-all" title="Sair do Sistema">
+                        <button onClick={logout} className="text-black/40 hover:text-red-500 p-2 rounded-lg hover:bg-black/5 transition-all" title="Sair do Sistema">
                             <LogOut size={16} />
                         </button>
                     </div>
@@ -449,16 +449,16 @@ export default function DashboardLayout() {
                         <div className="flex-1 max-w-2xl relative">
                             <button
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border border-black/5 dark:border-white/5 rounded-xl text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white/80 transition-all text-sm font-medium"
+                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-black/5 hover:bg-black/10 border border-black/5 rounded-xl text-black/50 hover:text-black transition-all text-xs font-black uppercase tracking-widest"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Search size={18} className="text-black/50 dark:text-white/50 group-hover:text-black dark:group-hover:text-white/80 transition-colors" />
-                                    <span>Buscar processos, clientes, financeiro...</span>
+                                    <Search size={18} className="text-black/40 group-hover:text-black transition-colors" />
+                                    <span>Buscar...</span>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                    <kbd className="px-2 py-1 bg-black/5 dark:bg-white/10 rounded-md text-[10px] font-bold tracking-widest uppercase border border-black/10 dark:border-white/10 shadow-sm">Ctrl</kbd>
+                                <div className="flex items-center gap-1 opacity-40">
+                                    <kbd className="px-2 py-1 bg-black/10 rounded-md text-[9px] font-black tracking-widest uppercase border border-black/10 shadow-sm">Ctrl</kbd>
                                     <span className="text-xs">+</span>
-                                    <kbd className="px-2 py-1 bg-black/5 dark:bg-white/10 rounded-md text-[10px] font-bold tracking-widest uppercase border border-black/10 dark:border-white/10 shadow-sm">K</kbd>
+                                    <kbd className="px-2 py-1 bg-black/10 rounded-md text-[9px] font-black tracking-widest uppercase border border-black/10 shadow-sm">K</kbd>
                                 </div>
                             </button>
                         </div>
@@ -596,7 +596,7 @@ export default function DashboardLayout() {
                                 >
                                     <Suspense fallback={
                                         <div className="flex items-center justify-center h-full min-h-[200px]">
-                                            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+                                            <div className="w-8 h-8 border-3 border-black dark:border-white border-t-transparent rounded-full animate-spin" />
                                         </div>
                                     }>
                                         <Outlet context={{ collapsed }} />
@@ -647,12 +647,12 @@ export default function DashboardLayout() {
                                         key={item.path}
                                         to={item.path}
                                         onClick={() => setIsMobileDrawerOpen(false)}
-                                        className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-app-input transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                        className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-black/5 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                                            <item.icon size={20} className="text-primary" />
+                                        <div className="w-10 h-10 rounded-lg bg-black/5 flex items-center justify-center">
+                                            <item.icon size={20} className="text-black" />
                                         </div>
-                                        <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">{item.label}</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-black/60 text-center leading-tight">{item.label}</span>
                                     </Link>
                                 ))}
                                 {/* IA Análise in drawer */}
@@ -670,12 +670,12 @@ export default function DashboardLayout() {
                                 <Link
                                     to="/app/configuracoes"
                                     onClick={() => setIsMobileDrawerOpen(false)}
-                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-app-input transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-black/5 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                                        <Settings size={20} className="text-primary" />
+                                    <div className="w-10 h-10 rounded-lg bg-black/5 flex items-center justify-center">
+                                        <Settings size={20} className="text-black" />
                                     </div>
-                                    <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">Ajustes</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-black/60 text-center leading-tight">Ajustes</span>
                                 </Link>
                                 {/* Logout */}
                                 <button

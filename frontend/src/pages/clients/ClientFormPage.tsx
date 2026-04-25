@@ -177,13 +177,13 @@ export default function ClientFormPage() {
     };
 
     const sections = [
-        { title: 'Dados do Lead', icon: User, color: 'text-blue-500' },
-        { title: 'Fatos e Informações', icon: FileText, color: 'text-amber-500' },
-        { title: 'Dados Pessoais', icon: FileBadge, color: 'text-purple-500' },
-        { title: 'Acompanhamento', icon: ClipboardList, color: 'text-emerald-500' },
+        { title: 'Dados do Lead', icon: User, color: 'text-black dark:text-white' },
+        { title: 'Fatos e Informações', icon: FileText, color: 'text-neutral-500' },
+        { title: 'Dados Pessoais', icon: FileBadge, color: 'text-neutral-400' },
+        { title: 'Acompanhamento', icon: ClipboardList, color: 'text-black dark:text-white' },
     ];
 
-    const inputClass = "w-full px-4 py-2.5 bg-app-bg border border-app-stroke rounded-lg text-app-text-main placeholder-app-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors";
+    const inputClass = "w-full px-4 py-2.5 bg-app-bg border border-app-stroke rounded-lg text-app-text-main placeholder-app-text-muted focus:border-black dark:focus:border-white focus:ring-1 focus:ring-black dark:focus:ring-white outline-none transition-colors";
     const labelClass = "block text-sm font-medium text-app-text-muted mb-1.5";
     const sectionClass = "bg-app-card border border-app-stroke rounded-xl p-6 space-y-5";
 
@@ -209,12 +209,12 @@ export default function ClientFormPage() {
                     <button
                         key={idx}
                         onClick={() => setActiveSection(idx)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${activeSection === idx
-                            ? 'bg-primary/10 text-primary border border-primary/30'
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-black text-xs uppercase tracking-widest transition-all ${activeSection === idx
+                            ? 'bg-black text-white dark:bg-white dark:text-black border border-black/10 dark:border-white/10 shadow-lg'
                             : 'bg-app-card border border-app-stroke text-app-text-muted hover:text-app-text-main hover:border-app-text-muted/30'
                             }`}
                     >
-                        <section.icon size={16} className={activeSection === idx ? 'text-primary' : section.color} />
+                        <section.icon size={16} className={activeSection === idx ? (idx % 2 === 0 ? 'text-white dark:text-black' : 'text-white dark:text-black') : section.color} />
                         {section.title}
                     </button>
                 ))}
@@ -225,8 +225,8 @@ export default function ClientFormPage() {
                 {/* Section 1: Dados do Lead */}
                 {activeSection === 0 && (
                     <div className={sectionClass}>
-                        <h3 className="text-lg font-semibold text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke">
-                            <User size={20} className="text-blue-500" />
+                        <h3 className="text-lg font-black text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke uppercase tracking-widest">
+                            <User size={20} className="text-black dark:text-white" />
                             Dados do Lead (Contato e Origem)
                         </h3>
 
@@ -311,8 +311,8 @@ export default function ClientFormPage() {
                 {/* Section 2: Fatos e Informações Iniciais */}
                 {activeSection === 1 && (
                     <div className={sectionClass}>
-                        <h3 className="text-lg font-semibold text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke">
-                            <FileText size={20} className="text-amber-500" />
+                        <h3 className="text-lg font-black text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke uppercase tracking-widest">
+                            <FileText size={20} className="text-neutral-500" />
                             Fatos e Informações Iniciais
                         </h3>
 
@@ -473,8 +473,8 @@ export default function ClientFormPage() {
                 {/* Section 3: Dados Pessoais e Adicionais */}
                 {activeSection === 2 && (
                     <div className={sectionClass}>
-                        <h3 className="text-lg font-semibold text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke">
-                            <FileBadge size={20} className="text-purple-500" />
+                        <h3 className="text-lg font-black text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke uppercase tracking-widest">
+                            <FileBadge size={20} className="text-neutral-400" />
                             Dados Pessoais e Adicionais
                         </h3>
 
@@ -594,8 +594,8 @@ export default function ClientFormPage() {
                 {/* Section 4: Acompanhamento do Lead */}
                 {activeSection === 3 && (
                     <div className={sectionClass}>
-                        <h3 className="text-lg font-semibold text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke">
-                            <ClipboardList size={20} className="text-emerald-500" />
+                        <h3 className="text-lg font-black text-app-text-main flex items-center gap-2 pb-3 border-b border-app-stroke uppercase tracking-widest">
+                            <ClipboardList size={20} className="text-black dark:text-white" />
                             Acompanhamento do Lead
                         </h3>
 
@@ -689,11 +689,11 @@ export default function ClientFormPage() {
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-lg shadow-primary/25"
+                            className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-black/20"
                             disabled={loading}
                         >
                             <Save size={18} />
-                            {loading ? 'Salvando...' : 'Salvar Lead'}
+                            {loading ? 'Salvando...' : 'Salvar'}
                         </button>
                     </div>
                 </div>

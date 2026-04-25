@@ -322,7 +322,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
         return (
             <div className="space-y-6 p-4 lg:p-8 animate-pulse">
                 {/* Header skeleton */}
-                <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-2xl p-6">
+                <div className="bg-gradient-to-r from-neutral-800/20 to-black/20 rounded-2xl p-6">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full bg-app-stroke/40" />
                         <div>
@@ -367,7 +367,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                 <p className="text-slate-500 mb-6 text-center max-w-md">O cliente procurado não existe ou você não possui acesso a ele.</p>
                 <button
                     onClick={() => navigate('/app/clientes')}
-                    className="px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                    className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:opacity-90 transition-colors"
                 >
                     Voltar para Clientes
                 </button>
@@ -395,8 +395,8 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     {client.name}
                                     {hasUrgentNotes && (
                                         <span className="relative flex h-3 w-3" title="Cliente possui anotações urgentes!">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black dark:bg-white opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-black dark:bg-white"></span>
                                         </span>
                                     )}
                                 </h1>
@@ -404,9 +404,9 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     onClick={handleToggleStatus}
                                     className={clsx(
                                         "px-2.5 py-0.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-80",
-                                        client.status === 'ATIVO' ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400" :
-                                        client.status === 'INATIVO' ? "bg-slate-100 text-slate-700 dark:bg-slate-500/20 dark:text-slate-400" :
-                                        "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400"
+                                        client.status === 'ATIVO' ? "bg-black text-white dark:bg-white dark:text-black" :
+                                        client.status === 'INATIVO' ? "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400" :
+                                        "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black"
                                     )}
                                     title="Clique para alterar status"
                                 >
@@ -431,7 +431,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                         {tag.name}
                                         <button 
                                             onClick={() => handleRemoveTag(tag.id)}
-                                            className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-black/10 dark:hover:bg-white/20 rounded-full p-0.5 transition-all"
+                                            className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-black/20 dark:hover:bg-white/30 rounded-full p-0.5 transition-all"
                                             title="Remover tag"
                                         >
                                             <X size={10} />
@@ -478,7 +478,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                     <div className="flex items-center gap-2">
                         <button 
                             onClick={() => navigate(`/app/processos/kanban?newProcess=true&clientId=${client.id}`)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 rounded-xl text-sm font-medium transition-all hover:shadow-md"
+                            className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border border-black/10 dark:border-white/10 rounded-xl text-sm font-bold transition-all hover:shadow-md"
                         >
                             <Briefcase size={16} />
                             <span className="hidden sm:inline">Criar Processo</span>
@@ -492,7 +492,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                         </button>
                         <button 
                             onClick={() => setShowDeleteModal(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-500/20 border border-rose-200 dark:border-rose-500/30 rounded-xl text-sm font-medium transition-all hover:shadow-md"
+                            className="flex items-center gap-2 px-4 py-2 bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold transition-all hover:shadow-md"
                         >
                             <Trash2 size={16} />
                             Excluir
@@ -504,33 +504,32 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
             {/* Quick Contact Bar */}
             <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-8 pt-6">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <a href={client.phone ? `https://wa.me/55${String(client.phone).replace(/\D/g, '')}` : '#'} target="_blank" rel="noopener noreferrer" onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
-                        <MessageSquare size={18} /><span className="text-sm font-medium">WhatsApp</span>
+                    <a href={client.phone ? `https://wa.me/55${String(client.phone).replace(/\D/g, '')}` : '#'} target="_blank" rel="noopener noreferrer" onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border-black/10 dark:border-white/10" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
+                        <MessageSquare size={18} /><span className="text-sm font-bold">WhatsApp</span>
                     </a>
-                    <a href={client.phone ? `tel:${client.phone}` : '#'} onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20 dark:text-blue-400" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
-                        <Phone size={18} /><span className="text-sm font-medium">Ligar</span>
+                    <a href={client.phone ? `tel:${client.phone}` : '#'} onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black hover:opacity-90 border-neutral-700" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
+                        <Phone size={18} /><span className="text-sm font-bold">Ligar</span>
                     </a>
                     <a href={client.email ? `mailto:${client.email}` : '#'} onClick={(e) => !client.email && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.email ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
                         <Mail size={18} /><span className="text-sm font-medium truncate">{client.email || 'Email não informado'}</span>
                     </a>
-                    <div className="flex items-center gap-3 p-3 rounded-xl border bg-gradient-to-r from-emerald-50 to-rose-50 border-slate-200 dark:from-emerald-500/10 dark:to-rose-500/10 dark:border-slate-700">
-                        <DollarSign size={18} className="text-emerald-600 dark:text-emerald-400" />
-                        <div className="flex gap-3 text-xs font-bold">
-                            <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(totalPaid)}</span>
+                    <div className="flex items-center gap-3 p-3 rounded-xl border bg-gradient-to-r from-neutral-50 to-white dark:from-neutral-900 dark:to-black border-slate-200 dark:border-slate-700">
+                        <DollarSign size={18} className="text-black dark:text-white" />
+                        <div className="flex gap-3 text-xs font-black">
+                            <span className="text-black dark:text-white">{formatCurrency(totalPaid)}</span>
                             <span className="text-slate-300 dark:text-slate-600">|</span>
-                            <span className="text-rose-600 dark:text-rose-400">{formatCurrency(totalPendencies)}</span>
+                            <span className="text-neutral-500 dark:text-neutral-400">{formatCurrency(totalPendencies)}</span>
                         </div>
                     </div>
                 </div>
             </div>
-
             {/* Tab Navigation */}
             <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-8 pt-6">
                 <div className="flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-slate-800 pb-px">
                     {tabs.map(tab => {
                         const Icon = tab.icon;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={clsx("flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg border-b-2 transition-all whitespace-nowrap", activeTab === tab.id ? "border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-500/10" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50")}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={clsx("flex items-center gap-2 px-4 py-2.5 text-sm font-black rounded-t-lg border-b-2 transition-all whitespace-nowrap uppercase tracking-widest", activeTab === tab.id ? "border-black text-black dark:text-white dark:border-white bg-black/5 dark:bg-white/10" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50")}>
                                 <Icon size={16} />{tab.label}
                             </button>
                         );
@@ -550,7 +549,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                             {/* Dados Pessoais */}
                             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm">
                                 <h3 className="text-lg font-semibold flex items-center gap-2 mb-6">
-                                    <FileBadge size={20} className="text-indigo-500" />
+                                    <FileBadge size={20} className="text-black dark:text-white" />
                                     Dados Pessoais
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
@@ -584,15 +583,15 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm relative overflow-hidden">
                                 <div className="flex items-center justify-between mb-6">
                                     <h3 className="text-lg font-semibold flex items-center gap-2">
-                                        <FileText size={20} className="text-amber-500" />
+                                        <FileText size={20} className="text-black dark:text-white" />
                                         Fatos e Demanda
                                     </h3>
                                     {client.urgencyLevel && (
                                         <span className={clsx(
                                             "px-3 py-1 text-[10px] font-bold uppercase rounded-full shadow-sm",
-                                            client.urgencyLevel === 'URGENTE' ? "bg-rose-500 text-white" :
-                                            client.urgencyLevel === 'ALTA' ? "bg-amber-500 text-white" :
-                                            "bg-indigo-500 text-white"
+                                            client.urgencyLevel === 'URGENTE' ? "bg-black text-white" :
+                                            client.urgencyLevel === 'ALTA' ? "bg-neutral-800 text-white" :
+                                            "bg-neutral-600 text-white"
                                         )}>
                                             {client.urgencyLevel}
                                         </span>
@@ -620,7 +619,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     {/* Campos Específicos Integrados */}
                                     {client.customFields && Object.keys(client.customFields).length > 0 && (
                                         <div className="pt-6 border-t border-slate-100 dark:border-slate-800 mt-6 md:col-span-2">
-                                            <p className="text-[10px] text-cyan-600 dark:text-cyan-400 uppercase tracking-widest font-bold mb-4">Campos Específicos ({client.demandType})</p>
+                                            <p className="text-[10px] text-black dark:text-white uppercase tracking-widest font-bold mb-4">Campos Específicos ({client.demandType})</p>
                                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                                 {Object.entries(client.customFields).map(([key, value]) => {
                                                     if (!value) return null;
@@ -642,9 +641,9 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                                     let displayVal = value as string;
                                                     if (key.toLowerCase().includes('date') || key === 'dib') displayVal = formatDate(value as string);
                                                     return (
-                                                        <div key={key} className="p-3 bg-cyan-50/50 dark:bg-cyan-500/5 rounded-xl border border-cyan-100 dark:border-cyan-500/10">
-                                                            <p className="text-[9px] font-bold text-cyan-600/70 dark:text-cyan-400/70 uppercase tracking-tighter mb-1">{labelMap[key] || key}</p>
-                                                            <p className="text-xs font-bold text-cyan-800 dark:text-cyan-300">{displayVal}</p>
+                                                        <div key={key} className="p-3 bg-neutral-50 dark:bg-white/5 rounded-xl border border-neutral-200 dark:border-white/10">
+                                                            <p className="text-[9px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tighter mb-1">{labelMap[key] || key}</p>
+                                                            <p className="text-xs font-bold text-black dark:text-white">{displayVal}</p>
                                                         </div>
                                                     );
                                                 })}
@@ -659,19 +658,19 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                         <div className="space-y-8 lg:col-span-1">
                             {/* Resumo Financeiro na Sidebar */}
                             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl" />
                                 <h3 className="text-sm font-bold flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200 relative z-10 uppercase tracking-widest">
-                                    <DollarSign size={18} className="text-emerald-500" />
+                                    <DollarSign size={18} className="text-black dark:text-white" />
                                     Painel Financeiro
                                 </h3>
                                 <div className="grid grid-cols-1 gap-4 relative z-10 mb-6">
-                                    <div className="p-4 bg-emerald-50/70 dark:bg-emerald-500/10 rounded-2xl border border-emerald-100/50 dark:border-emerald-500/20">
-                                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest mb-1">Recebido</p>
-                                        <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300">{formatCurrency(totalPaid)}</p>
+                                    <div className="p-4 bg-black dark:bg-white rounded-2xl border border-black/10 dark:border-white/10 shadow-lg shadow-black/10">
+                                        <p className="text-[10px] text-white dark:text-black font-bold uppercase tracking-widest mb-1">Recebido</p>
+                                        <p className="text-2xl font-black text-white dark:text-black">{formatCurrency(totalPaid)}</p>
                                     </div>
-                                    <div className="p-4 bg-rose-50/70 dark:bg-rose-500/10 rounded-2xl border border-rose-100/50 dark:border-rose-500/20">
-                                        <p className="text-[10px] text-rose-600 dark:text-rose-400 font-bold uppercase tracking-widest mb-1">Pendente</p>
-                                        <p className="text-2xl font-black text-rose-700 dark:text-rose-300">{formatCurrency(totalPendencies)}</p>
+                                    <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700">
+                                        <p className="text-[10px] text-neutral-600 dark:text-neutral-400 font-bold uppercase tracking-widest mb-1">Pendente</p>
+                                        <p className="text-2xl font-black text-neutral-800 dark:text-neutral-200">{formatCurrency(totalPendencies)}</p>
                                     </div>
                                 </div>
                                 <button onClick={() => navigate('/app/financeiro', { state: { clientId: client.id } })} className="w-full py-3 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-700 relative z-10 flex items-center justify-center gap-2">
@@ -682,7 +681,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                             {/* Checklist de Onboarding */}
                             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm overflow-hidden flex flex-col min-h-[450px]">
                                 <h3 className="text-sm font-bold flex items-center gap-2 mb-6 text-slate-800 dark:text-slate-200 uppercase tracking-widest">
-                                    <CheckSquare size={18} className="text-teal-500" />
+                                    <CheckSquare size={18} className="text-black dark:text-white" />
                                     Checklist de Onboarding
                                 </h3>
                                 
@@ -694,7 +693,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                         placeholder="Nova tarefa..." 
                                         className="flex-1 px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition-all placeholder:text-slate-400"
                                     />
-                                    <button type="submit" disabled={addingItem || !newItemText.trim()} className="p-2.5 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-all shadow-md shadow-teal-500/20 disabled:opacity-50">
+                                    <button type="submit" disabled={addingItem || !newItemText.trim()} className="p-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl hover:opacity-90 transition-all shadow-md shadow-black/20 disabled:opacity-50">
                                         <Plus size={18} />
                                     </button>
                                 </form>
@@ -710,7 +709,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                             <motion.div layout key={item.id} className="flex items-start gap-4 p-3 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 rounded-xl group transition-all hover:border-teal-500/30">
                                                 <button 
                                                     onClick={() => handleToggleChecklist(item.id, !item.completed)} 
-                                                    className={clsx("mt-1 shrink-0 transition-all transform hover:scale-110", item.completed ? "text-teal-500" : "text-slate-300 dark:text-slate-600 hover:text-teal-400")}
+                                                    className={clsx("mt-1 shrink-0 transition-all transform hover:scale-110", item.completed ? "text-black dark:text-white" : "text-slate-300 dark:text-slate-600 hover:text-black dark:hover:text-white")}
                                                 >
                                                     {item.completed ? <CheckCircle size={20} /> : <Circle size={20} />}
                                                 </button>
@@ -804,7 +803,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                                 </div>
                                             </div>
                                             <div className="text-right shrink-0 ml-2">
-                                                <p className={clsx("text-sm font-bold", fin.type === 'INCOME' ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400")}>{fin.type === 'INCOME' ? '+' : '-'}{formatCurrency(fin.amount)}</p>
+                                                <p className={clsx("text-sm font-black", fin.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>{fin.type === 'INCOME' ? '+' : '-'}{formatCurrency(fin.amount)}</p>
                                                 <p className="text-[10px] font-semibold uppercase text-slate-400">{fin.status === 'PAID' ? 'Pago' : 'Pendente'}</p>
                                             </div>
                                         </div>
@@ -822,18 +821,18 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                     {activeTab === 'notas' && (
                     <div>
                         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold flex items-center gap-2 mb-4"><StickyNote size={20} className="text-yellow-500" />Anotações</h3>
+                            <h3 className="text-lg font-black flex items-center gap-2 mb-4 uppercase tracking-widest"><StickyNote size={20} className="text-black dark:text-white" />Anotações</h3>
                             <form onSubmit={handleAddNote} className="mb-4 relative">
                                 <textarea className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 pb-8 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none pr-12" rows={3} placeholder="Adicionar nova anotação..." value={newNote} onChange={(e) => setNewNote(e.target.value)} disabled={savingNote} />
                                 <div className="absolute bottom-3 left-3 flex items-center gap-2">
                                     <label className="flex items-center gap-1.5 cursor-pointer group">
                                         <input type="checkbox" checked={isUrgentNote} onChange={(e) => setIsUrgentNote(e.target.checked)} className="sr-only" />
-                                        <div className={clsx("w-4 h-4 rounded flex items-center justify-center border transition-colors", isUrgentNote ? "bg-red-500 border-red-500 text-white" : "bg-white border-slate-300 dark:bg-slate-700 dark:border-slate-600 group-hover:border-red-400")}>{isUrgentNote && <Check size={12} />}</div>
-                                        <span className={clsx("text-xs font-medium transition-colors", isUrgentNote ? "text-red-500" : "text-slate-500 dark:text-slate-400")}>Urgente</span>
+                                        <div className={clsx("w-4 h-4 rounded flex items-center justify-center border transition-colors", isUrgentNote ? "bg-black dark:bg-white border-black dark:border-white text-white dark:text-black" : "bg-white border-slate-300 dark:bg-slate-700 dark:border-slate-600 group-hover:border-black")}>{isUrgentNote && <Check size={12} />}</div>
+                                        <span className={clsx("text-xs font-black transition-colors uppercase tracking-tighter", isUrgentNote ? "text-black dark:text-white" : "text-slate-500 dark:text-slate-400")}>Urgente</span>
                                     </label>
                                 </div>
-                                <button type="submit" disabled={savingNote || !newNote.trim()} className="absolute bottom-3 right-3 p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors">
-                                    {savingNote ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <Send size={16} />}
+                                <button type="submit" disabled={savingNote || !newNote.trim()} className="absolute bottom-3 right-3 p-1.5 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors shadow-lg">
+                                    {savingNote ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div> : <Send size={16} />}
                                 </button>
                             </form>
                             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
@@ -841,12 +840,12 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">Nenhuma anotação registrada.</p>
                                 ) : (
                                     notes.map((note: any) => (
-                                        <div key={note.id} className={clsx("p-3 rounded-xl relative group border", note.isUrgent ? "bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20" : "bg-yellow-50 dark:bg-yellow-500/10 border-yellow-200 dark:border-yellow-500/20")}>
+                                        <div key={note.id} className={clsx("p-3 rounded-xl relative group border", note.isUrgent ? "bg-black text-white dark:bg-white dark:text-black border-black/20" : "bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800")}>
                                             <p className="text-sm text-slate-700 dark:text-slate-300 pr-6 whitespace-pre-wrap">{note.content}</p>
-                                            <div className={clsx("flex items-center gap-2 mt-2 pt-2 border-t text-[10px] font-medium", note.isUrgent ? "border-red-200/50 dark:border-red-500/10 text-red-600/70 dark:text-red-400/80" : "border-yellow-200/50 dark:border-yellow-500/10 text-slate-500")}>
+                                            <div className={clsx("flex items-center gap-2 mt-2 pt-2 border-t text-[10px] font-medium", note.isUrgent ? "border-white/20 text-white/70" : "border-neutral-200 dark:border-neutral-800 text-slate-500")}>
                                                 <span>{formatDate(note.createdAt)}</span>
                                                 {note.createdBy && (<><span>•</span><span>{note.createdBy}</span></>)}
-                                                {note.isUrgent && (<><span>•</span><span className="uppercase text-red-600 dark:text-red-400 font-bold tracking-wider">Urgente</span></>)}
+                                                {note.isUrgent && (<><span>•</span><span className="uppercase text-white dark:text-black font-black tracking-wider">Urgente</span></>)}
                                             </div>
                                             <button onClick={() => handleDeleteNote(note.id)} className="absolute top-2 right-2 p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded transition-colors opacity-0 group-hover:opacity-100"><X size={14} /></button>
                                         </div>
@@ -862,15 +861,15 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                     <div className="space-y-6 max-w-3xl mx-auto animate-in slide-in-from-bottom-4">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold flex items-center gap-2">
-                                <History size={20} className="text-indigo-500" />
+                                <History size={20} className="text-black dark:text-white" />
                                 Histórico de Atividades
                             </h3>
-                            <button onClick={() => setShowServiceLogModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-teal-50 text-teal-600 hover:bg-teal-100 dark:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20 rounded-md transition-colors text-sm font-medium">
+                            <button onClick={() => setShowServiceLogModal(true)} className="flex items-center gap-2 px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black hover:opacity-90 rounded-md transition-colors text-sm font-black uppercase tracking-widest shadow-md">
                                 <Headset size={16} /> Registrar Atendimento
                             </button>
                         </div>
                         
-                        <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:via-blue-400 before:to-transparent">
+                        <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-neutral-800 before:via-neutral-400 before:to-transparent">
                             {timeline.length === 0 ? (
                                 <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                                     <History size={48} className="mx-auto text-slate-300 mb-4" />
@@ -881,16 +880,16 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     // Map activity types to icons and colors
                                     const getTypeConfig = (type: string) => {
                                         switch(type) {
-                                            case 'PROCESS_CREATED': return { icon: Briefcase, color: 'bg-blue-500', label: 'Processo' };
-                                            case 'PROCESS_WON': return { icon: CheckCircle, color: 'bg-emerald-500', label: 'Vitória' };
-                                            case 'STATUS_CHANGED': return { icon: RefreshCcw, color: 'bg-amber-500', label: 'Status' };
-                                            case 'NOTE_ADDED': return { icon: StickyNote, color: 'bg-purple-500', label: 'Nota' };
-                                            case 'SERVICE_LOG': return { icon: Headset, color: 'bg-indigo-500', label: 'Atendimento' };
-                                            case 'FINANCIAL': return { icon: DollarSign, color: 'bg-green-600', label: 'Financeiro' };
-                                            case 'CREATED': return { icon: User, color: 'bg-slate-500', label: 'Cadastro' };
-                                            case 'UPDATE': return { icon: Clock, color: 'bg-blue-400', label: 'Movimentação' };
-                                            case 'PROCESS': return { icon: Briefcase, color: 'bg-blue-500', label: 'Processo' };
-                                            default: return { icon: History, color: 'bg-slate-400', label: 'Sistema' };
+                                            case 'PROCESS_CREATED': return { icon: Briefcase, color: 'bg-black dark:bg-white', label: 'Processo' };
+                                            case 'PROCESS_WON': return { icon: CheckCircle, color: 'bg-neutral-800 dark:bg-neutral-200', label: 'Vitória' };
+                                            case 'STATUS_CHANGED': return { icon: RefreshCcw, color: 'bg-neutral-600 dark:bg-neutral-400', label: 'Status' };
+                                            case 'NOTE_ADDED': return { icon: StickyNote, color: 'bg-neutral-700 dark:bg-neutral-300', label: 'Nota' };
+                                            case 'SERVICE_LOG': return { icon: Headset, color: 'bg-black dark:bg-white', label: 'Atendimento' };
+                                            case 'FINANCIAL': return { icon: DollarSign, color: 'bg-neutral-900 dark:bg-white', label: 'Financeiro' };
+                                            case 'CREATED': return { icon: User, color: 'bg-neutral-500', label: 'Cadastro' };
+                                            case 'UPDATE': return { icon: Clock, color: 'bg-neutral-400', label: 'Movimentação' };
+                                            case 'PROCESS': return { icon: Briefcase, color: 'bg-black dark:bg-white', label: 'Processo' };
+                                            default: return { icon: History, color: 'bg-neutral-300', label: 'Sistema' };
                                         }
                                     };
                                     
@@ -907,7 +906,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                             <div className="flex-1 ml-12 pt-1">
                                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${config.color} bg-opacity-10 text-opacity-100`} style={{ color: config.color.replace('bg-', 'text-') }}>
+                                                        <span className={clsx("text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded text-white dark:text-black", config.color)}>
                                                             {config.label}
                                                         </span>
                                                         <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
@@ -955,7 +954,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                             className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 w-full max-w-md overflow-hidden"
                         >
                             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-                                <h3 className="text-lg font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2">
+                                <h3 className="text-lg font-black text-black dark:text-white flex items-center gap-2 uppercase tracking-widest">
                                     <AlertCircle size={20} />
                                     Excluir Cliente
                                 </h3>
@@ -967,7 +966,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                 <p className="text-slate-700 dark:text-slate-300 mb-4">
                                     Tem certeza que deseja excluir o cliente <strong>{client.name}</strong>?
                                 </p>
-                                <p className="text-sm text-rose-600 dark:text-rose-400 font-medium p-3 bg-rose-50 dark:bg-rose-500/10 rounded-lg border border-rose-100 dark:border-rose-500/20">
+                                <p className="text-sm text-black dark:text-white font-black p-3 bg-black/5 dark:bg-white/10 rounded-lg border border-black/10 dark:border-white/10 uppercase tracking-tighter">
                                     ⚠️ ATENÇÃO: Esta ação também excluirá todos os processos, movimentações e documentos vinculados a este cliente de forma irreversível!
                                 </p>
                                 <div className="flex gap-3 mt-6">
@@ -979,7 +978,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                     </button>
                                     <button 
                                         onClick={handleDelete}
-                                        className="flex-1 py-2.5 bg-rose-600 text-white rounded-lg font-medium hover:bg-rose-700 transition shadow-lg shadow-rose-600/20"
+                                        className="flex-1 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition shadow-lg shadow-black/20"
                                     >
                                         Sim, Excluir
                                     </button>
@@ -1000,7 +999,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                         >
                             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                                    <Headset size={20} className="text-teal-500" />
+                                    <Headset size={20} className="text-black dark:text-white" />
                                     Registrar Atendimento
                                 </h3>
                                 <button onClick={() => setShowServiceLogModal(false)} className="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 p-1.5 rounded-full">
@@ -1033,7 +1032,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                 </div>
                                 <div className="flex justify-end gap-3 mt-6">
                                     <button type="button" onClick={() => setShowServiceLogModal(false)} className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">Cancelar</button>
-                                    <button type="submit" disabled={!newServiceLog.summary.trim()} className="px-4 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition disabled:opacity-50">Salvar Registro</button>
+                                    <button type="submit" disabled={!newServiceLog.summary.trim()} className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition shadow-lg shadow-black/20">Salvar Registro</button>
                                 </div>
                             </form>
                         </motion.div>

@@ -5,7 +5,7 @@ import { PieChart as PieChartIcon, BarChart2 } from 'lucide-react';
 
 import api from '../../services/api';
 
-const COLORS = ['#000000', '#262626', '#404040', '#525252', '#737373'];
+const COLORS = ['#000000', '#1a1a1a', '#404040', '#737373', '#a3a3a3'];
 
 export default function TeamPerformanceChart() {
     const [loading, setLoading] = useState(true);
@@ -43,7 +43,7 @@ export default function TeamPerformanceChart() {
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-app-card border border-app-stroke rounded-2xl p-5 shadow-sm hover:border-primary/30 transition-colors"
+                className="bg-app-card border border-app-stroke rounded-2xl p-5 shadow-sm hover:border-black/20 dark:hover:border-white/20 transition-all"
                 style={{ boxShadow: '0 4px 20px -2px rgba(0,0,0,0.05)' }}
             >
                 <div className="flex items-center gap-3 mb-6">
@@ -59,7 +59,7 @@ export default function TeamPerformanceChart() {
                 <div className="h-[250px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" opacity={0.5} />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" opacity={0.1} />
                             <XAxis 
                                 dataKey="name" 
                                 axisLine={false} 
@@ -78,9 +78,9 @@ export default function TeamPerformanceChart() {
                                 itemStyle={{ color: 'var(--app-text-main)', fontSize: '12px' }}
                             />
                             <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '12px' }} />
-                            <Bar dataKey="processos" name="Processos Novos" fill="#000000" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1500} />
+                            <Bar dataKey="processos" name="Processos Novos" fill="#000000" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1500} className="dark:fill-white" />
                             <Bar dataKey="tarefas" name="Tarefas Concluídas" fill="#737373" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1500} />
-                            <Bar dataKey="prazos" name="Prazos" fill="#D4D4D4" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1500} />
+                            <Bar dataKey="prazos" name="Prazos" fill="#a3a3a3" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={1500} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

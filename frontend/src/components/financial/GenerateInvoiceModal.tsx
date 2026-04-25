@@ -93,11 +93,11 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#0c0e17]/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="bg-white dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 w-full max-w-[500px] rounded-[32px] shadow-2xl overflow-hidden relative"
+        className="bg-app-card border border-app-stroke w-full max-w-[500px] rounded-[32px] shadow-2xl overflow-hidden relative"
       >
         <button 
           onClick={onClose}
@@ -110,7 +110,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
           {!success ? (
             <>
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
+                <div className="w-12 h-12 bg-black/10 rounded-2xl flex items-center justify-center text-black dark:text-white">
                   <DollarSign size={24} />
                 </div>
                 <div>
@@ -128,10 +128,10 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                       <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{clientName || 'Cliente Selecionado'}</p>
                     </div>
                   ) : (
-                    <select
+                      <select
                       value={formData.clientId}
                       onChange={(e) => setFormData({...formData, clientId: e.target.value})}
-                      className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl py-3 px-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all appearance-none"
+                      className="w-full bg-app-bg border border-app-stroke rounded-xl py-3 px-4 text-sm font-bold text-app-text-main outline-none focus:ring-2 ring-black/20 transition-all appearance-none"
                     >
                       <option value="">Selecione um cliente...</option>
                       {clients.map(c => (
@@ -151,7 +151,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                         type="number" 
                         value={formData.amount}
                         onChange={(e) => setFormData({...formData, amount: parseFloat(e.target.value)})}
-                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all"
+                        className="w-full bg-app-bg border border-app-stroke rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-app-text-main outline-none focus:ring-2 ring-black/20 transition-all"
                         placeholder="0,00"
                       />
                     </div>
@@ -164,7 +164,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                         type="date" 
                         value={formData.dueDate}
                         onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all"
+                        className="w-full bg-app-bg border border-app-stroke rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-app-text-main outline-none focus:ring-2 ring-black/20 transition-all"
                       />
                     </div>
                   </div>
@@ -174,13 +174,13 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Método de Pagamento</label>
                   <div className="grid grid-cols-2 gap-3">
-                    <button 
+                      <button 
                       onClick={() => setFormData({...formData, billingType: 'PIX'})}
                       className={clsx(
                         "flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
                         formData.billingType === 'PIX' 
-                          ? "bg-blue-500/10 border-blue-500 text-blue-500 shadow-lg shadow-blue-500/10" 
-                          : "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-500"
+                          ? "bg-black text-white border-black shadow-lg shadow-black/20" 
+                          : "bg-app-bg border-app-stroke text-app-text-muted"
                       )}
                     >
                       <QrCode size={20} />
@@ -194,8 +194,8 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                       className={clsx(
                         "flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
                         formData.billingType === 'BOLETO' 
-                          ? "bg-blue-500/10 border-blue-500 text-blue-500 shadow-lg shadow-blue-500/10" 
-                          : "bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 text-slate-500"
+                          ? "bg-black text-white border-black shadow-lg shadow-black/20" 
+                          : "bg-app-bg border-app-stroke text-app-text-muted"
                       )}
                     >
                       <FileText size={20} />
@@ -213,7 +213,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                   <textarea 
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-4 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all resize-none h-20"
+                    className="w-full bg-app-bg border border-app-stroke rounded-xl p-4 text-xs font-medium text-app-text-main outline-none focus:ring-2 ring-black/20 transition-all resize-none h-20"
                     placeholder="Ex: Honorários Advocatícios - Processo X..."
                   />
                 </div>
@@ -228,7 +228,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                 <button
                   onClick={handleGenerate}
                   disabled={loading}
-                  className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-black hover:opacity-90 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-black/20 transition-all flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="animate-spin" size={18} /> : 'Gerar Cobrança Agora'}
                 </button>
@@ -236,7 +236,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
             </>
           ) : (
             <div className="text-center py-4">
-              <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 mx-auto mb-6">
+              <div className="w-20 h-20 bg-black/10 rounded-full flex items-center justify-center text-black dark:text-white mx-auto mb-6">
                 <CheckCircle2 size={48} />
               </div>
               <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase">Sucesso!</h2>
@@ -263,7 +263,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                   href={result?.invoiceUrl} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="w-full py-4 bg-slate-900 dark:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                  className="w-full py-4 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-all"
                 >
                   <ExternalLink size={16} /> Abrir Link de Pagamento
                 </a>

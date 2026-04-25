@@ -103,25 +103,25 @@ export const InvoiceManagementTab: React.FC = () => {
     switch (status) {
       case 'PAID':
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-[10px] font-black uppercase tracking-wider border border-emerald-500/20">
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-black/10 text-black dark:text-white rounded-full text-[10px] font-black uppercase tracking-wider border border-black/20">
             <CheckCircle2 size={12} /> Pago
           </span>
         );
       case 'OVERDUE':
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-600 dark:text-red-400 rounded-full text-[10px] font-black uppercase tracking-wider border border-red-500/20">
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-neutral-800 text-white rounded-full text-[10px] font-black uppercase tracking-wider border border-black/20">
             <AlertCircle size={12} /> Vencido
           </span>
         );
       case 'CANCELLED':
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-500/10 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-wider border border-slate-500/20">
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-neutral-400/10 text-neutral-500 rounded-full text-[10px] font-black uppercase tracking-wider border border-neutral-300">
             <XCircle size={12} /> Cancelado
           </span>
         );
       default:
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full text-[10px] font-black uppercase tracking-wider border border-amber-500/20">
+          <span className="flex items-center gap-1.5 px-3 py-1 bg-neutral-400/10 text-neutral-500 rounded-full text-[10px] font-black uppercase tracking-wider border border-neutral-300">
             <Clock size={12} /> Pendente
           </span>
         );
@@ -137,7 +137,7 @@ export const InvoiceManagementTab: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-[#161b2c] p-4 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-app-card p-4 rounded-[2rem] border border-app-stroke shadow-sm">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input 
@@ -145,13 +145,13 @@ export const InvoiceManagementTab: React.FC = () => {
             placeholder="Buscar por cliente ou ID da cobrança..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-900 border-none rounded-2xl py-3 pl-12 pr-4 text-sm font-medium text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/50 transition-all"
+            className="w-full bg-app-bg border border-app-stroke rounded-2xl py-3 pl-12 pr-4 text-sm font-medium text-app-text-main outline-none focus:ring-2 ring-black/20 transition-all"
           />
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
           <button 
             onClick={fetchInvoices}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/5 text-black dark:text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/10 transition-all"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Atualizar
           </button>
@@ -178,13 +178,13 @@ export const InvoiceManagementTab: React.FC = () => {
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-[#161b2c] border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all group"
+                className="bg-app-card border border-app-stroke rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all group"
               >
                 <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
                   {/* Icon & Method */}
                   <div className={clsx(
                     "w-16 h-16 rounded-[2rem] flex items-center justify-center shrink-0 shadow-inner",
-                    invoice.paymentMethod === 'PIX' ? "bg-emerald-500/10 text-emerald-500" : "bg-blue-500/10 text-blue-500"
+                    invoice.paymentMethod === 'PIX' ? "bg-black/10 text-black" : "bg-black/5 text-black dark:text-white"
                   )}>
                     {invoice.paymentMethod === 'PIX' ? <QrCode size={28} /> : <FileText size={28} />}
                   </div>
@@ -211,7 +211,7 @@ export const InvoiceManagementTab: React.FC = () => {
                     </span>
                     <span className={clsx(
                       "text-[10px] font-black uppercase tracking-widest",
-                      invoice.status === 'OVERDUE' ? "text-red-500" : "text-slate-400"
+                      invoice.status === 'OVERDUE' ? "text-black font-black" : "text-app-text-muted"
                     )}>
                       Vencimento: {new Date(invoice.dueDate).toLocaleDateString('pt-BR')}
                     </span>

@@ -18,8 +18,8 @@
   /* Medium gray */
   --app-text-label: #555555;
   /* Dark gray labels */
-  --glass-white: rgba(255, 255, 255, 0.06);
-  --glass-stroke: rgba(255, 255, 255, 0.10);
+  --glass-white: rgba(255, 255, 255, 0.15);
+  --glass-stroke: rgba(255, 255, 255, 0.20);
 }
 
 /* Light theme - Pure Gallery & Glass */
@@ -38,13 +38,13 @@
   /* Muted charcoal */
   --app-text-label: #999999;
   /* Neutral gray */
-  --glass-white: rgba(255, 255, 255, 0.7);
-  --glass-stroke: rgba(255, 255, 255, 0.3);
+  --glass-white: rgba(255, 255, 255, 0.85);
+  --glass-stroke: rgba(255, 255, 255, 0.5);
 }
 
 @layer base {
   body {
-    @apply bg-app-bg text-app-text-main font-body antialiased selection:bg-primary selection:text-white text-[15px] leading-relaxed;
+    @apply bg-app-bg text-app-text-main font-body antialiased selection:bg-black selection:text-white text-[15px] leading-relaxed;
     transition: background-color 0.3s ease, color 0.3s ease;
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
     --shadow-md: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
@@ -924,8 +924,8 @@ html {
 @layer utilities {
   .bg-glass {
     background: var(--glass-white);
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-color: var(--glass-stroke);
   }
 

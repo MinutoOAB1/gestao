@@ -108,7 +108,7 @@ export default function ProcessFormPage() {
     if (loadingProcess) {
         return (
             <div className="flex items-center justify-center h-64">
-                <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+                <div className="animate-spin w-8 h-8 border-2 border-black dark:border-white border-t-transparent rounded-full" />
             </div>
         );
     }
@@ -136,8 +136,8 @@ export default function ProcessFormPage() {
 
                 {/* Seção 1: Informações Básicas */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <FileText size={20} className="text-primary" />
+                    <h3 className="text-lg font-black text-app-text-main mb-4 flex items-center gap-2 uppercase tracking-widest">
+                        <FileText size={20} className="text-black dark:text-white" />
                         Dados Principais
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,7 +149,7 @@ export default function ProcessFormPage() {
                                 value={formData.title}
                                 onChange={handleChange}
                                 placeholder="Ex: Ação de Cobrança - Silva vs Souza"
-                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-1 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all"
                                 required
                             />
                         </div>
@@ -162,7 +162,7 @@ export default function ProcessFormPage() {
                                 value={formData.number}
                                 onChange={handleChange}
                                 placeholder="0000000-00.0000.0.00.0000"
-                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-2 focus:ring-primary focus:border-transparent outline-none font-mono transition-all"
+                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-1 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none font-mono transition-all"
                                 required
                             />
                         </div>
@@ -173,7 +173,7 @@ export default function ProcessFormPage() {
                                 name="area"
                                 value={formData.area}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main focus:ring-1 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all"
                             >
                                 <option value="Cível">Cível</option>
                                 <option value="Trabalhista">Trabalhista</option>
@@ -190,8 +190,8 @@ export default function ProcessFormPage() {
 
                 {/* Seção 2: Cliente Vinculado */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <Users size={20} className="text-primary" />
+                    <h3 className="text-lg font-black text-app-text-main mb-4 flex items-center gap-2 uppercase tracking-widest">
+                        <Users size={20} className="text-black dark:text-white" />
                         Cliente Vinculado
                     </h3>
                     <div>
@@ -220,7 +220,7 @@ export default function ProcessFormPage() {
                                 <button
                                     type="button"
                                     onClick={() => navigate('/app/clientes/novo')}
-                                    className="text-primary hover:underline"
+                                    className="text-black dark:text-white font-black uppercase tracking-widest hover:underline"
                                 >
                                     Cadastrar cliente
                                 </button>
@@ -233,8 +233,8 @@ export default function ProcessFormPage() {
 
                 {/* Seção 3: Tribunal e Valores */}
                 <div>
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <Scale size={20} className="text-primary" />
+                    <h3 className="text-lg font-black text-app-text-main mb-4 flex items-center gap-2 uppercase tracking-widest">
+                        <Scale size={20} className="text-black dark:text-white" />
                         Juízo e Valores
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -246,7 +246,7 @@ export default function ProcessFormPage() {
                                 value={formData.court}
                                 onChange={handleChange}
                                 placeholder="Ex: 3ª Vara Cível de São Paulo"
-                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-1 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all"
                             />
                         </div>
 
@@ -261,7 +261,7 @@ export default function ProcessFormPage() {
                                     onChange={handleChange}
                                     placeholder="0,00"
                                     step="0.01"
-                                    className="w-full pl-10 pr-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-1 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all"
                                 />
                             </div>
                         </div>
@@ -278,7 +278,7 @@ export default function ProcessFormPage() {
                         value={formData.description}
                         onChange={handleChange}
                         rows={4}
-                        className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none transition-all"
+                        className="w-full px-4 py-3 bg-app-input border border-app-stroke rounded-lg text-app-text-main placeholder:text-app-text-label focus:ring-1 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none resize-none transition-all"
                         placeholder="Detalhes adicionais sobre o caso..."
                     />
                 </div>
@@ -294,11 +294,11 @@ export default function ProcessFormPage() {
                     </button>
                     <button
                         type="submit"
-                        className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition-colors flex items-center gap-2"
+                        className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-black/20"
                         disabled={loading}
                     >
                         <Save size={18} />
-                        {loading ? 'Salvando...' : 'Salvar Processo'}
+                        {loading ? 'Salvando...' : 'Salvar'}
                     </button>
                 </div>
 

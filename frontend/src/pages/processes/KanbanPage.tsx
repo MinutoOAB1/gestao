@@ -76,14 +76,13 @@ interface Column {
 
 // Column visual styles – each column gets a distinct pastel background and accent
 const COLUMN_STYLES = [
-    { bg: 'bg-blue-50 dark:bg-blue-950/30', headerBg: 'bg-blue-100/80 dark:bg-blue-900/40', border: 'border-blue-200/60 dark:border-blue-800/40', accent: 'text-blue-600 dark:text-blue-400', dot: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' },
-    { bg: 'bg-amber-50 dark:bg-amber-950/30', headerBg: 'bg-amber-100/80 dark:bg-amber-900/40', border: 'border-amber-200/60 dark:border-amber-800/40', accent: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' },
-    { bg: 'bg-slate-50 dark:bg-slate-800/30', headerBg: 'bg-slate-100/80 dark:bg-slate-800/60', border: 'border-slate-200/60 dark:border-slate-700/40', accent: 'text-slate-600 dark:text-slate-400', dot: 'bg-slate-500', badge: 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' },
-    { bg: 'bg-purple-50 dark:bg-purple-950/30', headerBg: 'bg-purple-100/80 dark:bg-purple-900/40', border: 'border-purple-200/60 dark:border-purple-800/40', accent: 'text-purple-600 dark:text-purple-400', dot: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300' },
-    { bg: 'bg-emerald-50 dark:bg-emerald-950/30', headerBg: 'bg-emerald-100/80 dark:bg-emerald-900/40', border: 'border-emerald-200/60 dark:border-emerald-800/40', accent: 'text-emerald-600 dark:text-emerald-400', dot: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' },
-    { bg: 'bg-rose-50 dark:bg-rose-950/30', headerBg: 'bg-rose-100/80 dark:bg-rose-900/40', border: 'border-rose-200/60 dark:border-rose-800/40', accent: 'text-rose-600 dark:text-rose-400', dot: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300' },
-    { bg: 'bg-teal-50 dark:bg-teal-950/30', headerBg: 'bg-teal-100/80 dark:bg-teal-900/40', border: 'border-teal-200/60 dark:border-teal-800/40', accent: 'text-teal-600 dark:text-teal-400', dot: 'bg-teal-500', badge: 'bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300' },
-    { bg: 'bg-orange-50 dark:bg-orange-950/30', headerBg: 'bg-orange-100/80 dark:bg-orange-900/40', border: 'border-orange-200/60 dark:border-orange-800/40', accent: 'text-orange-600 dark:text-orange-400', dot: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300' },
+    { bg: 'bg-black/5 dark:bg-white/5', headerBg: 'bg-black/10 dark:bg-white/10', border: 'border-black/10 dark:border-white/10', accent: 'text-black dark:text-white', dot: 'bg-black dark:bg-white', badge: 'bg-black/10 text-black dark:bg-white/10 dark:text-white' },
+    { bg: 'bg-neutral-100 dark:bg-neutral-900/50', headerBg: 'bg-neutral-200 dark:bg-neutral-800', border: 'border-neutral-300 dark:border-neutral-700', accent: 'text-neutral-800 dark:text-neutral-200', dot: 'bg-neutral-600 dark:bg-neutral-400', badge: 'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300' },
+    { bg: 'bg-stone-50 dark:bg-stone-950/30', headerBg: 'bg-stone-100/80 dark:bg-stone-900/40', border: 'border-stone-200/60 dark:border-stone-800/40', accent: 'text-stone-600 dark:text-stone-400', dot: 'bg-stone-500', badge: 'bg-stone-100 text-stone-700 dark:bg-stone-900/50 dark:text-stone-300' },
+    { bg: 'bg-zinc-50 dark:bg-zinc-950/30', headerBg: 'bg-zinc-100/80 dark:bg-zinc-900/40', border: 'border-zinc-200/60 dark:border-zinc-800/40', accent: 'text-zinc-600 dark:text-zinc-400', dot: 'bg-zinc-500', badge: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-300' },
+    { bg: 'bg-slate-50 dark:bg-slate-950/30', headerBg: 'bg-slate-100/80 dark:bg-slate-900/40', border: 'border-slate-200/60 dark:border-slate-800/40', accent: 'text-slate-600 dark:text-slate-400', dot: 'bg-slate-500', badge: 'bg-slate-100 text-slate-700 dark:bg-slate-900/50 dark:text-slate-300' },
+    { bg: 'bg-neutral-50 dark:bg-neutral-950/20', headerBg: 'bg-neutral-100 dark:bg-neutral-900/30', border: 'border-neutral-200 dark:border-neutral-800/40', accent: 'text-neutral-500 dark:text-neutral-400', dot: 'bg-neutral-400', badge: 'bg-neutral-100 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400' },
+    { bg: 'bg-white dark:bg-black/40', headerBg: 'bg-neutral-50 dark:bg-neutral-950', border: 'border-neutral-200 dark:border-neutral-800', accent: 'text-neutral-900 dark:text-neutral-100', dot: 'bg-neutral-900 dark:bg-neutral-100', badge: 'bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white' },
 ];
 
 // Keep old COLUMN_COLORS for backward compat with localStorage
@@ -98,15 +97,15 @@ const DEFAULT_COLUMNS: Column[] = [
 ];
 
 const AREA_COLORS: Record<string, { bg: string; text: string }> = {
-    'Cível': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400' },
-    'Civil': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400' },
-    'Trabalhista': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400' },
-    'Penal': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
-    'Criminal': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400' },
-    'Previdenciário': { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-700 dark:text-teal-400' },
-    'Tributário': { bg: 'bg-gray-100 dark:bg-slate-700', text: 'text-gray-700 dark:text-gray-300' },
-    'Família': { bg: 'bg-pink-100 dark:bg-pink-900/30', text: 'text-pink-700 dark:text-pink-400' },
-    'Contratual': { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400' },
+    'Cível': { bg: 'bg-black/5 dark:bg-white/10', text: 'text-black dark:text-white' },
+    'Civil': { bg: 'bg-black/5 dark:bg-white/10', text: 'text-black dark:text-white' },
+    'Trabalhista': { bg: 'bg-neutral-800 text-white', text: 'text-white' },
+    'Penal': { bg: 'bg-neutral-600 text-white', text: 'text-white' },
+    'Criminal': { bg: 'bg-neutral-400 text-black', text: 'text-black' },
+    'Previdenciário': { bg: 'bg-stone-800 text-white', text: 'text-white' },
+    'Tributário': { bg: 'bg-zinc-700 text-white', text: 'text-white' },
+    'Família': { bg: 'bg-slate-800 text-white', text: 'text-white' },
+    'Contratual': { bg: 'bg-gray-800 text-white', text: 'text-white' },
 };
 
 function formatDeadline(deadline?: string): { text: string; isUrgent: boolean; isTomorrow: boolean } {
@@ -236,9 +235,9 @@ const DraggableCard = memo(function DraggableCard({ process, onOpenModal }: { pr
                     {/* Deadline badge */}
                     {deadline.text && (
                         <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-lg ${deadline.isUrgent
-                            ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+                            ? 'bg-neutral-800 text-white animate-pulse'
                             : deadline.isTomorrow
-                                ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400'
+                                ? 'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200'
                                 : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-gray-400'
                             }`}>
                             {deadline.isUrgent ? <AlertTriangle size={11} /> : <Calendar size={11} />}
@@ -248,7 +247,7 @@ const DraggableCard = memo(function DraggableCard({ process, onOpenModal }: { pr
 
                     {/* Checklist progress */}
                     {totalItems > 0 && (
-                        <span className={`inline-flex items-center gap-1 text-[11px] font-semibold ${completedItems === totalItems ? 'text-green-500' : 'text-gray-400'}`}>
+                        <span className={`inline-flex items-center gap-1 text-[11px] font-semibold ${completedItems === totalItems ? 'text-black dark:text-white' : 'text-gray-400'}`}>
                             <CheckSquare size={11} />
                             {completedItems}/{totalItems}
                         </span>
@@ -262,7 +261,7 @@ const DraggableCard = memo(function DraggableCard({ process, onOpenModal }: { pr
                         </span>
                     )}
 
-                    {isCompleted && <CheckCircle size={12} className="text-green-500 ml-auto" />}
+                    {isCompleted && <CheckCircle size={12} className="text-black dark:text-white ml-auto" />}
                 </div>
 
                 {/* Progress Bar (checklist) */}
@@ -274,7 +273,7 @@ const DraggableCard = memo(function DraggableCard({ process, onOpenModal }: { pr
                         </div>
                         <div className="h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                             <div
-                                className={`h-full rounded-full transition-all duration-500 ${completedItems === totalItems ? 'bg-green-500' : 'bg-blue-500'}`}
+                                className={`h-full rounded-full transition-all duration-500 ${completedItems === totalItems ? 'bg-black dark:bg-white' : 'bg-neutral-400'}`}
                                 style={{ width: `${(completedItems / totalItems) * 100}%` }}
                             />
                         </div>
@@ -285,15 +284,15 @@ const DraggableCard = memo(function DraggableCard({ process, onOpenModal }: { pr
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-slate-700/50">
                     <div className="flex items-center gap-2">
                         {process.client && (
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0">
-                                <span className="text-white font-bold text-[8px]">{process.client.name?.charAt(0)?.toUpperCase()}</span>
+                            <div className="w-5 h-5 rounded-full bg-neutral-800 dark:bg-neutral-200 flex items-center justify-center shrink-0">
+                                <span className="text-white dark:text-black font-bold text-[8px]">{process.client.name?.charAt(0)?.toUpperCase()}</span>
                             </div>
                         )}
                         <p className="text-[11px] text-gray-400 dark:text-gray-500">
                             {formatRelativeDate(process.updatedAt || process.createdAt)}
                         </p>
                     </div>
-                    {isCompleted && <CheckCircle size={12} className="text-green-500" />}
+                    {isCompleted && <CheckCircle size={12} className="text-black dark:text-white" />}
                 </div>
             </div>
         </div>
@@ -357,8 +356,8 @@ const DroppableColumn = memo(function DroppableColumn({
                                     autoFocus
                                     onKeyDown={(e) => e.key === 'Enter' && handleSave()}
                                 />
-                                <button onClick={handleSave} className="p-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"><Save size={14} /></button>
-                                <button onClick={() => setIsEditing(false)} className="p-1 bg-gray-200 dark:bg-slate-700 text-gray-500 rounded hover:bg-gray-300 transition-colors"><X size={14} /></button>
+                                <button onClick={handleSave} className="p-1 bg-black dark:bg-white text-white dark:text-black rounded transition-colors"><Save size={14} /></button>
+                                <button onClick={() => setIsEditing(false)} className="p-1 bg-neutral-200 dark:bg-neutral-800 text-neutral-500 rounded hover:bg-neutral-300 transition-colors"><X size={14} /></button>
                             </div>
                         ) : (
                             <>
@@ -404,9 +403,9 @@ const DroppableColumn = memo(function DroppableColumn({
             <div
                 ref={setNodeRef}
                 className={`flex-1 overflow-y-auto flex flex-col gap-3 px-3 py-3 rounded-b-2xl border transition-all duration-200 ${isOver
-                    ? 'border-blue-400 bg-blue-50/80 dark:bg-blue-900/20'
+                    ? 'border-black dark:border-white bg-black/5 dark:bg-white/5'
                     : isOverWip
-                        ? 'border-red-300 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
+                        ? 'border-neutral-800 dark:border-neutral-200 bg-neutral-100 dark:bg-neutral-900'
                         : `${style.border} ${style.bg}`
                     }`}
                 style={{ minHeight: 160 }}
@@ -418,7 +417,7 @@ const DroppableColumn = memo(function DroppableColumn({
                 </SortableContext>
 
                 {processes.length === 0 && (
-                    <div className="flex-1 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm py-10">
+                    <div className="flex-1 flex items-center justify-center text-neutral-400 dark:text-neutral-500 text-sm py-10">
                         Arraste processos aqui
                     </div>
                 )}
@@ -427,7 +426,7 @@ const DroppableColumn = memo(function DroppableColumn({
             {/* Add card button */}
             <button
                 onClick={() => onAddCard(column.id)}
-                className="flex items-center justify-center gap-2 py-2 mt-2 rounded-2xl border-2 border-dashed border-gray-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium transition-all touch-manipulation min-h-[40px] mb-0"
+                className="flex items-center justify-center gap-2 py-2 mt-2 rounded-2xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white hover:bg-black/5 dark:hover:bg-white/5 text-neutral-400 hover:text-black dark:hover:text-white text-sm font-medium transition-all touch-manipulation min-h-[40px] mb-0"
             >
                 <Plus size={16} />
                 Adicionar
@@ -537,7 +536,7 @@ function AddCardModal({
                     </div>
                     <div className="flex justify-end gap-3 pt-3 border-t border-gray-100 dark:border-slate-700">
                         <button type="button" onClick={onClose} className="px-5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 font-medium transition-colors">Cancelar</button>
-                        <button type="submit" className="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2 font-medium shadow-sm">
+                        <button type="submit" className="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-90 flex items-center gap-2 font-bold shadow-lg shadow-black/20">
                             <Plus size={16} /> Criar novo caso
                         </button>
                     </div>
@@ -597,7 +596,7 @@ function FilterModal({
                 </div>
                 <div className="flex justify-end gap-2 mt-6">
                     <button onClick={() => { setLocalFilters({ area: '', hasDeadline: false, assignedTo: '', assignedToMe: false }); onApply({ area: '', hasDeadline: false, assignedTo: '', assignedToMe: false }); onClose(); }} className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">Limpar</button>
-                    <button onClick={() => { onApply(localFilters); onClose(); }} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">Aplicar</button>
+                    <button onClick={() => { onApply(localFilters); onClose(); }} className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:opacity-90 font-bold shadow-lg">Aplicar</button>
                 </div>
             </div>
         </div>

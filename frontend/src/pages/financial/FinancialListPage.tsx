@@ -113,8 +113,7 @@ const INCOME_CATEGORIES = ['Honorários Contratuais', 'Honorários Sucumbenciais
 const EXPENSE_CATEGORY_LIST = ['Pessoal / Salários', 'Custas Processuais', 'Infraestrutura / Aluguel', 'Marketing / Softwares', 'Impostos', 'Token / Assinatura Digital', 'Viagens / Deslocamento', 'Outros'];
 const PARTNER_TYPES = ['TRABALHISTA', 'CÍVEL', 'TRIBUTÁRIO', 'CRIMINAL', 'PREVIDENCIÁRIO', 'FAMÍLIA', 'MARKETING', 'ADMINISTRATIVO', 'OUTROS'];
 const PARTNER_COLORS = [
-    'bg-amber-500', 'bg-blue-500', 'bg-green-500', 'bg-purple-500',
-    'bg-red-500', 'bg-pink-500', 'bg-indigo-500', 'bg-cyan-500', 'bg-slate-400'
+    'bg-black', 'bg-neutral-800', 'bg-neutral-700', 'bg-neutral-600', 'bg-neutral-500', 'bg-neutral-400', 'bg-neutral-300'
 ];
 
 export default function FinancialListPage() {
@@ -451,7 +450,7 @@ export default function FinancialListPage() {
             const contentWidth = pageWidth - (margin * 2);
 
             // Background Decorative Element (Subtle side bar)
-            doc.setFillColor(59, 130, 246, 0.05); // primary light alpha
+            doc.setFillColor(0, 0, 0, 0.05); // black alpha
             doc.rect(0, 0, 5, pageHeight, 'F');
 
             // Draw Logo
@@ -502,7 +501,7 @@ export default function FinancialListPage() {
             
             doc.setFontSize(18);
             doc.setFont('helvetica', 'bold');
-            doc.setTextColor(16, 185, 129); // emerald-500
+            doc.setTextColor(0, 0, 0); // black
             const valueStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(record.amount);
             doc.text(valueStr, margin + 10, 104);
 
@@ -927,7 +926,7 @@ export default function FinancialListPage() {
                                 setSelectedClientForInvoice(undefined);
                                 setIsInvoiceModalOpen(true);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-xl text-sm font-bold hover:bg-emerald-500/20 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 text-black dark:text-white rounded-xl text-sm font-bold hover:bg-black/10 transition-colors"
                         >
                             <QrCode size={16} />
                             Emitir Cobrança
@@ -936,7 +935,7 @@ export default function FinancialListPage() {
                     <Protect roles={['ADMIN', 'LAWYER']}>
                         <button
                             onClick={openNewTransaction}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20"
+                            className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-bold hover:opacity-90 transition-opacity shadow-lg shadow-black/20"
                         >
                             <DollarSign size={16} />
                             Nova Movimentação
@@ -951,35 +950,34 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        (stats?.balance || 0) >= 0 ? "bg-gradient-to-br from-green-500/10 to-app-card border-green-500/30 shadow-lg shadow-green-500/10" : "bg-gradient-to-br from-red-500/10 to-app-card border-red-500/30 shadow-lg shadow-red-500/10"
+                        (stats?.balance || 0) >= 0 ? "bg-gradient-to-br from-black/5 to-app-card border-black/20 shadow-lg shadow-black/5" : "bg-gradient-to-br from-neutral-800/10 to-app-card border-neutral-800/30 shadow-lg shadow-black/5"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
                     <div className={clsx(
                         "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
-                        (stats?.balance || 0) >= 0 ? "bg-green-500/20" : "bg-red-500/20"
+                        (stats?.balance || 0) >= 0 ? "bg-black/10" : "bg-neutral-800/10"
                     )} />
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-app-text-muted text-xs">Saldo Atual</p>
                         <div className={clsx(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            (stats?.balance || 0) >= 0 ? "bg-green-500/20" : "bg-red-500/20"
+                            (stats?.balance || 0) >= 0 ? "bg-black dark:bg-white" : "bg-neutral-800 dark:bg-neutral-600"
                         )}>
-                            <Building size={16} className={(stats?.balance || 0) >= 0 ? "text-green-500" : "text-red-500"} />
+                            <Building size={16} className={(stats?.balance || 0) >= 0 ? "text-white dark:text-black" : "text-white"} />
                         </div>
                     </div>
                     <p className="text-sm text-app-text-muted">R$</p>
                     <div className="flex items-center gap-2">
                         <p className={clsx(
-                            "text-2xl font-bold",
-                            (stats?.balance || 0) >= 0 ? "text-green-500" : "text-red-500"
+                            "text-2xl font-bold text-app-text-main"
                         )}>
                             {formatBRL(stats?.balance || 0).replace('R$', '').trim()}
                         </p>
                         {(stats?.balance || 0) >= 0 ? (
-                            <TrendingUp size={20} className="text-green-500" />
+                            <TrendingUp size={20} className="text-black dark:text-white" />
                         ) : (
-                            <TrendingDown size={20} className="text-red-500" />
+                            <TrendingDown size={20} className="text-neutral-500" />
                         )}
                     </div>
                     <p className="text-xs text-app-text-muted mt-1">
@@ -991,28 +989,28 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        (stats?.pendingIncome || 0) > 0 ? "bg-gradient-to-br from-blue-500/10 to-app-card border-blue-500/30 shadow-lg shadow-blue-500/10" : "bg-app-card border-app-stroke"
+                        (stats?.pendingIncome || 0) > 0 ? "bg-gradient-to-br from-black/5 to-app-card border-black/20 shadow-lg shadow-black/5" : "bg-app-card border-app-stroke"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-black/5 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <p className="text-app-text-muted text-xs">Contas a Receber</p>
                             <p className="text-[10px] text-app-text-muted">(Mês Atual)</p>
                         </div>
-                        <span className="px-2 py-0.5 bg-blue-500/20 text-blue-500 text-[10px] font-bold rounded-full">
+                        <span className="px-2 py-0.5 bg-black/10 dark:bg-white/10 text-black dark:text-white text-[10px] font-bold rounded-full">
                             {stats?.pendingIncomeCount || 0} Pendentes
                         </span>
                     </div>
-                    <p className="text-2xl font-bold text-blue-500">{formatBRL(stats?.pendingIncome || 0)}</p>
+                    <p className="text-2xl font-bold text-app-text-main">{formatBRL(stats?.pendingIncome || 0)}</p>
                     <div className="mt-2 pt-2 border-t border-app-stroke">
                         <div className="flex justify-between items-center mb-1">
                             <span className="text-[10px] text-app-text-muted">Progresso do Mês</span>
                             <span className="text-[10px] font-medium text-app-text-main">{stats?.receivedPercent || 0}% Recebido</span>
                         </div>
                         <div className="h-1.5 bg-app-stroke rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${stats?.receivedPercent || 0}%` }} />
+                            <div className="h-full bg-black dark:bg-white rounded-full transition-all duration-1000" style={{ width: `${stats?.receivedPercent || 0}%` }} />
                         </div>
                     </div>
                 </motion.div>
@@ -1022,7 +1020,7 @@ export default function FinancialListPage() {
                     className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden"
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-red-500/10 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-black/5 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <p className="text-app-text-muted text-xs">Contas a Pagar</p>
@@ -1030,19 +1028,18 @@ export default function FinancialListPage() {
                         </div>
                         <span className={clsx(
                             "px-2 py-0.5 text-[10px] font-bold rounded-full",
-                            (stats?.dueTodayCount || 0) > 0 ? "bg-red-500/20 text-red-500 animate-pulse" : "bg-app-stroke text-app-text-muted"
+                            (stats?.dueTodayCount || 0) > 0 ? "bg-neutral-800 text-white animate-pulse" : "bg-app-stroke text-app-text-muted"
                         )}>
                             {stats?.dueTodayCount || 0} Vencendo
                         </span>
                     </div>
-                    <p className="text-2xl font-bold text-red-500">{formatBRL(stats?.pendingExpense || 0)}</p>
+                    <p className="text-2xl font-bold text-app-text-main">{formatBRL(stats?.pendingExpense || 0)}</p>
                     <div className="mt-2 pt-2 border-t border-app-stroke flex justify-between items-center">
                         <span className="text-xs text-app-text-muted">
                             Vencimento Hoje:
                         </span>
                         <span className={clsx(
-                            "text-sm font-bold",
-                            (stats?.dueTodayAmount || 0) > 0 ? "text-red-400" : "text-app-text-main"
+                            "text-sm font-bold text-app-text-main"
                         )}>
                             {formatBRL(stats?.dueTodayAmount || 0)}
                         </span>
@@ -1053,27 +1050,26 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        currentMonthBalance >= 0 ? "bg-gradient-to-br from-emerald-500/10 to-app-card border-emerald-500/30 shadow-lg shadow-emerald-500/10" : "bg-gradient-to-br from-rose-500/10 to-app-card border-rose-500/30 shadow-lg shadow-rose-500/10"
+                        currentMonthBalance >= 0 ? "bg-gradient-to-br from-black/5 to-app-card border-black/20 shadow-lg shadow-black/5" : "bg-gradient-to-br from-neutral-800/10 to-app-card border-neutral-800/30 shadow-lg shadow-black/5"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
                     <div className={clsx(
                         "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
-                        currentMonthBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
+                        currentMonthBalance >= 0 ? "bg-black/10" : "bg-neutral-800/10"
                     )} />
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-app-text-muted text-xs">Resultado Realizado (Mês Atual)</p>
                         <div className={clsx(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            currentMonthBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
+                            currentMonthBalance >= 0 ? "bg-black dark:bg-white" : "bg-neutral-800 dark:bg-neutral-600"
                         )}>
-                            {currentMonthBalance >= 0 ? <TrendingUp size={16} className="text-emerald-500" /> : <TrendingDown size={16} className="text-rose-500" />}
+                            {currentMonthBalance >= 0 ? <TrendingUp size={16} className="text-white dark:text-black" /> : <TrendingDown size={16} className="text-white" />}
                         </div>
                     </div>
                     <p className="text-sm text-app-text-muted">R$</p>
                     <p className={clsx(
-                        "text-2xl font-bold",
-                        currentMonthBalance >= 0 ? "text-emerald-500" : "text-rose-500"
+                        "text-2xl font-bold text-app-text-main"
                     )}>
                         {formatBRL(Math.abs(currentMonthBalance)).replace('R$', '').trim()}
                     </p>
@@ -1087,11 +1083,11 @@ export default function FinancialListPage() {
                     className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden hidden"
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-black/5 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-app-text-muted text-xs">Repasses de Parcerias</p>
-                        <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                            <Users size={16} className="text-purple-500" />
+                        <div className="w-8 h-8 bg-black/10 rounded-lg flex items-center justify-center">
+                            <Users size={16} className="text-black" />
                         </div>
                     </div>
                     <p className="text-2xl font-bold text-app-text-main">{formatBRL(totalRepasses)}</p>
@@ -1143,19 +1139,19 @@ export default function FinancialListPage() {
                             >
                                 <defs>
                                     <linearGradient id="colorSaldo" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#000000" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#000000" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <XAxis dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value / 1000 > 0 ? (value / 1000) + 'k' : value}`} />
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                                <XAxis dataKey="name" stroke="#888888" fontSize={10} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#888888" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value / 1000 > 0 ? (value / 1000) + 'k' : value}`} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--app-stroke)" />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f8fafc' }}
-                                    itemStyle={{ color: '#f8fafc' }}
+                                    contentStyle={{ backgroundColor: 'var(--app-card)', border: '1px solid var(--app-stroke)', borderRadius: '12px', color: 'var(--app-text-main)' }}
+                                    itemStyle={{ color: 'var(--app-text-main)' }}
                                     formatter={(value: any) => [new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value), '']}
                                 />
-                                <Area type="monotone" dataKey="Saldo" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorSaldo)" />
+                                <Area type="monotone" dataKey="Saldo" stroke="#000000" strokeWidth={2} fillOpacity={1} fill="url(#colorSaldo)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -1168,7 +1164,7 @@ export default function FinancialListPage() {
                         <Protect roles={['ADMIN', 'LAWYER']}>
                             <button
                                 onClick={openNewPartner}
-                                className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition-colors"
+                                className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white hover:opacity-90 transition-colors"
                             >
                                 <Plus size={14} />
                             </button>
@@ -1184,7 +1180,7 @@ export default function FinancialListPage() {
                                     className="bg-app-bg border border-app-stroke rounded-xl p-3 hover:border-primary/30 transition-colors cursor-pointer"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={clsx("w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm", partner.color)}>
+                                        <div className={clsx("w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm bg-neutral-800")}>
                                             {partner.initials}
                                         </div>
                                         <div className="flex-1">
@@ -1211,7 +1207,7 @@ export default function FinancialListPage() {
                                 <p className="text-sm">Nenhum parceiro cadastrado</p>
                                 <button
                                     onClick={openNewPartner}
-                                    className="mt-2 text-primary text-sm hover:underline"
+                                    className="mt-2 text-black font-bold text-sm hover:underline"
                                 >
                                     Adicionar primeiro parceiro
                                 </button>
@@ -1229,7 +1225,7 @@ export default function FinancialListPage() {
                         className={clsx(
                             "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
                             activeTab === 'transactions'
-                                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                ? "bg-black text-white shadow-lg shadow-black/20"
                                 : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
                         )}
                     >
@@ -1240,7 +1236,7 @@ export default function FinancialListPage() {
                         className={clsx(
                             "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2",
                             activeTab === 'invoices'
-                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                ? "bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-black/20"
                                 : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
                         )}
                     >
@@ -1252,7 +1248,7 @@ export default function FinancialListPage() {
                         className={clsx(
                             "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
                             activeTab === 'repasses'
-                                ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20"
+                                ? "bg-neutral-800 text-white shadow-lg shadow-black/20"
                                 : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
                         )}
                     >
@@ -1396,12 +1392,12 @@ export default function FinancialListPage() {
                                                 <span className={clsx(
                                                     "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit",
                                                     rep.status === 'PAID'
-                                                        ? "bg-green-500/10 text-green-500"
-                                                        : "bg-amber-500/10 text-amber-500"
+                                                        ? "bg-black/10 text-black"
+                                                        : "bg-neutral-400/10 text-neutral-500"
                                                 )}>
                                                     <div className={clsx(
                                                         "w-1.5 h-1.5 rounded-full",
-                                                        rep.status === 'PAID' ? "bg-green-500" : "bg-amber-500"
+                                                        rep.status === 'PAID' ? "bg-black" : "bg-neutral-400"
                                                     )} />
                                                     {rep.status === 'PAID' ? 'Pago' : 'Pendente'}
                                                 </span>
@@ -1410,7 +1406,7 @@ export default function FinancialListPage() {
                                                 {rep.status === 'PENDING' && (
                                                     <button
                                                         onClick={() => handlePayRepasse(rep.id)}
-                                                        className="px-4 py-2 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors shadow-lg shadow-green-500/20"
+                                                        className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:opacity-90 transition-colors shadow-lg shadow-black/20"
                                                     >
                                                         Marcar Pago
                                                     </button>
@@ -1469,8 +1465,8 @@ export default function FinancialListPage() {
                                 className={clsx(
                                     "flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                                     newTransaction.type === 'EXPENSE'
-                                        ? "bg-red-500/10 text-red-400 border-2 border-red-500"
-                                        : "bg-app-bg/50 text-app-text-muted border border-app-stroke hover:border-red-500/50"
+                                        ? "bg-neutral-800 text-white border-2 border-black"
+                                        : "bg-app-bg/50 text-app-text-muted border border-app-stroke hover:border-black/50"
                                 )}
                                 onClick={() => setNewTransaction({ ...newTransaction, type: 'EXPENSE' })}
                             >
@@ -1524,7 +1520,7 @@ export default function FinancialListPage() {
                     {/* Classification & Links Section */}
                     <div className="bg-app-bg/30 border border-app-stroke rounded-xl p-4">
                         <h3 className="text-sm font-semibold text-app-text-main mb-3 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-primary rounded-full" />
+                            <div className="w-2 h-2 bg-black rounded-full" />
                             Classificação & Vínculos
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1755,8 +1751,8 @@ export default function FinancialListPage() {
                                 onClick={handleSaveTransaction}
                                 disabled={isSubmitting}
                                 className={clsx(
-                                    "flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-lg text-sm font-medium transition-colors shadow-lg",
-                                    isSubmitting ? "bg-green-500/50 cursor-not-allowed" : "bg-green-500 hover:bg-green-600 shadow-green-500/20"
+                                    "flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-lg text-sm font-bold transition-colors shadow-lg",
+                                    isSubmitting ? "bg-black/50 cursor-not-allowed" : "bg-black hover:opacity-90 shadow-black/20"
                                 )}
                             >
                                 {isSubmitting ? 'Salvando...' : '✓ Salvar Movimentação'}
@@ -1834,7 +1830,7 @@ export default function FinancialListPage() {
                                 Percentual (%)
                                 <span className={clsx(
                                     "px-1.5 py-0.5 rounded text-[10px] uppercase font-bold",
-                                    newPartner.percentage ? "bg-primary/20 text-primary" : "bg-app-stroke text-app-text-muted"
+                                    newPartner.percentage ? "bg-black/20 text-black" : "bg-app-stroke text-app-text-muted"
                                 )}>
                                     Repasse Automático
                                 </span>
@@ -1928,8 +1924,8 @@ export default function FinancialListPage() {
                                 onClick={handleSavePartner}
                                 disabled={isSubmitting}
                                 className={clsx(
-                                    "px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors",
-                                    isSubmitting ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary-dark"
+                                    "px-4 py-2 text-white text-sm font-bold rounded-lg transition-colors",
+                                    isSubmitting ? "bg-black/50 cursor-not-allowed" : "bg-black hover:opacity-90"
                                 )}
                             >
                                 {isSubmitting ? 'Salvando...' : 'Salvar'}
@@ -2033,7 +2029,7 @@ export default function FinancialListPage() {
                     <div className="flex items-center gap-3 p-3 bg-app-bg/50 border border-app-stroke rounded-xl">
                         <div className={clsx(
                             "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                            activeNoteRecord?.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+                            activeNoteRecord?.type === 'INCOME' ? "bg-black/10 text-black" : "bg-neutral-800 text-white"
                         )}>
                             {activeNoteRecord?.type === 'INCOME' ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                         </div>
@@ -2112,12 +2108,12 @@ const FinancialTableRow = memo(({
         <React.Fragment key={record.id}>
             <tr className={clsx(
                 "border-b border-app-stroke/30 transition-colors group",
-                isGroup ? "bg-blue-500/5 hover:bg-blue-500/10 cursor-pointer" : "hover:bg-app-bg/50 even:bg-app-bg/20"
+                isGroup ? "bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer" : "hover:bg-app-bg/50 even:bg-app-bg/20"
             )} onClick={() => isGroup ? toggleGroup(record.id) : undefined}>
                 <td className="w-1 px-5 py-4">
                     <div className={clsx(
                         "w-1 h-8 rounded-full transition-colors",
-                        record.type === 'INCOME' ? "bg-green-500" : "bg-red-500"
+                        record.type === 'INCOME' ? "bg-black" : "bg-neutral-800"
                     )} />
                 </td>
                 <td className="px-5 py-4 whitespace-nowrap">
@@ -2128,12 +2124,12 @@ const FinancialTableRow = memo(({
                             </span>
                         )}
                         {isOverdue(record.date, record.status) && !isGroup && (
-                            <AlertTriangle size={14} className="text-red-500" />
+                            <AlertTriangle size={14} className="text-neutral-500" />
                         )}
                         {(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) && isGroup && (
-                            <AlertTriangle size={14} className="text-red-500" />
+                            <AlertTriangle size={14} className="text-neutral-500" />
                         )}
-                        <span className={clsx("text-sm transition-colors", (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "text-red-500 font-medium" : "text-app-text-main group-hover:text-primary")}>
+                        <span className={clsx("text-sm transition-colors", (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "text-black font-black" : "text-app-text-main group-hover:text-black")}>
                             {getDateLabel(record.date)}
                         </span>
                     </div>
@@ -2143,7 +2139,7 @@ const FinancialTableRow = memo(({
                         {!isGroup && (
                             <div className={clsx(
                                 "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                                record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+                                record.type === 'INCOME' ? "bg-black/5 dark:bg-white/10 text-black dark:text-white" : "bg-neutral-800/10 text-neutral-800 dark:text-neutral-400"
                             )}>
                                 {record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                             </div>
@@ -2152,7 +2148,7 @@ const FinancialTableRow = memo(({
                             <p className="text-sm font-semibold text-app-text-main flex items-center gap-2 flex-wrap">
                         {record.description}
                         {isGroup && (
-                            <span className="px-2 py-0.5 text-[10px] bg-blue-500/10 text-blue-400 rounded-full font-medium shrink-0 flex items-center gap-1">
+                            <span className="px-2 py-0.5 text-[10px] bg-black/5 dark:bg-white/10 text-black dark:text-white rounded-full font-medium shrink-0 flex items-center gap-1">
                                 <Repeat size={10} />
                                 {record._children.length} parcelas
                             </span>
@@ -2161,11 +2157,11 @@ const FinancialTableRow = memo(({
                         {record.invoices && record.invoices.length > 0 && (
                             <div className="flex gap-1 items-center">
                                 {record.invoices[0].paymentMethod === 'PIX' ? (
-                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1">
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white border border-black/10 dark:border-white/20 flex items-center gap-1">
                                         <QrCode size={10} /> PIX
                                     </span>
                                 ) : (
-                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 flex items-center gap-1">
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white border border-black/10 dark:border-white/20 flex items-center gap-1">
                                         <FileText size={10} /> Boleto
                                     </span>
                                 )}
@@ -2180,7 +2176,7 @@ const FinancialTableRow = memo(({
                                 </a>
                             </div>
                         )}
-                        {!isGroup && record.isUrgent && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500/20 text-red-500 rounded-full shrink-0 animate-pulse">URGENTE</span>}
+                        {!isGroup && record.isUrgent && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-neutral-800 text-white rounded-full shrink-0 animate-pulse">URGENTE</span>}
                     </p>
                     {record.client && <p className="text-xs text-app-text-muted mt-0.5 max-w-[200px] truncate">Cli: {record.client.name}</p>}
                         </div>
@@ -2189,11 +2185,11 @@ const FinancialTableRow = memo(({
                 <td className="px-5 py-4 whitespace-nowrap"><span className="px-2.5 py-1 bg-app-bg/50 border border-app-stroke rounded-lg text-xs font-medium text-app-text-muted">{record.category}</span></td>
                 <td className="px-5 py-3 whitespace-nowrap text-center">
                     {isGroup ? (
-                        <span className="text-xs font-medium bg-blue-500/10 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/20 shadow-sm flex items-center gap-1 justify-center w-fit mx-auto">
+                        <span className="text-xs font-medium bg-black/5 dark:bg-white/10 text-black dark:text-white px-2.5 py-1 rounded-full border border-black/10 dark:border-white/20 shadow-sm flex items-center gap-1 justify-center w-fit mx-auto">
                             {record._paidCount}/{record._children.length} Pagos
                         </span>
                     ) : (record.isRecurring && record.totalInstallments && record.totalInstallments > 1) ? (
-                        <span className="text-xs font-medium bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-lg border border-blue-500/20 flex items-center gap-1 justify-center w-fit mx-auto">
+                        <span className="text-xs font-medium bg-black/5 dark:bg-white/10 text-black dark:text-white px-2 py-0.5 rounded-lg border border-black/10 dark:border-white/20 flex items-center gap-1 justify-center w-fit mx-auto">
                             <Repeat size={12} />
                             P. {record.currentInstallment || 1}/{record.totalInstallments}
                         </span>
@@ -2203,7 +2199,7 @@ const FinancialTableRow = memo(({
                 </td>
                 <td className="px-5 py-4 text-center">
                     {record.notes && !isGroup ? (
-                        <button onClick={(e) => { e.stopPropagation(); setActiveNoteRecord(record); }} className="p-1.5 text-primary bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors tooltip relative inline-flex" title="Anotação presente">
+                        <button onClick={(e) => { e.stopPropagation(); setActiveNoteRecord(record); }} className="p-1.5 text-black bg-black/5 hover:bg-black/10 rounded-lg transition-colors tooltip relative inline-flex" title="Anotação presente">
                             <MessageSquare size={14} />
                         </button>
                     ) : (
@@ -2214,17 +2210,17 @@ const FinancialTableRow = memo(({
                     <span className={clsx(
                         "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit shadow-sm",
                         record.status === 'PAID'
-                            ? "bg-green-500/10 text-green-500 border border-green-500/20"
+                            ? "bg-black/10 dark:bg-white/20 text-black dark:text-white border border-black/10 dark:border-white/20"
                             : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status))
-                                ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                                : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                                ? "bg-neutral-800 text-white border border-neutral-700"
+                                : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700"
                     )}>
                         {record.status === 'PAID' ? <CheckCircle2 size={12} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={12} /> : <Hourglass size={12} />}
                         {record.status === 'PAID' ? 'Pago' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
                     </span>
                 </td>
                 <td className="px-5 py-4 text-right whitespace-nowrap">
-                    <span className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-green-500" : "text-red-500")}>
+                    <span className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>
                         {record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}
                     </span>
                 </td>
@@ -2237,8 +2233,8 @@ const FinancialTableRow = memo(({
                                     className={clsx(
                                         "px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors shadow-sm",
                                         record.type === 'INCOME'
-                                            ? "bg-green-500/10 text-green-500 hover:bg-green-500/20 border border-green-500/20"
-                                            : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                                            ? "bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border border-black/10 dark:border-white/20"
+                                            : "bg-neutral-800 text-white hover:bg-neutral-900 border border-neutral-700"
                                     )}
                                 >
                                     {record.type === 'INCOME' ? 'Receber' : 'Pagar'}
@@ -2256,7 +2252,7 @@ const FinancialTableRow = memo(({
                                         }); 
                                         setIsInvoiceModalOpen(true); 
                                     }}
-                                    className="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20 text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center gap-1"
+                                    className="px-3 py-1.5 bg-black/5 dark:bg-white/10 text-black dark:text-white hover:bg-black/10 border border-black/10 dark:border-white/20 text-xs font-semibold rounded-lg transition-colors shadow-sm flex items-center gap-1"
                                     title="Gerar Cobrança Asaas (PIX/Boleto)"
                                 >
                                     <QrCode size={12} /> Cobrança
@@ -2296,14 +2292,14 @@ const FinancialTableRow = memo(({
             {/* Expanded Children Rows */}
             {isGroup && isExpanded && record._children.map((child: any) => (
                 <tr key={child.id} className="border-b border-app-stroke/30 bg-app-bg/50 hover:bg-app-bg transition-colors">
-                    <td className="w-1 px-5 py-3 border-l-4 border-l-blue-500/30"></td>
+                    <td className="w-1 px-5 py-3 border-l-4 border-l-black/10 dark:border-l-white/10"></td>
                     <td className="px-5 py-4 whitespace-nowrap"><div className="flex items-center gap-2 pl-4">{isOverdue(child.date, child.status) && <AlertTriangle size={12} className="text-red-500" />}<span className={clsx("text-xs", isOverdue(child.date, child.status) ? "text-red-500 font-medium" : "text-app-text-muted")}>{getDateLabel(child.date)}</span></div></td>
                     <td className="px-5 py-4"><p className="text-xs text-app-text-muted flex items-center gap-2">Parcela {child.currentInstallment || '?'}</p></td>
                     <td className="px-5 py-4"><span className="text-xs text-app-text-muted/50">-</span></td>
-                    <td className="px-5 py-4 text-center"><span className="text-[10px] font-medium bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">P. {child.currentInstallment || '?'}/{child.totalInstallments}</span></td>
+                    <td className="px-5 py-4 text-center"><span className="text-[10px] font-medium bg-black/5 dark:bg-white/10 text-black dark:text-white px-1.5 py-0.5 rounded border border-black/10 dark:border-white/20">P. {child.currentInstallment || '?'}/{child.totalInstallments}</span></td>
                     <td className="px-5 py-4 text-center"><span className="text-app-text-muted/30">-</span></td>
-                    <td className="px-5 py-4 whitespace-nowrap"><span className={clsx("px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 w-fit", child.status === 'PAID' ? "bg-green-500/10 text-green-500" : isOverdue(child.date, child.status) ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500")}>{child.status === 'PAID' ? <CheckCircle2 size={10} /> : isOverdue(child.date, child.status) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}{child.status === 'PAID' ? 'Pago' : isOverdue(child.date, child.status) ? 'Atraso' : 'Pendente'}</span></td>
-                    <td className="px-5 py-4 text-right whitespace-nowrap"><span className={clsx("text-xs", child.type === 'INCOME' ? "text-green-500/70" : "text-red-500/70")}>{child.type === 'INCOME' ? '+' : '-'}{formatBRL(child.amount)}</span></td>
+                    <td className="px-5 py-4 whitespace-nowrap"><span className={clsx("px-2 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 w-fit", child.status === 'PAID' ? "bg-black/10 dark:bg-white/20 text-black dark:text-white" : isOverdue(child.date, child.status) ? "bg-neutral-800 text-white" : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200")}>{child.status === 'PAID' ? <CheckCircle2 size={10} /> : isOverdue(child.date, child.status) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}{child.status === 'PAID' ? 'Pago' : isOverdue(child.date, child.status) ? 'Atraso' : 'Pendente'}</span></td>
+                    <td className="px-5 py-4 text-right whitespace-nowrap"><span className={clsx("text-xs", child.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>{child.type === 'INCOME' ? '+' : '-'}{formatBRL(child.amount)}</span></td>
                     <td className="px-5 py-4 text-right whitespace-nowrap"><div className="flex items-center justify-end gap-1">{child.status === 'PENDING' && <button onClick={() => handleEdit(child)} className={clsx("px-2 py-0.5 text-[10px] font-medium rounded", child.type === 'INCOME' ? "bg-green-500/10 text-green-400" : "bg-primary/10 text-primary")}>{child.type === 'INCOME' ? 'Receber' : 'Pagar'}</button>}{deleteConfirm === child.id ? (<div className="flex items-center gap-1"><button onClick={() => handleDelete(child.id)} className="px-2 py-0.5 bg-red-500 text-white text-[10px] rounded">Sim</button><button onClick={() => setDeleteConfirm(null)} className="px-2 py-0.5 bg-app-stroke text-app-text-muted text-[10px] rounded">Não</button></div>) : (<button onClick={() => setDeleteConfirm(child.id)} className="p-1 text-app-text-muted hover:text-red-500 rounded transition-colors"><Trash2 size={13} /></button>)}</div></td>
                 </tr>
             ))}
@@ -2320,29 +2316,29 @@ const FinancialMobileRow = memo(({
 
     return (
         <React.Fragment key={record.id}>
-            <div className={clsx("p-4 transition-colors touch-manipulation", isGroup ? "bg-blue-500/5 active:bg-blue-500/10 border-l-2 border-l-blue-500/40" : "hover:bg-app-stroke/10 active:bg-app-stroke/20")} onClick={() => isGroup ? toggleGroup(record.id) : undefined}>
+            <div className={clsx("p-4 transition-colors touch-manipulation", isGroup ? "bg-black/5 dark:bg-white/5 active:bg-black/10 dark:active:bg-white/10 border-l-2 border-l-black/20 dark:border-l-white/20" : "hover:bg-app-stroke/10 active:bg-app-stroke/20")} onClick={() => isGroup ? toggleGroup(record.id) : undefined}>
                 <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2 mt-0.5 shrink-0">
                         {isGroup && <span className="text-app-text-muted text-sm select-none">{isExpanded ? "▼" : "▶"}</span>}
-                        <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center", record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500")}>{record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}</div>
+                        <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center", record.type === 'INCOME' ? "bg-black/5 dark:bg-white/10 text-black dark:text-white" : "bg-neutral-800/10 text-neutral-800 dark:text-neutral-400")}>{record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}</div>
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <p className="text-sm font-semibold text-app-text-main truncate">{record.description}{isGroup && <span className="text-xs text-app-text-muted ml-1 flex items-center gap-0.5 inline-flex"><Repeat size={10} /> ({record._children.length} parc)</span>}</p>
-                            {record.notes && !isGroup && <button onClick={(e) => { e.stopPropagation(); setActiveNoteRecord(record); }} className="p-1 text-primary bg-primary/10 rounded-full shrink-0"><MessageSquare size={12} /></button>}
-                            {isGroup && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-blue-500/10 text-blue-400 rounded-full shrink-0">{record._paidCount}/{record._children.length}</span>}
-                            {record.isUrgent && !isGroup && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-red-500/20 text-red-400 rounded-full shrink-0">URGENTE</span>}
+                            {record.notes && !isGroup && <button onClick={(e) => { e.stopPropagation(); setActiveNoteRecord(record); }} className="p-1 text-black dark:text-white bg-black/5 dark:bg-white/10 rounded-full shrink-0"><MessageSquare size={12} /></button>}
+                            {isGroup && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-black/10 dark:bg-white/10 text-black dark:text-white rounded-full shrink-0">{record._paidCount}/{record._children.length}</span>}
+                            {record.isUrgent && !isGroup && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-neutral-800 text-white rounded-full shrink-0">URGENTE</span>}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-app-text-muted">
                             <span className={(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "text-red-500 font-medium" : ""}>{(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) && "⚠ "}{getDateLabel(record.date)}</span>
                             <span>•</span><span>{record.category}</span>
-                            {!isGroup && record.isRecurring && record.totalInstallments && record.totalInstallments > 1 && <><span>•</span><span className="text-blue-400">{record.currentInstallment || 1}/{record.totalInstallments}</span></>}
+                            {!isGroup && record.isRecurring && record.totalInstallments && record.totalInstallments > 1 && <><span>•</span><span className="text-black dark:text-white">{record.currentInstallment || 1}/{record.totalInstallments}</span></>}
                         </div>
                         {record.client && <p className="text-xs text-app-text-muted mt-1">Cliente: {record.client.name}</p>}
                     </div>
                     <div className="text-right shrink-0">
-                        <p className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-green-500" : "text-red-500")}>{record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}</p>
-                        <span className={clsx("inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full", record.status === 'PAID' ? "bg-green-500/10 text-green-500" : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500")}>
+                        <p className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>{record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}</p>
+                        <span className={clsx("inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full", record.status === 'PAID' ? "bg-black/10 dark:bg-white/20 text-black dark:text-white" : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "bg-neutral-800 text-white" : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200")}>
                             {record.status === 'PAID' ? <CheckCircle2 size={10} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}
                             {record.status === 'PAID' ? 'Pago' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
                         </span>
@@ -2350,7 +2346,7 @@ const FinancialMobileRow = memo(({
                 </div>
                 {!isGroup && record.status === 'PENDING' && (
                     <div className="flex gap-2 mt-2 pt-2 border-t border-app-stroke/50">
-                        <button onClick={(e) => { e.stopPropagation(); handleEdit(record); }} className={clsx("flex-1 py-2 text-xs font-medium rounded-lg transition-colors text-center", record.type === 'INCOME' ? "bg-green-500/10 text-green-500" : "bg-primary/10 text-primary")}>{record.type === 'INCOME' ? 'Marcar Recebido' : 'Marcar Pago'}</button>
+                        <button onClick={(e) => { e.stopPropagation(); handleEdit(record); }} className={clsx("flex-1 py-2 text-xs font-medium rounded-lg transition-colors text-center", record.type === 'INCOME' ? "bg-black dark:bg-white text-white dark:text-black" : "bg-neutral-800 text-white")}>{record.type === 'INCOME' ? 'Marcar Recebido' : 'Marcar Pago'}</button>
                         {record.type === 'INCOME' && record.clientId && (
                             <button 
                                 onClick={(e) => { 
@@ -2363,7 +2359,7 @@ const FinancialMobileRow = memo(({
                                     }); 
                                     setIsInvoiceModalOpen(true); 
                                 }}
-                                className="px-3 py-2 bg-emerald-500/10 text-emerald-500 rounded-lg flex items-center justify-center"
+                                className="px-3 py-2 bg-black/5 dark:bg-white/10 text-black dark:text-white rounded-lg flex items-center justify-center border border-black/10"
                             >
                                 <QrCode size={16} />
                             </button>
@@ -2387,14 +2383,14 @@ const FinancialMobileRow = memo(({
                                     {isOverdue(child.date, child.status) && <AlertTriangle size={10} className="text-red-500" />}
                                     <span className={clsx("text-xs", isOverdue(child.date, child.status) ? "text-red-500 font-medium" : "text-app-text-muted")}>{getDateLabel(child.date)}</span>
                                     <span className="text-[10px] text-app-text-muted">P. {child.currentInstallment || '?'}/{child.totalInstallments}</span>
-                                    <span className={clsx("px-1.5 py-0.5 text-[9px] font-medium rounded-full flex items-center gap-1", child.status === 'PAID' ? "bg-green-500/10 text-green-500" : isOverdue(child.date, child.status) ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500")}>
+                                    <span className={clsx("px-1.5 py-0.5 text-[9px] font-medium rounded-full flex items-center gap-1", child.status === 'PAID' ? "bg-black/10 text-black" : isOverdue(child.date, child.status) ? "bg-neutral-800 text-white" : "bg-neutral-400/10 text-neutral-500")}>
                                         {child.status === 'PAID' ? <CheckCircle2 size={10} /> : isOverdue(child.date, child.status) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}
                                         {child.status === 'PAID' ? 'Pago' : isOverdue(child.date, child.status) ? 'Atrasado' : 'Pend'}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className={clsx("text-xs font-semibold", child.type === 'INCOME' ? "text-green-500/80" : "text-red-500/80")}>{child.type === 'INCOME' ? '+' : '-'}{formatBRL(child.amount)}</span>
-                                    {child.status === 'PENDING' && <button onClick={(e) => { e.stopPropagation(); handleEdit(child); }} className={clsx("px-2 py-0.5 text-[10px] font-medium rounded", child.type === 'INCOME' ? "bg-green-500/10 text-green-400" : "bg-primary/10 text-primary")}>{child.type === 'INCOME' ? 'Receber' : 'Pagar'}</button>}
+                                    <span className={clsx("text-xs font-semibold", child.type === 'INCOME' ? "text-black" : "text-neutral-500")}>{child.type === 'INCOME' ? '+' : '-'}{formatBRL(child.amount)}</span>
+                                    {child.status === 'PENDING' && <button onClick={(e) => { e.stopPropagation(); handleEdit(child); }} className={clsx("px-2 py-0.5 text-[10px] font-medium rounded", child.type === 'INCOME' ? "bg-black/10 text-black" : "bg-neutral-800/10 text-neutral-800")}>{child.type === 'INCOME' ? 'Receber' : 'Pagar'}</button>}
                                 </div>
                             </div>
                         ))}

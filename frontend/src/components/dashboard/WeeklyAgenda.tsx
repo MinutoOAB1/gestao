@@ -43,15 +43,15 @@ export default function WeeklyAgenda({ events }: WeeklyAgendaProps) {
         <div className="bg-app-card rounded-2xl border border-app-stroke p-5 sm:p-6 transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.04)] h-full flex flex-col">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-2 cursor-pointer group w-fit" onClick={() => navigate('/app/agenda')}>
-                    <h2 className="text-lg font-bold text-app-text-main group-hover:text-primary transition-colors">Agenda da semana</h2>
-                    <ExternalLink size={16} className="text-primary opacity-70 group-hover:opacity-100" />
+                    <h2 className="text-lg font-black text-app-text-main group-hover:underline decoration-black dark:decoration-white transition-all uppercase tracking-widest">Agenda da semana</h2>
+                    <ExternalLink size={16} className="text-black dark:text-white opacity-70 group-hover:opacity-100" />
                 </div>
                 <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer group">
                         <div className="relative">
                             <input type="checkbox" className="sr-only" checked={hideOverdue} onChange={(e) => setHideOverdue(e.target.checked)} />
-                            <div className={cn("block w-9 h-5 rounded-full transition-colors", hideOverdue ? "bg-primary" : "bg-app-stroke group-hover:bg-app-stroke/80")}></div>
-                            <div className={cn("absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform shadow-sm", hideOverdue ? "translate-x-4" : "")}></div>
+                            <div className={cn("block w-9 h-5 rounded-full transition-colors border border-black/10 dark:border-white/10", hideOverdue ? "bg-black dark:bg-white" : "bg-app-stroke group-hover:bg-app-stroke/80")}></div>
+                            <div className={cn("absolute left-1 top-1 w-3 h-3 rounded-full transition-transform shadow-sm", hideOverdue ? "translate-x-4 bg-white dark:bg-black" : "bg-white dark:bg-slate-400")}></div>
                         </div>
                         <span className="text-xs text-app-text-muted font-medium">Ocultar atividades atrasadas</span>
                     </label>
@@ -73,13 +73,13 @@ export default function WeeklyAgenda({ events }: WeeklyAgendaProps) {
                                 "flex flex-col items-center justify-center min-w-[65px] h-[80px] rounded-[14px] border transition-all duration-200",
                                 active 
                                     ? "bg-black dark:bg-white border-black dark:border-white text-white dark:text-black shadow-lg shadow-black/20 scale-105" 
-                                    : "bg-transparent border-app-stroke/60 text-app-text-muted hover:border-primary/40 hover:bg-app-input"
+                                    : "bg-transparent border-app-stroke/60 text-app-text-muted hover:border-black/40 dark:hover:border-white/40 hover:bg-app-input"
                             )}
                         >
                             <span className={cn("text-[11px] font-semibold capitalize mb-1", active ? "text-white/90" : "text-app-text-label")}>
                                 {getDayName(date)}
                             </span>
-                            <span className={cn("text-xl font-extrabold", active ? "text-white" : "text-app-text-main")}>
+                            <span className={cn("text-xl font-extrabold", active ? "text-white dark:text-black" : "text-app-text-main")}>
                                 {date.getDate()}
                             </span>
                         </button>
