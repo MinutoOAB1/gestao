@@ -10,6 +10,8 @@ import {
   Clock, 
   AlertCircle, 
   XCircle,
+  X,
+  AlertTriangle,
   QrCode,
   FileText
 } from 'lucide-react';
@@ -110,7 +112,7 @@ export const InvoiceManagementTab: React.FC = () => {
       case 'PAID':
         return (
           <span className="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-            <CheckCircle size={10} /> Paga
+            <CheckCircle2 size={10} /> Paga
           </span>
         );
       case 'OVERDUE':
