@@ -101,28 +101,34 @@ export const InvoiceManagementTab: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'PENDING':
+        return (
+          <span className="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center gap-1">
+            <Clock size={10} /> Pendente
+          </span>
+        );
       case 'PAID':
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-black/10 text-black dark:text-white rounded-full text-[10px] font-black uppercase tracking-wider border border-black/20">
-            <CheckCircle2 size={12} /> Pago
+          <span className="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <CheckCircle size={10} /> Paga
           </span>
         );
       case 'OVERDUE':
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-neutral-800 text-white rounded-full text-[10px] font-black uppercase tracking-wider border border-black/20">
-            <AlertCircle size={12} /> Vencido
+          <span className="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center gap-1">
+            <AlertTriangle size={10} /> Vencida
           </span>
         );
       case 'CANCELLED':
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-neutral-400/10 text-neutral-500 rounded-full text-[10px] font-black uppercase tracking-wider border border-neutral-300">
-            <XCircle size={12} /> Cancelado
+          <span className="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-500/10 text-slate-600 dark:text-slate-400 flex items-center gap-1">
+            <X size={10} /> Cancelada
           </span>
         );
       default:
         return (
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-neutral-400/10 text-neutral-500 rounded-full text-[10px] font-black uppercase tracking-wider border border-neutral-300">
-            <Clock size={12} /> Pendente
+          <span className="px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center gap-1">
+            <Clock size={10} /> Pendente
           </span>
         );
     }

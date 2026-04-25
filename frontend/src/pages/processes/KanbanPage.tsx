@@ -76,13 +76,13 @@ interface Column {
 
 // Column visual styles – each column gets a distinct pastel background and accent
 const COLUMN_STYLES = [
-    { bg: 'bg-black/5 dark:bg-white/5', headerBg: 'bg-black/10 dark:bg-white/10', border: 'border-black/10 dark:border-white/10', accent: 'text-black dark:text-white', dot: 'bg-black dark:bg-white', badge: 'bg-black/10 text-black dark:bg-white/10 dark:text-white' },
-    { bg: 'bg-neutral-100 dark:bg-neutral-900/50', headerBg: 'bg-neutral-200 dark:bg-neutral-800', border: 'border-neutral-300 dark:border-neutral-700', accent: 'text-neutral-800 dark:text-neutral-200', dot: 'bg-neutral-600 dark:bg-neutral-400', badge: 'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-300' },
-    { bg: 'bg-stone-50 dark:bg-stone-950/30', headerBg: 'bg-stone-100/80 dark:bg-stone-900/40', border: 'border-stone-200/60 dark:border-stone-800/40', accent: 'text-stone-600 dark:text-stone-400', dot: 'bg-stone-500', badge: 'bg-stone-100 text-stone-700 dark:bg-stone-900/50 dark:text-stone-300' },
-    { bg: 'bg-zinc-50 dark:bg-zinc-950/30', headerBg: 'bg-zinc-100/80 dark:bg-zinc-900/40', border: 'border-zinc-200/60 dark:border-zinc-800/40', accent: 'text-zinc-600 dark:text-zinc-400', dot: 'bg-zinc-500', badge: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-300' },
-    { bg: 'bg-slate-50 dark:bg-slate-950/30', headerBg: 'bg-slate-100/80 dark:bg-slate-900/40', border: 'border-slate-200/60 dark:border-slate-800/40', accent: 'text-slate-600 dark:text-slate-400', dot: 'bg-slate-500', badge: 'bg-slate-100 text-slate-700 dark:bg-slate-900/50 dark:text-slate-300' },
-    { bg: 'bg-neutral-50 dark:bg-neutral-950/20', headerBg: 'bg-neutral-100 dark:bg-neutral-900/30', border: 'border-neutral-200 dark:border-neutral-800/40', accent: 'text-neutral-500 dark:text-neutral-400', dot: 'bg-neutral-400', badge: 'bg-neutral-100 text-neutral-600 dark:bg-neutral-900 dark:text-neutral-400' },
-    { bg: 'bg-white dark:bg-black/40', headerBg: 'bg-neutral-50 dark:bg-neutral-950', border: 'border-neutral-200 dark:border-neutral-800', accent: 'text-neutral-900 dark:text-neutral-100', dot: 'bg-neutral-900 dark:bg-neutral-100', badge: 'bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white' },
+    { bg: 'bg-green-50 dark:bg-green-950/20', headerBg: 'bg-green-100 dark:bg-green-900/30', border: 'border-green-200 dark:border-green-800/40', accent: 'text-green-600 dark:text-green-400', dot: 'bg-green-500', badge: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400' },
+    { bg: 'bg-blue-50 dark:bg-blue-950/20', headerBg: 'bg-blue-100 dark:bg-blue-900/30', border: 'border-blue-200 dark:border-blue-800/40', accent: 'text-blue-600 dark:text-blue-400', dot: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-400' },
+    { bg: 'bg-red-50 dark:bg-red-950/20', headerBg: 'bg-red-100 dark:bg-red-900/30', border: 'border-red-200 dark:border-red-800/40', accent: 'text-red-600 dark:text-red-400', dot: 'bg-red-500', badge: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-400' },
+    { bg: 'bg-amber-50 dark:bg-amber-950/20', headerBg: 'bg-amber-100 dark:bg-amber-900/30', border: 'border-amber-200 dark:border-amber-800/40', accent: 'text-amber-600 dark:text-amber-400', dot: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-400' },
+    { bg: 'bg-emerald-50 dark:bg-emerald-950/20', headerBg: 'bg-emerald-100 dark:bg-emerald-900/30', border: 'border-emerald-200 dark:border-emerald-800/40', accent: 'text-emerald-600 dark:text-emerald-400', dot: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-400' },
+    { bg: 'bg-indigo-50 dark:bg-indigo-950/20', headerBg: 'bg-indigo-100 dark:bg-indigo-900/30', border: 'border-indigo-200 dark:border-indigo-800/40', accent: 'text-indigo-600 dark:text-indigo-400', dot: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-400' },
+    { bg: 'bg-white dark:bg-slate-900', headerBg: 'bg-slate-50 dark:bg-slate-800', border: 'border-slate-200 dark:border-slate-700', accent: 'text-slate-600 dark:text-slate-400', dot: 'bg-slate-500', badge: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' },
 ];
 
 // Keep old COLUMN_COLORS for backward compat with localStorage
@@ -97,15 +97,15 @@ const DEFAULT_COLUMNS: Column[] = [
 ];
 
 const AREA_COLORS: Record<string, { bg: string; text: string }> = {
-    'Cível': { bg: 'bg-black/5 dark:bg-white/10', text: 'text-black dark:text-white' },
-    'Civil': { bg: 'bg-black/5 dark:bg-white/10', text: 'text-black dark:text-white' },
-    'Trabalhista': { bg: 'bg-neutral-800 text-white', text: 'text-white' },
-    'Penal': { bg: 'bg-neutral-600 text-white', text: 'text-white' },
-    'Criminal': { bg: 'bg-neutral-400 text-black', text: 'text-black' },
-    'Previdenciário': { bg: 'bg-stone-800 text-white', text: 'text-white' },
-    'Tributário': { bg: 'bg-zinc-700 text-white', text: 'text-white' },
-    'Família': { bg: 'bg-slate-800 text-white', text: 'text-white' },
-    'Contratual': { bg: 'bg-gray-800 text-white', text: 'text-white' },
+    'Cível': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400' },
+    'Civil': { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-400' },
+    'Trabalhista': { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-400' },
+    'Penal': { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400' },
+    'Criminal': { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400' },
+    'Previdenciário': { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-700 dark:text-teal-400' },
+    'Tributário': { bg: 'bg-gray-100 dark:bg-slate-700', text: 'text-gray-700 dark:text-gray-300' },
+    'Família': { bg: 'bg-pink-100 dark:bg-pink-900/30', text: 'text-pink-700 dark:text-pink-400' },
+    'Contratual': { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400' },
 };
 
 function formatDeadline(deadline?: string): { text: string; isUrgent: boolean; isTomorrow: boolean } {

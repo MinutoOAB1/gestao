@@ -15,11 +15,11 @@ interface ProcessNote {
 }
 
 const NOTE_COLORS = [
-    { key: 'yellow', bg: 'bg-white dark:bg-white/10', border: 'border-neutral-200 dark:border-white/20', ring: 'ring-black' },
-    { key: 'blue', bg: 'bg-neutral-50 dark:bg-neutral-800/50', border: 'border-neutral-200 dark:border-neutral-700', ring: 'ring-neutral-400' },
-    { key: 'green', bg: 'bg-neutral-100 dark:bg-neutral-800', border: 'border-neutral-300 dark:border-neutral-600', ring: 'ring-neutral-500' },
-    { key: 'pink', bg: 'bg-neutral-200 dark:bg-neutral-700', border: 'border-neutral-400 dark:border-neutral-500', ring: 'ring-neutral-600' },
-    { key: 'purple', bg: 'bg-black dark:bg-neutral-900', border: 'border-neutral-800 dark:border-white/10', ring: 'ring-neutral-900' },
+    { key: 'yellow', bg: 'bg-yellow-100 dark:bg-yellow-500/20', border: 'border-yellow-300 dark:border-yellow-500/50', ring: 'ring-yellow-400' },
+    { key: 'blue', bg: 'bg-blue-100 dark:bg-blue-500/20', border: 'border-blue-300 dark:border-blue-500/50', ring: 'ring-blue-400' },
+    { key: 'green', bg: 'bg-green-100 dark:bg-green-500/20', border: 'border-green-300 dark:border-green-500/50', ring: 'ring-green-400' },
+    { key: 'pink', bg: 'bg-pink-100 dark:bg-pink-500/20', border: 'border-pink-300 dark:border-pink-500/50', ring: 'ring-pink-400' },
+    { key: 'purple', bg: 'bg-purple-100 dark:bg-purple-500/20', border: 'border-purple-300 dark:border-purple-500/50', ring: 'ring-purple-400' },
 ];
 
 interface StickyNotesProps {
@@ -120,7 +120,7 @@ export default function StickyNotes({ processId }: StickyNotesProps) {
                 onClick={() => setExpanded(!expanded)}
             >
                 <h2 className="text-sm font-bold text-app-text-main flex items-center gap-2">
-                    <StickyNote size={16} className="text-black" />
+                    <StickyNote size={16} className="text-yellow-500" />
                     Anotações Rápidas
                     <span className="text-xs font-normal text-app-text-muted">
                         ({notes.length})
@@ -129,7 +129,7 @@ export default function StickyNotes({ processId }: StickyNotesProps) {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
-                        className="p-1.5 bg-black/5 text-black rounded-lg hover:bg-black/10 transition-colors"
+                        className="p-1.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 rounded-lg hover:bg-yellow-500/20 transition-colors"
                     >
                         <Plus size={16} />
                     </button>
@@ -150,7 +150,7 @@ export default function StickyNotes({ processId }: StickyNotesProps) {
                             <p className="text-sm">Nenhuma anotação.</p>
                             <button
                                 onClick={() => setShowModal(true)}
-                                className="mt-3 text-black font-bold text-sm hover:underline"
+                                className="mt-3 text-yellow-600 dark:text-yellow-400 text-sm font-medium hover:underline"
                             >
                                 + Adicionar primeira nota
                             </button>
@@ -175,7 +175,7 @@ export default function StickyNotes({ processId }: StickyNotesProps) {
                                                 onClick={() => handleTogglePin(note)}
                                                 className={clsx(
                                                     "p-1 rounded transition-colors",
-                                                    note.isPinned ? "text-black bg-white/50" : "text-gray-500 hover:text-black"
+                                                    note.isPinned ? "text-amber-600 bg-white/50" : "text-gray-500 hover:text-amber-600"
                                                 )}
                                                 title={note.isPinned ? "Desafixar" : "Fixar"}
                                             >
@@ -222,7 +222,7 @@ export default function StickyNotes({ processId }: StickyNotesProps) {
                         <button
                             onClick={handleCreate}
                             disabled={saving}
-                            className="px-4 py-2 rounded-lg text-sm font-bold bg-black text-white hover:opacity-90 transition-colors disabled:opacity-50"
+                            className="px-4 py-2 rounded-lg text-sm font-medium bg-yellow-500 text-white hover:bg-yellow-600 transition-colors disabled:opacity-50"
                         >
                             {saving ? 'Salvando...' : 'Salvar'}
                         </button>

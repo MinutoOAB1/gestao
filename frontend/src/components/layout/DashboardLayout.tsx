@@ -30,16 +30,16 @@ const SidebarItem = memo(({ icon: Icon, label, path, collapsed }: { icon: any, l
                 className={cn(
                 "group flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden touch-manipulation no-tap-highlight",
                 active
-                    ? "bg-black/5 dark:bg-black/10 text-black shadow-sm"
-                    : "text-black/50 hover:bg-black/5 hover:text-black active:bg-black/10"
+                    ? "bg-white/15 text-white shadow-lg shadow-white/5"
+                    : "text-white/60 hover:bg-white/8 hover:text-white active:bg-white/15"
             )}>
                 {/* Active indicator bar */}
-                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-black rounded-r-full shadow-md shadow-black/50" />}
-                <div className={cn("p-1 rounded-lg transition-all duration-200", active ? "bg-black/5" : "group-hover:bg-black/5")}>
-                    <Icon size={18} className={cn("transition-all duration-200", active ? "text-black scale-110" : "text-black/60")} />
+                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full shadow-md shadow-primary/50" />}
+                <div className={cn("p-1 rounded-lg transition-all duration-200", active ? "bg-white/10" : "group-hover:bg-white/5")}>
+                    <Icon size={18} className={cn("transition-all duration-200", active ? "text-primary scale-110" : "text-white/60")} />
                 </div>
                 {!collapsed && (
-                    <span className={cn("font-black text-[11px] uppercase tracking-widest", active ? "text-black" : "text-black/60")}>
+                    <span className={cn("font-medium text-[13px] tracking-wide", active ? "text-white" : "text-white/60")}>
                         {label}
                     </span>
                 )}
@@ -107,7 +107,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
             <div
                 className={cn(
                     "group flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer transition-fast relative",
-                    active ? "bg-black/5 text-black border border-black/5" : "text-black/60 hover:bg-black/5 hover:text-black"
+                    active ? "bg-white/15 text-white border border-white/10" : "text-white/60 hover:bg-white/5 hover:text-white"
                 )}
             >
                 {/* Click on icon + text navigates to page */}
@@ -115,8 +115,8 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                     className="flex items-center gap-3 flex-1"
                     onClick={() => navigate('/app/analise-ia')}
                 >
-                    <Shield size={20} className={cn("transition-fast", active ? "text-black scale-110" : "text-black/60")} />
-                    <span className="font-black text-[11px] uppercase tracking-widest">IA Análise</span>
+                    <Shield size={20} className={cn("transition-fast", active ? "text-white scale-110" : "text-white/60")} />
+                    <span className="font-medium text-[13px] tracking-wide">IA Análise</span>
                 </div>
                 {/* Arrow only toggles dropdown */}
                 <button
@@ -152,15 +152,15 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                                             key={doc.id}
                                             onClick={() => handleLoadDocument(doc)}
                                             className={cn(
-                                                "flex items-center gap-2 px-4 py-2 ml-6 text-xs cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/10 rounded-lg",
-                                                idx === 0 ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
+                                                "flex items-center gap-2 px-4 py-2 ml-6 text-xs cursor-pointer transition-all hover:bg-primary/10 rounded-lg",
+                                                idx === 0 ? "text-primary font-bold" : "text-slate-600 dark:text-slate-400"
                                             )}
                                             style={{ opacity: 1 - (idx * 0.15) }}
                                         >
                                             <History size={10} />
                                             <div className="flex-1 truncate">
                                                 <p className="truncate font-medium">{doc.label}</p>
-                                                <p className="text-[9px] text-black/40 dark:text-white/40">
+                                                <p className="text-[9px] opacity-70">
                                                     {doc.timestamp.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })} • {doc.score}%
                                                 </p>
                                             </div>
@@ -189,8 +189,8 @@ const BottomNavItem = memo(({ icon: Icon, label, path, isMain = false, onClick }
     if (onClick) {
         return (
             <button onClick={onClick} className="flex-1 flex flex-col items-center justify-center py-2 gap-1 text-xs font-medium touch-manipulation no-tap-highlight active:scale-95 transition-fast">
-                <Icon size={22} className="text-app-text-muted" />
-                <span className="text-app-text-muted">{label}</span>
+                <Icon size={22} className={active ? "text-primary" : "text-app-text-muted"} />
+                <span className={active ? "text-primary font-bold" : "text-app-text-muted"}>{label}</span>
             </button>
         )
     }
@@ -208,10 +208,10 @@ const BottomNavItem = memo(({ icon: Icon, label, path, isMain = false, onClick }
     return (
         <PrefetchLink to={path} className={cn(
             "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[9px] touch-manipulation no-tap-highlight active:scale-95 transition-fast",
-            active && "bg-black/5 rounded-xl"
+            active && "bg-primary/5 rounded-xl"
         )}>
-            <Icon size={22} fill={active ? "black" : "none"} className={cn("transition-fast", active ? "text-black" : "text-black/40")} />
-            <span className={cn("transition-fast font-black uppercase tracking-widest", active ? "text-black" : "text-black/40")}>{label}</span>
+            <Icon size={22} className={cn("transition-fast", active ? "text-primary" : "text-slate-400")} />
+            <span className={cn("transition-fast font-black uppercase tracking-widest", active ? "text-primary" : "text-slate-400")}>{label}</span>
         </PrefetchLink>
     )
 });
@@ -280,19 +280,19 @@ export default function DashboardLayout() {
             <aside
                 className={cn(
                     "hidden md:flex flex-col z-20 transition-all duration-300 flex-shrink-0",
-                    "bg-glass border-r border-white/10",
+                    "bg-gradient-to-b from-[#0F172A] to-[#1E3A8A] border-r border-white/5",
                     collapsed ? "w-20" : "w-72"
                 )}
             >
                 <div className="p-5 flex items-center justify-between">
                     {!collapsed && (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            <BrandLogo variant="dark" />
+                            <BrandLogo variant="light" />
                         </motion.div>
                     )}
                     <button
                         onClick={() => setCollapsed(!collapsed)}
-                        className="p-1.5 rounded-lg text-black/40 hover:text-black hover:bg-black/5 transition-all"
+                        className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-all"
                     >
                         <Menu size={18} />
                     </button>
@@ -301,7 +301,7 @@ export default function DashboardLayout() {
                 {/* User Profile Card */}
                 <div className={cn("mx-3 mb-4 p-3 rounded-xl bg-white/[0.06] border border-white/[0.08]", collapsed && "mx-2 p-2")}>
                     <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-                        <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-lg">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-lg shadow-primary/20">
                             {user?.avatar ? (
                                 <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -310,8 +310,8 @@ export default function DashboardLayout() {
                         </div>
                         {!collapsed && (
                             <div className="min-w-0 flex-1">
-                                <p className="text-[13px] font-black text-black truncate font-display uppercase tracking-wider">{user?.name || 'Usuário'}</p>
-                                <p className="text-[9px] text-black/40 truncate uppercase tracking-widest font-black">
+                                <p className="text-[13px] font-semibold text-white truncate">{user?.name || 'Usuário'}</p>
+                                <p className="text-[10px] text-white/50 truncate uppercase tracking-wider font-medium">
                                     {user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'LAWYER' ? 'Advogado(a)' : user?.role === 'INTERN' ? 'Estagiário(a)' : 'Parceiro(a)'}
                                 </p>
                             </div>
@@ -321,7 +321,7 @@ export default function DashboardLayout() {
 
                 <div className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
                     {/* Módulos Principais */}
-                    <p className={cn("px-4 text-[9px] font-black text-black/30 uppercase tracking-widest mb-2", collapsed && "hidden")}>Principal</p>
+                    <p className={cn("px-4 text-[9px] font-black text-white/30 uppercase tracking-widest mb-2", collapsed && "hidden")}>Principal</p>
                     <SidebarItem icon={Home} label="Início" path="/app" collapsed={collapsed} />
                     {/* Processos - expandable with Lista and Kanban */}
                     <div>
@@ -329,8 +329,8 @@ export default function DashboardLayout() {
                             className={cn(
                                 "group flex items-center gap-3 px-3 py-3 mx-2 rounded-xl cursor-pointer transition-fast relative overflow-hidden",
                                 location.pathname.startsWith('/app/processos')
-                                    ? "bg-black/5 text-black border border-black/5 shadow-sm"
-                                    : "text-black/60 hover:bg-black/5 hover:text-black"
+                                    ? "bg-white/15 text-white border border-white/10 shadow-sm"
+                                    : "text-white/60 hover:bg-white/5 hover:text-white"
                             )}
                         >
                             <div className="flex items-center gap-3 flex-1" onClick={() => navigate('/app/processos')}>
@@ -340,7 +340,7 @@ export default function DashboardLayout() {
                             {!collapsed && (
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setProcessExpanded(!processExpanded); }}
-                                    className="p-1 hover:bg-black/10 rounded transition-colors text-black/40"
+                                    className="p-1 hover:bg-white/10 rounded transition-colors text-white/40"
                                 >
                                     <ChevronDown size={14} className={cn("transition-transform", processExpanded && "rotate-180")} />
                                 </button>
@@ -355,12 +355,12 @@ export default function DashboardLayout() {
                                     className="overflow-hidden"
                                 >
                                     <Link to="/app/processos">
-                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest transition-colors rounded-lg", location.pathname === '/app/processos' ? 'text-black bg-black/5' : 'text-black/40 hover:text-black hover:bg-black/5')}>
+                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest transition-colors rounded-lg", location.pathname === '/app/processos' ? 'text-white bg-white/10' : 'text-white/40 hover:text-white hover:bg-white/5')}>
                                             <FileText size={12} /> Lista
                                         </div>
                                     </Link>
                                     <Link to="/app/processos/kanban">
-                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest transition-colors rounded-lg", location.pathname === '/app/processos/kanban' ? 'text-black bg-black/5' : 'text-black/40 hover:text-black hover:bg-black/5')}>
+                                        <div className={cn("flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest transition-colors rounded-lg", location.pathname === '/app/processos/kanban' ? 'text-white bg-white/10' : 'text-white/40 hover:text-white hover:bg-white/5')}>
                                             <ClipboardList size={12} /> Kanban
                                         </div>
                                     </Link>
@@ -428,37 +428,37 @@ export default function DashboardLayout() {
                     <div className={cn("flex items-center gap-1", collapsed ? "justify-center" : "justify-end px-2")}>
                         <button
                             onClick={toggleTheme}
-                            className="text-black/40 hover:text-black p-2 rounded-lg hover:bg-black/5 transition-all"
+                            className="text-white/40 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all"
                             title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
                         >
                             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                         </button>
-                        <button onClick={logout} className="text-black/40 hover:text-red-500 p-2 rounded-lg hover:bg-black/5 transition-all" title="Sair do Sistema">
+                        <button onClick={logout} className="text-white/40 hover:text-red-400 p-2 rounded-lg hover:bg-white/10 transition-all" title="Sair do Sistema">
                             <LogOut size={16} />
                         </button>
                     </div>
                 </div>
             </aside>
 
-            {/* Right Side - Header + Main Content - Black background so curved corner shows black */}
-            <div className="flex-1 flex flex-col h-full bg-black relative overflow-hidden">
+            {/* Right Side - Header + Main Content - Dark background so curved corner shows dark */}
+            <div className="flex-1 flex flex-col h-full bg-[#0F172A] relative overflow-hidden">
                 {/* Desktop Header - Glass effect */}
                 {!isFullScreenPage && (
-                    <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-glass border-b border-white/5">
+                    <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-app-card border-b border-app-stroke">
                         {/* Search Bar - Replaced with Global Search Trigger to enforce ecosystem approach */}
                         <div className="flex-1 max-w-2xl relative">
                             <button
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-black/5 hover:bg-black/10 border border-black/5 rounded-xl text-black/50 hover:text-black transition-all text-xs font-black uppercase tracking-widest"
+                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-app-input hover:bg-app-input/80 border border-app-stroke rounded-xl text-app-text-muted hover:text-app-text-main transition-all text-xs font-medium"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Search size={18} className="text-black/40 group-hover:text-black transition-colors" />
-                                    <span>Buscar...</span>
+                                    <Search size={18} className="text-app-text-label group-hover:text-app-text-main transition-colors" />
+                                    <span>Buscar no sistema...</span>
                                 </div>
                                 <div className="flex items-center gap-1 opacity-40">
-                                    <kbd className="px-2 py-1 bg-black/10 rounded-md text-[9px] font-black tracking-widest uppercase border border-black/10 shadow-sm">Ctrl</kbd>
+                                    <kbd className="px-2 py-1 bg-app-bg rounded-md text-[9px] font-mono border border-app-stroke shadow-sm">Ctrl</kbd>
                                     <span className="text-xs">+</span>
-                                    <kbd className="px-2 py-1 bg-black/10 rounded-md text-[9px] font-black tracking-widest uppercase border border-black/10 shadow-sm">K</kbd>
+                                    <kbd className="px-2 py-1 bg-app-bg rounded-md text-[9px] font-mono border border-app-stroke shadow-sm">K</kbd>
                                 </div>
                             </button>
                         </div>
@@ -573,7 +573,7 @@ export default function DashboardLayout() {
                         )}>
                             {!isFullScreenPage && pathSegments.length > 0 && (
                                 <div className="flex items-center gap-2 mb-6 text-sm">
-                                    <Link to="/app" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">Dashboard</Link>
+                                    <Link to="/app" className="text-primary hover:text-primary/80 transition-colors">Dashboard</Link>
                                     {pathSegments.map((segment, idx) => (
                                         <div key={idx} className="flex items-center gap-2">
                                             <ChevronRight size={14} className="text-slate-400" />
@@ -596,7 +596,7 @@ export default function DashboardLayout() {
                                 >
                                     <Suspense fallback={
                                         <div className="flex items-center justify-center h-full min-h-[200px]">
-                                            <div className="w-8 h-8 border-3 border-black dark:border-white border-t-transparent rounded-full animate-spin" />
+                                            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
                                         </div>
                                     }>
                                         <Outlet context={{ collapsed }} />
@@ -647,22 +647,22 @@ export default function DashboardLayout() {
                                         key={item.path}
                                         to={item.path}
                                         onClick={() => setIsMobileDrawerOpen(false)}
-                                        className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-black/5 transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                        className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary/5 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-black/5 flex items-center justify-center">
-                                            <item.icon size={20} className="text-black" />
+                                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                            <item.icon size={20} className="text-primary" />
                                         </div>
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-black/60 text-center leading-tight">{item.label}</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 text-center leading-tight">{item.label}</span>
                                     </Link>
                                 ))}
                                 {/* IA Análise in drawer */}
                                 <Link
                                     to="/app/analise-ia"
                                     onClick={() => setIsMobileDrawerOpen(false)}
-                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary/5 dark:hover:bg-white/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                                        <Shield size={20} className="text-black dark:text-white" />
+                                    <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-white/10 flex items-center justify-center">
+                                        <Shield size={20} className="text-primary dark:text-white" />
                                     </div>
                                     <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">IA Análise</span>
                                 </Link>
@@ -670,12 +670,12 @@ export default function DashboardLayout() {
                                 <Link
                                     to="/app/configuracoes"
                                     onClick={() => setIsMobileDrawerOpen(false)}
-                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-black/5 transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary/5 transition-colors touch-manipulation no-tap-highlight active:scale-95"
                                 >
-                                    <div className="w-10 h-10 rounded-lg bg-black/5 flex items-center justify-center">
-                                        <Settings size={20} className="text-black" />
+                                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                        <Settings size={20} className="text-primary" />
                                     </div>
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-black/60 text-center leading-tight">Ajustes</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 text-center leading-tight">Ajustes</span>
                                 </Link>
                                 {/* Logout */}
                                 <button

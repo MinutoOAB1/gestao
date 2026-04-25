@@ -16,13 +16,13 @@ interface ProcessUpdate {
 }
 
 const UPDATE_TYPES = [
-    { key: 'MOVIMENTO', label: 'Movimento', icon: FileText, color: 'text-neutral-500' },
-    { key: 'DECISAO', label: 'Decisão', icon: Gavel, color: 'text-black' },
-    { key: 'SENTENCA', label: 'Sentença', icon: Scale, color: 'text-black font-black' },
-    { key: 'DESPACHO', label: 'Despacho', icon: FileText, color: 'text-neutral-700' },
-    { key: 'AUDIENCIA', label: 'Audiência', icon: Calendar, color: 'text-neutral-800' },
-    { key: 'PRAZO', label: 'Prazo', icon: AlertTriangle, color: 'text-black' },
-    { key: 'OUTRO', label: 'Outro', icon: Clock, color: 'text-neutral-400' },
+    { key: 'MOVIMENTO', label: 'Movimento', icon: FileText, color: 'text-slate-500' },
+    { key: 'DECISAO', label: 'Decisão', icon: Gavel, color: 'text-indigo-600' },
+    { key: 'SENTENCA', label: 'Sentença', icon: Scale, color: 'text-emerald-600' },
+    { key: 'AUDIENCIA', label: 'Audiência', icon: Calendar, color: 'text-rose-600' },
+    { key: 'PETICAO', label: 'Petição', icon: FileText, color: 'text-blue-600' },
+    { key: 'PUBLICACAO', label: 'Publicação', icon: AlertTriangle, color: 'text-amber-600' },
+    { key: 'OUTRO', label: 'Outro', icon: Clock, color: 'text-slate-400' },
 ];
 
 interface ProcessTimelineProps {
@@ -102,7 +102,7 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
                 onClick={() => setExpanded(!expanded)}
             >
                 <h2 className="text-sm font-bold text-app-text-main flex items-center gap-2">
-                    <Clock size={16} className="text-black" />
+                    <Clock size={16} className="text-primary" />
                     Cronologia do Processo
                     <span className="text-xs font-normal text-app-text-muted">
                         ({updates.length} {updates.length === 1 ? 'andamento' : 'andamentos'})
@@ -111,7 +111,7 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
-                        className="p-1.5 bg-black/5 text-black rounded-lg hover:bg-black/10 transition-colors"
+                        className="p-1.5 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                     >
                         <Plus size={16} />
                     </button>
@@ -132,7 +132,7 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
                             <p className="text-sm">Nenhum andamento registrado.</p>
                             <button
                                 onClick={() => setShowModal(true)}
-                                className="mt-3 text-black font-bold text-sm hover:underline"
+                                className="mt-3 text-primary font-bold text-sm hover:underline"
                             >
                                 + Adicionar primeiro andamento
                             </button>
@@ -169,8 +169,8 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
                                             )}>
                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                     <span className={clsx(
-                                                        "text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded",
-                                                        update.isImportant ? "bg-black text-white" : "bg-app-stroke/50 text-app-text-muted"
+                                                        "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded",
+                                                        update.isImportant ? "bg-primary text-white" : "bg-app-stroke/50 text-app-text-muted"
                                                     )}>
                                                         {typeInfo.label}
                                                     </span>
@@ -216,7 +216,7 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
                         <button
                             onClick={handleCreate}
                             disabled={saving}
-                            className="px-4 py-2 rounded-lg text-sm font-bold bg-black text-white hover:opacity-90 transition-colors disabled:opacity-50"
+                            className="px-4 py-2 rounded-lg text-sm font-bold bg-primary text-white hover:opacity-90 transition-colors disabled:opacity-50"
                         >
                             {saving ? 'Salvando...' : 'Salvar'}
                         </button>

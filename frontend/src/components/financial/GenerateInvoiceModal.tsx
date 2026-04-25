@@ -168,52 +168,49 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                       />
                     </div>
                   </div>
+                        className="w-full bg-app-bg border border-app-stroke rounded-xl py-3 pl-10 pr-4 text-sm font-bold text-app-text-main outline-none focus:ring-2 ring-blue-500/20 transition-all"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Payment Method */}
                 <div className="space-y-3">
                   <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Método de Pagamento</label>
                   <div className="grid grid-cols-2 gap-3">
-                      <button 
-                      onClick={() => setFormData({...formData, billingType: 'PIX'})}
-                      className={clsx(
-                        "flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
-                        formData.billingType === 'PIX' 
-                          ? "bg-black text-white border-black shadow-lg shadow-black/20" 
-                          : "bg-app-bg border-app-stroke text-app-text-muted"
+                    <button
+                      onClick={() => setPaymentMethod('PIX')}
+                      className={cn(
+                        "flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all",
+                        paymentMethod === 'PIX' ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-md" : "border-app-stroke hover:border-blue-300"
                       )}
                     >
-                      <QrCode size={20} />
-                      <div>
-                        <p className="text-xs font-black uppercase">PIX</p>
-                        <p className="text-[8px] opacity-70">Instantâneo</p>
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl flex items-center justify-center">
+                        <QrCode size={24} />
                       </div>
+                      <span className="text-xs font-bold text-app-text-main uppercase">PIX</span>
                     </button>
-                    <button 
-                      onClick={() => setFormData({...formData, billingType: 'BOLETO'})}
-                      className={clsx(
-                        "flex items-center gap-3 p-4 rounded-2xl border transition-all text-left",
-                        formData.billingType === 'BOLETO' 
-                          ? "bg-black text-white border-black shadow-lg shadow-black/20" 
-                          : "bg-app-bg border-app-stroke text-app-text-muted"
+
+                    <button
+                      onClick={() => setPaymentMethod('BOLETO')}
+                      className={cn(
+                        "flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all",
+                        paymentMethod === 'BOLETO' ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-md" : "border-app-stroke hover:border-blue-300"
                       )}
                     >
-                      <FileText size={20} />
-                      <div>
-                        <p className="text-xs font-black uppercase">Boleto</p>
-                        <p className="text-[8px] opacity-70">Até 3 dias úteis</p>
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl flex items-center justify-center">
+                        <Barcode size={24} />
                       </div>
+                      <span className="text-xs font-bold text-app-text-main uppercase">Boleto</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Description */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1">Descrição</label>
                   <textarea 
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full bg-app-bg border border-app-stroke rounded-xl p-4 text-xs font-medium text-app-text-main outline-none focus:ring-2 ring-black/20 transition-all resize-none h-20"
+                    className="w-full bg-app-bg border border-app-stroke rounded-xl p-4 text-xs font-medium text-app-text-main outline-none focus:ring-2 ring-blue-500/20 transition-all resize-none h-20"
                     placeholder="Ex: Honorários Advocatícios - Processo X..."
                   />
                 </div>
@@ -228,7 +225,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
                 <button
                   onClick={handleGenerate}
                   disabled={loading}
-                  className="w-full py-4 bg-black hover:opacity-90 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-black/20 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
                 >
                   {loading ? <Loader2 className="animate-spin" size={18} /> : 'Gerar Cobrança Agora'}
                 </button>
@@ -236,7 +233,7 @@ export const GenerateInvoiceModal: React.FC<Props> = ({
             </>
           ) : (
             <div className="text-center py-4">
-              <div className="w-20 h-20 bg-black/10 rounded-full flex items-center justify-center text-black dark:text-white mx-auto mb-6">
+              <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 size={48} />
               </div>
               <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase">Sucesso!</h2>

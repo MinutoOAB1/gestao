@@ -302,12 +302,12 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
     // Determine Area Color
     const getAreaColor = (areaStr: string) => {
         const area = areaStr || 'Cível';
-        if (area.toLowerCase().includes('cível')) return 'bg-black text-white dark:bg-white dark:text-black border-black/10 dark:border-white/10';
-        if (area.toLowerCase().includes('trabalho') || area.toLowerCase().includes('trabalh')) return 'bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black border-black/10 dark:border-white/10';
-        if (area.toLowerCase().includes('família')) return 'bg-neutral-400 text-white dark:bg-neutral-600 dark:text-white border-neutral-300 dark:border-neutral-700';
-        if (area.toLowerCase().includes('criminal') || area.toLowerCase().includes('penal')) return 'bg-black text-white dark:bg-white dark:text-black border-black dark:border-white ring-1 ring-black dark:ring-white';
-        if (area.toLowerCase().includes('tribut')) return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700';
-        return 'bg-neutral-200 text-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 border-neutral-300 dark:border-neutral-800';
+        if (area.toLowerCase().includes('cível')) return 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/30';
+        if (area.toLowerCase().includes('trabalho') || area.toLowerCase().includes('trabalh')) return 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-100 dark:border-blue-800/30';
+        if (area.toLowerCase().includes('família')) return 'bg-pink-50 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400 border-pink-100 dark:border-pink-800/30';
+        if (area.toLowerCase().includes('criminal') || area.toLowerCase().includes('penal')) return 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 border-orange-100 dark:border-orange-800/30';
+        if (area.toLowerCase().includes('tribut')) return 'bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400 border-cyan-100 dark:border-cyan-800/30';
+        return 'bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border-gray-100 dark:border-gray-700';
     };
 
     // Determine Urgency

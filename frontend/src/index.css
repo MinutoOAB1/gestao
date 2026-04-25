@@ -2,42 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Dark theme (default) - Deep Glossy Black & Glass */
+/* Dark theme (default) - Refined "LegalDesk" Palette */
 :root {
-  --app-bg: #000000;
-  /* Pure glossy black */
-  --app-card: #0D0D0D;
-  /* Slightly elevated deep black */
-  --app-input: #141414;
+  --app-bg: #090E17;
+  /* Deeper, more formal dark background (Midnight) */
+  --app-card: #131B2B;
+  /* Oxford Blue tint for cards */
+  --app-input: #1C263A;
   /* Input background */
-  --app-stroke: #1F1F1F;
-  /* Minimalist dark borders */
-  --app-text-main: #FFFFFF;
-  /* Pure white for text */
-  --app-text-muted: #888888;
-  /* Medium gray */
-  --app-text-label: #555555;
-  /* Dark gray labels */
+  --app-stroke: #2A364E;
+  /* Border/Divider color */
+  --app-text-main: #F8FAFC;
+  /* Crisp white for better contrast */
+  --app-text-muted: #94A3B8;
+  /* Slate-400 */
+  --app-text-label: #64748B;
+  /* Slate-500 */
   --glass-white: rgba(255, 255, 255, 0.15);
   --glass-stroke: rgba(255, 255, 255, 0.20);
 }
 
-/* Light theme - Pure Gallery & Glass */
+/* Light theme - Improved contrast "Document" style */
 :root.light {
-  --app-bg: #FFFFFF;
-  /* Pure white gallery feel */
-  --app-card: #F8F8F8;
-  /* Subtle off-white for cards */
-  --app-input: #F2F2F2;
-  /* Distinct input background */
-  --app-stroke: #EAEAEA;
-  /* Soft borders */
-  --app-text-main: #000000;
-  /* Pure black for text */
-  --app-text-muted: #666666;
-  /* Muted charcoal */
-  --app-text-label: #999999;
-  /* Neutral gray */
+  --app-bg: #F4F7FA;
+  /* Very subtle cool gray (Paper feeling) */
+  --app-card: #FFFFFF;
+  /* Pure white cards */
+  --app-input: #FFFFFF;
+  /* Inputs same as card but with distinct border */
+  --app-stroke: #D1D5DB;
+  /* Gray-300 borders */
+  --app-text-main: #111827;
+  /* Near-black for crisp readability */
+  --app-text-muted: #4B5563;
+  /* Gray-600 */
+  --app-text-label: #6B7280;
+  /* Gray-500 */
   --glass-white: rgba(255, 255, 255, 0.85);
   --glass-stroke: rgba(255, 255, 255, 0.5);
 }

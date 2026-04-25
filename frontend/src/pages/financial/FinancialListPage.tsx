@@ -113,7 +113,13 @@ const INCOME_CATEGORIES = ['Honorários Contratuais', 'Honorários Sucumbenciais
 const EXPENSE_CATEGORY_LIST = ['Pessoal / Salários', 'Custas Processuais', 'Infraestrutura / Aluguel', 'Marketing / Softwares', 'Impostos', 'Token / Assinatura Digital', 'Viagens / Deslocamento', 'Outros'];
 const PARTNER_TYPES = ['TRABALHISTA', 'CÍVEL', 'TRIBUTÁRIO', 'CRIMINAL', 'PREVIDENCIÁRIO', 'FAMÍLIA', 'MARKETING', 'ADMINISTRATIVO', 'OUTROS'];
 const PARTNER_COLORS = [
-    'bg-black', 'bg-neutral-800', 'bg-neutral-700', 'bg-neutral-600', 'bg-neutral-500', 'bg-neutral-400', 'bg-neutral-300'
+    '#3B82F6', // Blue
+    '#10B981', // Emerald
+    '#F59E0B', // Amber
+    '#EF4444', // Red
+    '#8B5CF6', // Violet
+    '#EC4899', // Pink
+    '#06B6D4', // Cyan
 ];
 
 export default function FinancialListPage() {
@@ -950,21 +956,21 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        (stats?.balance || 0) >= 0 ? "bg-gradient-to-br from-black/5 to-app-card border-black/20 shadow-lg shadow-black/5" : "bg-gradient-to-br from-neutral-800/10 to-app-card border-neutral-800/30 shadow-lg shadow-black/5"
+                        (stats?.balance || 0) >= 0 ? "bg-gradient-to-br from-emerald-500/10 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-gradient-to-br from-rose-500/10 to-app-card border-rose-500/20 shadow-lg shadow-rose-500/5"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
                     <div className={clsx(
                         "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
-                        (stats?.balance || 0) >= 0 ? "bg-black/10" : "bg-neutral-800/10"
+                        (stats?.balance || 0) >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
                     )} />
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-app-text-muted text-xs">Saldo Atual</p>
                         <div className={clsx(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            (stats?.balance || 0) >= 0 ? "bg-black dark:bg-white" : "bg-neutral-800 dark:bg-neutral-600"
+                            (stats?.balance || 0) >= 0 ? "bg-emerald-500" : "bg-rose-500"
                         )}>
-                            <Building size={16} className={(stats?.balance || 0) >= 0 ? "text-white dark:text-black" : "text-white"} />
+                            <Building size={16} className="text-white" />
                         </div>
                     </div>
                     <p className="text-sm text-app-text-muted">R$</p>
@@ -975,9 +981,9 @@ export default function FinancialListPage() {
                             {formatBRL(stats?.balance || 0).replace('R$', '').trim()}
                         </p>
                         {(stats?.balance || 0) >= 0 ? (
-                            <TrendingUp size={20} className="text-black dark:text-white" />
+                            <TrendingUp size={20} className="text-emerald-500" />
                         ) : (
-                            <TrendingDown size={20} className="text-neutral-500" />
+                            <TrendingDown size={20} className="text-rose-500" />
                         )}
                     </div>
                     <p className="text-xs text-app-text-muted mt-1">
@@ -989,28 +995,28 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        (stats?.pendingIncome || 0) > 0 ? "bg-gradient-to-br from-black/5 to-app-card border-black/20 shadow-lg shadow-black/5" : "bg-app-card border-app-stroke"
+                        (stats?.pendingIncome || 0) > 0 ? "bg-gradient-to-br from-emerald-500/5 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-app-card border-app-stroke"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-black/5 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <p className="text-app-text-muted text-xs">Contas a Receber</p>
                             <p className="text-[10px] text-app-text-muted">(Mês Atual)</p>
                         </div>
-                        <span className="px-2 py-0.5 bg-black/10 dark:bg-white/10 text-black dark:text-white text-[10px] font-bold rounded-full">
+                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full">
                             {stats?.pendingIncomeCount || 0} Pendentes
                         </span>
                     </div>
-                    <p className="text-2xl font-bold text-app-text-main">{formatBRL(stats?.pendingIncome || 0)}</p>
+                    <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatBRL(stats?.pendingIncome || 0)}</p>
                     <div className="mt-2 pt-2 border-t border-app-stroke">
                         <div className="flex justify-between items-center mb-1">
                             <span className="text-[10px] text-app-text-muted">Progresso do Mês</span>
-                            <span className="text-[10px] font-medium text-app-text-main">{stats?.receivedPercent || 0}% Recebido</span>
+                            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">{stats?.receivedPercent || 0}% Recebido</span>
                         </div>
                         <div className="h-1.5 bg-app-stroke rounded-full overflow-hidden">
-                            <div className="h-full bg-black dark:bg-white rounded-full transition-all duration-1000" style={{ width: `${stats?.receivedPercent || 0}%` }} />
+                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${stats?.receivedPercent || 0}%` }} />
                         </div>
                     </div>
                 </motion.div>
@@ -1020,7 +1026,7 @@ export default function FinancialListPage() {
                     className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden"
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-black/5 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <div>
                             <p className="text-app-text-muted text-xs">Contas a Pagar</p>
@@ -1028,12 +1034,12 @@ export default function FinancialListPage() {
                         </div>
                         <span className={clsx(
                             "px-2 py-0.5 text-[10px] font-bold rounded-full",
-                            (stats?.dueTodayCount || 0) > 0 ? "bg-neutral-800 text-white animate-pulse" : "bg-app-stroke text-app-text-muted"
+                            (stats?.dueTodayCount || 0) > 0 ? "bg-amber-500 text-white animate-pulse" : "bg-app-stroke text-app-text-muted"
                         )}>
                             {stats?.dueTodayCount || 0} Vencendo
                         </span>
                     </div>
-                    <p className="text-2xl font-bold text-app-text-main">{formatBRL(stats?.pendingExpense || 0)}</p>
+                    <p className="text-2xl font-bold text-rose-600 dark:text-rose-400">{formatBRL(stats?.pendingExpense || 0)}</p>
                     <div className="mt-2 pt-2 border-t border-app-stroke flex justify-between items-center">
                         <span className="text-xs text-app-text-muted">
                             Vencimento Hoje:
@@ -1050,26 +1056,27 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        currentMonthBalance >= 0 ? "bg-gradient-to-br from-black/5 to-app-card border-black/20 shadow-lg shadow-black/5" : "bg-gradient-to-br from-neutral-800/10 to-app-card border-neutral-800/30 shadow-lg shadow-black/5"
+                        currentMonthBalance >= 0 ? "bg-gradient-to-br from-emerald-500/5 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-gradient-to-br from-rose-500/5 to-app-card border-rose-500/20 shadow-lg shadow-rose-500/5"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
                     <div className={clsx(
                         "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
-                        currentMonthBalance >= 0 ? "bg-black/10" : "bg-neutral-800/10"
+                        currentMonthBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
                     )} />
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-app-text-muted text-xs">Resultado Realizado (Mês Atual)</p>
                         <div className={clsx(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            currentMonthBalance >= 0 ? "bg-black dark:bg-white" : "bg-neutral-800 dark:bg-neutral-600"
+                            currentMonthBalance >= 0 ? "bg-emerald-500" : "bg-rose-500"
                         )}>
-                            {currentMonthBalance >= 0 ? <TrendingUp size={16} className="text-white dark:text-black" /> : <TrendingDown size={16} className="text-white" />}
+                            {currentMonthBalance >= 0 ? <TrendingUp size={16} className="text-white" /> : <TrendingDown size={16} className="text-white" />}
                         </div>
                     </div>
                     <p className="text-sm text-app-text-muted">R$</p>
                     <p className={clsx(
-                        "text-2xl font-bold text-app-text-main"
+                        "text-2xl font-bold",
+                        currentMonthBalance >= 0 ? "text-emerald-600" : "text-rose-600"
                     )}>
                         {formatBRL(Math.abs(currentMonthBalance)).replace('R$', '').trim()}
                     </p>
@@ -1083,11 +1090,11 @@ export default function FinancialListPage() {
                     className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden hidden"
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-black/5 rounded-full blur-2xl" />
+                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-app-text-muted text-xs">Repasses de Parcerias</p>
-                        <div className="w-8 h-8 bg-black/10 rounded-lg flex items-center justify-center">
-                            <Users size={16} className="text-black" />
+                        <div className="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center">
+                            <Users size={16} className="text-violet-600" />
                         </div>
                     </div>
                     <p className="text-2xl font-bold text-app-text-main">{formatBRL(totalRepasses)}</p>
@@ -1139,8 +1146,8 @@ export default function FinancialListPage() {
                             >
                                 <defs>
                                     <linearGradient id="colorSaldo" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#000000" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#000000" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <XAxis dataKey="name" stroke="#888888" fontSize={10} tickLine={false} axisLine={false} />
@@ -1151,7 +1158,7 @@ export default function FinancialListPage() {
                                     itemStyle={{ color: 'var(--app-text-main)' }}
                                     formatter={(value: any) => [new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value), '']}
                                 />
-                                <Area type="monotone" dataKey="Saldo" stroke="#000000" strokeWidth={2} fillOpacity={1} fill="url(#colorSaldo)" />
+                                <Area type="monotone" dataKey="Saldo" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorSaldo)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -1180,7 +1187,7 @@ export default function FinancialListPage() {
                                     className="bg-app-bg border border-app-stroke rounded-xl p-3 hover:border-primary/30 transition-colors cursor-pointer"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={clsx("w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm bg-neutral-800")}>
+                                        <div style={{ backgroundColor: partner.color }} className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm">
                                             {partner.initials}
                                         </div>
                                         <div className="flex-1">
@@ -1248,7 +1255,7 @@ export default function FinancialListPage() {
                         className={clsx(
                             "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all",
                             activeTab === 'repasses'
-                                ? "bg-neutral-800 text-white shadow-lg shadow-black/20"
+                                ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
                                 : "bg-app-card text-app-text-muted hover:text-app-text-main border border-app-stroke"
                         )}
                     >
@@ -1365,7 +1372,7 @@ export default function FinancialListPage() {
                                             </td>
                                             <td className="px-6 py-4 align-middle">
                                                 <div className="flex items-center gap-2">
-                                                    <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs", rep.partner?.color || 'bg-slate-500')}>
+                                                    <div style={{ backgroundColor: rep.partner?.color }} className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs">
                                                         {rep.partner?.initials}
                                                     </div>
                                                     <div>
@@ -1393,11 +1400,11 @@ export default function FinancialListPage() {
                                                     "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit",
                                                     rep.status === 'PAID'
                                                         ? "bg-black/10 text-black"
-                                                        : "bg-neutral-400/10 text-neutral-500"
+                                                        : "bg-amber-400/10 text-amber-600"
                                                 )}>
                                                     <div className={clsx(
                                                         "w-1.5 h-1.5 rounded-full",
-                                                        rep.status === 'PAID' ? "bg-black" : "bg-neutral-400"
+                                                        rep.status === 'PAID' ? "bg-black" : "bg-amber-400"
                                                     )} />
                                                     {rep.status === 'PAID' ? 'Pago' : 'Pendente'}
                                                 </span>
@@ -2139,7 +2146,7 @@ const FinancialTableRow = memo(({
                         {!isGroup && (
                             <div className={clsx(
                                 "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                                record.type === 'INCOME' ? "bg-black/5 dark:bg-white/10 text-black dark:text-white" : "bg-neutral-800/10 text-neutral-800 dark:text-neutral-400"
+                                record.type === 'INCOME' ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"
                             )}>
                                 {record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                             </div>
@@ -2320,7 +2327,7 @@ const FinancialMobileRow = memo(({
                 <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2 mt-0.5 shrink-0">
                         {isGroup && <span className="text-app-text-muted text-sm select-none">{isExpanded ? "▼" : "▶"}</span>}
-                        <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center", record.type === 'INCOME' ? "bg-black/5 dark:bg-white/10 text-black dark:text-white" : "bg-neutral-800/10 text-neutral-800 dark:text-neutral-400")}>{record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}</div>
+                        <div className={clsx("w-8 h-8 rounded-lg flex items-center justify-center", record.type === 'INCOME' ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-rose-500/10 text-rose-600 dark:text-rose-400")}>{record.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}</div>
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">

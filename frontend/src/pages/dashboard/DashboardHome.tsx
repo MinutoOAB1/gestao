@@ -472,9 +472,9 @@ export default function DashboardHome() {
                 return (
                     <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 sm:gap-4">
                         {[
-                            { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-black dark:text-white', bg: 'bg-black/5 dark:bg-white/10', path: '/app/clientes' },
-                            { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-black dark:text-white', bg: 'bg-black/5 dark:bg-white/10', path: '/app/processos' },
-                            { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-black dark:text-white', bg: 'bg-black/5 dark:bg-white/10', path: '/app/agenda' }
+                            { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-500/10', path: '/app/clientes' },
+                            { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-500/10', path: '/app/processos' },
+                            { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-500/10', path: '/app/agenda' }
                         ].map((stat, i) => (
                             <div
                                 key={i}
@@ -499,44 +499,44 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-black to-neutral-800 dark:from-white dark:to-neutral-200 rounded-xl border border-black/10 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
+                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl border border-blue-500/20 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 dark:bg-black/10 rounded-full blur-2xl pointer-events-none" />
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-black flex items-center justify-center">
-                                        <Calculator size={20} className="text-black dark:text-white" />
+                                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                                        <Calculator size={20} className="text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-[12px] sm:text-xs text-white dark:text-black font-black uppercase tracking-widest font-display">A Receber</p>
-                                        <p className="text-[10px] text-white/60 dark:text-black/60 font-medium">Valores pendentes</p>
+                                        <p className="text-[12px] sm:text-xs text-white font-black uppercase tracking-widest font-display">A Receber</p>
+                                        <p className="text-[10px] text-white/60 font-medium">Valores pendentes</p>
                                     </div>
                                 </div>
-                                <p className="text-3xl sm:text-4xl font-black text-white dark:text-black tracking-tight font-display">{formatBRLCompact(productivity.pendingPayments)}</p>
+                                <p className="text-3xl sm:text-4xl font-black text-white tracking-tight font-display">{formatBRLCompact(productivity.pendingPayments)}</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-black/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-orange-500/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                                        <AlertTriangle size={16} className="text-black dark:text-white" />
+                                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                        <AlertTriangle size={16} className="text-orange-500" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-bold text-black dark:text-white">{productivity.upcomingDeadlines}</p>
+                                <p className="text-xl sm:text-2xl font-bold text-app-text-main">{productivity.upcomingDeadlines}</p>
                                 <p className="text-[11px] sm:text-xs text-app-text-muted">Prazos</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-black/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-blue-500/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                                        <FileText size={16} className="text-black dark:text-white" />
+                                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                        <FileText size={16} className="text-blue-500" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{productivity.newProcesses}</p>
+                                <p className="text-xl sm:text-2xl font-black text-app-text-main">{productivity.newProcesses}</p>
                                 <p className="text-[11px] sm:text-xs text-app-text-muted uppercase tracking-tighter font-bold">Novos Process.</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-black/20 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-emerald-500/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-black/5 dark:bg-white/10 flex items-center justify-center">
-                                        <Users size={16} className="text-black dark:text-white" />
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                                        <Users size={16} className="text-emerald-500" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-black text-black dark:text-white">{productivity.activeClients}</p>
+                                <p className="text-xl sm:text-2xl font-black text-app-text-main">{productivity.activeClients}</p>
                                 <p className="text-[11px] sm:text-xs text-app-text-muted uppercase tracking-tighter font-bold">Clientes Ativos</p>
                             </div>
                         </div>
@@ -545,18 +545,18 @@ export default function DashboardHome() {
             case 'urgent':
                 return productivity.urgentPayments && productivity.urgentPayments.length > 0 ? (
                     <motion.div variants={itemVariants}>
-                        <div className="bg-black/5 dark:bg-white/10 border border-black/20 dark:border-white/20 rounded-2xl p-5">
+                        <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-5">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center">
-                                        <AlertTriangle size={20} className="text-white dark:text-black" />
+                                    <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center">
+                                        <AlertTriangle size={20} className="text-white" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-app-text-main font-display">Pagamentos Urgentes</h3>
                                         <p className="text-xs text-app-text-muted">{productivity.urgentPayments.length} pagamento(s) marcado(s) como urgente</p>
                                     </div>
                                 </div>
-                                <button onClick={() => navigate('/app/financeiro')} className="text-xs text-black dark:text-white font-bold hover:underline transition-colors">
+                                <button onClick={() => navigate('/app/financeiro')} className="text-xs text-rose-600 dark:text-rose-400 font-bold hover:underline transition-colors">
                                     Ver todos →
                                 </button>
                             </div>
@@ -564,7 +564,7 @@ export default function DashboardHome() {
                                 {displayUrgentPayments.map((payment: any, i: number) => (
                                     <div key={payment.id || i} className="bg-app-card/50 backdrop-blur-sm border border-app-stroke rounded-xl p-3 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse`} />
+                                            <div className={`w-2 h-2 rounded-full bg-rose-500 animate-pulse`} />
                                             <div>
                                                 <p className="text-sm font-medium text-app-text-main">{payment.description}</p>
                                                 <p className="text-xs text-app-text-muted">
