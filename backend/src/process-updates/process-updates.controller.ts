@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Request, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Request, UseGuards, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { ProcessUpdatesService } from './process-updates.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -7,20 +7,45 @@ import { AuthGuard } from '@nestjs/passport';
 export class ProcessUpdatesController {
     constructor(private readonly processUpdatesService: ProcessUpdatesService) { }
 
-    // Create new andamento for a process
-    @Post(':processId')
-    async create(
-        @Param('processId') processId: string,
-        @Body() body: { description: string; type?: string; date?: string; isImportant?: boolean },
+    // Root POST: Create new andamento
+    @Post()
+    async createRoot(
+        @Body() body: { processId?: string; description?: string; update?: string; type?: string; date?: string; isImportant?: boolean },
         @Request() req,
     ) {
+        if (!body.processId) throw new BadRequestException('processId is required in request body');
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        const createdBy = req.user?.name || 'Sistema';
+        const description = body.description || body.update || '';
+        return this.processUpdatesService.create(body.processId, {
+            description,
+            type: body.type,
+            date: body.date ? new Date(body.date) : undefined,
+            isImportant: body.isImportant,
+            createdBy,
+        }, tenantId);
+    }
+
+    // Create new andamento via URL param
+    @Post(':processId')
+    async create(
+        @Param('processId') processIdParam: string,
+        @Body() body: { processId?: string; description?: string; update?: string; type?: string; date?: string; isImportant?: boolean },
+        @Request() req,
+    ) {
+        const processId = processIdParam || body.processId;
+        if (!processId) throw new BadRequestException('processId is required');
         const tenantId = req.user?.tenantId;
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         
         const createdBy = req.user?.name || 'Sistema';
+        const description = body.description || body.update || '';
         return this.processUpdatesService.create(processId, {
-            ...body,
+            description,
+            type: body.type,
             date: body.date ? new Date(body.date) : undefined,
+            isImportant: body.isImportant,
             createdBy,
         }, tenantId);
     }

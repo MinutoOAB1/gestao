@@ -33,32 +33,32 @@ export default {
                     }
                 },
                 primary: {
-                    DEFAULT: '#1E3A8A', // Executive Navy Blue (Blue-900)
-                    dark: '#172554',    // Midnight Blue (Blue-950)
-                    light: '#3B82F6',   // Highlighting Blue
-                    glow: 'rgba(30, 58, 138, 0.3)',
-                    gold: '#D4AF37',    // Champagne/Gold for premium accents
+                    DEFAULT: '#000000', // Sophisticated Black
+                    dark: '#000000',
+                    light: '#404040',
+                    glow: 'rgba(0, 0, 0, 0.1)',
+                    gold: '#D4D4D4',    // Platinum/Silver accent
                 },
                 status: {
                     urgent: {
-                        bg: 'rgba(225, 29, 72, 0.1)', // Rose-600
-                        text: '#E11D48',
-                        border: '#E11D48'
+                        bg: 'rgba(0, 0, 0, 0.05)',
+                        text: '#000000',
+                        border: '#000000'
                     },
                     warning: {
-                        bg: 'rgba(212, 175, 55, 0.1)', // Gold/Amber mix
-                        text: '#D4AF37',
-                        border: '#D4AF37'
+                        bg: 'rgba(64, 64, 64, 0.05)',
+                        text: '#404040',
+                        border: '#404040'
                     },
                     success: {
-                        bg: 'rgba(15, 118, 110, 0.1)', // Teal-700 (More formal green)
-                        text: '#0F766E',
-                        border: '#0F766E'
+                        bg: 'rgba(0, 0, 0, 0.05)',
+                        text: '#000000',
+                        border: '#000000'
                     },
                     info: {
-                        bg: 'rgba(51, 65, 85, 0.1)', // Slate-700 (Very sober blue/gray)
-                        text: '#334155',
-                        border: '#334155'
+                        bg: 'rgba(115, 115, 115, 0.05)',
+                        text: '#737373',
+                        border: '#737373'
                     }
                 }
             },

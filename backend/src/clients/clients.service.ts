@@ -12,9 +12,9 @@ export class ClientsService {
     ) { }
 
     async create(createClientDto: CreateClientDto, tenantId: string, userId?: string) {
-        // Sanitize: convert empty strings to null for optional fields
-        console.log('Creating client with data:', createClientDto);
-        const data: any = { ...createClientDto, tenantId };
+        // Sanitize: remove unknown fields for Prisma
+        const { type, urgency, ...cleanDto } = createClientDto as any;
+        const data: any = { ...cleanDto, tenantId };
 
         // Separate tags from client data
         const tags = data.tags;

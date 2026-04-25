@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request, Param, Patch, Delete, Query, Headers, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, Param, Patch, Delete, Query, Headers, Req, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto/create-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -29,6 +29,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @Post('auth/login')
+  @HttpCode(200)
   login(@Body() loginDto: LoginDto, @Req() req: any) {
     // Extract IP and User-Agent for login tracking
     const ipAddress = req.headers?.['x-forwarded-for'] || req.ip || req.socket?.remoteAddress;

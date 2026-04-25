@@ -1,0 +1,52 @@
+{
+  "product_name": "LegalFlow",
+  "overview": "LegalFlow is a modern SaaS platform for legal management, designed to centralize processes, clients, contracts, and finances for lawyers and law firms.",
+  "target_audience": [
+    "Autonomous lawyers",
+    "Small and medium law firms",
+    "Legal departments"
+  ],
+  "features": [
+    {
+      "name": "Clients Management",
+      "description": "CRUD operations for PF/PJ clients with history and tenant isolation.",
+      "critical_flows": [
+        "Create client",
+        "View complete client profile",
+        "Update client status"
+      ]
+    },
+    {
+      "name": "Process Management",
+      "description": "Kanban board for legal processes with status tracking and urgency indicators.",
+      "critical_flows": [
+        "Move process card between stages",
+        "Add process updates",
+        "Filter processes by tribunal or area"
+      ]
+    },
+    {
+      "name": "Financial Management",
+      "description": "Income, expense, and profit tracking with automated PDF reports.",
+      "critical_flows": [
+        "Record payment",
+        "Generate financial stats",
+        "Export PDF report"
+      ]
+    },
+    {
+      "name": "Authentication & Security",
+      "description": "JWT-based auth with strict multi-tenancy and 2FA support.",
+      "critical_flows": [
+        "Login",
+        "Register tenant",
+        "Switch between roles"
+      ]
+    }
+  ],
+  "technical_requirements": {
+    "backend": "NestJS with Prisma",
+    "frontend": "React with Vite",
+    "security": "JWT, RolesGuard, TenantMiddleware"
+  }
+}

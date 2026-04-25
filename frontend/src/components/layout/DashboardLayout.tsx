@@ -280,7 +280,7 @@ export default function DashboardLayout() {
             <aside
                 className={cn(
                     "hidden md:flex flex-col z-20 transition-all duration-300 flex-shrink-0",
-                    "bg-gradient-to-b from-slate-800 to-blue-900",
+                    "bg-black border-r border-white/5",
                     collapsed ? "w-20" : "w-72"
                 )}
             >
@@ -301,7 +301,7 @@ export default function DashboardLayout() {
                 {/* User Profile Card */}
                 <div className={cn("mx-3 mb-4 p-3 rounded-xl bg-white/[0.06] border border-white/[0.08]", collapsed && "mx-2 p-2")}>
                     <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-lg shadow-primary/20">
+                        <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center shrink-0 ring-2 ring-white/20 shadow-lg">
                             {user?.avatar ? (
                                 <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -400,12 +400,12 @@ export default function DashboardLayout() {
                 {!collapsed && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
-                            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-slate-700/50">
+                            <div className="relative bg-neutral-900 rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-lg transition-all border border-white/10">
                                 {/* Robot Icon Background */}
                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="w-16 h-16 text-blue-400"
+                                        className="w-16 h-16 text-white"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -415,8 +415,8 @@ export default function DashboardLayout() {
                                     </svg>
                                 </div>
                                 <h3 className="text-white font-bold text-sm mb-1">IA Jurídica</h3>
-                                <p className="text-slate-400 text-xs mb-3">Analise contratos em segundos.</p>
-                                <button className="px-4 py-1.5 bg-white text-slate-900 rounded-lg text-xs font-semibold hover:bg-slate-100 transition-colors">
+                                <p className="text-white/50 text-xs mb-3">Analise contratos em segundos.</p>
+                                <button className="px-4 py-1.5 bg-white text-black rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors">
                                     Testar Agora
                                 </button>
                             </div>
@@ -440,8 +440,8 @@ export default function DashboardLayout() {
                 </div>
             </aside>
 
-            {/* Right Side - Header + Main Content - Blue gradient background so curved corner shows blue */}
-            <div className="flex-1 flex flex-col h-full bg-gradient-to-br from-slate-800 to-blue-900 relative overflow-hidden">
+            {/* Right Side - Header + Main Content - Black background so curved corner shows black */}
+            <div className="flex-1 flex flex-col h-full bg-black relative overflow-hidden">
                 {/* Desktop Header - Dark blue gradient matching sidebar */}
                 {!isFullScreenPage && (
                     <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0">
@@ -472,7 +472,7 @@ export default function DashboardLayout() {
                                     {teamMembers.filter(m => m.id !== user?.id).slice(0, 3).map((member) => (
                                         <div
                                             key={member.id}
-                                            className="w-9 h-9 rounded-full border-2 border-slate-700 flex items-center justify-center overflow-hidden bg-white/20 hover:z-10 transition-transform hover:scale-110"
+                                            className="w-9 h-9 rounded-full border-2 border-black flex items-center justify-center overflow-hidden bg-white/20 hover:z-10 transition-transform hover:scale-110"
                                             title={`${member.name} - ${member.role}`}
                                         >
                                             {member.avatar ? (
@@ -505,7 +505,7 @@ export default function DashboardLayout() {
                                 {timer.isRunning ? (
                                     <button
                                         onClick={() => navigate('/app/timesheet')}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500/30 transition-colors animate-pulse"
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-white text-black rounded-xl hover:bg-gray-200 transition-colors"
                                         title={timer.processTitle || timer.description || 'Timer rodando'}
                                     >
                                         <Pause size={16} />
@@ -536,7 +536,7 @@ export default function DashboardLayout() {
 
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
-                    <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/10 bg-slate-800/80 backdrop-blur-md">
+                    <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/10 bg-black/80 backdrop-blur-md">
                         <div className="flex items-center gap-3.5" onClick={() => navigate('/app/perfil')}>
                             <div className="w-11 h-11 rounded-full bg-white/20 overflow-hidden flex items-center justify-center ring-2 ring-white/10 shadow-lg transition-transform active:scale-95">
                                 {user?.avatar ? (

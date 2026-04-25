@@ -1,0 +1,82 @@
+version: "2"
+type: backend
+tech_stack:
+  - TypeScript
+  - NestJS
+  - Prisma
+  - SQLite (Dev) / PostgreSQL (Prod)
+  - Passport (JWT)
+  - Socket.io (Notifications)
+features:
+  - name: Authentication and User Management
+    description: Handles user registration, login, 2FA, and multi-tenant user management.
+    files:
+      - backend/src/auth/auth.controller.ts
+      - backend/src/auth/auth.service.ts
+    endpoints:
+      - method: POST
+        path: /auth/register
+        description: Register a new user and tenant
+        auth_required: false
+      - method: POST
+        path: /auth/login
+        description: Authenticate user and return JWT
+        auth_required: false
+      - method: GET
+        path: /auth/profile
+        description: Get logged-in user profile
+        auth_required: true
+      - method: GET
+        path: /auth/users
+        description: List users in the current tenant
+        auth_required: true
+  - name: Clients Management
+    description: CRUD operations for clients with multi-tenancy isolation.
+    files:
+      - backend/src/clients/clients.controller.ts
+      - backend/src/clients/clients.service.ts
+    endpoints:
+      - method: POST
+        path: /clients
+        description: Create a new client
+        auth_required: true
+      - method: GET
+        path: /clients
+        description: List all clients for the tenant
+        auth_required: true
+      - method: GET
+        path: /clients/:id/complete
+        description: Get complete client data including processes and financial records
+        auth_required: true
+  - name: Financial Management
+    description: Management of income, expenses, and financial reporting.
+    files:
+      - backend/src/financial/financial.controller.ts
+      - backend/src/financial/financial.service.ts
+    endpoints:
+      - method: POST
+        path: /financial
+        description: Create a financial record
+        auth_required: true
+      - method: GET
+        path: /financial/stats
+        description: Get financial statistics (income, expense, profit)
+        auth_required: true
+      - method: GET
+        path: /financial/report/pdf
+        description: Generate an HTML/PDF financial report
+        auth_required: true
+  - name: Processes Management
+    description: Management of legal processes and status tracking.
+    files:
+      - backend/src/processes/processes.controller.ts
+      - backend/src/processes/processes.service.ts
+    endpoints:
+      - method: GET
+        path: /processes
+        description: List all processes for the tenant
+        auth_required: true
+known_limitations:
+  - issue: "Strict Tenant ID check relies on req.user?.tenantId which must be populated by the AuthGuard and TenantMiddleware"
+    location: "backend/src/prisma/tenant.middleware.ts"
+    impact: "If middleware is bypassed, tenant isolation could be compromised"

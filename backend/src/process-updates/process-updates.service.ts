@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -7,15 +7,19 @@ export class ProcessUpdatesService {
 
     // Create a new andamento
     async create(processId: string, data: { description: string; type?: string; date?: Date; isImportant?: boolean; createdBy?: string }, tenantId: string) {
-        // Verify process ownership
-        await this.prisma.process.findFirstOrThrow({
+        // Verify process ownership (gracefully)
+        const process = await this.prisma.process.findFirst({
             where: { id: processId, tenantId }
         });
+
+        if (!process) {
+            throw new NotFoundException(`Process ${processId} not found`);
+        }
 
         return this.prisma.processUpdate.create({
             data: {
                 processId,
-                description: data.description,
+                description: data.description || '',
                 type: data.type || 'MOVIMENTO',
                 date: data.date || new Date(),
                 isImportant: data.isImportant || false,

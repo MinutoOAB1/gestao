@@ -41,6 +41,7 @@ export class FinancialController {
         return this.financialService.findAll(tenantId);
     }
 
+
     @Get('stats')
     async getStats(@Request() req) {
         const tenantId = req.user?.tenantId;
@@ -73,8 +74,8 @@ export class FinancialController {
         const paidExpense = paidTotals.expense;
 
         return {
-            totalIncome,
-            totalExpense,
+            income: totalIncome,
+            expense: totalExpense,
             profit: totalIncome - totalExpense,
             balance: paidIncome - paidExpense,
             pendingIncome,
@@ -114,6 +115,8 @@ export class FinancialController {
     }
 
     @Get('report/pdf')
+    @Get('export/pdf')
+    @Get('export')
     async generatePdfReport(
         @Request() req,
         @Res() res: Response,
@@ -496,9 +499,34 @@ export class FinancialController {
 </html>`;
 
         // Return HTML report (can be printed to PDF by browser)
-        res.setHeader('Content-Type', 'text/html');
-        res.setHeader('Content-Disposition', `inline; filename="relatorio_financeiro_${new Date().toISOString().split('T')[0]}.html"`);
-        res.send(html);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=relatorio.pdf');
+        return res.send(html);
+    }
+
+    // Alias routes for PDF export - NestJS requires separate methods for multiple route paths
+    @Get('export/pdf')
+    async exportPdf(
+        @Request() req,
+        @Res() res: Response,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+        @Query('status') status?: string,
+        @Query('search') search?: string
+    ) {
+        return this.generatePdfReport(req, res, startDate, endDate, status, search);
+    }
+
+    @Get('export')
+    async exportFinancial(
+        @Request() req,
+        @Res() res: Response,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string,
+        @Query('status') status?: string,
+        @Query('search') search?: string
+    ) {
+        return this.generatePdfReport(req, res, startDate, endDate, status, search);
     }
 
     @Get(':id')

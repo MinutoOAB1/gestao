@@ -2,40 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Dark theme (default) - Refined "LegalDesk" Palette */
+/* Dark theme (default) - Elegant Grayscale */
 :root {
-  --app-bg: #090E17;
-  /* Deeper, more formal dark background (Midnight) */
-  --app-card: #131B2B;
-  /* Oxford Blue tint for cards */
-  --app-input: #1C263A;
+  --app-bg: #000000;
+  /* Deep black for sophistication */
+  --app-card: #0A0A0A;
+  /* Dark gray for cards */
+  --app-input: #111111;
   /* Input background */
-  --app-stroke: #2A364E;
-  /* Border/Divider color */
-  --app-text-main: #F8FAFC;
-  /* Crisp white for better contrast */
-  --app-text-muted: #94A3B8;
-  /* Slate-400 */
-  --app-text-label: #64748B;
-  /* Slate-500 */
+  --app-stroke: #262626;
+  /* Minimalist borders */
+  --app-text-main: #FFFFFF;
+  /* Pure white for text */
+  --app-text-muted: #A3A3A3;
+  /* Neutral gray */
+  --app-text-label: #737373;
+  /* Darker gray labels */
 }
 
-/* Light theme - Improved contrast "Document" style */
+/* Light theme - Minimalist Gallery style */
 :root.light {
-  --app-bg: #F4F7FA;
-  /* Very subtle cool gray (Paper feeling) */
-  --app-card: #FFFFFF;
-  /* Pure white cards */
-  --app-input: #FFFFFF;
-  /* Inputs same as card but with distinct border */
-  --app-stroke: #D1D5DB;
-  /* Gray-300 borders */
-  --app-text-main: #111827;
-  /* Near-black for crisp readability */
-  --app-text-muted: #4B5563;
-  /* Gray-600 */
-  --app-text-label: #6B7280;
-  /* Gray-500 */
+  --app-bg: #FFFFFF;
+  /* Pure white gallery feel */
+  --app-card: #FAFAFA;
+  /* Subtle off-white for cards */
+  --app-input: #F5F5F5;
+  /* Distinct input background */
+  --app-stroke: #E5E5E5;
+  /* Soft borders */
+  --app-text-main: #000000;
+  /* Pure black for text */
+  --app-text-muted: #404040;
+  /* Muted charcoal */
+  --app-text-label: #737373;
+  /* Neutral gray */
 }
 
 @layer base {
@@ -160,11 +160,10 @@
   border-color: var(--app-stroke) !important;
 }
 
-/* Light mode blue color fixes */
+/* Light mode grayscale color fixes */
 .light .text-blue-400,
 .light .text-blue-500 {
-  color: #1D4ED8 !important;
-  /* Darker blue for better contrast */
+  color: #000000 !important;
 }
 
 .light .bg-blue-500\/10 {

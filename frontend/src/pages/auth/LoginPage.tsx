@@ -99,7 +99,7 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex">
             {/* Left Side - Dark with Image Carousel (Hidden on Mobile) */}
-            <div className="hidden lg:flex lg:w-1/2 bg-[#0c1220] flex-col p-8 relative">
+            <div className="hidden lg:flex lg:w-1/2 bg-black flex-col p-8 relative">
                 {/* Logo */}
                 <div className="absolute top-8 left-8 z-20">
                     <BrandLogo variant="light" />
@@ -120,7 +120,7 @@ export default function LoginPage() {
                         />
                     </AnimatePresence>
                     {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c1220] via-[#0c1220]/80 to-[#0c1220]/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
                 </div>
 
                 {/* Spacer */}
@@ -128,7 +128,7 @@ export default function LoginPage() {
 
                 {/* Quote Card with better visibility */}
                 <div className="z-10 relative">
-                    <div className="bg-[#0c1220]/90 backdrop-blur-md rounded-2xl p-6 border border-blue-500/20 shadow-xl shadow-blue-500/5">
+                    <div className="bg-black/90 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl shadow-white/5">
                         <AnimatePresence mode="wait">
                             <motion.p
                                 key={currentIndex}
@@ -149,8 +149,8 @@ export default function LoginPage() {
                                     key={index}
                                     onClick={() => setCurrentIndex(index)}
                                     className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                        ? 'w-8 bg-blue-500'
-                                        : 'w-2 bg-slate-600 hover:bg-slate-500'
+                                        ? 'w-8 bg-white'
+                                        : 'w-2 bg-neutral-700 hover:bg-neutral-600'
                                         }`}
                                 />
                             ))}
@@ -160,9 +160,9 @@ export default function LoginPage() {
             </div>
 
             {/* Right Side - Form (Supports both themes) */}
-            <div className="flex-1 bg-slate-50 dark:bg-[#0c1220] flex items-center justify-center p-8 relative">
+            <div className="flex-1 bg-white dark:bg-black flex items-center justify-center p-8 relative">
                 {/* Subtle background pattern for dark mode */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.05),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none" />
                 <div className="w-full max-w-md relative z-10">
                     {/* Mobile Logo */}
                     <div className="flex items-center gap-3 mb-8 lg:hidden">
@@ -227,7 +227,7 @@ export default function LoginPage() {
                                     <button
                                         type="submit"
                                         disabled={loading || twoFactorCode.length !== 6}
-                                        className="w-full bg-gradient-to-r from-slate-700 to-blue-800 hover:from-slate-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 text-white font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {loading ? (
                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -338,7 +338,7 @@ export default function LoginPage() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full bg-gradient-to-r from-slate-700 to-blue-800 hover:from-slate-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 text-white font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full bg-black dark:bg-white text-white dark:text-black font-semibold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         {loading ? (
                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -361,8 +361,8 @@ export default function LoginPage() {
                         )}
                     </AnimatePresence>
 
-                    <p className="text-center text-slate-500 dark:text-slate-600 text-xs mt-12">
-                        © 2026 Blue Adv. Todos os direitos reservados.
+                    <p className="text-center text-gray-500 dark:text-gray-600 text-xs mt-12">
+                        © 2026 Advus. Todos os direitos reservados.
                     </p>
                 </div>
             </div>

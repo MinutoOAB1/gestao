@@ -73,6 +73,11 @@ export class AuthService {
     // Normal account login without tenant context to allow finding the user first
     return this.tenantContext.runWithTenant(null, true, async () => {
       const { password, twoFactorCode } = loginDto;
+      
+      if (!loginDto.email) {
+        throw new BadRequestException('Email é obrigatório');
+      }
+      
       const email = loginDto.email.toLowerCase().trim();
 
       console.log(`[AUTH] Login attempt for email: ${email}`);
@@ -163,8 +168,13 @@ export class AuthService {
       }
 
       const payload = { email: user.email, sub: user.id, tenantId: user.tenantId, role: user.role };
+      const access_token = this.jwtService.sign(payload);
       return {
-        access_token: this.jwtService.sign(payload),
+        access_token,
+        token: access_token,
+        tenantId: user.tenantId,
+        userId: user.id,
+        role: user.role,
         user: {
           id: user.id,
           name: user.name,
@@ -173,9 +183,14 @@ export class AuthService {
           tenantId: user.tenantId,
           avatar: user.avatar,
           twoFactorEnabled: user.twoFactorEnabled,
+          two_factor_enabled: user.twoFactorEnabled,
+          twoFactorStatus: user.twoFactorEnabled ? 'ENABLED' : 'DISABLED',
+          two_factor_status: user.twoFactorEnabled ? 'ENABLED' : 'DISABLED',
           googleCalendarConnected: user.googleCalendarConnected,
+          google_calendar_connected: user.googleCalendarConnected,
           plan: user.tenant.plan,
           subscriptionStatus: user.tenant.subscriptionStatus,
+          subscription_status: user.tenant.subscriptionStatus,
         },
       };
     });

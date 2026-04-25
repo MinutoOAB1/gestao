@@ -1,4 +1,4 @@
-
+import { Scale } from 'lucide-react';
 
 interface BrandLogoProps {
     className?: string;
@@ -20,16 +20,15 @@ export function BrandLogo({ className = '', variant = 'dark', size = 'md' }: Bra
 
     return (
         <div className={`flex items-center gap-2.5 font-sans select-none ${className}`}>
-            <div className={`${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden`}>
-                <img
-                    src="/iconelogo2.png"
-                    alt="Logo"
-                    className="w-full h-full object-cover"
+            <div className={`${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden bg-app-text-main`}>
+                <Scale 
+                    size={currentSize.icon} 
+                    className="text-app-bg" 
                 />
             </div>
             <div className={`flex items-baseline tracking-tight font-bold leading-none ${currentSize.text}`}>
-                <span className={isDarkBg ? 'text-blue-400' : 'text-blue-600'}>Blue</span>
-                <span className={isDarkBg ? 'text-white' : 'text-slate-800 dark:text-white'}>Adv</span>
+                <span className={isDarkBg ? 'text-white' : 'text-app-text-main'}>Adv</span>
+                <span className={isDarkBg ? 'text-white/70' : 'text-app-text-muted'}>us</span>
             </div>
         </div>
     );

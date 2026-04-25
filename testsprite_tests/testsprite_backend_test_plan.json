@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "createclientendpoint",
+    "description": "Verify that the create client API endpoint successfully creates a new PF or PJ client with correct tenant isolation and stores client history."
+  },
+  {
+    "id": "TC002",
+    "title": "viewclientprofileendpoint",
+    "description": "Verify that the view client profile API endpoint returns the complete and accurate client profile data for the authenticated tenant."
+  },
+  {
+    "id": "TC003",
+    "title": "updateclientstatusendpoint",
+    "description": "Verify that the update client status API endpoint correctly updates the status of a client and maintains tenant isolation."
+  },
+  {
+    "id": "TC004",
+    "title": "moveprocesscardendpoint",
+    "description": "Verify that the API endpoint for moving a process card between stages updates the process status correctly and reflects urgency indicators."
+  },
+  {
+    "id": "TC005",
+    "title": "addprocessupdateendpoint",
+    "description": "Verify that the add process update API endpoint successfully adds updates to a legal process and associates them with the correct process and tenant."
+  },
+  {
+    "id": "TC006",
+    "title": "filterprocessesendpoint",
+    "description": "Verify that the filter processes API endpoint correctly filters legal processes by tribunal or area for the authenticated tenant."
+  },
+  {
+    "id": "TC007",
+    "title": "recordpaymentendpoint",
+    "description": "Verify that the record payment API endpoint accurately records income or expense payments and associates them with the correct tenant."
+  },
+  {
+    "id": "TC008",
+    "title": "generatefinancialstatsendpoint",
+    "description": "Verify that the generate financial stats API endpoint returns correct income, expense, and profit statistics for the authenticated tenant."
+  },
+  {
+    "id": "TC009",
+    "title": "exportpdfreportendpoint",
+    "description": "Verify that the export PDF report API endpoint generates and returns an accurate financial report PDF for the tenant's data."
+  },
+  {
+    "id": "TC010",
+    "title": "loginendpoint",
+    "description": "Verify that the login API endpoint authenticates users using JWT and enforces multi-tenancy and 2FA security requirements."
+  }
+]

@@ -72,7 +72,7 @@ export class StripeService {
               currency: 'brl',
               product_data: {
                 name: 'Plano Adv Plus',
-                description: 'Acesso completo ao Blue Adv (7 dias de teste grátis)',
+                description: 'Acesso completo ao Advus (7 dias de teste grátis)',
               },
               unit_amount: 4700, // R$ 47,00
               recurring: { interval: 'month' },

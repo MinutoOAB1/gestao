@@ -1,4 +1,4 @@
-# LegalFlow - Plataforma de Gestão Jurídica
+# Advus - Plataforma de Gestão Jurídica
 
 <div align="center">
   <h3>🏛️ Sistema completo para gestão de escritórios de advocacia</h3>
@@ -9,7 +9,7 @@
 
 ## 📋 Visão Geral
 
-**LegalFlow** é uma plataforma SaaS moderna para gestão jurídica, desenvolvida com tecnologias de ponta para oferecer uma experiência premium a advogados e escritórios de advocacia.
+**Advus** é uma plataforma SaaS moderna para gestão jurídica, desenvolvida com tecnologias de ponta para oferecer uma experiência premium a advogados e escritórios de advocacia.
 
 ### ✨ Funcionalidades Principais
 
@@ -36,8 +36,8 @@
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/legalflow.git
-cd legalflow
+git clone https://github.com/seu-usuario/Advus.git
+cd Advus
 ```
 
 ### 2. Configure o Backend
@@ -101,7 +101,7 @@ PORT=3000
 ## 📁 Estrutura do Projeto
 
 ```
-legalflow/
+Advus/
 ├── backend/                 # API NestJS
 │   ├── prisma/
 │   │   ├── schema.prisma   # Schema do banco de dados
@@ -162,7 +162,7 @@ A plataforma utiliza **JWT (JSON Web Tokens)** para autenticação:
 ### Usuário de Teste
 
 Após rodar o seed, você pode usar:
-- **Email:** `admin@legalflow.com`
+- **Email:** `admin@Advus.com`
 - **Senha:** `admin123`
 
 ---
@@ -246,12 +246,12 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 📞 Suporte
 
-- **Email:** suporte@legalflow.com.br
-- **Documentação:** [docs.legalflow.com.br](https://docs.legalflow.com.br)
+- **Email:** suporte@Advus.com.br
+- **Documentação:** [docs.Advus.com.br](https://docs.Advus.com.br)
 
 ---
 
 <div align="center">
   <p>Feito com ❤️ para advogados brasileiros</p>
-  <p><strong>LegalFlow</strong> © 2024</p>
+  <p><strong>Advus</strong> © 2024</p>
 </div>

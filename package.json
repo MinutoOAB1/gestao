@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
+    "@testsprite/testsprite-mcp": "^0.0.37",
     "@types/express": "^5.0.0",
     "@types/node": "^24.10.4",
     "typescript": "~5.4.5"

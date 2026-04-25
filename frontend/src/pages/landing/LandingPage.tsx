@@ -19,11 +19,11 @@ function Navbar() {
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#0B1120] dark:bg-slate-100 rounded-xl flex items-center justify-center shadow-md">
-                            <Scale className="w-5 h-5 text-white dark:text-slate-900" />
+                        <div className="w-10 h-10 bg-black dark:bg-white rounded-xl flex items-center justify-center shadow-md">
+                            <Scale className="w-5 h-5 text-white dark:text-black" />
                         </div>
-                        <span className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
-                            Blue Adv
+                        <span className="text-xl font-semibold text-black dark:text-white tracking-tight">
+                            Advus
                         </span>
                     </div>
 
@@ -112,15 +112,15 @@ function HeroSection() {
                     </div>
 
                     {/* Headline */}
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1] mb-8">
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-black dark:text-white tracking-tight leading-[1.1] mb-8">
                         A eficiência que o seu <br className="hidden md:block" />
-                        <span className="text-blue-600 dark:text-blue-500">
+                        <span className="text-black dark:text-gray-300">
                             escritório merece
                         </span>
                     </h1>
 
                     {/* Subheadline */}
-                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
+                    <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
                         Processos, clientes, finanças e documentos em um só lugar.
                         Simplifique sua rotina jurídica e aumente sua produtividade em até 40%.
                     </p>
@@ -129,12 +129,12 @@ function HeroSection() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
                         <button
                             onClick={() => navigate('/register')}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-[#0B1120] dark:bg-white text-white dark:text-[#0B1120] font-semibold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg group"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-all shadow-lg group"
                         >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </button>
-                        <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
+                        <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 text-black dark:text-white font-semibold rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
                             Ver Demonstração
                         </button>
                     </div>
@@ -380,7 +380,7 @@ function PricingSection() {
                                         navigate('/register');
                                     }
                                 }}
-                                className="w-full py-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                                className="w-full py-4 rounded-xl font-bold bg-black hover:bg-gray-900 text-white transition-all shadow-lg shadow-black/20 active:scale-95"
                             >
                                 {plan.cta}
                             </button>

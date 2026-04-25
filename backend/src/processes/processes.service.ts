@@ -28,12 +28,12 @@ export class ProcessesService {
         return date;
       };
 
-      const deadline = parseDate(createProcessDto.deadline);
-      const { deadline: _, number: incomingNumber, ...restDto } = createProcessDto;
+      const { deadline: _, number: incomingNumber, urgency, type, tribunal, court, ...rest } = createProcessDto as any;
       
       const processData: any = {
-        ...restDto,
-        deadline,
+        ...rest,
+        court: court || tribunal,
+        deadline: parseDate(createProcessDto.deadline),
         tenantId,
         status: createProcessDto.status || 'ACTIVE',
       };
@@ -84,9 +84,27 @@ export class ProcessesService {
     }
   }
 
-  findAll(tenantId: string, take = 50, skip = 0) {
+  findAll(tenantId: string, filters?: { tribunal?: string; court?: string; area?: string; status?: string; clientId?: string; processId?: string; limit?: number; page?: number }, take = 50, skip = 0) {
+    const where: any = { tenantId };
+    
+    // Support both 'tribunal' and 'court' as aliases for the same field
+    const courtFilter = filters?.court || filters?.tribunal;
+    if (courtFilter) {
+      where.court = { contains: courtFilter, mode: 'insensitive' };
+    }
+    // Note: 'area' field does not exist in the schema - ignore it to prevent Prisma errors
+    if (filters?.status) {
+      where.status = filters.status;
+    }
+    if (filters?.clientId) {
+      where.clientId = filters.clientId;
+    }
+    if (filters?.processId) {
+      where.id = filters.processId;
+    }
+
     return this.prisma.process.findMany({
-      where: { tenantId },
+      where,
       orderBy: { createdAt: 'desc' },
       include: {
         client: { select: { id: true, name: true, email: true } },
@@ -117,32 +135,35 @@ export class ProcessesService {
   }
 
   async update(id: string, updateProcessDto: UpdateProcessDto, tenantId: string, userId?: string) {
-    const data: any = { ...updateProcessDto };
+    const { deadline: deadlineRaw, number: incomingNumber, urgency, type, tribunal, court, comment, ...rest } = updateProcessDto as any;
 
-    if (data.deadline) {
-      if (typeof data.deadline === 'string' && data.deadline.length === 10) {
-        const [year, month, day] = data.deadline.split('-').map(Number);
-        data.deadline = new Date(year, month - 1, day, 12, 0, 0);
-      } else {
-        const d = new Date(data.deadline);
-        if (!isNaN(d.getTime())) {
-          d.setHours(12, 0, 0, 0);
-          data.deadline = d;
-        }
-      }
-    }
+    const parseDate = (d: any) => {
+      if (!d) return undefined;
+      const date = new Date(d);
+      if (isNaN(date.getTime())) return undefined;
+      date.setHours(12, 0, 0, 0);
+      return date;
+    };
+
+    const processData: any = {
+      ...rest,
+    };
+
+    if (court || tribunal) processData.court = court || tribunal;
+    if (deadlineRaw !== undefined) processData.deadline = parseDate(deadlineRaw);
+    if (incomingNumber !== undefined) processData.number = incomingNumber;
 
     // Handle completion logic
-    const isCompleted = data.status === 'GANHO' || data.status === 'COMPLETED' || data.status === 'WON' || data.kanbanColumn === 'Ganho' || data.kanbanColumn === 'Concluído';
+    const isCompleted = processData.status === 'GANHO' || processData.status === 'COMPLETED' || processData.status === 'WON' || processData.kanbanColumn === 'Ganho' || processData.kanbanColumn === 'Concluído';
     if (isCompleted) {
-      data.completedAt = new Date();
-    } else if (data.status === 'ACTIVE' || data.status === 'OPEN' || data.kanbanColumn === 'novo') {
-      data.completedAt = null;
+      processData.completedAt = new Date();
+    } else if (processData.status === 'ACTIVE' || processData.status === 'OPEN' || processData.kanbanColumn === 'novo') {
+      processData.completedAt = null;
     }
 
     const updated = await this.prisma.process.update({
       where: { id, tenantId },
-      data,
+      data: processData,
     });
 
     // Event Emitter: Emit when a process is marked as won/completed

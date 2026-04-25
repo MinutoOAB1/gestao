@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Query, Put } from '@nestjs/common';
 import { ProcessesService } from './processes.service';
 import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
@@ -74,8 +74,26 @@ export class ProcessesController {
   }
 
   @Get()
-  findAll(@Request() req) {
-    return this.processesService.findAll(req.user.tenantId);
+  @Get('filter')
+  @Post('filter')
+  @Roles(Role.ADMIN, Role.LAWYER)
+  async findAll(
+    @Request() req,
+    @Query('tribunal') tribunal?: string,
+    @Query('court') court?: string,
+    @Query('area') area?: string,
+    @Query('status') status?: string,
+    @Query('clientId') clientId?: string,
+    @Query('processId') processId?: string,
+    @Query('limit') limit?: string,
+    @Query('page') page?: string,
+    @Body() body?: any,
+  ) {
+    const take = limit ? parseInt(limit) : 50;
+    const skip = page ? (parseInt(page) - 1) * take : 0;
+    const filters = { tribunal: tribunal || body?.tribunal, court: court || body?.court, area: area || body?.area, status: status || body?.status, clientId: clientId || body?.clientId, processId: processId || body?.processId };
+    const result = await this.processesService.findAll(req.user.tenantId, filters, take, skip);
+    return result;
   }
 
   @Get(':id')
@@ -92,6 +110,13 @@ export class ProcessesController {
   @Roles(Role.ADMIN, Role.LAWYER)
   remove(@Request() req, @Param('id') id: string) {
     return this.processesService.remove(id, req.user.tenantId, req.user.sub);
+  }
+
+  @Patch(':id/move')
+  @Post(':id/move')
+  @Put(':id/move')
+  move(@Request() req, @Param('id') id: string, @Body() body: { column: string; order?: number }) {
+    return this.processesService.update(id, { kanbanColumn: body.column, kanbanOrder: body.order } as any, req.user.tenantId, req.user.sub);
   }
 
   // ─── Process sub-resources (:id/*) ───────────────────────

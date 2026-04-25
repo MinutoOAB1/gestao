@@ -86,7 +86,7 @@ export default function RegisterPage() {
     return (
         <div className="min-h-screen flex">
             {/* Left Side - Dark with Image Carousel (Hidden on Mobile) */}
-            <div className="hidden lg:flex lg:w-1/2 bg-[#0c1220] flex-col p-8 relative">
+            <div className="hidden lg:flex lg:w-1/2 bg-black flex-col p-8 relative">
                 {/* Logo */}
                 <div className="absolute top-8 left-8 z-20">
                     <BrandLogo variant="light" />
@@ -107,7 +107,7 @@ export default function RegisterPage() {
                         />
                     </AnimatePresence>
                     {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c1220] via-[#0c1220]/80 to-[#0c1220]/40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
                 </div>
 
                 {/* Spacer */}
@@ -115,7 +115,7 @@ export default function RegisterPage() {
 
                 {/* Quote Card with better visibility */}
                 <div className="z-10 relative">
-                    <div className="bg-[#0c1220]/90 backdrop-blur-md rounded-2xl p-6 border border-blue-500/20 shadow-xl shadow-blue-500/5">
+                    <div className="bg-black/90 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl shadow-white/5">
                         <AnimatePresence mode="wait">
                             <motion.p
                                 key={currentIndex}
@@ -136,8 +136,8 @@ export default function RegisterPage() {
                                     key={index}
                                     onClick={() => setCurrentIndex(index)}
                                     className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                        ? 'w-8 bg-blue-500'
-                                        : 'w-2 bg-slate-600 hover:bg-slate-500'
+                                        ? 'w-8 bg-white'
+                                        : 'w-2 bg-neutral-700 hover:bg-neutral-600'
                                         }`}
                                 />
                             ))}
@@ -161,9 +161,9 @@ export default function RegisterPage() {
                     >
                         <div className="relative">
                             <div className="absolute inset-0 bg-slate-50/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-2xl">
-                                <div className="bg-white p-8 rounded-3xl shadow-2xl border border-blue-500/20 text-center max-w-sm transform hover:scale-105 transition-transform duration-300">
-                                    <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                        <Mail className="text-blue-600" size={32} />
+                                <div className="bg-white p-8 rounded-3xl shadow-2xl border border-black/10 text-center max-w-sm transform hover:scale-105 transition-transform duration-300">
+                                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                        <Mail className="text-black" size={32} />
                                     </div>
                                     <h2 className="text-2xl font-bold text-slate-900 mb-2">Em Breve</h2>
                                     <p className="text-slate-600 text-sm mb-6 leading-relaxed">
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                                         Para acessar a plataforma, entre em contato com o administrador do seu escritório.
                                     </p>
                                     <div className="space-y-3">
-                                        <a href="mailto:contato@legalflow.com.br" className="block w-full py-3 px-4 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
+                                        <a href="mailto:contato@advus.com.br" className="block w-full py-3 px-4 bg-black text-white rounded-xl font-semibold text-sm hover:bg-gray-900 transition-colors">
                                             Falar com Suporte
                                         </a>
                                         <Link to="/login" className="block w-full py-3 px-4 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors">
@@ -344,7 +344,7 @@ export default function RegisterPage() {
                     </motion.div>
 
                     <p className="text-center text-slate-500 text-xs mt-12">
-                        © 2024 Blue Adv. Todos os direitos reservados.
+                        © 2026 Advus. Todos os direitos reservados.
                     </p>
                 </div>
             </div>

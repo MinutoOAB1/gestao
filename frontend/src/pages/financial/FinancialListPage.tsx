@@ -553,7 +553,7 @@ export default function FinancialListPage() {
             doc.setFontSize(8);
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(148, 163, 184);
-            doc.text('ESTE É UM DOCUMENTO DIGITAL EMITIDO PELO SISTEMA LEGALFLOW', pageWidth / 2, sigY + 15, { align: 'center' });
+            doc.text('ESTE É UM DOCUMENTO DIGITAL EMITIDO PELO SISTEMA Advus', pageWidth / 2, sigY + 15, { align: 'center' });
 
             // Footer
             doc.setFillColor(30, 41, 59);

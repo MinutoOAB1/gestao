@@ -12,16 +12,16 @@ export default function PrivacyPage() {
         const doc = new jsPDF();
         
         doc.setFontSize(22);
-        doc.text('Política de Privacidade - LegalFlow', 105, 20, { align: 'center' });
+        doc.text('Política de Privacidade - Advus', 105, 20, { align: 'center' });
         
         doc.setFontSize(10);
         doc.text('Última atualização: 23 de Abril de 2024', 105, 30, { align: 'center' });
         
         doc.setFontSize(12);
         const splitText = doc.splitTextToSize(
-            `1. Introdução\nA LegalFlow valoriza sua privacidade e está comprometida em proteger seus dados pessoais em conformidade com a LGPD.\n\n` +
+            `1. Introdução\nA Advus valoriza sua privacidade e está comprometida em proteger seus dados pessoais em conformidade com a LGPD.\n\n` +
             `2. Dados que Coletamos\nColetamos informações que você fornece ao criar uma conta (nome, e-mail, CNPJ) e dados de uso da plataforma para melhorar nossos serviços.\n\n` +
-            `3. Como Usamos seus Dados\nSeus dados são usados para fornecer e manter os serviços da LegalFlow, processar pagamentos, enviar comunicações importantes e garantir a segurança da plataforma.\n\n` +
+            `3. Como Usamos seus Dados\nSeus dados são usados para fornecer e manter os serviços da Advus, processar pagamentos, enviar comunicações importantes e garantir a segurança da plataforma.\n\n` +
             `4. Compartilhamento de Dados\nNão vendemos seus dados a terceiros. Podemos compartilhar informações com parceiros que prestam serviços essenciais (como processadores de pagamento), sempre sob estrita confidencialidade.\n\n` +
             `5. Segurança\nImplementamos medidas técnicas e organizacionais avançadas para proteger seus dados contra acesso não autorizado, perda ou alteração.\n\n` +
             `6. Seus Direitos\nVocê tem o direito de acessar, corrigir ou excluir seus dados pessoais a qualquer momento, conforme garantido pela LGPD.\n\n` +
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
         );
         doc.text(splitText, 20, 45);
         
-        doc.save('Politica_de_Privacidade_LegalFlow.pdf');
+        doc.save('Politica_de_Privacidade_Advus.pdf');
     };
 
     return (
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
                                 Introdução
                             </h2>
                             <p className="text-slate-600 leading-relaxed">
-                                A LegalFlow está comprometida com a proteção da sua privacidade e de seus dados pessoais. 
+                                A Advus está comprometida com a proteção da sua privacidade e de seus dados pessoais. 
                                 Esta Política de Privacidade explica como coletamos, usamos, compartilhamos e protegemos suas informações 
                                 em total conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).
                             </p>
@@ -163,7 +163,7 @@ export default function PrivacyPage() {
                         <section className="pt-8 border-t border-slate-100">
                             <p className="text-slate-500 text-sm text-center">
                                 Para exercer seus direitos de privacidade, entre em contato com nosso DPO através do e-mail: 
-                                <a href="mailto:privacidade@legalflow.com.br" className="text-emerald-600 font-medium ml-1">privacidade@legalflow.com.br</a>
+                                <a href="mailto:privacidade@Advus.com.br" className="text-emerald-600 font-medium ml-1">privacidade@Advus.com.br</a>
                             </p>
                         </section>
                     </div>
