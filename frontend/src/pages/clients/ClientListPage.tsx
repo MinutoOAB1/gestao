@@ -52,20 +52,20 @@ interface Client {
 }
 
 const STATUS_MAP: Record<string, { label: string; bg: string; text: string; border: string }> = {
-    ATIVO: { label: 'Ativo', bg: 'bg-black dark:bg-white text-white dark:text-black', text: 'text-black dark:text-white', border: 'border-black/20 dark:border-white/20' },
-    INATIVO: { label: 'Inativo', bg: 'bg-neutral-500/10', text: 'text-neutral-400', border: 'border-neutral-500/20' },
-    SUSPENSO: { label: 'Suspenso', bg: 'bg-neutral-800 text-white', text: 'text-white', border: 'border-neutral-800/20' },
+    ATIVO: { label: 'Ativo', bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20' },
+    INATIVO: { label: 'Inativo', bg: 'bg-slate-500/10', text: 'text-slate-500', border: 'border-slate-500/20' },
+    SUSPENSO: { label: 'Suspenso', bg: 'bg-amber-500/10', text: 'text-amber-600', border: 'border-amber-500/20' },
 };
 
 const AVATAR_GRADIENTS = [
-    'from-neutral-800 to-black',
-    'from-neutral-600 to-neutral-800',
-    'from-neutral-400 to-neutral-600',
-    'from-neutral-200 to-neutral-400',
-    'from-black to-neutral-800',
-    'from-neutral-700 to-neutral-900',
-    'from-neutral-500 to-neutral-700',
-    'from-neutral-300 to-neutral-500'
+    'from-indigo-500 to-purple-600',
+    'from-emerald-500 to-teal-600',
+    'from-blue-500 to-indigo-600',
+    'from-rose-500 to-pink-600',
+    'from-amber-500 to-orange-600',
+    'from-cyan-500 to-blue-600',
+    'from-violet-500 to-purple-600',
+    'from-slate-500 to-slate-700'
 ];
 
 const getAvatarGradient = (id: string = '') => {
@@ -176,18 +176,18 @@ export default function ClientListPage() {
                 <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">${c.demandType || '--'}</td>
                 <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">
                     <span style="padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;
-                        ${c.urgencyLevel === 'URGENTE' ? 'background:#000000;color:#ffffff;' :
-                c.urgencyLevel === 'ALTA' ? 'background:#18181b;color:#ffffff;' :
-                    c.urgencyLevel === 'MEDIA' ? 'background:#3f3f46;color:#ffffff;' :
-                        'background:#f4f4f5;color:#000000;'}">
+                        ${c.urgencyLevel === 'URGENTE' ? 'background:#ef4444;color:#ffffff;' :
+                c.urgencyLevel === 'ALTA' ? 'background:#f97316;color:#ffffff;' :
+                    c.urgencyLevel === 'MEDIA' ? 'background:#f59e0b;color:#ffffff;' :
+                        'background:#10b981;color:#ffffff;'}">
                         ${c.urgencyLevel || '--'}
                     </span>
                 </td>
                 <td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:center;">
                     <span style="padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;
-                        ${c.status === 'ATIVO' ? 'background:#000000;color:#ffffff;' :
-                c.status === 'SUSPENSO' ? 'background:#3f3f46;color:#ffffff;' :
-                    'background:#f3f4f6;color:#000000;'}">
+                        ${c.status === 'ATIVO' ? 'background:#10b981;color:#ffffff;' :
+                c.status === 'SUSPENSO' ? 'background:#f59e0b;color:#ffffff;' :
+                    'background:#6b7280;color:#ffffff;'}">
                         ${(c.status || 'ATIVO')}
                     </span>
                 </td>

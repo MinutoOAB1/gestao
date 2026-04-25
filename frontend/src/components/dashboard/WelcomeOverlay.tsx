@@ -214,23 +214,23 @@ export default function WelcomeOverlay({ isOpen, onClose, userName, stats, onSho
                                         </h3>
                                         <div className="grid grid-cols-1 gap-3">
                                             {stats.pendingActions.oldProcesses.map((proc, idx) => (
-                                                <div key={`p-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                                                    <div className="w-2 h-2 rounded-full bg-black dark:bg-white" />
+                                                <div key={`p-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-blue-500/5 dark:bg-blue-400/5 border border-blue-500/10 dark:border-blue-400/10">
+                                                    <div className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400" />
                                                     <div className="flex-1">
                                                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Atualizar Processo: {proc.title}</p>
                                                         <p className="text-[10px] text-slate-500">Sem andamentos há mais de 30 dias</p>
                                                     </div>
-                                                    <ArrowRight size={14} className="text-slate-400" />
+                                                    <ArrowRight size={14} className="text-blue-400" />
                                                 </div>
                                             ))}
                                             {stats.pendingActions.incompleteClients.map((client, idx) => (
-                                                <div key={`c-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700">
-                                                    <div className="w-2 h-2 rounded-full bg-neutral-400 dark:bg-neutral-500" />
+                                                <div key={`c-${idx}`} className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 dark:bg-amber-400/5 border border-amber-500/10 dark:border-amber-400/10">
+                                                    <div className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400" />
                                                     <div className="flex-1">
                                                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Completar Cadastro: {client.name}</p>
                                                         <p className="text-[10px] text-slate-500">Falta e-mail ou telefone de contato</p>
                                                     </div>
-                                                    <ArrowRight size={14} className="text-slate-400" />
+                                                    <ArrowRight size={14} className="text-amber-400" />
                                                 </div>
                                             ))}
                                         </div>

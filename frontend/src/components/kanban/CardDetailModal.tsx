@@ -380,7 +380,7 @@ export default function CardDetailModal({
                                         <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                                             <FileText size={18} className="text-black dark:text-white" /> Memorial do Caso
                                         </h3>
-                                        <button onClick={() => setEditingDesc(!editingDesc)} className="text-[10px] font-bold text-black dark:text-white bg-black/5 dark:bg-white/10 px-3 py-1.5 rounded-lg hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all">
+                                        <button onClick={() => setEditingDesc(!editingDesc)} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-500/10 dark:bg-blue-400/10 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all">
                                             {editingDesc ? 'CANCELAR' : 'EDITAR CONTEÚDO'}
                                         </button>
                                     </div>
@@ -393,7 +393,7 @@ export default function CardDetailModal({
                                                 autoFocus
                                             />
                                             <div className="flex justify-end">
-                                                <button onClick={saveDesc} className="px-6 py-2 bg-black dark:bg-white text-white dark:text-black font-bold rounded-xl shadow-lg shadow-black/20 hover:opacity-90 transition-all flex items-center gap-2">
+                                                <button onClick={saveDesc} className="px-6 py-2 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all flex items-center gap-2">
                                                     <Save size={16} /> SALVAR ALTERAÇÕES
                                                 </button>
                                             </div>
@@ -411,7 +411,7 @@ export default function CardDetailModal({
                                         <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                                             <CheckSquare size={18} className="text-black dark:text-white" /> Checklists de Execução
                                         </h3>
-                                        <button onClick={handleCreateChecklist} className="text-[10px] font-bold text-black dark:text-white bg-black/5 dark:bg-white/10 px-3 py-1.5 rounded-lg hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all">
+                                        <button onClick={handleCreateChecklist} className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 dark:bg-indigo-400/10 px-3 py-1.5 rounded-lg hover:bg-indigo-600 hover:text-white transition-all">
                                             + NOVO CHECKLIST
                                         </button>
                                     </div>
@@ -419,7 +419,7 @@ export default function CardDetailModal({
                                     {totalChecklistItems > 0 && (
                                         <div className="mb-6 flex items-center gap-4">
                                             <div className="flex-1 h-3 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-200 dark:border-slate-700 shadow-inner">
-                                                <div className="h-full bg-gradient-to-r from-neutral-800 to-black dark:from-neutral-200 dark:to-white transition-all duration-700" style={{ width: `${checklistProgress}%` }} />
+                                                <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-all duration-700" style={{ width: `${checklistProgress}%` }} />
                                             </div>
                                             <span className="text-[11px] font-black text-black dark:text-white whitespace-nowrap">{checklistProgress}% CONCLUÍDO</span>
                                         </div>
@@ -437,9 +437,9 @@ export default function CardDetailModal({
                                                         <div key={item.id} className="flex items-center gap-3 group">
                                                             <button 
                                                                 onClick={() => toggleChecklistItem(item.id, item.completed)}
-                                                                className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${item.completed ? 'bg-black dark:bg-white border-black dark:border-white shadow-sm shadow-black/30' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}
+                                                                className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${item.completed ? 'bg-emerald-500 border-emerald-500 shadow-sm shadow-emerald-500/30' : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700'}`}
                                                             >
-                                                                {item.completed && <span className="text-white dark:text-black text-[10px]">✓</span>}
+                                                                {item.completed && <span className="text-white text-[10px]">✓</span>}
                                                             </button>
                                                             <span className={`flex-1 text-sm ${item.completed ? 'text-gray-400 line-through decoration-2' : 'text-gray-700 dark:text-gray-300 font-medium'}`}>{item.text}</span>
                                                             <button onClick={() => handleDeleteChecklistItem(item.id)} className="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-all"><Trash2 size={12} /></button>

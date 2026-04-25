@@ -157,7 +157,7 @@ export const InvoiceManagementTab: React.FC = () => {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <button 
             onClick={fetchInvoices}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/5 text-black dark:text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-black/10 dark:hover:bg-white/10 transition-all"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-500/20 transition-all"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Atualizar
           </button>
@@ -190,7 +190,7 @@ export const InvoiceManagementTab: React.FC = () => {
                   {/* Icon & Method */}
                   <div className={clsx(
                     "w-16 h-16 rounded-[2rem] flex items-center justify-center shrink-0 shadow-inner",
-                    invoice.paymentMethod === 'PIX' ? "bg-black/10 text-black" : "bg-black/5 text-black dark:text-white"
+                    invoice.paymentMethod === 'PIX' ? "bg-indigo-500/10 text-indigo-600" : "bg-blue-500/10 text-blue-600"
                   )}>
                     {invoice.paymentMethod === 'PIX' ? <QrCode size={28} /> : <FileText size={28} />}
                   </div>
