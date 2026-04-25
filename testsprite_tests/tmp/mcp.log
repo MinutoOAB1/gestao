@@ -14233,3 +14233,55 @@
 {"timestamp":"2026-04-25T22:26:51.546Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
 {"timestamp":"2026-04-25T22:26:52.055Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
 {"timestamp":"2026-04-25T22:26:52.566Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:14.862Z","level":"debug","message":"Generate code and execute params","context":{"projectName":"gestao","projectPath":"c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv","testIds":[],"serverMode":"development"}}
+{"timestamp":"2026-04-25T23:23:15.027Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:15.542Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:16.052Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:16.561Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:17.070Z","level":"info","message":"checkPortListening tcp failed, trying http fallback: 5173 localhost"}
+{"timestamp":"2026-04-25T23:23:17.090Z","level":"error","message":"checkPortListening http check failed: http://localhost:5173/ TypeError: fetch failed"}
+{"timestamp":"2026-04-25T23:23:17.091Z","level":"error","message":"checkPortListening failed (tcp + http): 5173 localhost"}
+{"timestamp":"2026-04-25T23:23:17.091Z","level":"info","message":"Attempting to start server (attempt 1/3)"}
+{"timestamp":"2026-04-25T23:23:17.999Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:17.095Z","level":"info","message":"HTTP server started successfully on port 52464"}
+{"timestamp":"2026-04-25T23:23:18.508Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:19.020Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:19.537Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:20.045Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:20.558Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:21.073Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:21.579Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:22.096Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:22.607Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:23.121Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:23.628Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:24.135Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:24.649Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:25.158Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:23:25.670Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:36.817Z","level":"debug","message":"Generate code and execute params","context":{"projectName":"gestao","projectPath":"c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv","testIds":["TC001","TC004"],"serverMode":"development"}}
+{"timestamp":"2026-04-25T23:30:36.954Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:37.462Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:37.977Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:38.484Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:38.994Z","level":"info","message":"checkPortListening tcp failed, trying http fallback: 5173 localhost"}
+{"timestamp":"2026-04-25T23:30:39.006Z","level":"info","message":"Attempting to start server (attempt 1/3)"}
+{"timestamp":"2026-04-25T23:30:39.010Z","level":"info","message":"HTTP server started successfully on port 53206"}
+{"timestamp":"2026-04-25T23:30:39.005Z","level":"error","message":"checkPortListening http check failed: http://localhost:5173/ TypeError: fetch failed"}
+{"timestamp":"2026-04-25T23:30:39.005Z","level":"error","message":"checkPortListening failed (tcp + http): 5173 localhost"}
+{"timestamp":"2026-04-25T23:30:39.736Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:40.251Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:40.763Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:41.266Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:41.776Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:42.285Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:42.799Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:43.312Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:43.819Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:44.328Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:44.836Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:45.345Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:45.857Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:46.368Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:46.877Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-25T23:30:47.387Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}

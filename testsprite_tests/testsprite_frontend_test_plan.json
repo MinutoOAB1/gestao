@@ -1,8 +1,8 @@
 [
   {
     "id": "TC001",
-    "title": "Sign in successfully to access the dashboard",
-    "description": "Verifies an existing user can sign in with valid credentials and reach the dashboard.",
+    "title": "Returning user logs in and reaches dashboard",
+    "description": "Verifies an existing user can log in from the login page and is redirected into the authenticated dashboard at /app.",
     "category": "User Authentication",
     "steps": [
       {
@@ -23,32 +23,44 @@
       },
       {
         "type": "assertion",
-        "description": "Verify the user lands on the dashboard at /app"
+        "description": "Verify the user lands on the dashboard"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC002",
-    "title": "Redirect unauthenticated user from dashboard route to login",
-    "description": "Verifies attempting to access the dashboard while logged out redirects the user to the login page or blocks access.",
-    "category": "Dashboard Access",
+    "title": "Unauthenticated user is redirected to login when accessing dashboard and can continue after signing in",
+    "description": "Verifies the auth guard redirects an unauthenticated visit to /app to /login and allows access to the dashboard after successful login.",
+    "category": "User Authentication",
     "steps": [
       {
         "type": "action",
         "description": "Navigate to /app"
       },
       {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
         "type": "assertion",
-        "description": "Verify the user is blocked from the dashboard and prompted to log in"
+        "description": "Verify the user lands on the dashboard"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC003",
-    "title": "Register then sign in to reach the dashboard",
-    "description": "Verifies a new user can register, then log in with the same credentials, and land on the dashboard.",
+    "title": "New user registers and proceeds to sign in",
+    "description": "Verifies a new user can complete registration, see a success confirmation, and navigate to the login screen to sign in.",
     "category": "User Authentication",
     "steps": [
       {
@@ -57,15 +69,15 @@
       },
       {
         "type": "action",
-        "description": "Fill \"Advus Auth User\" into the name field"
+        "description": "Fill a valid name into the name field"
       },
       {
         "type": "action",
-        "description": "Fill \"advus.auth+{{RAND}}@example.com\" into the email field"
+        "description": "Fill a unique email into the email field"
       },
       {
         "type": "action",
-        "description": "Fill \"ValidPass123!\" into the password field"
+        "description": "Fill a valid password into the password field"
       },
       {
         "type": "action",
@@ -73,65 +85,20 @@
       },
       {
         "type": "action",
-        "description": "Navigate to /login"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"advus.auth+{{RAND}}@example.com\" into the email field"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"ValidPass123!\" into the password field"
-      },
-      {
-        "type": "action",
-        "description": "Submit the login form"
+        "description": "Click the option to sign in after successful registration"
       },
       {
         "type": "assertion",
-        "description": "Verify the user lands on the dashboard at /app"
+        "description": "Verify the user lands on the login page"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC004",
-    "title": "Access dashboard directly while authenticated",
-    "description": "Verifies an authenticated user can navigate directly to the dashboard route and see the dashboard overview and navigation.",
-    "category": "Dashboard Access",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /login"
-      },
-      {
-        "type": "action",
-        "description": "Fill in the email field with {{LOGIN_USER}}"
-      },
-      {
-        "type": "action",
-        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
-      },
-      {
-        "type": "action",
-        "description": "Submit the login form"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to /app"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the dashboard overview and core navigation are displayed"
-      }
-    ],
-    "priority": "High"
-  },
-  {
-    "id": "TC005",
-    "title": "Convert from landing page to successful account registration",
-    "description": "Verifies a visitor can review the landing page, navigate to registration, create an account, and see an account creation confirmation.",
-    "category": "Landing Page",
+    "title": "Prospect navigates from landing page to registration",
+    "description": "Verifies a public visitor can browse the landing page content and reach the registration page from a registration call-to-action.",
+    "category": "Premium Landing Page",
     "steps": [
       {
         "type": "action",
@@ -139,39 +106,48 @@
       },
       {
         "type": "action",
-        "description": "Scroll to the features section"
+        "description": "Scroll through the landing page sections"
       },
       {
         "type": "action",
         "description": "Click the call-to-action to create an account"
       },
       {
+        "type": "assertion",
+        "description": "Verify the user lands on the registration page"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Prospect navigates from landing page to login",
+    "description": "Verifies a public visitor can browse the landing page content and reach the login page from a sign-in call-to-action.",
+    "category": "Premium Landing Page",
+    "steps": [
+      {
         "type": "action",
-        "description": "Fill \"Advus Test User\" into the name field"
+        "description": "Navigate to /"
       },
       {
         "type": "action",
-        "description": "Fill \"advus.user+{{RAND}}@example.com\" into the email field"
+        "description": "Scroll through the landing page sections"
       },
       {
         "type": "action",
-        "description": "Fill \"ValidPass123!\" into the password field"
-      },
-      {
-        "type": "action",
-        "description": "Submit the registration form"
+        "description": "Click the call-to-action to sign in"
       },
       {
         "type": "assertion",
-        "description": "Verify an account creation confirmation is visible"
+        "description": "Verify the user lands on the login page"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC006",
-    "title": "Request password recovery from forgot-password",
-    "description": "Verifies a user can submit an email address on the forgot-password page and see a recovery request confirmation.",
+    "title": "User requests password reset instructions",
+    "description": "Verifies a locked-out user can submit the forgot-password form and sees instructions indicating next steps were provided.",
     "category": "User Authentication",
     "steps": [
       {
@@ -180,81 +156,23 @@
       },
       {
         "type": "action",
-        "description": "Fill \"recovery.user@example.com\" into the email field"
+        "description": "Fill a registered email into the email field"
       },
       {
         "type": "action",
-        "description": "Submit the recovery request form"
+        "description": "Submit the password recovery request"
       },
       {
         "type": "assertion",
-        "description": "Verify a password recovery confirmation is visible"
+        "description": "Verify an instruction or confirmation is shown indicating reset steps were sent"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC007",
-    "title": "Show required-field validation on registration from landing page",
-    "description": "Verifies a visitor can reach registration from the landing page and is prevented from submitting when required fields are missing.",
-    "category": "Landing Page",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "action",
-        "description": "Scroll through the main marketing content"
-      },
-      {
-        "type": "action",
-        "description": "Click the call-to-action to create an account"
-      },
-      {
-        "type": "action",
-        "description": "Submit the registration form"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify required-field validation errors are visible"
-      }
-    ],
-    "priority": "Low"
-  },
-  {
-    "id": "TC008",
-    "title": "Prevent reset-password submission when confirmation does not match",
-    "description": "Verifies the reset-password form blocks submission when the new password and confirmation do not match.",
-    "category": "User Authentication",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /reset-password"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"ValidPass123!\" into the new password field"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"DifferentPass123!\" into the confirm password field"
-      },
-      {
-        "type": "action",
-        "description": "Submit the reset password form"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify a password mismatch validation error is visible"
-      }
-    ],
-    "priority": "Low"
-  },
-  {
-    "id": "TC009",
-    "title": "Reject sign-in with incorrect password",
-    "description": "Verifies the login form shows an invalid-credentials error when the password is incorrect.",
+    "title": "Login shows error for incorrect credentials",
+    "description": "Verifies a user entering an incorrect password is shown an authentication error and is not logged in.",
     "category": "User Authentication",
     "steps": [
       {
@@ -267,7 +185,7 @@
       },
       {
         "type": "action",
-        "description": "Fill \"WrongPassword123!\" into the password field"
+        "description": "Fill an invalid password into the password field"
       },
       {
         "type": "action",
@@ -275,7 +193,94 @@
       },
       {
         "type": "assertion",
-        "description": "Verify an invalid-credentials error is visible"
+        "description": "Verify an authentication error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC008",
+    "title": "Landing page key marketing content is discoverable by scrolling",
+    "description": "Verifies the landing page can be scrolled and core product sections like features and pricing/highlights are present for evaluation.",
+    "category": "Premium Landing Page",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down until feature highlights are in view"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down until pricing or plan highlights are in view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify product feature and pricing highlights are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC009",
+    "title": "Registration shows required-field validation when data is missing",
+    "description": "Verifies the registration form prevents submission with missing required information and shows a validation error.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid name into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique email into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Leave at least one required field empty"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a required-field validation error is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC010",
+    "title": "Reset password requires matching confirmation",
+    "description": "Verifies the reset-password form enforces that the new password and confirmation match before allowing completion.",
+    "category": "User Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid new password into the new password field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a different valid password into the confirmation field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the reset password form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a password mismatch validation error is visible"
       }
     ],
     "priority": "Low"

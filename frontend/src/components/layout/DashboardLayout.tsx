@@ -30,13 +30,13 @@ const SidebarItem = memo(({ icon: Icon, label, path, collapsed }: { icon: any, l
                 className={cn(
                 "group flex items-center gap-3 px-3 py-2.5 mx-2 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden touch-manipulation no-tap-highlight",
                 active
-                    ? "bg-white/15 text-white shadow-lg shadow-white/5"
-                    : "text-white/60 hover:bg-white/8 hover:text-white active:bg-white/15"
+                    ? "bg-white/10 text-white"
+                    : "text-white/50 hover:bg-white/5 hover:text-white/80 active:bg-white/10"
             )}>
                 {/* Active indicator bar */}
-                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-r-full shadow-md shadow-primary/50" />}
+                {active && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-white rounded-r-full" />}
                 <div className={cn("p-1 rounded-lg transition-all duration-200", active ? "bg-white/10" : "group-hover:bg-white/5")}>
-                    <Icon size={18} className={cn("transition-all duration-200", active ? "text-primary scale-110" : "text-white/60")} />
+                    <Icon size={18} className={cn("transition-all duration-200", active ? "text-white" : "text-white/50")} />
                 </div>
                 {!collapsed && (
                     <span className={cn("font-medium text-[13px] tracking-wide", active ? "text-white" : "text-white/60")}>
@@ -276,11 +276,11 @@ export default function DashboardLayout() {
 
     return (
         <div className="flex h-screen-stable bg-app-bg text-app-text-main font-body overflow-hidden">
-            {/* Desktop Sidebar - Dark blue gradient */}
+            {/* Desktop Sidebar */}
             <aside
                 className={cn(
                     "hidden md:flex flex-col z-20 transition-all duration-300 flex-shrink-0",
-                    "bg-gradient-to-b from-primary-dark via-[#1E1B4B] to-black border-r border-white/5",
+                    "bg-[#0F172A] border-r border-white/5",
                     collapsed ? "w-20" : "w-72"
                 )}
             >
@@ -301,7 +301,7 @@ export default function DashboardLayout() {
                 {/* User Profile Card */}
                 <div className={cn("mx-3 mb-4 p-3 rounded-xl bg-white/[0.06] border border-white/[0.08]", collapsed && "mx-2 p-2")}>
                     <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary via-primary-dark to-accent flex items-center justify-center shrink-0 ring-2 ring-white/10 shadow-lg shadow-primary/30">
+                        <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0 ring-2 ring-white/10">
                             {user?.avatar ? (
                                 <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
                             ) : (
@@ -400,16 +400,13 @@ export default function DashboardLayout() {
                 {!collapsed && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
-                            <div className="relative bg-gradient-to-br from-primary via-primary-dark to-black rounded-2xl p-4 overflow-hidden group cursor-pointer hover:shadow-2xl transition-all border border-white/10 group-hover:border-primary/30">
-                                {/* Sparkle Effect */}
-                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                                
+                            <div className="relative bg-white/[0.06] rounded-2xl p-4 overflow-hidden group cursor-pointer hover:bg-white/[0.09] transition-all border border-white/[0.08]">
                                 <h3 className="text-white font-bold text-sm mb-1 font-display tracking-tight flex items-center gap-2">
-                                    IA Jurídica Premium
-                                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(79,115,245,0.8)]" />
+                                    IA Jurídica
+                                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                                 </h3>
-                                <p className="text-white/40 text-[11px] mb-4 leading-relaxed font-medium">Analise contratos complexos com precisão absoluta.</p>
-                                <button className="w-full py-2 bg-primary text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-white hover:text-primary transition-all shadow-lg shadow-primary/10">
+                                <p className="text-white/40 text-[11px] mb-4 leading-relaxed font-medium">Analise contratos com precisão absoluta.</p>
+                                <button className="w-full py-2 bg-white/10 text-white rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-white/20 transition-all">
                                     Acessar Agora
                                 </button>
                             </div>
@@ -434,24 +431,24 @@ export default function DashboardLayout() {
             </aside>
 
             {/* Right Side - Header + Main Content */}
-            <div className="flex-1 flex flex-col h-full bg-primary-dark relative overflow-hidden">
+            <div className="flex-1 flex flex-col h-full bg-[#0F172A] relative overflow-hidden">
                 {/* Desktop Header - Glass effect */}
                 {!isFullScreenPage && (
-                    <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-app-card border-b border-app-stroke">
+                    <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-[#0F172A] border-b border-white/5">
                         {/* Search Bar - Replaced with Global Search Trigger to enforce ecosystem approach */}
                         <div className="flex-1 max-w-2xl relative">
                             <button
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-app-input hover:bg-app-input/80 border border-app-stroke rounded-xl text-app-text-muted hover:text-app-text-main transition-all text-xs font-medium"
+                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-white/[0.06] hover:bg-white/[0.09] border border-white/10 rounded-xl text-white/50 hover:text-white/80 transition-all text-xs font-medium"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Search size={18} className="text-app-text-label group-hover:text-app-text-main transition-colors" />
+                                    <Search size={18} className="text-white/40 group-hover:text-white/70 transition-colors" />
                                     <span>Buscar no sistema...</span>
                                 </div>
                                 <div className="flex items-center gap-1 opacity-40">
-                                    <kbd className="px-2 py-1 bg-app-bg rounded-md text-[9px] font-mono border border-app-stroke shadow-sm">Ctrl</kbd>
-                                    <span className="text-xs">+</span>
-                                    <kbd className="px-2 py-1 bg-app-bg rounded-md text-[9px] font-mono border border-app-stroke shadow-sm">K</kbd>
+                                    <kbd className="px-2 py-1 bg-white/5 rounded-md text-[9px] font-mono border border-white/10 text-white/40">Ctrl</kbd>
+                                    <span className="text-xs text-white/30">+</span>
+                                    <kbd className="px-2 py-1 bg-white/5 rounded-md text-[9px] font-mono border border-white/10 text-white/40">K</kbd>
                                 </div>
                             </button>
                         </div>
@@ -465,7 +462,7 @@ export default function DashboardLayout() {
                                     {teamMembers.filter(m => m.id !== user?.id).slice(0, 3).map((member) => (
                                         <div
                                             key={member.id}
-                                            className="w-9 h-9 rounded-full border-2 border-black flex items-center justify-center overflow-hidden bg-white/20 hover:z-10 transition-transform hover:scale-110"
+                                            className="w-9 h-9 rounded-full border-2 border-[#0F172A] flex items-center justify-center overflow-hidden bg-white/15 hover:z-10 transition-transform hover:scale-110"
                                             title={`${member.name} - ${member.role}`}
                                         >
                                             {member.avatar ? (
@@ -476,14 +473,14 @@ export default function DashboardLayout() {
                                         </div>
                                     ))}
                                     {teamMembers.filter(m => m.id !== user?.id).length > 3 && (
-                                        <div className="w-9 h-9 rounded-full border-2 border-black dark:border-white/20 bg-neutral-800 dark:bg-white/10 flex items-center justify-center">
-                                            <span className="text-white dark:text-white/80 text-xs font-bold">+{teamMembers.filter(m => m.id !== user?.id).length - 3}</span>
+                                        <div className="w-9 h-9 rounded-full border-2 border-[#0F172A] bg-white/10 flex items-center justify-center">
+                                            <span className="text-white/80 text-xs font-bold">+{teamMembers.filter(m => m.id !== user?.id).length - 3}</span>
                                         </div>
                                     )}
                                 </div>
                                 {/* Current user avatar on top */}
                                 <div
-                                    className="w-10 h-10 rounded-full border-2 border-black/10 dark:border-white/30 flex items-center justify-center overflow-hidden bg-black/5 dark:bg-white/20 -ml-3 z-10 ring-2 ring-white dark:ring-black"
+                                    className="w-10 h-10 rounded-full border-2 border-white/20 flex items-center justify-center overflow-hidden bg-white/15 -ml-3 z-10 ring-2 ring-[#0F172A]"
                                     title={user?.name || 'Usuário'}
                                 >
                                     {user?.avatar ? (
@@ -498,7 +495,7 @@ export default function DashboardLayout() {
                                 {timer.isRunning ? (
                                         <button
                                         onClick={() => navigate('/app/timesheet')}
-                                        className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-xl hover:bg-white hover:text-primary transition-all shadow-lg shadow-primary/20"
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
                                         title={timer.processTitle || timer.description || 'Timer rodando'}
                                     >
                                         <Pause size={16} />
@@ -514,7 +511,7 @@ export default function DashboardLayout() {
                                 ) : (
                                     <button
                                         onClick={() => navigate('/app/timesheet')}
-                                        className="p-2.5 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                                        className="p-2.5 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
                                         title="Timesheet"
                                     >
                                         <Clock size={20} />
@@ -529,7 +526,7 @@ export default function DashboardLayout() {
 
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
-                    <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/10 bg-black/80 backdrop-blur-md">
+                    <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/5 bg-[#0F172A]">
                         <div className="flex items-center gap-3.5" onClick={() => navigate('/app/perfil')}>
                             <div className="w-11 h-11 rounded-full bg-white/20 overflow-hidden flex items-center justify-center ring-2 ring-white/10 shadow-lg transition-transform active:scale-95">
                                 {user?.avatar ? (
@@ -556,7 +553,7 @@ export default function DashboardLayout() {
                 )}
 
                 {/* THE CURVE: Main content with rounded-tl-[40px] creates the organic curved corner */}
-                <main className="flex-1 relative z-10 bg-slate-50 dark:bg-slate-950 bg-dot-pattern text-slate-900/[0.05] dark:text-white/[0.02] rounded-tl-[40px] md:rounded-tl-[40px] shadow-[inset_2px_2px_8px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col pb-20 md:pb-0">
+                <main className="flex-1 relative z-10 bg-app-bg rounded-tl-[40px] md:rounded-tl-[40px] overflow-hidden flex flex-col pb-20 md:pb-0">
                     <div className={cn(
                         "flex-1 custom-scrollbar scroll-smooth",
                         !isFullScreenPage ? "p-4 sm:p-6 lg:p-8 overflow-y-auto" : "flex flex-col h-full overflow-hidden"

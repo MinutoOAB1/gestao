@@ -8,12 +8,15 @@
   "executionArgs": {
     "projectName": "gestao",
     "projectPath": "c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv",
-    "testIds": [],
-    "additionalInstruction": "Frontend is running on port 5174. Backend is running on port 3000. Validate the new Advus branding (Indigo/Gold) and core flows (Login, Dashboard).",
+    "testIds": [
+      "TC001",
+      "TC004"
+    ],
+    "additionalInstruction": "Run only tests TC001 and TC004 to validate the new Advus Electric Blue branding on the Login page and Landing Page. Frontend is on port 5174.",
     "serverMode": "development",
     "envs": {
       "API_KEY": "sk-user-wzczV0JioCRer3xEAWcyQpeKCLLAyLGXZV9i11hYV0Eq12qy6nk7DWmJT6k9oRrY9acuRV3mpMGetUxV3cIyYek3E-mpIbKRb3Aor9bXPPEvhKaGSv9iRq766A7EDeD0W6Y"
     }
   },
-  "serverPort": 53733
+  "serverPort": 53206
 }

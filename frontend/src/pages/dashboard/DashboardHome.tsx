@@ -499,7 +499,7 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                            <div className="col-span-2 lg:col-span-2 bg-gradient-to-br from-primary via-primary-dark to-accent rounded-xl border border-white/10 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
+                            <div className="col-span-2 lg:col-span-2 bg-primary rounded-xl border border-white/10 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 dark:bg-black/10 rounded-full blur-2xl pointer-events-none" />
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">

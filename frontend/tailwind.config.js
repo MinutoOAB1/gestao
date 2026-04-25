@@ -34,11 +34,11 @@ export default {
                 },
                 primary: {
                     DEFAULT: '#4F73F5', 
-                    dark: '#3730A3',
+                    dark: '#0F172A',
                     light: '#6366F1',
                     glow: 'rgba(79, 115, 245, 0.2)',
-                    accent: '#6B5CE7',
                 },
+                accent: '#6B5CE7',
                 status: {
                     urgent: {
                         bg: 'rgba(239, 68, 68, 0.05)',
