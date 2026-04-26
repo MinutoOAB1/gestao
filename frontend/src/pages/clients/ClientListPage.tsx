@@ -99,8 +99,8 @@ export default function ClientListPage() {
         
         reader.onload = async (evt) => {
             try {
-                const bstr = evt.target?.result;
-                const wb = XLSX.read(bstr, { type: 'binary' });
+                const dataBuffer = evt.target?.result;
+                const wb = XLSX.read(dataBuffer, { type: 'array' });
                 const wsname = wb.SheetNames[0];
                 const ws = wb.Sheets[wsname];
                 const data = XLSX.utils.sheet_to_json(ws) as any[];
@@ -110,42 +110,57 @@ export default function ClientListPage() {
 
                 for (const row of data) {
                     try {
-                        // Normalize keys to lowercase for easier mapping
+                        // Normalize keys: lowercase and remove spaces/special chars
                         const normalizedRow: any = {};
                         Object.keys(row).forEach(key => {
-                            normalizedRow[key.toLowerCase()] = row[key];
+                            const cleanKey = key.toLowerCase()
+                                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
+                                .replace(/[^a-z0-9]/g, ''); // remove spaces and special chars
+                            normalizedRow[cleanKey] = row[key];
                         });
 
-                        const payload = {
-                            name: normalizedRow.nome || normalizedRow.name || normalizedRow.cliente,
-                            document: String(normalizedRow.cpf || normalizedRow.cnpj || normalizedRow.documento || '').replace(/\D/g, ''),
-                            email: normalizedRow.email || normalizedRow.correio || '',
-                            phone: String(normalizedRow.telefone || normalizedRow.celular || normalizedRow.phone || ''),
-                            type: normalizedRow.tipo === 'PJ' ? 'PJ' : 'PF',
-                            status: 'ATIVO'
-                        };
+                        // Flexible mapping for common headers
+                        const name = normalizedRow.nome || normalizedRow.name || normalizedRow.cliente || normalizedRow.razaosocial || normalizedRow.nomecompleto;
+                        const document = String(normalizedRow.cpf || normalizedRow.cnpj || normalizedRow.documento || normalizedRow.cpfcnpj || '').replace(/\D/g, '');
+                        const email = normalizedRow.email || normalizedRow.correio || normalizedRow.correioeletronico || '';
+                        const phone = String(normalizedRow.telefone || normalizedRow.celular || normalizedRow.phone || normalizedRow.contato || '');
+                        const type = (normalizedRow.tipo === 'PJ' || String(document).length > 11) ? 'PJ' : 'PF';
 
-                        if (payload.name) {
-                            await api.post('/clients', payload);
+                        if (name) {
+                            await api.post('/clients', {
+                                name,
+                                document,
+                                email,
+                                phone,
+                                status: 'ATIVO'
+                            });
                             successCount++;
                         }
                     } catch (err) {
+                        console.error('Falha ao importar linha:', row, err);
                         errorCount++;
                     }
                 }
 
-                addToast(`${successCount} clientes importados com sucesso! ${errorCount > 0 ? `${errorCount} falhas.` : ''}`, successCount > 0 ? 'success' : 'error');
+                if (successCount > 0) {
+                    addToast(`${successCount} clientes importados com sucesso!`, 'success');
+                    if (errorCount > 0) {
+                        addToast(`${errorCount} linhas falharam. Verifique o console para detalhes.`, 'error');
+                    }
+                } else {
+                    addToast('Nenhum cliente foi importado. Verifique os cabeçalhos da planilha.', 'error');
+                }
                 fetchClients();
             } catch (error) {
                 console.error('Erro ao processar planilha:', error);
-                addToast('Erro ao ler a planilha. Verifique o formato.', 'error');
+                addToast('Erro ao ler a planilha. Tente salvar como .xlsx ou .csv padrão.', 'error');
             } finally {
                 setIsImporting(false);
                 e.target.value = ''; // clear input
             }
         };
 
-        reader.readAsBinaryString(file);
+        reader.readAsArrayBuffer(file);
     };
 
     useEffect(() => {
