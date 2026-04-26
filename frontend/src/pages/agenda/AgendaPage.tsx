@@ -765,34 +765,34 @@ export default function AgendaPage() {
             {notification && <NotificationToast event={notification} onDismiss={() => setNotification(null)} />}
 
             {/* Main Calendar Area */}
-            <main className="flex-1 bg-app-card border border-app-stroke rounded-xl flex flex-col overflow-hidden">
+            <main className="flex-1 bg-white dark:bg-[#111111] border border-app-stroke rounded-[2rem] flex flex-col overflow-hidden shadow-sm">
 
                 {/* Header */}
-                <div className="p-3 border-b border-app-stroke flex flex-col md:flex-row justify-between items-center gap-3">
+                <div className="p-4 border-b border-app-stroke bg-[#0F172A] flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex-1 flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-app-text-main capitalize">
+                        <h2 className="text-xl font-black text-white capitalize tracking-tight">
                             {getMonthName(currentMonth)} {currentYear}
                         </h2>
                         <div className="flex items-center gap-3">
-                            <button onClick={goToToday} className="text-xs font-semibold text-app-text-muted hover:text-primary transition-colors">Hoje</button>
+                            <button onClick={goToToday} className="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Hoje</button>
                             <div className="flex items-center gap-1">
-                                <button onClick={goToPrevMonth} className="p-1.5 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronLeft size={20} /></button>
-                                <button onClick={goToNextMonth} className="p-1.5 rounded-full hover:bg-app-stroke/30 text-app-text-muted transition-colors"><ChevronRight size={20} /></button>
+                                <button onClick={goToPrevMonth} className="p-1.5 rounded-full hover:bg-white/10 text-slate-300 transition-colors"><ChevronLeft size={20} /></button>
+                                <button onClick={goToNextMonth} className="p-1.5 rounded-full hover:bg-white/10 text-slate-300 transition-colors"><ChevronRight size={20} /></button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1 bg-app-bg p-1 rounded-lg border border-app-stroke shadow-sm">
+                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner">
                         {(['day', 'week', 'month', 'list'] as const).map(v => (
                             <button
                                 key={v}
                                 onClick={() => setView(v)}
                                 className={clsx(
-                                    "px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 flex items-center gap-1.5", 
-                                    view === v ? "bg-primary text-white shadow-sm" : "text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/20"
+                                    "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2", 
+                                    view === v ? "bg-white text-slate-900 shadow-lg" : "text-slate-400 hover:text-white hover:bg-white/5"
                                 )}
                             >
-                                {v === 'list' && <List size={13} />}
+                                {v === 'list' && <List size={14} />}
                                 {v === 'day' ? 'Dia' : v === 'week' ? 'Semana' : v === 'month' ? 'Mês' : 'Pauta'}
                             </button>
                         ))}
@@ -820,8 +820,8 @@ export default function AgendaPage() {
                                 </div>
                             )}
                         </div>
-                        <button onClick={() => setIsNewEventOpen(true)} className="bg-primary hover:bg-primary-dark text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors">
-                            <Plus size={16} /> Novo Evento
+                        <button onClick={() => setIsNewEventOpen(true)} className="bg-white text-slate-900 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-tighter">
+                            <Plus size={18} /> Novo Evento
                         </button>
                     </div>
                 </div>
@@ -936,9 +936,9 @@ export default function AgendaPage() {
                         >
                             {view === 'month' && (
                                 <div className="border border-app-stroke rounded-xl bg-app-bg overflow-hidden flex flex-col h-full">
-                                    <div className="grid grid-cols-7 bg-app-card border-b border-app-stroke">
+                                    <div className="grid grid-cols-7 bg-white dark:bg-[#111111] border-b border-app-stroke">
                                         {DAYS_SHORT.map(day => (
-                                            <div key={day} className="text-center text-[10px] font-bold text-app-text-muted uppercase tracking-widest py-3 border-r border-app-stroke last:border-r-0">
+                                            <div key={day} className="text-center text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] py-4 border-r border-app-stroke last:border-r-0 bg-app-bg/5">
                                                 {day}
                                             </div>
                                         ))}

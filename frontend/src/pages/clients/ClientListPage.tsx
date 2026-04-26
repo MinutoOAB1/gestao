@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo, useDeferredValue } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Phone, Trash2, Printer, Briefcase } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Plus, Search, Phone, Trash2, Printer, Briefcase, FileUp, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import * as XLSX from 'xlsx';
 import api from '../../services/api';
 import { clsx } from 'clsx';
 import { ListSkeleton } from '../../components/ui/Skeleton';
@@ -87,6 +88,65 @@ export default function ClientListPage() {
     const [statusMenu, setStatusMenu] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState('all');
+    const [isImporting, setIsImporting] = useState(false);
+
+    const handleImportSpreadsheet = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsImporting(true);
+        const reader = new FileReader();
+        
+        reader.onload = async (evt) => {
+            try {
+                const bstr = evt.target?.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const data = XLSX.utils.sheet_to_json(ws) as any[];
+
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const row of data) {
+                    try {
+                        // Normalize keys to lowercase for easier mapping
+                        const normalizedRow: any = {};
+                        Object.keys(row).forEach(key => {
+                            normalizedRow[key.toLowerCase()] = row[key];
+                        });
+
+                        const payload = {
+                            name: normalizedRow.nome || normalizedRow.name || normalizedRow.cliente,
+                            document: String(normalizedRow.cpf || normalizedRow.cnpj || normalizedRow.documento || '').replace(/\D/g, ''),
+                            email: normalizedRow.email || normalizedRow.correio || '',
+                            phone: String(normalizedRow.telefone || normalizedRow.celular || normalizedRow.phone || ''),
+                            type: normalizedRow.tipo === 'PJ' ? 'PJ' : 'PF',
+                            status: 'ATIVO'
+                        };
+
+                        if (payload.name) {
+                            await api.post('/clients', payload);
+                            successCount++;
+                        }
+                    } catch (err) {
+                        errorCount++;
+                    }
+                }
+
+                addToast(`${successCount} clientes importados com sucesso! ${errorCount > 0 ? `${errorCount} falhas.` : ''}`, successCount > 0 ? 'success' : 'error');
+                fetchClients();
+            } catch (error) {
+                console.error('Erro ao processar planilha:', error);
+                addToast('Erro ao ler a planilha. Verifique o formato.', 'error');
+            } finally {
+                setIsImporting(false);
+                e.target.value = ''; // clear input
+            }
+        };
+
+        reader.readAsBinaryString(file);
+    };
 
     useEffect(() => {
         fetchClients();
@@ -265,6 +325,21 @@ export default function ClientListPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    <input
+                        type="file"
+                        id="import-spreadsheet"
+                        className="hidden"
+                        accept=".xlsx, .xls, .csv"
+                        onChange={handleImportSpreadsheet}
+                    />
+                    <button
+                        onClick={() => document.getElementById('import-spreadsheet')?.click()}
+                        disabled={isImporting}
+                        className="hidden md:flex items-center gap-2 px-4 py-2 border border-app-stroke rounded-lg text-app-text-main hover:bg-app-stroke/30 transition-colors text-sm font-medium disabled:opacity-50"
+                    >
+                        {isImporting ? <Loader2 size={16} className="animate-spin" /> : <FileUp size={16} />}
+                        {isImporting ? 'Importando...' : 'Importar Planilha'}
+                    </button>
                     <button
                         onClick={handleGenerateReport}
                         className="hidden md:flex items-center gap-2 px-4 py-2 border border-app-stroke rounded-lg text-app-text-main hover:bg-app-stroke/30 transition-colors text-sm font-medium"
