@@ -148,24 +148,24 @@ const QuickAction = memo(({ icon: Icon, label, colorClass, onClick }: any) => (
 
 const DeadlineCard = memo(({ type, title, subtitle, time, color }: any) => (
     <div
-        className="bg-app-card p-4 rounded-xl border border-app-stroke relative overflow-hidden flex items-center gap-4 cursor-pointer transition-colors hover:border-black/20 dark:hover:border-white/20"
+        className="bg-white/[0.02] backdrop-blur-md p-4 rounded-2xl border border-white/5 relative overflow-hidden flex items-center gap-4 cursor-pointer transition-all hover:border-white/20 hover:scale-[1.02] group"
         style={{ boxShadow: premiumShadow }}
     >
-        <div className={`absolute left-0 top-0 bottom-0 w-1 ${color} transition-all duration-300`}></div>
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-opacity-10 ${color.replace('bg-', 'bg-').replace('text-', '')} bg-app-stroke/30 transition-all duration-300`}>
-            {type === 'urgent' && <AlertTriangle size={18} className={color.replace('bg-', 'text-')} />}
-            {type === 'warning' && <Gavel size={18} className={color.replace('bg-', 'text-')} />}
-            {type === 'info' && <FileText size={18} className={color.replace('bg-', 'text-')} />}
+        <div className={`absolute left-0 top-0 bottom-0 w-1 ${color === 'bg-rose-500' ? 'bg-rose-500' : color === 'bg-amber-500' ? 'bg-amber-500' : 'bg-primary'} transition-all duration-300`}></div>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/5 group-hover:bg-white/10 transition-all">
+            {type === 'urgent' && <AlertTriangle size={18} className="text-rose-500" />}
+            {type === 'warning' && <Gavel size={18} className="text-amber-500" />}
+            {type === 'info' && <FileText size={18} className="text-primary" />}
         </div>
         <div className="flex-1">
             <div className="flex justify-between items-start">
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${color.replace('bg-', 'text-')}`}>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${type === 'urgent' ? 'text-rose-500' : type === 'warning' ? 'text-amber-500' : 'text-primary'}`}>
                     {type === 'urgent' ? 'Urgente' : type === 'warning' ? 'Amanhã' : '3 Dias'}
                 </span>
-                <span className="text-xs text-app-text-muted">{time}</span>
+                <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">{time}</span>
             </div>
-            <h4 className="font-semibold text-app-text-main text-sm line-clamp-1 mt-0.5">{title}</h4>
-            <p className="text-xs text-app-text-muted line-clamp-1">{subtitle}</p>
+            <h4 className="font-bold text-white text-sm line-clamp-1 mt-1">{title}</h4>
+            <p className="text-[11px] text-white/40 line-clamp-1">{subtitle}</p>
         </div>
     </div>
 ));
@@ -428,24 +428,24 @@ export default function DashboardHome() {
                             </button>
                         </div>
                         <div
-                            className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-6 relative overflow-hidden transition-colors hover:border-black/20 dark:hover:border-white/20"
+                            className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-6 relative overflow-hidden transition-all hover:border-white/10"
                             style={{ boxShadow: premiumShadow }}
                         >
                             <button
                                 onClick={() => setIsFinanceHidden(!isFinanceHidden)}
-                                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 rounded-lg bg-gray-100 dark:bg-slate-700/50 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+                                className="absolute top-4 right-4 z-20 p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group"
                                 title={isFinanceHidden ? "Mostrar valores" : "Ocultar valores"}
                             >
-                                {isFinanceHidden ? <EyeOff size={16} className="text-gray-500" /> : <Eye size={16} className="text-gray-500" />}
+                                {isFinanceHidden ? <EyeOff size={16} className="text-white/40 group-hover:text-white" /> : <Eye size={16} className="text-white/40 group-hover:text-white" />}
                             </button>
 
                             <div className="relative z-10">
-                                <p className="text-xs sm:text-sm text-app-text-muted mb-1">Saldo Total</p>
-                                <div className="flex items-center gap-3">
-                                    <h3 className={`text-2xl sm:text-3xl font-bold text-app-text-main transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
+                                <p className="text-xs font-black uppercase tracking-[0.2em] text-white/30 mb-2">Saldo Consolidado</p>
+                                <div className="flex items-center gap-4">
+                                    <h3 className={`text-3xl sm:text-4xl font-black text-white font-display tracking-tight transition-all duration-300 ${isFinanceHidden ? 'blur-xl select-none opacity-20' : ''}`}>
                                         {formatBRL(data.balance)}
                                     </h3>
-                                    <span className={`${data.balance >= 0 ? 'bg-black dark:bg-white text-white dark:text-black border-black/10' : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700'} text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>
+                                    <span className={`${data.balance >= 0 ? 'bg-primary/20 text-primary border-primary/20' : 'bg-rose-500/10 text-rose-500 border-rose-500/20'} text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none opacity-0' : ''}`}>
                                         {percentChange}
                                     </span>
                                 </div>
@@ -472,24 +472,24 @@ export default function DashboardHome() {
                 return (
                     <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2 sm:gap-4">
                         {[
-                            { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-500/10', path: '/app/clientes' },
-                            { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-500/10', path: '/app/processos' },
-                            { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-500/10', path: '/app/agenda' }
+                            { value: productivity.totalClients || data.clientsCount, label: 'Clientes', icon: Users, color: 'text-primary', bg: 'bg-primary/5', path: '/app/clientes' },
+                            { value: productivity.totalProcesses || data.processesCount, label: 'Processos', icon: FileText, color: 'text-primary', bg: 'bg-primary/5', path: '/app/processos' },
+                            { value: data.eventsCount, label: 'Eventos', icon: Calendar, color: 'text-primary', bg: 'bg-primary/5', path: '/app/agenda' }
                         ].map((stat, i) => (
                             <div
                                 key={i}
                                 onClick={() => navigate(stat.path)}
-                                className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-all hover:border-black/20 dark:hover:border-white/20 cursor-pointer touch-manipulation group"
+                                className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 hover:scale-[1.02] cursor-pointer group"
                                 style={{ boxShadow: premiumShadow }}
                             >
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg ${stat.bg} flex items-center justify-center transition-transform group-hover:scale-110`}>
-                                        <stat.icon size={16} className={`sm:w-[18px] sm:h-[18px] ${stat.color}`} />
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-primary group-hover:text-white transition-all">
+                                        <stat.icon size={18} className="text-white/40 group-hover:text-white" />
                                     </div>
-                                    <ChevronRight size={14} className="text-app-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <ChevronRight size={14} className="text-white/20 group-hover:text-white/60 transition-colors" />
                                 </div>
-                                <p className="text-xl sm:text-2xl font-bold text-app-text-main">{stat.value}</p>
-                                <p className="text-[10px] sm:text-xs text-app-text-muted">{stat.label}</p>
+                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{stat.value}</p>
+                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">{stat.label}</p>
                             </div>
                         ))}
                     </motion.div>
@@ -499,45 +499,48 @@ export default function DashboardHome() {
                     <motion.div variants={itemVariants}>
                         <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                            <div className="col-span-2 lg:col-span-2 bg-primary rounded-xl border border-white/10 p-4 sm:p-5 transition-colors hover:opacity-90 relative overflow-hidden" style={{ boxShadow: premiumShadow }}>
-                                <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 dark:bg-black/10 rounded-full blur-2xl pointer-events-none" />
-                                <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                                        <Calculator size={20} className="text-white" />
+                            <div className="col-span-2 lg:col-span-2 bg-primary rounded-2xl border border-white/10 p-5 sm:p-6 transition-all hover:scale-[1.01] hover:shadow-xl hover:shadow-primary/10 relative overflow-hidden group" style={{ boxShadow: premiumShadow }}>
+                                <div className="absolute -right-4 -top-4 w-32 h-32 bg-white/10 rounded-full blur-3xl pointer-events-none group-hover:bg-white/20 transition-all" />
+                                <div className="flex items-center gap-4 mb-4 relative z-10">
+                                    <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center border border-white/20">
+                                        <Calculator size={22} className="text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-[12px] sm:text-xs text-white font-black uppercase tracking-widest font-display">A Receber</p>
-                                        <p className="text-[10px] text-white/60 font-medium">Valores pendentes</p>
+                                        <p className="text-[12px] sm:text-xs text-white/70 font-black uppercase tracking-[0.2em] font-display">A Receber</p>
+                                        <p className="text-[10px] text-white/50 font-medium">Valores pendentes totais</p>
                                     </div>
                                 </div>
-                                <p className="text-3xl sm:text-4xl font-black text-white tracking-tight font-display">{formatBRLCompact(productivity.pendingPayments)}</p>
+                                <p className="text-4xl sm:text-5xl font-black text-white tracking-tight font-display relative z-10">{formatBRLCompact(productivity.pendingPayments)}</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-orange-500/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                                        <AlertTriangle size={16} className="text-orange-500" />
+
+                            <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 flex flex-col justify-center group" style={{ boxShadow: premiumShadow }}>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-all">
+                                        <AlertTriangle size={18} className="text-white/60 group-hover:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-bold text-app-text-main">{productivity.upcomingDeadlines}</p>
-                                <p className="text-[11px] sm:text-xs text-app-text-muted">Prazos</p>
+                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{productivity.upcomingDeadlines}</p>
+                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">Prazos</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-primary/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                        <FileText size={16} className="text-primary" />
+
+                            <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 flex flex-col justify-center group" style={{ boxShadow: premiumShadow }}>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-all">
+                                        <FileText size={18} className="text-white/60 group-hover:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-black text-app-text-main">{productivity.newProcesses}</p>
-                                <p className="text-[11px] sm:text-xs text-app-text-muted uppercase tracking-tighter font-bold">Novos Process.</p>
+                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{productivity.newProcesses}</p>
+                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">Processos</p>
                             </div>
-                            <div className="bg-app-card rounded-xl border border-app-stroke p-3 sm:p-4 transition-colors hover:border-emerald-500/30 flex flex-col justify-center" style={{ boxShadow: premiumShadow }}>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                                        <Users size={16} className="text-emerald-500" />
+
+                            <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 flex flex-col justify-center group" style={{ boxShadow: premiumShadow }}>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-all">
+                                        <Users size={18} className="text-white/60 group-hover:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-xl sm:text-2xl font-black text-app-text-main">{productivity.activeClients}</p>
-                                <p className="text-[11px] sm:text-xs text-app-text-muted uppercase tracking-tighter font-bold">Clientes Ativos</p>
+                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{productivity.activeClients}</p>
+                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">Clientes</p>
                             </div>
                         </div>
                     </motion.div>
@@ -667,20 +670,21 @@ export default function DashboardHome() {
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mx-2 mb-4 p-4 bg-black dark:bg-white rounded-2xl text-white dark:text-black shadow-lg shadow-black/20 flex flex-col sm:flex-row items-center justify-between gap-4"
+                    className="mx-2 mb-4 p-5 bg-white/[0.03] backdrop-blur-xl rounded-[2rem] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group shadow-2xl shadow-black/20"
                 >
-                    <div className="flex items-center gap-3 text-center sm:text-left">
-                        <div className="w-10 h-10 bg-white/20 dark:bg-black/20 rounded-full flex items-center justify-center shrink-0">
-                            <Zap size={20} className="text-white dark:text-black" />
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/10 to-transparent pointer-events-none" />
+                    <div className="flex items-center gap-5 text-center sm:text-left relative z-10">
+                        <div className="w-12 h-12 bg-primary/20 border border-primary/30 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                            <Zap size={24} className="text-primary fill-primary/20" />
                         </div>
                         <div>
-                            <p className="font-bold text-sm sm:text-base font-display">Upgrade para o Advus Plus</p>
-                            <p className="text-xs text-white/80 dark:text-black/80">Libere usuários ilimitados, IA de análise e muito mais por apenas R$ 47/mês.</p>
+                            <p className="font-black text-lg text-white font-display tracking-tight">Upgrade para o Advus Plus</p>
+                            <p className="text-sm text-white/50 font-medium">Libere usuários ilimitados, IA de análise avançada e muito mais.</p>
                         </div>
                     </div>
                     <button 
-                        onClick={() => navigate('/app/faturamento')}
-                        className="px-6 py-2 bg-white dark:bg-black text-black dark:text-white font-bold rounded-xl text-sm hover:opacity-90 transition-opacity shadow-sm active:scale-95"
+                        onClick={() => navigate('/app/configuracoes?tab=billing')}
+                        className="px-8 py-3 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-neutral-100 transition-all shadow-xl shadow-white/5 active:scale-95 shrink-0"
                     >
                         Ver Detalhes
                     </button>

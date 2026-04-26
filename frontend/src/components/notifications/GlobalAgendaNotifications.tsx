@@ -17,29 +17,28 @@ interface AgendaEvent {
 
 // Notification Toast Component - global overlay
 const NotificationToast = ({ event, onDismiss }: { event: AgendaEvent; onDismiss: () => void }) => (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-8 z-[9999] animate-in slide-in-from-bottom bg-slate-800/95 backdrop-blur-sm border border-slate-600/50 rounded-2xl shadow-2xl shadow-black/30 p-4 w-[90vw] max-w-[380px]">
-        <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shrink-0 ring-2 ring-white/20">
-                <Bell size={22} className="text-white" />
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-8 z-[9999] animate-in slide-in-from-bottom bg-[#0F172A]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/40 p-5 w-[90vw] max-w-[400px]">
+        <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 shadow-lg shadow-primary/10">
+                <Bell size={24} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                    <h4 className="font-bold text-white text-sm flex items-center gap-1">
-                        Lembrete de Compromisso
-                        <span className="text-primary">✨</span>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                    <h4 className="font-black text-white text-xs uppercase tracking-[0.2em] opacity-40">
+                        Compromisso
                     </h4>
-                    <button onClick={onDismiss} className="text-gray-400 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10">
+                    <button onClick={onDismiss} className="text-white/20 hover:text-white transition-all p-1 hover:bg-white/5 rounded-lg">
                         <X size={16} />
                     </button>
                 </div>
-                <p className="text-white font-medium truncate">{event.title}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-white font-black text-sm tracking-tight leading-tight mb-0.5 truncate">{event.title}</p>
+                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
                     {new Date(event.start).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
                 </p>
             </div>
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white border-2 border-slate-800">
-                1
-            </div>
+        </div>
+        <div className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-[10px] font-black text-white border-4 border-[#0F172A] shadow-lg">
+            !
         </div>
     </div>
 );
