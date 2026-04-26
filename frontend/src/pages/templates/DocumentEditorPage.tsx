@@ -369,7 +369,7 @@ export default function DocumentEditorPage() {
             // Load logo
             try {
                 const logoImg = new Image();
-                logoImg.src = '/iconelogo3.png';
+                logoImg.src = '/Advus.png';
                 await new Promise((resolve) => logoImg.onload = resolve);
 
                 const logoH = 15;

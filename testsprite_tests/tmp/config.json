@@ -2,19 +2,19 @@
   "status": "commited",
   "type": "frontend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:5174",
+  "localEndpoint": "http://localhost:5175",
   "loginUser": "informacoesextras.01@gmail.com",
   "loginPassword": "123456vv",
   "executionArgs": {
-    "projectName": "Antigravi-platadv",
+    "projectName": "gestao",
     "projectPath": "c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv",
     "testIds": [],
-    "additionalInstruction": "The platform has been rebranded to Advus. Verify that the new design is consistent across the dashboard and that no broken colorful elements remain. Ensure the 'Welcome' overlay works as intended. Ensure it uses port 5174.",
+    "additionalInstruction": "Verify the new Advus brand visual hierarchy and ensure there are no contrast issues (no white-on-white text). Focus on the Dashboard and Sidebar. Ensure the balance visibility toggle works and text remains readable.",
     "serverMode": "development",
     "envs": {
       "API_KEY": "sk-user-wzczV0JioCRer3xEAWcyQpeKCLLAyLGXZV9i11hYV0Eq12qy6nk7DWmJT6k9oRrY9acuRV3mpMGetUxV3cIyYek3E-mpIbKRb3Aor9bXPPEvhKaGSv9iRq766A7EDeD0W6Y"
     }
   },
-  "serverPort": 62440,
-  "proxy": "http://f0819d69-fe82-492b-a809-cb7bbce6f99f:MCYuvNXPtaa5qi4mp29MdL5PWmQuvCVI@tun.testsprite.com:8080"
+  "serverPort": 56347,
+  "proxy": "http://08ab4d57-39d8-480f-856e-e28c8f899753:Mv4082Aj9zXC70TNIDz7hJDtAQhaRcXH@tun.testsprite.com:8080"
 }

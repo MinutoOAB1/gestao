@@ -1,5 +1,4 @@
-import { Scale, Sparkles } from 'lucide-react';
-import { colors } from '../../lib/design-system';
+import { memo } from 'react';
 
 interface BrandLogoProps {
     className?: string;
@@ -8,35 +7,26 @@ interface BrandLogoProps {
     showText?: boolean;
 }
 
-export function BrandLogo({ className = '', variant = 'dark', size = 'md', showText = true }: BrandLogoProps) {
-    const isDarkBg = variant === 'light';
-
-    // Size variants
+export const BrandLogo = memo(({ className = '', size = 'md' }: BrandLogoProps) => {
+    // Size variants mapping for height
     const sizes = {
-        sm: { box: 'w-7 h-7 rounded-lg', icon: 14, text: 'text-lg', gap: 'gap-2' },
-        md: { box: 'w-10 h-10 rounded-xl', icon: 20, text: 'text-2xl', gap: 'gap-3' },
-        lg: { box: 'w-12 h-12 rounded-2xl', icon: 24, text: 'text-3xl', gap: 'gap-4' },
-        xl: { box: 'w-16 h-16 rounded-[1.25rem]', icon: 32, text: 'text-4xl', gap: 'gap-5' }
+        sm: 'h-6',
+        md: 'h-8',
+        lg: 'h-12',
+        xl: 'h-16'
     };
 
-    const currentSize = sizes[size];
+    const currentHeight = sizes[size];
 
     return (
-        <div className={`flex items-center ${currentSize.gap} font-display select-none group ${className}`}>
-            <div className={`relative ${currentSize.box} flex items-center justify-center shrink-0 overflow-hidden bg-primary shadow-lg border border-white/10 group-hover:scale-105 transition-transform duration-500`}>
-                <Scale 
-                    size={currentSize.icon} 
-                    className="text-white relative z-10" 
-                />
-            </div>
-            
-            {showText && (
-                <div className={`flex items-baseline tracking-[-0.05em] font-black leading-none ${currentSize.text}`}>
-                    <span className={isDarkBg ? 'text-white' : 'text-slate-900'}>ADV</span>
-                    <span className={isDarkBg ? 'text-white/60' : 'text-slate-400'}>US</span>
-                </div>
-            )}
+        <div className={`flex items-center select-none ${className}`}>
+            <img 
+                src="/Advus.png" 
+                alt="Advus" 
+                className={`${currentHeight} w-auto object-contain transition-transform duration-500 hover:scale-105`}
+                draggable={false}
+            />
         </div>
     );
-}
+});
 
