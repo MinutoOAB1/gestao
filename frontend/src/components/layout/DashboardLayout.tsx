@@ -137,7 +137,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                     >
                         {/* Quick access to main page */}
                         <Link to="/app/analise-ia">
-                            <div className="flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest text-black/50 hover:text-black transition-colors">
+                            <div className="flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
                                 <Plus size={12} />
                                 Nova Análise
                             </div>
@@ -152,8 +152,8 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                                             key={doc.id}
                                             onClick={() => handleLoadDocument(doc)}
                                             className={cn(
-                                                "flex items-center gap-2 px-4 py-2 ml-6 text-xs cursor-pointer transition-all hover:bg-primary/10 rounded-lg",
-                                                idx === 0 ? "text-primary font-bold" : "text-slate-600 dark:text-slate-400"
+                                                "flex items-center gap-2 px-4 py-2 ml-6 text-xs cursor-pointer transition-all hover:bg-white/10 rounded-lg",
+                                                idx === 0 ? "text-primary font-bold" : "text-white/60"
                                             )}
                                             style={{ opacity: 1 - (idx * 0.15) }}
                                         >
@@ -168,10 +168,10 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                                     ))}
                                 </div>
                                 {/* Fade effect at bottom - matches dark blue sidebar */}
-                                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-black to-transparent pointer-events-none" />
+                                <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-[#0F172A] to-transparent pointer-events-none" />
                             </div>
                         ) : (
-                            <div className="px-4 py-2 ml-6 text-[10px] text-black/30 dark:text-white/30 italic">
+                            <div className="px-4 py-2 ml-6 text-[10px] text-white/30 italic">
                                 Nenhum documento analisado
                             </div>
                         )}
@@ -562,12 +562,12 @@ export default function DashboardLayout() {
                             !isFullScreenPage ? "max-w-7xl mx-auto" : "w-full h-full flex flex-col"
                         )}>
                             {!isFullScreenPage && pathSegments.length > 0 && (
-                                <div className="flex items-center gap-2 mb-6 text-sm">
-                                    <Link to="/app" className="text-primary hover:text-primary/80 transition-colors">Dashboard</Link>
+                                <div className="flex items-center gap-2 mb-6 text-[11px] font-black uppercase tracking-[0.1em]">
+                                    <Link to="/app" className="text-slate-400 hover:text-primary transition-colors">Dashboard</Link>
                                     {pathSegments.map((segment, idx) => (
                                         <div key={idx} className="flex items-center gap-2">
-                                            <ChevronRight size={14} className="text-slate-400" />
-                                            <span className={idx === pathSegments.length - 1 ? "text-slate-700 dark:text-slate-200 font-medium capitalize" : "text-slate-400 capitalize"}>
+                                            <ChevronRight size={10} className="text-slate-300 dark:text-white/20" />
+                                            <span className={idx === pathSegments.length - 1 ? "text-slate-900 dark:text-white" : "text-slate-400"}>
                                                 {segment === 'processos' ? 'Processos' : segment === 'clientes' ? 'Clientes' : segment === 'financeiro' ? 'Financeiro' : segment === 'configuracoes' ? 'Configurações' : segment.length > 15 ? 'Detalhes' : segment}
                                             </span>
                                         </div>

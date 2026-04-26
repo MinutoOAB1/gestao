@@ -148,24 +148,24 @@ const QuickAction = memo(({ icon: Icon, label, colorClass, onClick }: any) => (
 
 const DeadlineCard = memo(({ type, title, subtitle, time, color }: any) => (
     <div
-        className="bg-white/[0.02] backdrop-blur-md p-4 rounded-2xl border border-white/5 relative overflow-hidden flex items-center gap-4 cursor-pointer transition-all hover:border-white/20 hover:scale-[1.02] group"
+        className="bg-white dark:bg-white/[0.02] backdrop-blur-md p-4 rounded-2xl border border-slate-100 dark:border-white/5 relative overflow-hidden flex items-center gap-4 cursor-pointer transition-all hover:border-slate-200 dark:hover:border-white/20 hover:scale-[1.02] group shadow-sm"
         style={{ boxShadow: premiumShadow }}
     >
         <div className={`absolute left-0 top-0 bottom-0 w-1 ${color === 'bg-rose-500' ? 'bg-rose-500' : color === 'bg-amber-500' ? 'bg-amber-500' : 'bg-primary'} transition-all duration-300`}></div>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/5 group-hover:bg-white/10 transition-all">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 group-hover:bg-slate-100 dark:group-hover:bg-white/10 transition-all">
             {type === 'urgent' && <AlertTriangle size={18} className="text-rose-500" />}
             {type === 'warning' && <Gavel size={18} className="text-amber-500" />}
             {type === 'info' && <FileText size={18} className="text-primary" />}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
                 <span className={`text-[10px] font-black uppercase tracking-widest ${type === 'urgent' ? 'text-rose-500' : type === 'warning' ? 'text-amber-500' : 'text-primary'}`}>
                     {type === 'urgent' ? 'Urgente' : type === 'warning' ? 'Amanhã' : '3 Dias'}
                 </span>
-                <span className="text-[10px] text-white/30 font-bold uppercase tracking-wider">{time}</span>
+                <span className="text-[10px] text-slate-400 dark:text-white/30 font-bold uppercase tracking-wider">{time}</span>
             </div>
-            <h4 className="font-bold text-white text-sm line-clamp-1 mt-1">{title}</h4>
-            <p className="text-[11px] text-white/40 line-clamp-1">{subtitle}</p>
+            <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate mt-1">{title}</h4>
+            <p className="text-[11px] text-slate-500 dark:text-white/40 truncate">{subtitle}</p>
         </div>
     </div>
 ));
@@ -419,7 +419,7 @@ export default function DashboardHome() {
                 return (
                     <motion.div variants={itemVariants}>
                         <div className="flex justify-between items-center mb-4 px-2">
-                            <h2 className="text-lg font-bold text-app-text-main">Resumo Financeiro</h2>
+                            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30">Resumo Financeiro</h2>
                                 <button
                                 onClick={() => navigate('/app/financeiro')}
                                 className="text-xs text-primary font-black uppercase tracking-widest hover:opacity-80 transition-all"
@@ -428,41 +428,41 @@ export default function DashboardHome() {
                             </button>
                         </div>
                         <div
-                            className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-6 relative overflow-hidden transition-all hover:border-white/10"
+                            className="bg-white dark:bg-white/[0.02] backdrop-blur-md rounded-2xl border border-slate-100 dark:border-white/5 p-4 sm:p-6 relative overflow-hidden transition-all hover:border-slate-200 dark:hover:border-white/10 shadow-sm"
                             style={{ boxShadow: premiumShadow }}
                         >
                             <button
                                 onClick={() => setIsFinanceHidden(!isFinanceHidden)}
-                                className="absolute top-4 right-4 z-20 p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all group"
+                                className="absolute top-4 right-4 z-20 p-2 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/5 transition-all group"
                                 title={isFinanceHidden ? "Mostrar valores" : "Ocultar valores"}
                             >
-                                {isFinanceHidden ? <EyeOff size={16} className="text-white/40 group-hover:text-white" /> : <Eye size={16} className="text-white/40 group-hover:text-white" />}
+                                {isFinanceHidden ? <EyeOff size={16} className="text-slate-400 dark:text-white/40 group-hover:text-slate-600 dark:group-hover:text-white" /> : <Eye size={16} className="text-slate-400 dark:text-white/40 group-hover:text-slate-600 dark:group-hover:text-white" />}
                             </button>
 
                             <div className="relative z-10">
-                                <p className="text-xs font-black uppercase tracking-[0.2em] text-white/30 mb-2">Saldo Consolidado</p>
+                                <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30 mb-2">Saldo Consolidado</p>
                                 <div className="flex items-center gap-4">
-                                    <h3 className={`text-3xl sm:text-4xl font-black text-white font-display tracking-tight transition-all duration-300 ${isFinanceHidden ? 'blur-xl select-none opacity-20' : ''}`}>
+                                    <h3 className={`text-3xl sm:text-4xl font-black text-slate-900 dark:text-white font-display tracking-tight transition-all duration-300 ${isFinanceHidden ? 'blur-xl select-none opacity-20' : ''}`}>
                                         {formatBRL(data.balance)}
                                     </h3>
-                                    <span className={`${data.balance >= 0 ? 'bg-primary/20 text-primary border-primary/20' : 'bg-rose-500/10 text-rose-500 border-rose-500/20'} text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none opacity-0' : ''}`}>
+                                    <span className={`${data.balance >= 0 ? 'bg-primary/10 text-primary border-primary/20' : 'bg-rose-500/10 text-rose-500 border-rose-500/20'} text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none opacity-0' : ''}`}>
                                         {percentChange}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none">
+                            <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none opacity-50 dark:opacity-100">
                                 <MovingWaveChart />
                             </div>
 
-                            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-app-stroke grid grid-cols-2 gap-4 sm:gap-8 relative z-10">
+                            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 dark:border-white/5 grid grid-cols-2 gap-4 sm:gap-8 relative z-10">
                                 <div>
-                                    <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Receitas</p>
-                                    <p className={`text-base sm:text-lg font-bold text-black dark:text-white transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalIncome)}</p>
+                                    <p className="text-[10px] sm:text-xs text-slate-400 dark:text-app-text-muted mb-0.5 sm:mb-1 uppercase font-black tracking-widest">Receitas</p>
+                                    <p className={`text-base sm:text-lg font-bold text-slate-900 dark:text-white transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalIncome)}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] sm:text-xs text-app-text-muted mb-0.5 sm:mb-1">Despesas</p>
-                                    <p className={`text-base sm:text-lg font-bold text-gray-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalExpense)}</p>
+                                    <p className="text-[10px] sm:text-xs text-slate-400 dark:text-app-text-muted mb-0.5 sm:mb-1 uppercase font-black tracking-widest">Despesas</p>
+                                    <p className={`text-base sm:text-lg font-bold text-slate-500 transition-all duration-300 ${isFinanceHidden ? 'blur-md select-none' : ''}`}>{formatBRLCompact(data.totalExpense)}</p>
                                 </div>
                             </div>
                         </div>
@@ -479,17 +479,17 @@ export default function DashboardHome() {
                             <div
                                 key={i}
                                 onClick={() => navigate(stat.path)}
-                                className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 hover:scale-[1.02] cursor-pointer group"
+                                className="bg-white dark:bg-white/[0.02] backdrop-blur-md rounded-2xl border border-slate-100 dark:border-white/5 p-4 sm:p-5 transition-all hover:border-slate-200 dark:hover:border-white/10 hover:scale-[1.02] cursor-pointer group shadow-sm"
                                 style={{ boxShadow: premiumShadow }}
                             >
                                 <div className="flex items-center justify-between mb-3">
-                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-primary group-hover:text-white transition-all">
-                                        <stat.icon size={18} className="text-white/40 group-hover:text-white" />
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center border border-slate-100 dark:border-white/5 group-hover:bg-primary group-hover:text-white transition-all">
+                                        <stat.icon size={18} className="text-slate-400 dark:text-white/40 group-hover:text-white" />
                                     </div>
-                                    <ChevronRight size={14} className="text-white/20 group-hover:text-white/60 transition-colors" />
+                                    <ChevronRight size={14} className="text-slate-300 dark:text-white/20 group-hover:text-slate-600 dark:group-hover:text-white/60 transition-colors" />
                                 </div>
-                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{stat.value}</p>
-                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">{stat.label}</p>
+                                <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">{stat.value}</p>
+                                <p className="text-[11px] font-black text-slate-400 dark:text-white/30 uppercase tracking-widest mt-1">{stat.label}</p>
                             </div>
                         ))}
                     </motion.div>
@@ -497,7 +497,7 @@ export default function DashboardHome() {
             case 'productivity':
                 return (
                     <motion.div variants={itemVariants}>
-                        <h2 className="text-lg font-bold text-app-text-main mb-4 px-2">Métricas de Produtividade</h2>
+                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30 mb-4 px-2">Métricas de Produtividade</h2>
                         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                             <div className="col-span-2 lg:col-span-2 bg-primary rounded-2xl border border-white/10 p-5 sm:p-6 transition-all hover:scale-[1.01] hover:shadow-xl hover:shadow-primary/10 relative overflow-hidden group" style={{ boxShadow: premiumShadow }}>
                                 <div className="absolute -right-4 -top-4 w-32 h-32 bg-white/10 rounded-full blur-3xl pointer-events-none group-hover:bg-white/20 transition-all" />
@@ -513,34 +513,34 @@ export default function DashboardHome() {
                                 <p className="text-4xl sm:text-5xl font-black text-white tracking-tight font-display relative z-10">{formatBRLCompact(productivity.pendingPayments)}</p>
                             </div>
 
-                            <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 flex flex-col justify-center group" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-white dark:bg-white/[0.02] backdrop-blur-md rounded-2xl border border-slate-100 dark:border-white/5 p-4 sm:p-5 transition-all hover:border-slate-200 dark:hover:border-white/10 flex flex-col justify-center group shadow-sm" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-all">
-                                        <AlertTriangle size={18} className="text-white/60 group-hover:text-white" />
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center border border-slate-100 dark:border-white/5 group-hover:bg-slate-100 dark:group-hover:bg-white/10 transition-all">
+                                        <AlertTriangle size={18} className="text-slate-400 dark:text-white/60 group-hover:text-amber-500 dark:group-hover:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{productivity.upcomingDeadlines}</p>
-                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">Prazos</p>
+                                <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">{productivity.upcomingDeadlines}</p>
+                                <p className="text-[11px] font-black text-slate-400 dark:text-white/30 uppercase tracking-widest mt-1">Prazos</p>
                             </div>
 
-                            <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 flex flex-col justify-center group" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-white dark:bg-white/[0.02] backdrop-blur-md rounded-2xl border border-slate-100 dark:border-white/5 p-4 sm:p-5 transition-all hover:border-slate-200 dark:hover:border-white/10 flex flex-col justify-center group shadow-sm" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-all">
-                                        <FileText size={18} className="text-white/60 group-hover:text-white" />
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center border border-slate-100 dark:border-white/5 group-hover:bg-slate-100 dark:group-hover:bg-white/10 transition-all">
+                                        <FileText size={18} className="text-slate-400 dark:text-white/60 group-hover:text-primary dark:group-hover:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{productivity.newProcesses}</p>
-                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">Processos</p>
+                                <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">{productivity.newProcesses}</p>
+                                <p className="text-[11px] font-black text-slate-400 dark:text-white/30 uppercase tracking-widest mt-1">Processos</p>
                             </div>
 
-                            <div className="bg-white/[0.02] backdrop-blur-md rounded-2xl border border-white/5 p-4 sm:p-5 transition-all hover:border-white/10 flex flex-col justify-center group" style={{ boxShadow: premiumShadow }}>
+                            <div className="bg-white dark:bg-white/[0.02] backdrop-blur-md rounded-2xl border border-slate-100 dark:border-white/5 p-4 sm:p-5 transition-all hover:border-slate-200 dark:hover:border-white/10 flex flex-col justify-center group shadow-sm" style={{ boxShadow: premiumShadow }}>
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-all">
-                                        <Users size={18} className="text-white/60 group-hover:text-white" />
+                                    <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-white/5 flex items-center justify-center border border-slate-100 dark:border-white/5 group-hover:bg-slate-100 dark:group-hover:bg-white/10 transition-all">
+                                        <Users size={18} className="text-slate-400 dark:text-white/60 group-hover:text-primary dark:group-hover:text-white" />
                                     </div>
                                 </div>
-                                <p className="text-2xl sm:text-3xl font-black text-white font-display">{productivity.activeClients}</p>
-                                <p className="text-[11px] font-black text-white/30 uppercase tracking-widest mt-1">Clientes</p>
+                                <p className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display">{productivity.activeClients}</p>
+                                <p className="text-[11px] font-black text-slate-400 dark:text-white/30 uppercase tracking-widest mt-1">Clientes</p>
                             </div>
                         </div>
                     </motion.div>
@@ -601,7 +601,7 @@ export default function DashboardHome() {
                 return (
                     <motion.div variants={itemVariants}>
                         <div className="flex justify-between items-center mb-4 px-2">
-                            <h2 className="text-lg font-bold text-app-text-main">Últimos Clientes</h2>
+                            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30">Últimos Clientes</h2>
                             <button onClick={() => navigate('/app/clientes')} className="text-xs text-primary font-black uppercase tracking-widest hover:opacity-80 transition-all">
                                 Ver todos
                             </button>
@@ -655,13 +655,16 @@ export default function DashboardHome() {
             className="space-y-5 px-1 sm:px-0 pb-24 md:pb-8"
         >
             <div className="pt-2 flex items-center justify-between px-2">
-                <h1 className="text-2xl font-black text-app-text-main">Dashboard</h1>
+                <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-white/30">Visão Geral</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white font-display tracking-tight">Dashboard</h1>
+                </div>
                 <button
                     onClick={() => setIsEditMode(!isEditMode)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-black uppercase tracking-widest transition-all ${isEditMode ? 'bg-black text-white dark:bg-white dark:text-black shadow-lg scale-105' : 'bg-app-card border border-app-stroke text-app-text-muted hover:text-app-text-main'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isEditMode ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-105' : 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white shadow-sm'}`}
                 >
-                    <Settings2 size={16} />
-                    {isEditMode ? 'Concluído' : 'Layout'}
+                    <Settings2 size={14} />
+                    {isEditMode ? 'Concluir' : 'Layout'}
                 </button>
             </div>
             
@@ -670,21 +673,21 @@ export default function DashboardHome() {
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mx-2 mb-4 p-5 bg-white/[0.03] backdrop-blur-xl rounded-[2rem] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group shadow-2xl shadow-black/20"
+                    className="mx-2 mb-4 p-5 bg-[#0F172A] rounded-[2rem] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group shadow-2xl shadow-primary/20"
                 >
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/10 to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/20 to-transparent pointer-events-none" />
                     <div className="flex items-center gap-5 text-center sm:text-left relative z-10">
                         <div className="w-12 h-12 bg-primary/20 border border-primary/30 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
                             <Zap size={24} className="text-primary fill-primary/20" />
                         </div>
                         <div>
                             <p className="font-black text-lg text-white font-display tracking-tight">Upgrade para o Advus Plus</p>
-                            <p className="text-sm text-white/50 font-medium">Libere usuários ilimitados, IA de análise avançada e muito mais.</p>
+                            <p className="text-sm text-white/60 font-medium">Libere usuários ilimitados, IA de análise avançada e muito mais.</p>
                         </div>
                     </div>
                     <button 
                         onClick={() => navigate('/app/configuracoes?tab=billing')}
-                        className="px-8 py-3 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-neutral-100 transition-all shadow-xl shadow-white/5 active:scale-95 shrink-0"
+                        className="px-8 py-3 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-neutral-100 transition-all shadow-xl shadow-white/10 active:scale-95 shrink-0"
                     >
                         Ver Detalhes
                     </button>

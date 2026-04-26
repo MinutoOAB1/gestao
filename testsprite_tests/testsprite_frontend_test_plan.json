@@ -1,9 +1,9 @@
 [
   {
     "id": "TC001",
-    "title": "Returning user logs in and reaches dashboard",
-    "description": "Verifies an existing user can log in from the login page and is redirected into the authenticated dashboard at /app.",
-    "category": "User Authentication",
+    "title": "Dashboard shows stats, upcoming deadlines, and recent activity",
+    "description": "Verifies the dashboard overview renders key operational sections including stats, upcoming deadlines, and recent activity.",
+    "category": "Dashboard - Overview & Interaction",
     "steps": [
       {
         "type": "action",
@@ -11,11 +11,11 @@
       },
       {
         "type": "action",
-        "description": "Fill in the email field with {{LOGIN_USER}}"
+        "description": "Fill {{LOGIN_USER}} into the email field"
       },
       {
         "type": "action",
-        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
       },
       {
         "type": "action",
@@ -23,28 +23,134 @@
       },
       {
         "type": "assertion",
-        "description": "Verify the user lands on the dashboard"
+        "description": "Verify dashboard stats are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify upcoming deadlines and recent activity are displayed"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC002",
-    "title": "Unauthenticated user is redirected to login when accessing dashboard and can continue after signing in",
-    "description": "Verifies the auth guard redirects an unauthenticated visit to /app to /login and allows access to the dashboard after successful login.",
-    "category": "User Authentication",
+    "title": "Dashboard cards navigate to Clients and return keeps layout intact",
+    "description": "Verifies a user can navigate from dashboard cards to the clients area and return to the dashboard while keeping the app shell intact.",
+    "category": "Dashboard - Overview & Interaction",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /app"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Fill in the email field with {{LOGIN_USER}}"
+        "description": "Fill {{LOGIN_USER}} into the email field"
       },
       {
         "type": "action",
-        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click a dashboard card that navigates to clients"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the clients management page is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the app navigation item to go to the dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the dashboard and the app shell navigation remains visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Create a revenue entry and see it listed and reflected in cashflow summary",
+    "description": "Verifies a user can record a revenue entry with required fields and it appears in the ledger with the cashflow summary updated.",
+    "category": "Financial Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the financial area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new financial entry"
+      },
+      {
+        "type": "action",
+        "description": "Select revenue as the entry type"
+      },
+      {
+        "type": "action",
+        "description": "Fill 1000.50 into the amount field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid date into the date field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid category"
+      },
+      {
+        "type": "action",
+        "description": "Save the financial entry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new entry is listed in the financial ledger"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cashflow summary reflects the new revenue"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Rebranded login-to-dashboard entry shows welcome overlay and unified navigation",
+    "description": "Verifies a user can log in and lands on the dashboard where the welcome overlay and the unified app shell navigation are visible.",
+    "category": "Platform Branding & UI",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
       },
       {
         "type": "action",
@@ -53,127 +159,19 @@
       {
         "type": "assertion",
         "description": "Verify the user lands on the dashboard"
-      }
-    ],
-    "priority": "High"
-  },
-  {
-    "id": "TC003",
-    "title": "New user registers and proceeds to sign in",
-    "description": "Verifies a new user can complete registration, see a success confirmation, and navigate to the login screen to sign in.",
-    "category": "User Authentication",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /register"
-      },
-      {
-        "type": "action",
-        "description": "Fill a valid name into the name field"
-      },
-      {
-        "type": "action",
-        "description": "Fill a unique email into the email field"
-      },
-      {
-        "type": "action",
-        "description": "Fill a valid password into the password field"
-      },
-      {
-        "type": "action",
-        "description": "Submit the registration form"
-      },
-      {
-        "type": "action",
-        "description": "Click the option to sign in after successful registration"
       },
       {
         "type": "assertion",
-        "description": "Verify the user lands on the login page"
-      }
-    ],
-    "priority": "High"
-  },
-  {
-    "id": "TC004",
-    "title": "Prospect navigates from landing page to registration",
-    "description": "Verifies a public visitor can browse the landing page content and reach the registration page from a registration call-to-action.",
-    "category": "Premium Landing Page",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "action",
-        "description": "Scroll through the landing page sections"
-      },
-      {
-        "type": "action",
-        "description": "Click the call-to-action to create an account"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the user lands on the registration page"
+        "description": "Verify a welcome overlay and the app shell navigation (sidebar/topbar) are visible"
       }
     ],
     "priority": "High"
   },
   {
     "id": "TC005",
-    "title": "Prospect navigates from landing page to login",
-    "description": "Verifies a public visitor can browse the landing page content and reach the login page from a sign-in call-to-action.",
-    "category": "Premium Landing Page",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "action",
-        "description": "Scroll through the landing page sections"
-      },
-      {
-        "type": "action",
-        "description": "Click the call-to-action to sign in"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the user lands on the login page"
-      }
-    ],
-    "priority": "High"
-  },
-  {
-    "id": "TC006",
-    "title": "User requests password reset instructions",
-    "description": "Verifies a locked-out user can submit the forgot-password form and sees instructions indicating next steps were provided.",
-    "category": "User Authentication",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /forgot-password"
-      },
-      {
-        "type": "action",
-        "description": "Fill a registered email into the email field"
-      },
-      {
-        "type": "action",
-        "description": "Submit the password recovery request"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an instruction or confirmation is shown indicating reset steps were sent"
-      }
-    ],
-    "priority": "High"
-  },
-  {
-    "id": "TC007",
-    "title": "Login shows error for incorrect credentials",
-    "description": "Verifies a user entering an incorrect password is shown an authentication error and is not logged in.",
-    "category": "User Authentication",
+    "title": "Create a new process and see it on the Kanban board",
+    "description": "Verifies a user can create a process with required case details and the new process appears as a card in the Kanban board.",
+    "category": "Process Management (Kanban)",
     "steps": [
       {
         "type": "action",
@@ -181,11 +179,468 @@
       },
       {
         "type": "action",
-        "description": "Fill in the email field with {{LOGIN_USER}}"
+        "description": "Fill {{LOGIN_USER}} into the email field"
       },
       {
         "type": "action",
-        "description": "Fill an invalid password into the password field"
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the processes area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new process"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid process number into the process number field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid tribunal into the tribunal field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid legal area"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid responsible person"
+      },
+      {
+        "type": "action",
+        "description": "Save the process"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new process card is displayed on the Kanban board"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Create a client with CPF/CNPJ and open client detail with linked sections",
+    "description": "Verifies a paralegal can create a client with required CPF/CNPJ, see it in the list, and open the detail view where linked sections render.",
+    "category": "Client Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the app navigation item to go to clients"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new client"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique client name into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid CPF or CNPJ into the identifier field"
+      },
+      {
+        "type": "action",
+        "description": "Save the client"
+      },
+      {
+        "type": "action",
+        "description": "Open the newly created client from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the client detail view is displayed with sections for processes, notes, and financial records"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Move a process card to another status column",
+    "description": "Verifies a user can move a process card to a different Kanban status and the card is shown in the new column.",
+    "category": "Process Management (Kanban)",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the processes area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new process"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid process number into the process number field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid tribunal into the tribunal field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid legal area"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid responsible person"
+      },
+      {
+        "type": "action",
+        "description": "Save the process"
+      },
+      {
+        "type": "action",
+        "description": "Drag the newly created process card to a different status column"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the process card is displayed in the destination status column"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Dashboard financial values visibility can be toggled",
+    "description": "Verifies a user can toggle financial values visibility and the dashboard reflects values as hidden or shown accordingly.",
+    "category": "Dashboard - Overview & Interaction",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the control for financial values visibility"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial values on the dashboard are hidden"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the control for financial values visibility again"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify financial values on the dashboard are shown"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Client creation is blocked when CPF/CNPJ is missing",
+    "description": "Verifies attempting to create a client without CPF/CNPJ shows a validation error and does not create a new client record.",
+    "category": "Client Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the app navigation item to go to clients"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new client"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique client name into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Leave the CPF/CNPJ identifier field empty"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the client"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible indicating the identifier is required"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no new client is added to the clients list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC010",
+    "title": "Client detail linked sections remain consistent after navigating away and back",
+    "description": "Verifies the client detail view linked sections remain visible and consistent after navigating to another area and returning.",
+    "category": "Client Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the app navigation item to go to clients"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new client"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique client name into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid CPF or CNPJ into the identifier field"
+      },
+      {
+        "type": "action",
+        "description": "Save the client"
+      },
+      {
+        "type": "action",
+        "description": "Open the newly created client from the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the app navigation item to go to the dashboard"
+      },
+      {
+        "type": "action",
+        "description": "Click the app navigation item to go back to clients"
+      },
+      {
+        "type": "action",
+        "description": "Open the same client from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the client detail view still shows sections for processes, notes, and financial records"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC011",
+    "title": "Dashboard blocks can be reordered via drag and drop",
+    "description": "Verifies the user can reorder dashboard blocks and the new order is reflected visually.",
+    "category": "Dashboard - Overview & Interaction",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Drag one dashboard block and drop it into a different position"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard block order updates to reflect the drop position"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC012",
+    "title": "Prevent saving a financial entry without an amount",
+    "description": "Verifies that attempting to save a financial entry without an amount shows a validation error and the entry is not added to the ledger.",
+    "category": "Financial Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the financial area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new financial entry"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid entry type"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid date into the date field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid category"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to save the financial entry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an amount validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no new entry is added to the financial ledger"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC013",
+    "title": "Welcome overlay can be dismissed without breaking dashboard layout",
+    "description": "Verifies the welcome overlay can be dismissed and the dashboard remains usable with the app shell layout intact.",
+    "category": "Platform Branding & UI",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Dismiss the welcome overlay"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the welcome overlay is no longer visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard content and the app shell navigation are still visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Glassmorphism metric cards render on dashboard after login",
+    "description": "Verifies the dashboard loads and displays the rebranded metric cards with the expected card-based layout.",
+    "category": "Platform Branding & UI",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_USER}} into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
       },
       {
         "type": "action",
@@ -193,94 +648,194 @@
       },
       {
         "type": "assertion",
-        "description": "Verify an authentication error is visible"
+        "description": "Verify metric cards are displayed on the dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard uses a card-based layout consistent with the app shell"
       }
     ],
     "priority": "Medium"
   },
   {
-    "id": "TC008",
-    "title": "Landing page key marketing content is discoverable by scrolling",
-    "description": "Verifies the landing page can be scrolled and core product sections like features and pricing/highlights are present for evaluation.",
-    "category": "Premium Landing Page",
+    "id": "TC015",
+    "title": "Drag a process card to the same status column does not change its column",
+    "description": "Verifies dragging a process card and dropping it back into the same column does not move it to a different status column.",
+    "category": "Process Management (Kanban)",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Scroll down until feature highlights are in view"
+        "description": "Fill {{LOGIN_USER}} into the email field"
       },
       {
         "type": "action",
-        "description": "Scroll down until pricing or plan highlights are in view"
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the processes area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new process"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid process number into the process number field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid tribunal into the tribunal field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid legal area"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid responsible person"
+      },
+      {
+        "type": "action",
+        "description": "Save the process"
+      },
+      {
+        "type": "action",
+        "description": "Drag the new process card within its current status column and drop it back into the same column"
       },
       {
         "type": "assertion",
-        "description": "Verify product feature and pricing highlights are displayed"
+        "description": "Verify the process card remains displayed in its original status column"
       }
     ],
-    "priority": "Medium"
+    "priority": "Low"
   },
   {
-    "id": "TC009",
-    "title": "Registration shows required-field validation when data is missing",
-    "description": "Verifies the registration form prevents submission with missing required information and shows a validation error.",
-    "category": "User Authentication",
+    "id": "TC016",
+    "title": "Rapid successive status changes keep only the latest status in view",
+    "description": "Verifies that moving the same process card across multiple status columns in quick succession results in the card ending in the final column.",
+    "category": "Process Management (Kanban)",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /register"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Fill a valid name into the name field"
+        "description": "Fill {{LOGIN_USER}} into the email field"
       },
       {
         "type": "action",
-        "description": "Fill a unique email into the email field"
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
       },
       {
         "type": "action",
-        "description": "Leave at least one required field empty"
+        "description": "Submit the login form"
       },
       {
         "type": "action",
-        "description": "Submit the registration form"
+        "description": "Click the navigation item to open the processes area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new process"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid process number into the process number field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid tribunal into the tribunal field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid legal area"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid responsible person"
+      },
+      {
+        "type": "action",
+        "description": "Save the process"
+      },
+      {
+        "type": "action",
+        "description": "Drag the process card to a different status column"
+      },
+      {
+        "type": "action",
+        "description": "Drag the same process card to another status column"
       },
       {
         "type": "assertion",
-        "description": "Verify a required-field validation error is visible"
+        "description": "Verify the process card is displayed in the final destination status column"
       }
     ],
-    "priority": "Medium"
+    "priority": "Low"
   },
   {
-    "id": "TC010",
-    "title": "Reset password requires matching confirmation",
-    "description": "Verifies the reset-password form enforces that the new password and confirmation match before allowing completion.",
-    "category": "User Authentication",
+    "id": "TC017",
+    "title": "Accept large amount values with decimals in a financial entry",
+    "description": "Verifies a user can enter a large decimal amount for a financial entry and it is saved and shown in the ledger.",
+    "category": "Financial Management",
     "steps": [
       {
         "type": "action",
-        "description": "Navigate to /reset-password"
+        "description": "Navigate to /login"
       },
       {
         "type": "action",
-        "description": "Fill a valid new password into the new password field"
+        "description": "Fill {{LOGIN_USER}} into the email field"
       },
       {
         "type": "action",
-        "description": "Fill a different valid password into the confirmation field"
+        "description": "Fill {{LOGIN_PASSWORD}} into the password field"
       },
       {
         "type": "action",
-        "description": "Submit the reset password form"
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation item to open the financial area"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new financial entry"
+      },
+      {
+        "type": "action",
+        "description": "Select revenue as the entry type"
+      },
+      {
+        "type": "action",
+        "description": "Fill 99999999.99 into the amount field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid date into the date field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid category"
+      },
+      {
+        "type": "action",
+        "description": "Save the financial entry"
       },
       {
         "type": "assertion",
-        "description": "Verify a password mismatch validation error is visible"
+        "description": "Verify the new entry is listed in the financial ledger"
       }
     ],
     "priority": "Low"

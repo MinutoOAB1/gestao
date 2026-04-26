@@ -2,21 +2,19 @@
   "status": "commited",
   "type": "frontend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:5173",
+  "localEndpoint": "http://localhost:5174",
   "loginUser": "informacoesextras.01@gmail.com",
   "loginPassword": "123456vv",
   "executionArgs": {
-    "projectName": "gestao",
+    "projectName": "Antigravi-platadv",
     "projectPath": "c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv",
-    "testIds": [
-      "TC001",
-      "TC004"
-    ],
-    "additionalInstruction": "Run only tests TC001 and TC004 to validate the new Advus Electric Blue branding on the Login page and Landing Page. Frontend is on port 5174.",
+    "testIds": [],
+    "additionalInstruction": "The platform has been rebranded to Advus. Verify that the new design is consistent across the dashboard and that no broken colorful elements remain. Ensure the 'Welcome' overlay works as intended. Ensure it uses port 5174.",
     "serverMode": "development",
     "envs": {
       "API_KEY": "sk-user-wzczV0JioCRer3xEAWcyQpeKCLLAyLGXZV9i11hYV0Eq12qy6nk7DWmJT6k9oRrY9acuRV3mpMGetUxV3cIyYek3E-mpIbKRb3Aor9bXPPEvhKaGSv9iRq766A7EDeD0W6Y"
     }
   },
-  "serverPort": 53206
+  "serverPort": 62440,
+  "proxy": "http://f0819d69-fe82-492b-a809-cb7bbce6f99f:MCYuvNXPtaa5qi4mp29MdL5PWmQuvCVI@tun.testsprite.com:8080"
 }

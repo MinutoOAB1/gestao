@@ -14285,3 +14285,98 @@
 {"timestamp":"2026-04-25T23:30:46.368Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
 {"timestamp":"2026-04-25T23:30:46.877Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
 {"timestamp":"2026-04-25T23:30:47.387Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:33.060Z","level":"debug","message":"Generate code and execute params","context":{"projectName":"Antigravi-platadv","projectPath":"c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv","testIds":[],"serverMode":"development"}}
+{"timestamp":"2026-04-26T00:30:33.117Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:33.626Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:34.129Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:34.640Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:35.146Z","level":"info","message":"checkPortListening tcp failed, trying http fallback: 5173 localhost"}
+{"timestamp":"2026-04-26T00:30:35.161Z","level":"info","message":"HTTP server started successfully on port 49328"}
+{"timestamp":"2026-04-26T00:30:35.159Z","level":"error","message":"checkPortListening http check failed: http://localhost:5173/ TypeError: fetch failed"}
+{"timestamp":"2026-04-26T00:30:35.904Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:35.159Z","level":"info","message":"Attempting to start server (attempt 1/3)"}
+{"timestamp":"2026-04-26T00:30:35.159Z","level":"error","message":"checkPortListening failed (tcp + http): 5173 localhost"}
+{"timestamp":"2026-04-26T00:30:36.419Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:36.925Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:37.437Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:37.950Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:38.461Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:38.972Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:39.483Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:39.994Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:40.502Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:41.014Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:41.524Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:42.032Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:42.541Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:43.047Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:30:43.558Z","level":"error","message":"checkPortListening tcp error: 5173 localhost\nAggregateError"}
+{"timestamp":"2026-04-26T00:33:15.842Z","level":"debug","message":"Generate code and execute params","context":{"projectName":"Antigravi-platadv","projectPath":"c:\\Users\\victo\\OneDrive\\Documentos\\Antigravi-platadv","testIds":[],"serverMode":"development"}}
+{"timestamp":"2026-04-26T00:33:15.899Z","level":"info","message":"HTTP server started successfully on port 62440"}
+{"timestamp":"2026-04-26T00:33:15.978Z","level":"info","message":"Selected tests: TC001[High], TC002[High], TC003[High], TC004[High], TC005[High], TC006[High], TC007[High], TC008[High], TC009[Medium], TC010[Medium], TC011[Medium], TC012[Medium], TC013[Medium], TC014[Medium], TC015[Low]"}
+{"timestamp":"2026-04-26T00:33:15.977Z","level":"info","message":"Dev-mode test cap: selecting 15 of 17 frontend tests (serverMode=development)"}
+{"timestamp":"2026-04-26T00:33:15.978Z","level":"info","message":"Skipped tests: TC016[Low], TC017[Low]"}
+{"timestamp":"2026-04-26T00:33:15.895Z","level":"info","message":"Attempting to start server (attempt 1/3)"}
+{"timestamp":"2026-04-26T00:33:16.825Z","level":"info","message":"HTTP proxy started successfully on port 62444"}
+{"timestamp":"2026-04-26T00:33:16.824Z","level":"info","message":"Attempting to start HTTP proxy (attempt 1/3)"}
+{"timestamp":"2026-04-26T00:33:17.513Z","level":"info","message":"🚀 Starting tunnel client: f0819d69-fe82-492b-a809-cb7bbce6f99f","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:17.514Z","level":"info","message":"⏱️ Network timeout: 10000ms, Auth: enabled","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:17.514Z","level":"info","message":"🔗 Establishing control connection...","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:17.882Z","level":"info","message":"proxy: [REDACTED]tun.testsprite.com:8080"}
+{"timestamp":"2026-04-26T00:33:17.883Z","level":"info","message":"Pre-flight probe attempt 1/3 to http://localhost:5174..."}
+{"timestamp":"2026-04-26T00:33:18.044Z","level":"info","message":"Verifying tunnel connectivity..."}
+{"timestamp":"2026-04-26T00:33:18.044Z","level":"info","message":"Pre-flight probe succeeded on attempt 1: status=200"}
+{"timestamp":"2026-04-26T00:33:18.199Z","level":"info","message":"✅ Tunnel established, remote port: 8080","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:17.513Z","level":"info","message":"📋 Config: localhost:62444 -> tun.testsprite.com:7300","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.045Z","level":"info","message":"Tunnel probe attempt 1/2 through tun.testsprite.com:8080 to http://localhost:5174..."}
+{"timestamp":"2026-04-26T00:33:18.415Z","level":"info","message":"🌐 [1] Connecting to remote tun.testsprite.com:7300","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.414Z","level":"info","message":"TIME: connection-1","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.555Z","level":"info","message":"TIME END: remote-connect-1","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.556Z","level":"info","message":"📡 [1] Connecting to local localhost:62444","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.699Z","level":"info","message":"✋ [1] Sending Accept message for 055b8c4f-044f-46dd-8646-f1ea86671c49","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.413Z","level":"info","message":"🔄 [1] New connection request: 055b8c4f-044f-46dd-8646-f1ea86671c49","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.698Z","level":"info","message":"✅ [1] Authentication completed","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.555Z","level":"info","message":"✅ [1] Remote connection established","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.703Z","level":"info","message":"TIME END: connection-1","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:19.016Z","level":"info","message":"📦 [Proxy-1] First data packet transferred","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.414Z","level":"info","message":"🔗 [1] Starting handleConnection for 055b8c4f-044f-46dd-8646-f1ea86671c49","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.415Z","level":"info","message":"TIME: remote-connect-1","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.559Z","level":"info","message":"TIME END: local-connect-1","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.559Z","level":"info","message":"✅ [1] Local connection established","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.556Z","level":"info","message":"local-connect-1","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.559Z","level":"info","message":"🤝 [1] Starting handshake","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.560Z","level":"info","message":"👋 [1] Hello message sent","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.560Z","level":"info","message":"🔐 [1] Performing authentication","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.700Z","level":"info","message":"🔄 [Proxy-1] Starting proxy: local 127.0.0.1:62444 <-> remote 35.170.174.200:7300","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.703Z","level":"info","message":"✅ [1] Connection 055b8c4f-044f-46dd-8646-f1ea86671c49 fully established and proxying","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:18.699Z","level":"info","message":"🔄 [1] Starting data proxy","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:22.227Z","level":"info","message":"GET /favicon.ico 404 1ms"}
+{"timestamp":"2026-04-26T00:33:33.279Z","level":"warn","message":"Tunnel probe attempt 1 failed: Tunnel probe timed out after 15000ms — retrying in 3s..."}
+{"timestamp":"2026-04-26T00:33:33.417Z","level":"info","message":"🔚 [Proxy-1] Remote closed after 14718ms (transferred: 0→214 bytes)","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:33.418Z","level":"info","message":"🔚 [Proxy-1] Local closed after 14719ms (transferred: 0→214 bytes)","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.285Z","level":"info","message":"Tunnel probe attempt 2/2 through tun.testsprite.com:8080 to http://localhost:5174..."}
+{"timestamp":"2026-04-26T00:33:36.614Z","level":"info","message":"TIME: connection-2","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.614Z","level":"info","message":"🌐 [2] Connecting to remote tun.testsprite.com:7300","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.613Z","level":"info","message":"🔄 [2] New connection request: 55fd890b-71ad-4b09-b973-f1adfc2455df","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.769Z","level":"info","message":"✅ [2] Remote connection established","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.772Z","level":"info","message":"🔐 [2] Performing authentication","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.770Z","level":"info","message":"local-connect-2","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.614Z","level":"info","message":"🔗 [2] Starting handleConnection for 55fd890b-71ad-4b09-b973-f1adfc2455df","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.922Z","level":"info","message":"✋ [2] Sending Accept message for 55fd890b-71ad-4b09-b973-f1adfc2455df","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.922Z","level":"info","message":"🔄 [Proxy-2] Starting proxy: local 127.0.0.1:62444 <-> remote 35.170.174.200:7300","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.769Z","level":"info","message":"TIME END: remote-connect-2","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.923Z","level":"info","message":"TIME END: connection-2","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:37.252Z","level":"info","message":"📦 [Proxy-2] First data packet transferred","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.614Z","level":"info","message":"TIME: remote-connect-2","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.772Z","level":"info","message":"🤝 [2] Starting handshake","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.771Z","level":"info","message":"TIME END: local-connect-2","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.770Z","level":"info","message":"📡 [2] Connecting to local localhost:62444","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.771Z","level":"info","message":"✅ [2] Local connection established","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.772Z","level":"info","message":"👋 [2] Hello message sent","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.921Z","level":"info","message":"✅ [2] Authentication completed","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.922Z","level":"info","message":"✅ [2] Connection 55fd890b-71ad-4b09-b973-f1adfc2455df fully established and proxying","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:36.922Z","level":"info","message":"🔄 [2] Starting data proxy","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:37.980Z","level":"info","message":"🔚 [Proxy-2] Local closed after 1058ms (transferred: 3347→214 bytes)","context":{"tunnelVersion":"1"}}
+{"timestamp":"2026-04-26T00:33:38.144Z","level":"info","message":"Tunnel probe succeeded on attempt 2: status=200"}
+{"timestamp":"2026-04-26T00:33:38.144Z","level":"info","message":"Tunnel connectivity verified."}
+{"timestamp":"2026-04-26T00:33:38.285Z","level":"info","message":"🔚 [Proxy-2] Remote closed after 1363ms (transferred: 3347→214 bytes)","context":{"tunnelVersion":"1"}}
