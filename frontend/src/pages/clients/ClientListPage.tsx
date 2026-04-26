@@ -7,6 +7,7 @@ import api from '../../services/api';
 import { clsx } from 'clsx';
 import { ListSkeleton } from '../../components/ui/Skeleton';
 import { useToast } from '../../context/ToastContext';
+import { haptics } from '../../utils/haptics';
 
 // Optimized animation variants
 const containerVariants = {
@@ -89,6 +90,36 @@ export default function ClientListPage() {
     const [statusFilter, setStatusFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState('all');
     const [isImporting, setIsImporting] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+    const [pullDistance, setPullDistance] = useState(0);
+    const [touchStart, setTouchStart] = useState(0);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (window.scrollY === 0) {
+            setTouchStart(e.touches[0].clientY);
+        }
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (touchStart > 0) {
+            const currentTouch = e.touches[0].clientY;
+            const distance = currentTouch - touchStart;
+            if (distance > 0 && distance < 150) {
+                setPullDistance(distance);
+            }
+        }
+    };
+
+    const handleTouchEnd = async () => {
+        if (pullDistance > 60) {
+            setRefreshing(true);
+            haptics.light();
+            await fetchClients();
+            setRefreshing(false);
+        }
+        setPullDistance(0);
+        setTouchStart(0);
+    };
 
     const handleImportSpreadsheet = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -323,7 +354,31 @@ export default function ClientListPage() {
     };
 
     return (
-        <div className="space-y-4 pb-20 md:pb-0">
+        <div 
+            className="space-y-4 pb-20 md:pb-0"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+        >
+            {/* Pull to refresh indicator */}
+            <AnimatePresence>
+                {(pullDistance > 0 || refreshing) && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: pullDistance > 60 || refreshing ? 60 : pullDistance, opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="flex justify-center items-center overflow-hidden"
+                    >
+                        <div className={clsx(
+                            "w-8 h-8 rounded-full border-2 border-app-stroke flex items-center justify-center transition-all",
+                            pullDistance > 60 ? "border-black dark:border-white scale-110" : "scale-90"
+                        )}>
+                            <Loader2 size={16} className={clsx(refreshing && "animate-spin")} style={{ transform: `rotate(${pullDistance * 2}deg)` }} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                     <div>
@@ -424,7 +479,10 @@ export default function ClientListPage() {
                     {alphabet.map(letter => (
                         <button
                             key={letter}
-                            onClick={() => setSelectedLetter(letter)}
+                            onClick={() => {
+                                setSelectedLetter(letter);
+                                haptics.light();
+                            }}
                             className={clsx(
                                 "w-8 h-8 rounded-full text-[10px] font-bold transition-all shrink-0 flex items-center justify-center border shadow-sm",
                                 selectedLetter === letter

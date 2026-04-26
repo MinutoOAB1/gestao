@@ -1,0 +1,23 @@
+{
+  "name": "Advus - Gestão Jurídica",
+  "short_name": "Advus",
+  "description": "Plataforma premium para gestão de escritórios de advocacia.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
+  "icons": [
+    {
+      "src": "/Advus.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Advus.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
