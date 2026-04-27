@@ -317,6 +317,7 @@ function EngagementSection() {
     const [roi, setRoi] = useState<number>(0);
     const [hoursSaved, setHoursSaved] = useState<number>(10);
     const [teamSize, setTeamSize] = useState<number>(5);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Simple ROI calculation: (Hours saved * Team Size * Avg Hourly Rate) * 12 months
@@ -384,11 +385,11 @@ function EngagementSection() {
                         </div>
                         <div className="space-y-4">
                             {[
-                                'Importação de Processos',
-                                'Configuração de Fluxo Financeiro',
-                                'Treinamento da Equipe',
-                                'Integração com Tribunais',
-                                'Personalização de Documentos'
+                                'Cadastro de Clientes',
+                                'Gestão de Processos',
+                                'Controle Financeiro',
+                                'Agenda de Prazos',
+                                'Configuração de Equipe'
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-accent/30 transition-colors cursor-pointer group">
                                     <div className="w-6 h-6 rounded-lg border-2 border-white/10 group-hover:border-accent flex items-center justify-center transition-colors">
@@ -412,7 +413,10 @@ function EngagementSection() {
                             <p className="text-white/50 text-sm mb-8 leading-relaxed">
                                 Descubra o nível de maturidade digital do seu escritório em 2 minutos.
                             </p>
-                            <button className="w-full py-4 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-xs">
+                            <button 
+                                onClick={() => navigate('/register')}
+                                className="w-full py-4 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-xs"
+                            >
                                 Iniciar Avaliação
                             </button>
                         </div>
