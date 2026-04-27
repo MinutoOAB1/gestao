@@ -771,14 +771,14 @@ export default function AgendaPage() {
                 {/* Header */}
                 <div className="p-4 border-b border-app-stroke bg-[#0F172A] flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex-1 flex items-center justify-between">
-                        <h2 className="text-xl font-black text-white capitalize tracking-tight">
+                        <h2 className="text-xl font-black !text-white capitalize tracking-tight">
                             {getMonthName(currentMonth)} {currentYear}
                         </h2>
                         <div className="flex items-center gap-3">
-                            <button onClick={goToToday} className="text-xs font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest">Hoje</button>
+                            <button onClick={goToToday} className="text-xs font-bold text-white/60 hover:text-white transition-colors uppercase tracking-widest">Hoje</button>
                             <div className="flex items-center gap-1">
-                                <button onClick={goToPrevMonth} className="p-1.5 rounded-full hover:bg-white/10 text-slate-300 transition-colors"><ChevronLeft size={20} /></button>
-                                <button onClick={goToNextMonth} className="p-1.5 rounded-full hover:bg-white/10 text-slate-300 transition-colors"><ChevronRight size={20} /></button>
+                                <button onClick={goToPrevMonth} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"><ChevronLeft size={20} /></button>
+                                <button onClick={goToNextMonth} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"><ChevronRight size={20} /></button>
                             </div>
                         </div>
                     </div>
@@ -790,7 +790,7 @@ export default function AgendaPage() {
                                 onClick={() => setView(v)}
                                 className={clsx(
                                     "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2", 
-                                    view === v ? "bg-white text-slate-900 shadow-lg" : "text-slate-400 hover:text-white hover:bg-white/5"
+                                    view === v ? "bg-white text-slate-900 shadow-lg" : "text-white/60 hover:text-white hover:bg-white/5"
                                 )}
                             >
                                 {v === 'list' && <List size={14} />}
