@@ -1,11 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards, UnauthorizedException, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('contracts')
 export class ContractsController {
     constructor(private readonly contractsService: ContractsService) { }
+
+    @Post('upload-signature')
+    @UseInterceptors(FileInterceptor('file'))
+    uploadSignature(
+        @UploadedFile() file: Express.Multer.File,
+        @Body() body: { title: string; signerName: string; signerEmail: string },
+        @Req() req: any
+    ) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.contractsService.requestManualSignature(file, body, tenantId);
+    }
 
     @Post()
     create(@Body() createContractDto: {

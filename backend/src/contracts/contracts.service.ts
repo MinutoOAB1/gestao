@@ -99,6 +99,53 @@ export class ContractsService {
         };
     }
 
+    async requestManualSignature(
+        file: Express.Multer.File,
+        data: { title: string; signerName: string; signerEmail: string },
+        tenantId: string
+    ) {
+        // Check signature limit (max 10)
+        const signatureCount = await this.prisma.contract.count({
+            where: {
+                tenantId,
+                autentiqueId: { not: null }
+            }
+        });
+
+        if (signatureCount >= 10) {
+            throw new BadRequestException('Limite de 10 assinaturas atingido para esta conta. Entre em contato com o suporte para aumentar seu limite.');
+        }
+
+        const apiKey = process.env.AUTENTIQUE_API_KEY;
+        if (!apiKey) {
+            throw new BadRequestException('Serviço de assinatura temporariamente indisponível (Erro de Configuração).');
+        }
+
+        const result = await this.autentique.createSignatureRequest(
+            apiKey,
+            data.title,
+            data.signerEmail,
+            file.buffer
+        );
+
+        // Create a contract record for this manual signature to keep it in the history
+        const contract = await this.prisma.contract.create({
+            data: {
+                number: `SIG-${Date.now()}`,
+                title: data.title,
+                description: `Assinatura manual enviada para ${data.signerName} (${data.signerEmail})`,
+                value: 0,
+                status: 'MADE',
+                tenantId,
+                autentiqueId: result.id,
+                autentiqueStatus: 'PENDING',
+                area: 'ASSINATURA'
+            }
+        });
+
+        return { contract, autentique: result };
+    }
+
     async requestSignature(id: string, tenantId: string) {
         // Check signature limit (max 10)
         const signatureCount = await this.prisma.contract.count({
