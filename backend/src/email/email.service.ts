@@ -63,57 +63,192 @@ export class EmailService {
     }
   }
 
+  private getBaseStyles(): string {
+    return `
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Inter:wght@400;500&display=swap');
+      
+      body { 
+        font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; 
+        background-color: #020617; 
+        margin: 0; 
+        padding: 40px 20px; 
+        -webkit-font-smoothing: antialiased;
+      }
+      
+      .container { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        background: #0F172A; 
+        border-radius: 24px; 
+        overflow: hidden; 
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+      
+      .header { 
+        background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%); 
+        padding: 48px 40px; 
+        text-align: center; 
+        position: relative;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .logo-text {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 800;
+        font-size: 32px;
+        letter-spacing: -0.05em;
+        color: #FFFFFF;
+        margin-bottom: 24px;
+        display: inline-block;
+      }
+      
+      .logo-text span { color: rgba(255, 255, 255, 0.5); }
+      
+      .header h1 { 
+        color: white; 
+        margin: 0; 
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 28px; 
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      
+      .content { padding: 48px 40px; }
+      
+      .content p { 
+        color: #94A3B8; 
+        line-height: 1.7; 
+        margin: 0 0 20px; 
+        font-size: 16px;
+      }
+      
+      .user-greeting {
+        color: #FFFFFF !important;
+        font-weight: 600;
+        font-size: 18px !important;
+        margin-bottom: 12px !important;
+      }
+      
+      .button-container {
+        text-align: center;
+        margin: 40px 0;
+      }
+      
+      .button { 
+        display: inline-block; 
+        background: #6366F1; 
+        color: #FFFFFF !important; 
+        padding: 18px 36px; 
+        text-decoration: none; 
+        border-radius: 16px; 
+        font-weight: 700; 
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        text-transform: uppercase;
+        font-size: 14px;
+        letter-spacing: 0.05em;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+      }
+      
+      .accent-box { 
+        background: rgba(99, 102, 241, 0.05); 
+        border-radius: 16px;
+        border: 1px solid rgba(99, 102, 241, 0.1); 
+        padding: 20px; 
+        margin: 30px 0; 
+      }
+
+      .accent-text {
+        color: #6366F1;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 !important;
+      }
+      
+      .divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 40px 0;
+      }
+      
+      .footer { 
+        background: #020617; 
+        padding: 32px 40px; 
+        text-align: center; 
+      }
+
+      .footer-text {
+        font-size: 12px; 
+        color: #475569; 
+        line-height: 1.8;
+        margin: 0;
+        font-weight: 500;
+      }
+    `;
+  }
+
+  private wrapInBaseTemplate(title: string, content: string): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>${this.getBaseStyles()}</style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div class="logo-text">ADV<span>US</span></div>
+            <h1>${title}</h1>
+          </div>
+          <div class="content">
+            ${content}
+          </div>
+          <div class="footer">
+            <p class="footer-text">
+              © 2026 Advus Premium - Gestão Jurídica Inteligente<br>
+              Ambiente de segurança criptografada AES-256-GCM.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
   /**
    * Send password reset email
    */
   async sendPasswordReset(to: string, resetToken: string, userName: string): Promise<void> {
     const resetUrl = `${this.getBaseUrl()}/reset-password/${resetToken}`;
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #312e81, #1e1b4b); padding: 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .button { display: inline-block; background: #312e81; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-          .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-          .warning { background: #fef3cd; border-left: 4px solid #f59e0b; padding: 12px; margin: 15px 0; font-size: 14px; color: #92400e; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🔐 Recuperação de Senha</h1>
-          </div>
-          <div class="content">
-            <p>Olá, <strong>${userName}</strong>!</p>
-            <p>Recebemos uma solicitação para redefinir a senha da sua conta.</p>
-            <p>Clique no botão abaixo para criar uma nova senha:</p>
-            <a href="${resetUrl}" class="button">Redefinir Minha Senha</a>
-            <div class="warning">
-              ⚠️ Este link expira em <strong>1 hora</strong>. Se você não solicitou esta alteração, ignore este e-mail.
-            </div>
-            <p style="font-size: 12px; color: #94a3b8;">Se o botão não funcionar, copie e cole este link no navegador:<br>${resetUrl}</p>
-          </div>
-          <div class="footer">
-            Advus - Gestão Jurídica Inteligente<br>
-            Este é um e-mail automático, não responda.
-          </div>
-        </div>
-      </body>
-      </html>
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>Recebemos uma solicitação para redefinir a segurança da sua conta premium no ecossistema Advus.</p>
+      <p>Para prosseguir com a criação de uma nova credencial, clique no botão de acesso seguro abaixo:</p>
+      
+      <div class="button-container">
+        <a href="${resetUrl}" class="button">Redefinir Senha Premium</a>
+      </div>
+
+      <div class="accent-box" style="background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.1);">
+        <p class="accent-text" style="color: #F59E0B;">
+          <strong>Segurança:</strong> Este link expira automaticamente em 1 hora. Se você não solicitou esta alteração, sua conta permanece segura e você pode ignorar este e-mail.
+        </p>
+      </div>
+      
+      <div class="divider"></div>
+      
+      <p class="footer-text" style="color: #64748B; text-align: left;">
+        Se o botão acima não funcionar, copie e cole o link de segurança em seu navegador:
+      </p>
+      <a href="${resetUrl}" style="word-break: break-all; color: #475569; font-size: 11px; text-decoration: none; margin-top: 16px; display: block;">${resetUrl}</a>
     `;
 
     await this.sendEmail({
       to,
       subject: '🔐 Redefinição de Senha - Advus',
-      html,
+      html: this.wrapInBaseTemplate('Redefinição de Senha', content),
     });
   }
 
@@ -127,52 +262,27 @@ export class EmailService {
   ): Promise<void> {
     const now = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .info-box { background: #f8fafc; border-radius: 8px; padding: 15px; margin: 15px 0; }
-          .warning { background: #fee2e2; border-left: 4px solid #ef4444; padding: 12px; margin: 15px 0; font-size: 14px; color: #b91c1c; }
-          .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🔔 Novo Login Detectado</h1>
-          </div>
-          <div class="content">
-            <p>Olá, <strong>${userName}</strong>!</p>
-            <p>Detectamos um novo login na sua conta.</p>
-            <div class="info-box">
-              <p><strong>📅 Data/Hora:</strong> ${now}</p>
-              <p><strong>🌐 IP:</strong> ${details.ip || 'Não disponível'}</p>
-              <p><strong>💻 Dispositivo:</strong> ${this.parseUserAgent(details.userAgent)}</p>
-            </div>
-            <div class="warning">
-              ⚠️ Se você não reconhece este login, altere sua senha imediatamente.
-            </div>
-          </div>
-          <div class="footer">
-            Advus - Gestão Jurídica Inteligente
-          </div>
-        </div>
-      </body>
-      </html>
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>Detectamos um novo acesso à sua conta premium de um dispositivo não reconhecido.</p>
+      
+      <div class="accent-box">
+        <p class="accent-text"><strong>📅 Data/Hora:</strong> ${now}</p>
+        <p class="accent-text"><strong>🌐 Endereço IP:</strong> ${details.ip || 'Não disponível'}</p>
+        <p class="accent-text"><strong>💻 Dispositivo:</strong> ${this.parseUserAgent(details.userAgent)}</p>
+      </div>
+
+      <div class="accent-box" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
+        <p class="accent-text" style="color: #EF4444;">
+          ⚠️ Se você não reconhece este login, sua conta pode estar em risco. Recomendamos alterar sua senha imediatamente e ativar a autenticação de dois fatores (2FA).
+        </p>
+      </div>
     `;
 
     await this.sendEmail({
       to,
       subject: '🔔 Novo Login Detectado - Advus',
-      html,
+      html: this.wrapInBaseTemplate('Novo Login Detectado', content),
     });
   }
 
@@ -184,44 +294,20 @@ export class EmailService {
     userName: string,
     options: { title: string; message: string; actionUrl?: string; actionLabel?: string }
   ): Promise<void> {
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #3b82f6, #2563eb); padding: 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-          .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>📬 ${options.title}</h1>
-          </div>
-          <div class="content">
-            <p>Olá, <strong>${userName}</strong>!</p>
-            <p>${options.message}</p>
-            ${options.actionUrl ? `<a href="${options.actionUrl}" class="button">${options.actionLabel || 'Ver Detalhes'}</a>` : ''}
-          </div>
-          <div class="footer">
-            Advus - Gestão Jurídica Inteligente
-          </div>
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>${options.message}</p>
+      ${options.actionUrl ? `
+        <div class="button-container">
+          <a href="${options.actionUrl}" class="button">${options.actionLabel || 'Ver Detalhes'}</a>
         </div>
-      </body>
-      </html>
+      ` : ''}
     `;
 
     await this.sendEmail({
       to,
       subject: `📬 ${options.title}`,
-      html,
+      html: this.wrapInBaseTemplate(options.title, content),
     });
   }
 
@@ -233,51 +319,25 @@ export class EmailService {
     userName: string,
     deadline: { title: string; date: string; processNumber?: string }
   ): Promise<void> {
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #ef4444, #dc2626); padding: 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .deadline-box { background: #fef2f2; border: 2px solid #fecaca; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
-          .deadline-date { font-size: 24px; font-weight: bold; color: #dc2626; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-          .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>⏰ Lembrete de Prazo</h1>
-          </div>
-          <div class="content">
-            <p>Olá, <strong>${userName}</strong>!</p>
-            <p>Este é um lembrete sobre um prazo importante:</p>
-            <div class="deadline-box">
-              <div class="deadline-date">📅 ${deadline.date}</div>
-              <div style="margin-top: 8px; font-size: 16px;">${deadline.title}</div>
-              ${deadline.processNumber ? `<div style="margin-top: 8px; font-size: 14px; color: #6b7280;">Processo: ${deadline.processNumber}</div>` : ''}
-            </div>
-            <a href="${this.getBaseUrl()}/agenda" class="button">Ver Agenda</a>
-          </div>
-          <div class="footer">
-            Advus - Gestão Jurídica Inteligente
-          </div>
-        </div>
-      </body>
-      </html>
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>Este é um lembrete automático sobre um prazo processual importante no seu ecossistema jurídico:</p>
+      
+      <div class="accent-box" style="text-align: center; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
+        <div style="font-size: 24px; font-weight: 800; color: #EF4444; margin-bottom: 8px;">📅 ${deadline.date}</div>
+        <div style="color: #FFFFFF; font-weight: 600; font-size: 16px;">${deadline.title}</div>
+        ${deadline.processNumber ? `<div style="margin-top: 4px; color: #94A3B8; font-size: 14px;">Processo: ${deadline.processNumber}</div>` : ''}
+      </div>
+
+      <div class="button-container">
+        <a href="${this.getBaseUrl()}/agenda" class="button">Ver na Agenda</a>
+      </div>
     `;
 
     await this.sendEmail({
       to,
       subject: `⏰ Lembrete: ${deadline.title}`,
-      html,
+      html: this.wrapInBaseTemplate('Lembrete de Prazo', content),
     });
   }
 
