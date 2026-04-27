@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import api from '../../services/api';
 import Modal from '../../components/ui/Modal';
+import { Avatar } from '../../components/ui/Avatar';
 import { useToast } from '../../context/ToastContext';
 import { useDebounce } from '../../hooks/useDebounce';
 
@@ -455,10 +456,12 @@ export default function ContractsPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-app-stroke flex items-center justify-center text-xs font-medium text-app-text-main">
-                                                    {contract.client?.name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'N/A'}
-                                                </div>
+                                            <div className="flex items-center gap-3">
+                                                <Avatar 
+                                                    name={contract.client?.name || contract.title} 
+                                                    size="sm" 
+                                                    className="bg-app-stroke"
+                                                />
                                                 <span className="text-sm text-app-text-main">{contract.client?.name || 'Sem cliente'}</span>
                                             </div>
                                         </td>
@@ -679,7 +682,10 @@ export default function ContractsPage() {
                             </div>
                             <div>
                                 <p className="text-xs text-app-text-muted mb-1">Cliente Vinculado</p>
-                                <p className="text-sm font-bold text-app-text-main">{selectedContract.client?.name || 'Nenhum'}</p>
+                                <div className="flex items-center gap-2">
+                                    <Avatar name={selectedContract.client?.name || selectedContract.title} size="sm" className="w-5 h-5" />
+                                    <p className="text-sm font-bold text-app-text-main">{selectedContract.client?.name || 'Nenhum'}</p>
+                                </div>
                             </div>
                             <div>
                                 <p className="text-xs text-app-text-muted mb-1">ID do Contrato</p>

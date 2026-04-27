@@ -125,7 +125,8 @@ export class ContractsService {
             apiKey,
             data.title,
             data.signerEmail,
-            file.buffer
+            file.buffer,
+            data.signerName
         );
 
         // Create a contract record for this manual signature to keep it in the history

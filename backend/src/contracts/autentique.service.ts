@@ -12,7 +12,8 @@ export class AutentiqueService {
         documentName: string,
         signerEmail: string,
         fileBuffer: Buffer,
-        sandbox = true
+        signerName?: string,
+        sandbox = false
     ) {
         const query = `
             mutation CreateDocumentMutation($document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload!) {
@@ -26,7 +27,7 @@ export class AutentiqueService {
 
         const variables = {
             document: { name: documentName },
-            signers: [{ email: signerEmail, action: 'SIGN' }],
+            signers: [{ email: signerEmail, name: signerName, action: 'SIGN' }],
             file: null,
         };
 
