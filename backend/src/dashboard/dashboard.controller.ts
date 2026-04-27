@@ -1,4 +1,4 @@
-import { Controller, Get, Request, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards, UnauthorizedException, Header } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -8,6 +8,7 @@ export class DashboardController {
     constructor(private prisma: PrismaService) { }
 
     @Get('stats')
+    @Header('Cache-Control', 'private, max-age=300') // 5 minutes cache
     async getStats(@Request() req) {
         const tenantId = req.user?.tenantId;
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
@@ -285,6 +286,37 @@ export class DashboardController {
         return {
             barData: days,
             pieData: pieData.length > 0 ? pieData : [{ name: 'Nenhum contrato', value: 0 }]
+        };
+    }
+
+    @Get('summary')
+    @Header('Cache-Control', 'private, max-age=300')
+    async getSummary(@Request() req) {
+        const tenantId = req.user?.tenantId;
+        
+        const [stats, performance, recentClients, agenda] = await Promise.all([
+            this.getStats(req),
+            this.getTeamPerformance(req),
+            this.prisma.client.findMany({
+                where: { tenantId },
+                orderBy: { createdAt: 'desc' },
+                take: 3
+            }),
+            this.prisma.event.findMany({
+                where: { 
+                    tenantId,
+                    start: { gte: new Date() }
+                },
+                orderBy: { start: 'asc' },
+                take: 10
+            })
+        ]);
+
+        return {
+            ...stats,
+            performance,
+            recentClients,
+            agenda
         };
     }
 }

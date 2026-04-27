@@ -134,6 +134,8 @@ model Process {
   @@index([clientId])
   @@index([status])
   @@index([kanbanColumn])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, deadline])
 }
 
 model ProcessNote {
@@ -242,6 +244,7 @@ model Client {
   @@index([tenantId])
   @@index([status])
   @@index([document])
+  @@index([tenantId, createdAt])
 }
 
 model ClientActivity {
@@ -341,6 +344,8 @@ model FinancialRecord {
   @@index([clientId])
   @@index([status])
   @@index([date])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, type])
 }
 
 model Invoice {
@@ -511,6 +516,7 @@ model Contract {
   @@index([tenantId])
   @@index([clientId])
   @@index([status])
+  @@index([tenantId, area])
 }
 
 model Partnership {

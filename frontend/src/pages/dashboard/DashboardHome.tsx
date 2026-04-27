@@ -265,33 +265,26 @@ export default function DashboardHome() {
 
     const fetchDashboardData = useCallback(async () => {
         try {
-            const [clientsRes, , eventsRes, statsRes] = await Promise.all([
-                api.get('/clients?take=3').catch(() => ({ data: [] })),
-                api.get('/processes?take=1').catch(() => ({ data: [] })),
-                api.get('/agenda').catch(() => ({ data: [] })),
-                api.get('/dashboard/stats').catch(() => ({ data: null }))
-            ]);
+            const res = await api.get('/dashboard/summary');
+            const summary = res.data;
 
-            const stats = statsRes.data;
-            if (stats) {
-                setProductivity(stats);
+            if (summary) {
+                setProductivity(summary);
+                
+                const clients = summary.recentClients || [];
+                const events = summary.agenda || [];
+
+                setData({
+                    totalIncome: summary.pendingPayments || 0,
+                    totalExpense: 0,
+                    balance: (summary.pendingPayments || 0),
+                    clientsCount: summary.totalClients || 0,
+                    processesCount: summary.totalProcesses || 0,
+                    eventsCount: events.length,
+                    recentClients: clients,
+                    upcomingEvents: events
+                });
             }
-
-            const clients = clientsRes.data || [];
-            const events = eventsRes.data || [];
-
-            const allEvents = events.sort((a: any, b: any) => new Date(a.start).getTime() - new Date(b.start).getTime());
-
-            setData({
-                totalIncome: stats?.pendingPayments || 0,
-                totalExpense: 0,
-                balance: (stats?.pendingPayments || 0),
-                clientsCount: stats?.totalClients || clients.length,
-                processesCount: stats?.totalProcesses || 0,
-                eventsCount: events.length,
-                recentClients: clients.slice(0, 3),
-                upcomingEvents: allEvents
-            });
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
         } finally {
