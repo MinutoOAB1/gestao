@@ -208,14 +208,18 @@ export class AuthService {
 
   async forgotPassword(email: string) {
     return this.tenantContext.runWithTenant(null, true, async () => {
+      console.log(`[AUTH] Password reset requested for: ${email}`);
       const user = await this.prisma.user.findUnique({
         where: { email: email.toLowerCase().trim() },
       });
 
       if (!user) {
+        console.log(`[AUTH] Reset failed: User not found: ${email}`);
         // Return success anyway to prevent email enumeration
         return { message: 'Se o e-mail existir, um link de recuperação foi enviado.' };
       }
+
+      console.log(`[AUTH] User found: ${user.name} (${user.id}). Generating token...`);
 
       // Generate a secure random token
       const token = crypto.randomBytes(32).toString('hex');
@@ -230,8 +234,12 @@ export class AuthService {
         },
       });
 
+      console.log(`[AUTH] Token saved for ${user.email}. Sending email...`);
+
       // Send email
       await this.emailService.sendPasswordReset(user.email, token, user.name);
+
+      console.log(`[AUTH] Reset email triggered successfully for ${user.email}`);
 
       return { message: 'Link de recuperação enviado com sucesso.' };
     });

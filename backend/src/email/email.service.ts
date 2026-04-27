@@ -15,6 +15,7 @@ export class EmailService {
     if (this.isConfigured) {
       this.resend = new Resend(apiKey);
       this.logger.log('✅ Resend email service initialized');
+      this.logger.log(`📧 Configured with FROM: ${this.getFromEmail()}`);
     } else {
       this.logger.warn('⚠️ RESEND_API_KEY not configured - emails will be logged to console');
     }
