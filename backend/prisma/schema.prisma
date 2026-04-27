@@ -129,6 +129,11 @@ model Process {
   updates      ProcessUpdate[]
   timeEntries  TimeEntry[]
   labels       ProcessLabel[]     @relation("ProcessLabels")
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@index([status])
+  @@index([kanbanColumn])
 }
 
 model ProcessNote {
@@ -233,6 +238,10 @@ model Client {
   processes        Process[]
   activities       ClientActivity[]
   invoices         Invoice[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([document])
 }
 
 model ClientActivity {
@@ -245,6 +254,9 @@ model ClientActivity {
   userId      String?  // Who did it
   createdAt   DateTime @default(now())
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([tenantId])
 }
 
 model ClientTag {
@@ -324,6 +336,11 @@ model FinancialRecord {
   client             Client?   @relation(fields: [clientId], references: [id])
   tenant             Tenant    @relation(fields: [tenantId], references: [id])
   invoices           Invoice[]
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@index([status])
+  @@index([date])
 }
 
 model Invoice {
@@ -346,6 +363,10 @@ model Invoice {
   client           Client   @relation(fields: [clientId], references: [id])
   financialRecord  FinancialRecord? @relation(fields: [financialRecordId], references: [id])
   tenant           Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@index([asaasId])
 }
 
 model Folder {
@@ -360,6 +381,9 @@ model Folder {
   parent    Folder?    @relation("FolderHierarchy", fields: [parentId], references: [id])
   children  Folder[]   @relation("FolderHierarchy")
   tenant    Tenant     @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([parentId])
 }
 
 model Document {
@@ -381,6 +405,10 @@ model Document {
   tenant       Tenant             @relation(fields: [tenantId], references: [id])
   auditLogs    DocumentAuditLog[]
   comments     DocumentComment[]
+
+  @@index([tenantId])
+  @@index([folderId])
+  @@index([type])
 }
 
 model DocumentComment {
@@ -434,6 +462,10 @@ model Event {
   tenant          Tenant               @relation(fields: [tenantId], references: [id])
   assignees       EventAssignee[]
   checklistItems  EventChecklistItem[]
+
+  @@index([tenantId])
+  @@index([start])
+  @@index([processId])
 }
 
 model EventChecklistItem {
@@ -460,21 +492,25 @@ model EventAssignee {
 }
 
 model Contract {
-  id          String   @id @default(uuid())
-  number      String
-  title       String
-  description String?
-  status      String   @default("INITIATED")
-  value       Float
-  clientId    String?
-  tenantId    String
-  createdAt   DateTime @default(now())
+  id               String   @id @default(uuid())
+  number           String
+  title            String
+  description      String?
+  status           String   @default("INITIATED")
+  value            Float
+  clientId         String?
+  tenantId         String
+  createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   area             String?
   autentiqueId     String?
   autentiqueStatus String?
   client           Client?  @relation(fields: [clientId], references: [id])
   tenant           Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@index([status])
 }
 
 model Partnership {
@@ -494,6 +530,8 @@ model Partnership {
   updatedAt    DateTime                 @updatedAt
   tenant       Tenant                   @relation(fields: [tenantId], references: [id])
   transactions PartnershipTransaction[]
+
+  @@index([tenantId])
 }
 
 model PartnershipTransaction {
@@ -509,6 +547,9 @@ model PartnershipTransaction {
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   partner           Partnership @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId])
+  @@index([tenantId])
 }
 
 model Template {
@@ -526,6 +567,9 @@ model Template {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   tenant           Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([category])
 }
 
 
@@ -565,6 +609,10 @@ model TimeEntry {
   process      Process? @relation(fields: [processId], references: [id])
   tenant       Tenant   @relation(fields: [tenantId], references: [id])
   user         User     @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([processId])
 }
 
 model AiAnalysisLog {
@@ -578,6 +626,9 @@ model AiAnalysisLog {
   createdAt      DateTime @default(now())
   tenant         Tenant   @relation(fields: [tenantId], references: [id])
   user           User?    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
 }
 
 model LoginHistory {
