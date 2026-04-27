@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import api from '../../services/api';
+import { useToast } from '../../context/ToastContext';
+import { Avatar } from '../../components/ui/Avatar';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
