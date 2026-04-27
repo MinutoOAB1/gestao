@@ -340,7 +340,6 @@ model FinancialRecord {
   @@index([status])
   @@index([date])
 }
-}
 
 model Invoice {
   id               String   @id @default(uuid())
@@ -367,7 +366,6 @@ model Invoice {
   @@index([clientId])
   @@index([asaasId])
 }
-}
 
 model Folder {
   id        String     @id @default(uuid())
@@ -384,7 +382,6 @@ model Folder {
 
   @@index([tenantId])
   @@index([parentId])
-}
 }
 
 model Document {
@@ -410,7 +407,6 @@ model Document {
   @@index([tenantId])
   @@index([folderId])
   @@index([type])
-}
 }
 
 model DocumentComment {
@@ -469,7 +465,6 @@ model Event {
   @@index([start])
   @@index([processId])
 }
-}
 
 model EventChecklistItem {
   id        String   @id @default(uuid())
@@ -513,7 +508,6 @@ model Contract {
   @@index([clientId])
   @@index([status])
 }
-}
 
 model Partnership {
   id           String                   @id @default(uuid())
@@ -535,7 +529,6 @@ model Partnership {
 
   @@index([tenantId])
 }
-}
 
 model PartnershipTransaction {
   id                String      @id @default(uuid())
@@ -553,7 +546,6 @@ model PartnershipTransaction {
 
   @@index([partnerId])
   @@index([tenantId])
-}
 }
 
 model Template {
@@ -574,7 +566,6 @@ model Template {
 
   @@index([tenantId])
   @@index([category])
-}
 }
 
 
@@ -618,7 +609,6 @@ model TimeEntry {
   @@index([userId])
   @@index([processId])
 }
-}
 
 model AiAnalysisLog {
   id             String   @id @default(uuid())
@@ -634,7 +624,6 @@ model AiAnalysisLog {
 
   @@index([tenantId])
   @@index([userId])
-}
 }
 
 model LoginHistory {
