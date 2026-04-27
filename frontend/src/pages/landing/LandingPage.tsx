@@ -48,7 +48,7 @@ function Navbar() {
                             onClick={() => navigate('/register')}
                             className="px-6 py-2.5 bg-accent text-primary-dark font-black rounded-xl hover:bg-white transition-all shadow-lg shadow-accent/10 text-xs uppercase tracking-tighter"
                         >
-                            SOLICITAR ACESSO
+                            SOLICITE UMA DEMO
                         </button>
                     </div>
 
@@ -73,7 +73,7 @@ function Navbar() {
                                     ENTRAR
                                 </button>
                                 <button onClick={() => navigate('/register')} className="py-4 text-center bg-accent text-primary-dark font-black rounded-2xl">
-                                    SOLICITAR ACESSO
+                                    SOLICITE UMA DEMO
                                 </button>
                             </div>
                         </div>
@@ -114,8 +114,8 @@ function HeroSection() {
                         className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-10 font-display"
                     >
                         A Nova Era da <br className="hidden md:block" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/40">
-                            Gestão Jurídica
+                        <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/40 lowercase">
+                            gestão de escritórios de advocacia
                         </span>
                     </motion.h1>
 
@@ -126,7 +126,7 @@ function HeroSection() {
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-2xl text-white/50 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
                     >
-                        Transforme seu escritório em uma potência de alta performance com a plataforma de gestão mais sofisticada do mercado.
+                        Advus é uma plataforma de gestão jurídica integrada, projetada para escritórios de advocacia que buscam eficiência, controle financeiro e satisfação de clientes.
                     </motion.p>
 
                     {/* CTA Buttons */}
@@ -144,7 +144,7 @@ function HeroSection() {
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                         <button className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md uppercase tracking-widest text-sm">
-                            Ver Demonstração
+                            Solicite uma Demo
                         </button>
                     </motion.div>
 
@@ -250,11 +250,10 @@ function FeaturesSection() {
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-32">
-                    <h2 className="text-accent font-black text-xs uppercase tracking-[0.3em] mb-6">Excelência Operacional</h2>
-                    <h3 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
-                        Recursos que <br />
-                        <span className="text-white/30">Definem o Futuro</span>
-                    </h3>
+                    <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
+                        Recursos <br />
+                        <span className="text-white/30">de Gestão</span>
+                    </h2>
                     <p className="text-xl text-white/40 leading-relaxed font-medium">
                         Desenvolvido especificamente para as necessidades da advocacia de alta performance.
                     </p>
@@ -313,6 +312,122 @@ function StatsSection() {
     );
 }
 
+// Engagement Tools Section
+function EngagementSection() {
+    const [roi, setRoi] = useState<number>(0);
+    const [hoursSaved, setHoursSaved] = useState<number>(10);
+    const [teamSize, setTeamSize] = useState<number>(5);
+
+    useEffect(() => {
+        // Simple ROI calculation: (Hours saved * Team Size * Avg Hourly Rate) * 12 months
+        // Assuming avg hourly rate of R$ 150
+        const calculatedRoi = hoursSaved * teamSize * 150 * 12;
+        setRoi(calculatedRoi);
+    }, [hoursSaved, teamSize]);
+
+    return (
+        <section className="py-32 md:py-48 bg-primary-dark/50 relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-24">
+                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
+                        Ferramentas <br />
+                        <span className="text-white/30">de Engajamento</span>
+                    </h2>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    {/* ROI Calculator */}
+                    <div className="p-10 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                                <DollarSign size={24} />
+                            </div>
+                            <h3 className="text-xl font-black text-white uppercase tracking-tight">Calculadora de ROI</h3>
+                        </div>
+                        <div className="space-y-8">
+                            <div>
+                                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">
+                                    Horas economizadas/mês por advogado: {hoursSaved}h
+                                </label>
+                                <input 
+                                    type="range" min="1" max="40" value={hoursSaved}
+                                    onChange={(e) => setHoursSaved(parseInt(e.target.value))}
+                                    className="w-full accent-accent"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">
+                                    Tamanho da Equipe: {teamSize}
+                                </label>
+                                <input 
+                                    type="range" min="1" max="50" value={teamSize}
+                                    onChange={(e) => setTeamSize(parseInt(e.target.value))}
+                                    className="w-full accent-accent"
+                                />
+                            </div>
+                            <div className="pt-8 border-t border-white/5">
+                                <div className="text-[10px] font-black text-accent uppercase tracking-[0.2em] mb-2">Economia Anual Estimada</div>
+                                <div className="text-4xl font-black text-white font-display">
+                                    R$ {roi.toLocaleString('pt-BR')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Onboarding Checklist */}
+                    <div className="p-10 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                                <Check size={24} />
+                            </div>
+                            <h3 className="text-xl font-black text-white uppercase tracking-tight">Checklist de Onboarding</h3>
+                        </div>
+                        <div className="space-y-4">
+                            {[
+                                'Importação de Processos',
+                                'Configuração de Fluxo Financeiro',
+                                'Treinamento da Equipe',
+                                'Integração com Tribunais',
+                                'Personalização de Documentos'
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-accent/30 transition-colors cursor-pointer group">
+                                    <div className="w-6 h-6 rounded-lg border-2 border-white/10 group-hover:border-accent flex items-center justify-center transition-colors">
+                                        <Check size={14} className="text-accent opacity-0 group-hover:opacity-100" />
+                                    </div>
+                                    <span className="text-xs font-bold text-white/70 uppercase tracking-tight">{item}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Management Quiz */}
+                    <div className="p-10 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                                <Sparkles size={24} />
+                            </div>
+                            <h3 className="text-xl font-black text-white uppercase tracking-tight">Quiz de Necessidades</h3>
+                        </div>
+                        <div className="text-center py-10">
+                            <p className="text-white/50 text-sm mb-8 leading-relaxed">
+                                Descubra o nível de maturidade digital do seu escritório em 2 minutos.
+                            </p>
+                            <button className="w-full py-4 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-xs">
+                                Iniciar Avaliação
+                            </button>
+                        </div>
+                        <div className="mt-8 grid grid-cols-3 gap-2">
+                            <div className="h-1 bg-accent rounded-full"></div>
+                            <div className="h-1 bg-white/10 rounded-full"></div>
+                            <div className="h-1 bg-white/10 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 // Pricing Section
 function PricingSection() {
     const navigate = useNavigate();
@@ -322,11 +437,10 @@ function PricingSection() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center max-w-3xl mx-auto mb-24">
-                    <h2 className="text-accent font-black text-xs uppercase tracking-[0.3em] mb-6">Início Imediato</h2>
-                    <h3 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
+                    <h2 id="pricing-title" className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
                         Assinatura <br />
-                        <span className="text-white/30">Premium Advus</span>
-                    </h3>
+                        <span className="text-white/30">Planos Premium</span>
+                    </h2>
                     <p className="text-xl text-white/40 leading-relaxed font-medium">
                         Acesso ilimitado ao ecossistema mais sofisticado do Brasil.
                     </p>
@@ -415,11 +529,10 @@ function TestimonialsSection() {
         <section id="testimonials" className="py-32 md:py-48 bg-primary-dark">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-24">
-                    <h2 className="text-accent font-black text-xs uppercase tracking-[0.3em] mb-6">Aprovação de Elite</h2>
-                    <h3 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
+                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
                         Depoimentos <br />
                         <span className="text-white/30">de Quem Decide</span>
-                    </h3>
+                    </h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -566,6 +679,7 @@ export default function LandingPage() {
             <HeroSection />
             <FeaturesSection />
             <StatsSection />
+            <EngagementSection />
             <PricingSection />
             <TestimonialsSection />
             <CTASection />
