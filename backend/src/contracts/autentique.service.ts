@@ -20,7 +20,6 @@ export class AutentiqueService {
                 createDocument(sandbox: ${sandbox}, document: $document, signers: $signers, file: $file) {
                     id
                     name
-                    link
                 }
             }
         `;
