@@ -8,6 +8,7 @@ import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import * as crypto from 'crypto';
 import { TenantContextService } from '../prisma/tenant-context.service';
+import { SecurityService } from '../common/security/security.service';
 
 @Injectable()
 export class AuthService {
