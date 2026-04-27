@@ -20,7 +20,6 @@ import html2canvas from 'html2canvas';
 import { renderAsync } from 'docx-preview';
 import PizZip from 'pizzip';
 
-import { useToast } from '../../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Template {
