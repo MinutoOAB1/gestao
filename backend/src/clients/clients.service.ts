@@ -3,12 +3,14 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { OnEvent, EventEmitter2 } from '@nestjs/event-emitter';
+import { SecurityService } from '../common/security/security.service';
 
 @Injectable()
 export class ClientsService {
     constructor(
         private prisma: PrismaService,
-        private eventEmitter: EventEmitter2
+        private eventEmitter: EventEmitter2,
+        private security: SecurityService
     ) { }
 
     async create(createClientDto: CreateClientDto, tenantId: string, userId?: string) {
@@ -26,6 +28,10 @@ export class ClientsService {
                 data[key] = null;
             }
         }
+
+        // Encrypt sensitive fields
+        if (data.document) data.document = this.security.encrypt(data.document);
+        if (data.email) data.email = this.security.encrypt(data.email);
 
         const parseDate = (d: any) => {
             if (!d) return undefined;
@@ -60,6 +66,11 @@ export class ClientsService {
 
         try {
             const client = await this.prisma.client.create({ data, include: { tags: true } });
+            
+            // Decrypt for returning to caller
+            if (client.document) client.document = this.security.decrypt(client.document);
+            if (client.email) client.email = this.security.decrypt(client.email);
+
             await this.logActivity(client.id, tenantId, 'CLIENT_CREATED', `Cliente ${client.name} cadastrado na plataforma.`);
             
             this.eventEmitter.emit('client.created', {
@@ -77,8 +88,8 @@ export class ClientsService {
         }
     }
 
-    findAll(tenantId: string, take = 50, skip = 0) {
-        return this.prisma.client.findMany({
+    async findAll(tenantId: string, take = 50, skip = 0) {
+        const clients = await this.prisma.client.findMany({
             where: { tenantId },
             orderBy: { name: 'asc' },
             include: {
@@ -96,10 +107,17 @@ export class ClientsService {
             take,
             skip,
         });
+
+        // Decrypt sensitive fields
+        return clients.map(client => ({
+            ...client,
+            document: client.document ? this.security.decrypt(client.document) : client.document,
+            email: client.email ? this.security.decrypt(client.email) : client.email,
+        }));
     }
 
-    findOne(id: string, tenantId: string) {
-        return this.prisma.client.findFirst({
+    async findOne(id: string, tenantId: string) {
+        const client = await this.prisma.client.findFirst({
             where: { id, tenantId },
             include: { 
                 tags: { orderBy: { order: 'asc' } },
@@ -108,6 +126,13 @@ export class ClientsService {
                 activities: { orderBy: { createdAt: 'desc' }, take: 50 }
             },
         });
+
+        if (client) {
+            client.document = client.document ? this.security.decrypt(client.document) : client.document;
+            client.email = client.email ? this.security.decrypt(client.email) : client.email;
+        }
+
+        return client;
     }
 
     async update(id: string, updateClientDto: UpdateClientDto, tenantId: string, userId?: string) {
@@ -137,6 +162,10 @@ export class ClientsService {
             return date;
         };
 
+        // Encrypt sensitive fields if they are being updated
+        if (data.document) data.document = this.security.encrypt(data.document);
+        if (data.email) data.email = this.security.encrypt(data.email);
+
         // Handle DateTime fields
         if (data.birthDate) {
             data.birthDate = parseDate(data.birthDate);
@@ -150,6 +179,10 @@ export class ClientsService {
             data,
             include: { tags: { orderBy: { order: 'asc' } } },
         });
+
+        // Decrypt for returning
+        updated.document = updated.document ? this.security.decrypt(updated.document) : updated.document;
+        updated.email = updated.email ? this.security.decrypt(updated.email) : updated.email;
 
         this.eventEmitter.emit('client.updated', {
             clientId: updated.id,

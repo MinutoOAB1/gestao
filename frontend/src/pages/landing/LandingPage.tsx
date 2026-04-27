@@ -157,11 +157,11 @@ function HeroSection() {
                     >
                         <div className="flex items-center gap-2">
                             <Check size={16} className="text-accent" />
-                            7 Dias de Experiência
+                            Criptografia AES-256-GCM
                         </div>
                         <div className="flex items-center gap-2">
                             <Check size={16} className="text-accent" />
-                            Assinatura Premium
+                            Assinaturas via Autentique
                         </div>
                         <div className="flex items-center gap-2">
                             <Check size={16} className="text-accent" />
@@ -212,7 +212,7 @@ function HeroSection() {
 function FeaturesSection() {
     const features = [
         {
-            icon: FileText,
+            icon: Folder,
             title: 'Gestão de Processos',
             description: 'Acompanhe cada movimento processual com uma interface intuitiva e poderosa.',
         },
@@ -222,24 +222,24 @@ function FeaturesSection() {
             description: 'Gestão 360º de clientes com histórico completo e automação de atendimento.',
         },
         {
-            icon: Shield,
-            title: 'Inteligência Artificial',
+            icon: Sparkles,
+            title: 'IA Jurídica',
             description: 'Análise profunda de contratos e identificação de riscos com tecnologia de elite.',
+        },
+        {
+            icon: Shield,
+            title: 'Criptografia AES-256',
+            description: 'Dados protegidos por criptografia de nível bancário AES-256-GCM em todas as camadas.',
+        },
+        {
+            icon: FileText,
+            title: 'Assinaturas Digitais',
+            description: 'Assinaturas de documentos com validade jurídica integradas via Autentique.',
         },
         {
             icon: DollarSign,
             title: 'Finanças Premium',
             description: 'Controle absoluto de honorários, despesas e fluxo de caixa com relatórios executivos.',
-        },
-        {
-            icon: Calendar,
-            title: 'Agenda Estratégica',
-            description: 'Prazos e audiências organizados de forma inteligente com notificações em tempo real.',
-        },
-        {
-            icon: MessageSquare,
-            title: 'Ecossistema Advus',
-            description: 'Colaboração total entre sua equipe com chat integrado e gestão de arquivos em nuvem.',
         },
     ];
 

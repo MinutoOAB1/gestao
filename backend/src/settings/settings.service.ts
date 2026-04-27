@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../supabase/storage.service';
+import { SecurityService } from '../common/security/security.service';
 
 @Injectable()
 export class SettingsService {
     constructor(
         private prisma: PrismaService,
         private storageService: StorageService,
+        private security: SecurityService,
     ) { }
 
     async upsert(settings: any, tenantId: string) {
@@ -19,8 +21,12 @@ export class SettingsService {
         const {
             officeName, cnpj, email, website, language, timezone, dateFormat,
             emailNotifications, processUpdates, deadlineReminders,
-            twoFactor, loginAlerts, logoUrl
+            twoFactor, loginAlerts, logoUrl, asaasApiKey, autentiqueApiKey
         } = settings;
+
+        // Encrypt sensitive API keys if provided
+        const encryptedAsaasKey = asaasApiKey ? this.security.encrypt(asaasApiKey) : undefined;
+        const encryptedAutentiqueKey = autentiqueApiKey ? this.security.encrypt(autentiqueApiKey) : undefined;
 
         return this.prisma.tenantSettings.upsert({
             where: {
@@ -29,23 +35,35 @@ export class SettingsService {
             update: {
                 officeName, cnpj, email, website, language, timezone, dateFormat,
                 emailNotifications, processUpdates, deadlineReminders,
-                twoFactor, loginAlerts, logoUrl
+                twoFactor, loginAlerts, logoUrl,
+                ...(encryptedAsaasKey && { asaasApiKey: encryptedAsaasKey }),
+                ...(encryptedAutentiqueKey && { autentiqueApiKey: encryptedAutentiqueKey }),
             },
             create: {
                 tenantId,
                 officeName, cnpj, email, website, language, timezone, dateFormat,
                 emailNotifications, processUpdates, deadlineReminders,
-                twoFactor, loginAlerts, logoUrl
+                twoFactor, loginAlerts, logoUrl,
+                asaasApiKey: encryptedAsaasKey,
+                autentiqueApiKey: encryptedAutentiqueKey,
             }
         });
     }
 
     async findOne(tenantId: string) {
-        return this.prisma.tenantSettings.findUnique({
+        const settings = await this.prisma.tenantSettings.findUnique({
             where: {
                 tenantId: tenantId
             }
         });
+
+        if (settings) {
+            // Decrypt API keys for frontend
+            if (settings.asaasApiKey) settings.asaasApiKey = this.security.decrypt(settings.asaasApiKey);
+            if (settings.autentiqueApiKey) settings.autentiqueApiKey = this.security.decrypt(settings.autentiqueApiKey);
+        }
+
+        return settings;
     }
 
     // Get storage info for the tenant/account (real data)

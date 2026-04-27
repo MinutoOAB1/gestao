@@ -16,6 +16,7 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private tenantContext: TenantContextService,
+    private security: SecurityService,
   ) { }
 
   async register(registerDto: RegisterDto) {
@@ -182,6 +183,7 @@ export class AuthService {
           role: user.role,
           tenantId: user.tenantId,
           avatar: user.avatar,
+          cpf: user.cpf ? this.security.decrypt(user.cpf) : user.cpf,
           twoFactorEnabled: user.twoFactorEnabled,
           two_factor_enabled: user.twoFactorEnabled,
           twoFactorStatus: user.twoFactorEnabled ? 'ENABLED' : 'DISABLED',
@@ -375,6 +377,7 @@ export class AuthService {
     const { tenant, ...userData } = user as any;
     return {
       ...userData,
+      cpf: userData.cpf ? this.security.decrypt(userData.cpf) : userData.cpf,
       plan: tenant?.plan,
       subscriptionStatus: tenant?.subscriptionStatus
     };
@@ -497,7 +500,7 @@ export class AuthService {
     if (data.name !== undefined) updateData.name = data.name;
     if (data.role !== undefined) updateData.role = data.role;
     if (data.avatar !== undefined) updateData.avatar = data.avatar;
-    if (data.cpf !== undefined) updateData.cpf = data.cpf;
+    if (data.cpf !== undefined) updateData.cpf = data.cpf ? this.security.encrypt(data.cpf) : null;
     if (data.birthDate !== undefined) updateData.birthDate = data.birthDate ? new Date(data.birthDate) : null;
     if (data.bio !== undefined) updateData.bio = data.bio;
     if (data.phone !== undefined) updateData.phone = data.phone;
