@@ -12,7 +12,7 @@ export class EmailService {
     const apiKey = this.configService.get<string>('RESEND_API_KEY');
     this.isConfigured = !!apiKey;
 
-    if (this.isConfigured) {
+    if (apiKey) {
       this.resend = new Resend(apiKey);
       const maskedKey = apiKey.substring(0, 4) + '...' + apiKey.substring(apiKey.length - 4);
       this.logger.log('✅ Resend email service initialized');
