@@ -467,10 +467,12 @@ model Contract {
   clientId    String?
   tenantId    String
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  area        String?
-  client      Client?  @relation(fields: [clientId], references: [id])
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  updatedAt        DateTime @updatedAt
+  area             String?
+  autentiqueId     String?
+  autentiqueStatus String?
+  client           Client?  @relation(fields: [clientId], references: [id])
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
 }
 
 model Partnership {
@@ -543,6 +545,7 @@ model TenantSettings {
   tenantId           String  @unique
   letterheadUrl      String?
   logoUrl            String?
+  autentiqueApiKey   String?
   tenant             Tenant  @relation(fields: [tenantId], references: [id])
 }
 

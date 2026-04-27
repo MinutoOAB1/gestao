@@ -56,6 +56,20 @@ export class ContractsController {
         return this.contractsService.update(id, updateContractDto, tenantId);
     }
 
+    @Post(':id/request-signature')
+    requestSignature(@Param('id') id: string, @Req() req: any) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.contractsService.requestSignature(id, tenantId);
+    }
+
+    @Get(':id/sync-signature')
+    syncSignature(@Param('id') id: string, @Req() req: any) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.contractsService.syncSignatureStatus(id, tenantId);
+    }
+
     @Delete(':id')
     remove(@Param('id') id: string, @Req() req: any) {
         const tenantId = req.user?.tenantId;

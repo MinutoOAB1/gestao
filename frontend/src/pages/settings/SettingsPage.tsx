@@ -65,29 +65,6 @@ const Toggle = ({ checked, onChange }: { checked: boolean, onChange: (e: React.M
     </button>
 );
 
-const IntegrationCard = ({ icon: Icon, name, description, connected, onConfigure }: any) => (
-    <div className="bg-app-bg border border-app-stroke rounded-xl p-4 flex items-start gap-4 hover:border-app-text-label transition-colors">
-        <div className="w-10 h-10 rounded-lg bg-white dark:bg-app-card flex items-center justify-center shrink-0">
-            <Icon size={20} className="text-primary" />
-        </div>
-        <div className="flex-1">
-            <div className="flex items-center justify-between mb-1">
-                <h4 className="font-bold text-app-text-main text-sm">{name}</h4>
-                <span className={clsx("text-[10px] font-bold px-2 py-0.5 rounded-full border", connected ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-app-stroke text-app-text-muted border-app-text-label/20")}>
-                    {connected ? 'Conectado' : 'Desconectado'}
-                </span>
-            </div>
-            <p className="text-xs text-app-text-muted mb-3">{description}</p>
-            <button
-                onClick={onConfigure}
-                className="text-xs font-medium text-app-text-main bg-app-card border border-app-stroke px-3 py-1.5 rounded-lg hover:bg-app-stroke transition-colors w-full"
-            >
-                Configurar
-            </button>
-        </div>
-    </div>
-);
-
 export default function SettingsPage() {
     const { addToast } = useToast();
     const { theme, toggleTheme } = useTheme();
@@ -95,9 +72,6 @@ export default function SettingsPage() {
     const [settings, setSettings] = useState<Settings>(defaultSettings);
     const [isSaving, setIsSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState('');
-    const [profilePhoto, setProfilePhoto] = useState<string | null>(() => {
-        return localStorage.getItem('profile_photo');
-    });
     const [show2FAModal, setShow2FAModal] = useState(false);
     const [showTeamModal, setShowTeamModal] = useState(false);
     const [user2FAEnabled, setUser2FAEnabled] = useState(false);
@@ -108,6 +82,7 @@ export default function SettingsPage() {
     const [phoneError, setPhoneError] = useState('');
     const [googleConnected, setGoogleConnected] = useState(false);
     const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
+    const [showAutentiqueModal, setShowAutentiqueModal] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams();
     
@@ -117,7 +92,6 @@ export default function SettingsPage() {
             const response = await api.get('/auth/profile');
             setUser2FAEnabled(response.data.twoFactorEnabled || false);
             setGoogleConnected(response.data.googleCalendarConnected || false);
-            console.log('Profile fetched, google status:', response.data.googleCalendarConnected);
         } catch (error) {
             console.error('Error fetching profile:', error);
         }
@@ -127,12 +101,9 @@ export default function SettingsPage() {
         fetchProfile();
     }, []);
 
-    // Check for google connection success in URL
     useEffect(() => {
         if (searchParams.get('google') === 'success') {
-            console.log('Google connection success detected, refreshing profile...');
             fetchProfile();
-            // Clear the param
             const newParams = new URLSearchParams(searchParams);
             newParams.delete('google');
             setSearchParams(newParams);
@@ -155,18 +126,14 @@ export default function SettingsPage() {
         }
     };
 
-    // Load settings on mount
     useEffect(() => {
         const loadSettings = async () => {
             try {
                 const response = await api.get('/settings');
                 if (response.data) {
-                    // Merge with defaults to ensure all fields exist
                     setSettings({ ...defaultSettings, ...response.data });
                 }
             } catch (error) {
-                console.error('Error loading settings:', error);
-                // Fallback to local storage if API fails (or first load)
                 const saved = localStorage.getItem(SETTINGS_KEY);
                 if (saved) {
                     setSettings({ ...defaultSettings, ...JSON.parse(saved) });
@@ -176,7 +143,6 @@ export default function SettingsPage() {
         loadSettings();
     }, []);
 
-    // Helper for CNPJ Mask
     const maskCNPJ = (value: string) => {
         return value
             .replace(/\D/g, '')
@@ -195,7 +161,6 @@ export default function SettingsPage() {
         return '';
     };
 
-    // Helper for Phone Mask
     const maskPhone = (value: string) => {
         return value
             .replace(/\D/g, '')
@@ -212,9 +177,7 @@ export default function SettingsPage() {
         return '';
     };
 
-    // Save settings
     const handleSave = async () => {
-        // Validate before save
         const cnpjErr = validateCNPJ(settings.cnpj);
         const phoneErr = validatePhone(settings.phone);
         
@@ -228,22 +191,17 @@ export default function SettingsPage() {
         setIsSaving(true);
         try {
             await api.post('/settings', settings);
-
-            // Keep local storage as backup/cache
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-
             setSaveMessage('Configurações salvas com sucesso!');
-            setIsDirty(false); // Reset dirty flag on successful save
+            setIsDirty(false);
             setTimeout(() => setSaveMessage(''), 3000);
         } catch (error) {
-            console.error('Error saving settings:', error);
             setSaveMessage('Erro ao salvar configurações.');
         } finally {
             setIsSaving(false);
         }
     };
 
-    // Reset settings
     const handleCancel = () => {
         const saved = localStorage.getItem(SETTINGS_KEY);
         if (saved) {
@@ -280,11 +238,8 @@ export default function SettingsPage() {
     return (
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 h-full lg:h-[calc(100vh-theme(spacing.20))]">
 
-            {/* Sidebar Navigation - horizontal scroll on mobile */}
             <aside className="w-full lg:w-64 shrink-0">
                 <h2 className="hidden lg:block text-xs font-bold text-app-text-muted uppercase tracking-wider mb-4 px-2">Configurações Gerais</h2>
-
-                {/* Mobile: horizontal scrolling tabs */}
                 <div className="flex lg:flex-col gap-1 lg:gap-1 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 -mx-2 px-2 lg:mx-0 lg:px-0 scrollbar-hide touch-pan-x">
                     {tabs.map((tab) => (
                         <button
@@ -329,7 +284,6 @@ export default function SettingsPage() {
                     </button>
                 </div>
 
-                {/* Theme Toggle */}
                 <div className="hidden lg:block mt-8 pt-8 border-t border-app-stroke">
                     <h2 className="text-xs font-bold text-app-text-muted uppercase tracking-wider mb-4 px-2">Aparência</h2>
                     <div className="bg-app-card border border-app-stroke rounded-xl p-4">
@@ -346,7 +300,6 @@ export default function SettingsPage() {
                 </div>
             </aside>
 
-            {/* Main Content */}
             <main className="flex-1 bg-app-card border border-app-stroke rounded-2xl overflow-hidden flex flex-col lg:mr-6 mb-6 lg:mb-0">
                 <div className="p-6 border-b border-app-stroke flex justify-between items-center bg-app-card sticky top-0 z-10">
                     <div>
@@ -388,10 +341,8 @@ export default function SettingsPage() {
 
                 <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
 
-                    {/* GENERAL TAB */}
                     {activeTab === 'general' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            {/* Identidade do Escritório */}
                             <section>
                                 <h2 className="text-lg font-bold text-app-text-main mb-4">Identidade do Escritório</h2>
                                 <div className="bg-app-bg border border-app-stroke rounded-xl p-6">
@@ -481,7 +432,6 @@ export default function SettingsPage() {
                                 </div>
                             </section>
 
-                            {/* Preferências Regionais */}
                             <section>
                                 <h2 className="text-lg font-bold text-app-text-main mb-4">Preferências Regionais</h2>
                                 <div className="bg-app-bg border border-app-stroke rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -524,9 +474,6 @@ export default function SettingsPage() {
                                 </div>
                             </section>
 
-
-
-                            {/* Backup de Dados */}
                             <section className="pb-8">
                                 <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
                                     <Download size={20} className="text-primary" /> Exportação e Backup de Dados
@@ -599,7 +546,6 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* INTEGRATIONS TAB */}
                     {activeTab === 'integrations' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <section>
@@ -609,7 +555,6 @@ export default function SettingsPage() {
                                 <p className="text-sm text-app-text-muted mb-6">Conecte sua plataforma jurídica com as melhores ferramentas do mercado.</p>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {/* Google Calendar */}
                                     <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col hover:border-primary/50 transition-all group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
@@ -666,30 +611,30 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
 
-                                    {/* Google Drive (Placeholder) */}
-                                    <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col opacity-60 grayscale">
+                                    <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col hover:border-primary/50 transition-all group">
                                         <div className="flex justify-between items-start mb-4">
-                                            <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center">
-                                                <Camera size={24} className="text-primary" />
+                                            <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                                <FileText size={24} className="text-primary" />
                                             </div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-app-stroke text-app-text-muted">
-                                                Em breve
+                                            <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                Ativo (Plataforma)
                                             </span>
                                         </div>
-                                        <h3 className="text-base font-bold text-app-text-main mb-1">Google Drive</h3>
+                                        <h3 className="text-base font-bold text-app-text-main mb-1">Autentique</h3>
                                         <p className="text-xs text-app-text-muted mb-6 leading-relaxed">
-                                            Armazenamento em nuvem para arquivos e petições integrados aos processos.
+                                            Assinaturas digitais integradas. O escritório tem direito a até 10 documentos inclusos.
                                         </p>
-                                        <button disabled className="w-full py-2.5 rounded-xl bg-app-stroke text-app-text-muted text-xs font-bold cursor-not-allowed">
-                                            Indisponível
-                                        </button>
+                                        <div className="mt-auto">
+                                            <div className="w-full py-2.5 rounded-xl bg-app-stroke/30 text-app-text-muted text-center text-xs font-bold">
+                                                Configurado pela Advus
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </section>
                         </div>
                     )}
 
-                    {/* NOTIFICATIONS TAB */}
                     {activeTab === 'notifications' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <section>
@@ -725,7 +670,6 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* SECURITY TAB */}
                     {activeTab === 'security' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <section>
@@ -763,7 +707,6 @@ export default function SettingsPage() {
                         </div>
                     )}
 
-                    {/* BILLING TAB */}
                     {activeTab === 'billing' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <BillingPage />
@@ -772,7 +715,6 @@ export default function SettingsPage() {
                 </div>
             </main>
 
-            {/* Modals */}
             <Modal
                 isOpen={showUnsavedModal}
                 onClose={() => setShowUnsavedModal(false)}

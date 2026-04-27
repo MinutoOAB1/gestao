@@ -33,8 +33,10 @@ interface Contract {
     status: string;
     value: number;
     clientId?: string;
-    client?: { id: string; name: string };
+    client?: { id: string; name: string; email?: string };
     createdAt: string;
+    autentiqueId?: string;
+    autentiqueStatus?: string;
 }
 
 interface Stats {
@@ -165,6 +167,26 @@ export default function ContractsPage() {
         } catch (error: any) {
             console.error('Erro ao criar contrato:', error);
             addToast('Erro ao criar contrato: ' + (error.response?.data?.message || 'Tente novamente.'), 'error');
+        }
+    };
+    
+    const handleRequestSignature = async (contractId: string) => {
+        try {
+            await api.post(`/contracts/${contractId}/request-signature`);
+            addToast('Solicitação de assinatura enviada com sucesso!', 'success');
+            fetchData();
+        } catch (error: any) {
+            addToast(error.response?.data?.message || 'Erro ao solicitar assinatura.', 'error');
+        }
+    };
+
+    const handleSyncSignature = async (contractId: string) => {
+        try {
+            await api.get(`/contracts/${contractId}/sync-signature`);
+            addToast('Status sincronizado!', 'success');
+            fetchData();
+        } catch (error: any) {
+            addToast('Erro ao sincronizar status.', 'error');
         }
     };
 
@@ -618,50 +640,51 @@ export default function ContractsPage() {
                                 <p className="text-sm font-mono text-app-text-main">#{selectedContract.number}</p>
                             </div>
                         </div>
-                    </div>
-                )}
-            </Modal>
-            {/* Contract Details Modal */}
-            <Modal
-                isOpen={!!selectedContract}
-                onClose={() => setSelectedContract(null)}
-                title="Detalhes do Contrato"
-                footer={
-                    <button onClick={() => setSelectedContract(null)} className="px-4 py-2 rounded-lg text-sm font-medium bg-app-stroke text-app-text-main hover:bg-app-stroke/80 transition-colors">Fechar</button>
-                }
-            >
-                {selectedContract && (
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-bold text-app-text-main">{selectedContract.title}</h3>
-                            <span className={clsx(
-                                "px-3 py-1 rounded-full text-xs font-medium",
-                                STATUS_MAP[selectedContract.status]?.color,
-                                STATUS_MAP[selectedContract.status]?.bgColor
-                            )}>
-                                {STATUS_MAP[selectedContract.status]?.label || selectedContract.status}
-                            </span>
-                        </div>
-                        <p className="text-sm text-app-text-muted break-words">
-                            {selectedContract.description || 'Sem descrição.'}
-                        </p>
-                        <div className="bg-app-bg p-4 rounded-xl border border-app-stroke grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-xs text-app-text-muted mb-1">Valor do Contrato</p>
-                                <p className="text-sm font-bold text-app-text-main">{formatCurrency(selectedContract.value)}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-app-text-muted mb-1">Data de Criação</p>
-                                <p className="text-sm font-bold text-app-text-main">{formatDate(selectedContract.createdAt)}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-app-text-muted mb-1">Cliente Vinculado</p>
-                                <p className="text-sm font-bold text-app-text-main">{selectedContract.client?.name || 'Nenhum'}</p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-app-text-muted mb-1">ID do Contrato</p>
-                                <p className="text-sm font-mono text-app-text-main">#{selectedContract.number}</p>
-                            </div>
+
+                        {/* Signature Section */}
+                        <div className="pt-4 border-t border-app-stroke space-y-4">
+                            <h4 className="text-sm font-bold text-app-text-main flex items-center gap-2">
+                                <FileText size={16} className="text-primary" /> Assinatura Digital (Autentique)
+                            </h4>
+                            
+                            {selectedContract.autentiqueId ? (
+                                <div className="bg-app-bg p-4 rounded-xl border border-app-stroke flex flex-col gap-3">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] text-app-text-muted uppercase font-bold">Status da Assinatura</span>
+                                            <span className={clsx(
+                                                "text-xs font-bold",
+                                                selectedContract.autentiqueStatus === 'SIGNED' ? "text-emerald-500" : "text-amber-500"
+                                            )}>
+                                                {selectedContract.autentiqueStatus === 'SIGNED' ? 'CONCLUÍDO' : 'AGUARDANDO ASSINATURA'}
+                                            </span>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleSyncSignature(selectedContract.id)}
+                                            className="px-3 py-1.5 text-xs font-medium bg-app-stroke hover:bg-app-stroke/80 text-app-text-main rounded-lg transition-colors"
+                                        >
+                                            Sincronizar
+                                        </button>
+                                    </div>
+                                    {selectedContract.autentiqueStatus !== 'SIGNED' && (
+                                        <p className="text-[10px] text-app-text-muted italic">
+                                            Um link de assinatura foi enviado para: {selectedContract.client?.email || 'e-mail não informado'}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <p className="text-xs text-app-text-muted">
+                                        Este contrato ainda não foi enviado para assinatura digital.
+                                    </p>
+                                    <button 
+                                        onClick={() => handleRequestSignature(selectedContract.id)}
+                                        className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                                    >
+                                        <FileText size={16} /> Enviar para Assinatura (Autentique)
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
