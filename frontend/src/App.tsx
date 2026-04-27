@@ -41,6 +41,8 @@ const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
 const BillingPage = lazy(() => import('./pages/settings/BillingPage'));
 const TermsPage = lazy(() => import('./pages/legal/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage'));
+const LGPDPage = lazy(() => import('./pages/legal/LGPDPage'));
+const AboutPage = lazy(() => import('./pages/landing/AboutPage'));
 import GlobalAgendaNotifications from './components/notifications/GlobalAgendaNotifications';
 
 // Loading fallback component
@@ -83,6 +85,8 @@ function App() {
                           <Route path="/landing" element={<LandingPage />} />
                           <Route path="/terms" element={<TermsPage />} />
                           <Route path="/privacy" element={<PrivacyPage />} />
+                          <Route path="/lgpd" element={<LGPDPage />} />
+                          <Route path="/about" element={<AboutPage />} />
 
                           <Route path="/app" element={
                             <PrivateRoute>

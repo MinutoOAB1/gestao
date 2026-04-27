@@ -1,174 +1,116 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Download, ChevronLeft, Lock, Eye, Database } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { BrandLogo } from '../../components/ui/BrandLogo';
+import { ShieldCheck, Download, Lock, Eye, Database, Shield } from 'lucide-react';
+import { InstitutionalLayout } from '../../components/layout/InstitutionalLayout';
 
 export default function PrivacyPage() {
-    const navigate = useNavigate();
-
     const handleDownloadPDF = async () => {
         const { jsPDF } = await import('jspdf');
         const doc = new jsPDF();
-        
         doc.setFontSize(22);
         doc.text('Política de Privacidade - Advus', 105, 20, { align: 'center' });
-        
-        doc.setFontSize(10);
-        doc.text('Última atualização: 23 de Abril de 2024', 105, 30, { align: 'center' });
-        
         doc.setFontSize(12);
-        const splitText = doc.splitTextToSize(
-            `1. Introdução\nA Advus valoriza sua privacidade e está comprometida em proteger seus dados pessoais em conformidade com a LGPD.\n\n` +
-            `2. Dados que Coletamos\nColetamos informações que você fornece ao criar uma conta (nome, e-mail, CNPJ) e dados de uso da plataforma para melhorar nossos serviços.\n\n` +
-            `3. Como Usamos seus Dados\nSeus dados são usados para fornecer e manter os serviços da Advus, processar pagamentos, enviar comunicações importantes e garantir a segurança da plataforma.\n\n` +
-            `4. Compartilhamento de Dados\nNão vendemos seus dados a terceiros. Podemos compartilhar informações com parceiros que prestam serviços essenciais (como processadores de pagamento), sempre sob estrita confidencialidade.\n\n` +
-            `5. Segurança\nImplementamos medidas técnicas e organizacionais avançadas para proteger seus dados contra acesso não autorizado, perda ou alteração.\n\n` +
-            `6. Seus Direitos\nVocê tem o direito de acessar, corrigir ou excluir seus dados pessoais a qualquer momento, conforme garantido pela LGPD.\n\n` +
-            `7. Cookies\nUsamos cookies para melhorar sua experiência de navegação e entender como você usa nossa plataforma.`,
-            170
-        );
-        doc.text(splitText, 20, 45);
-        
-        doc.save('Politica_de_Privacidade_Advus.pdf');
+        const content = `1. Compromisso: Proteção de dados em conformidade com a LGPD.\n2. Coleta: Dados cadastrais e de uso para melhoria do serviço.\n3. Finalidade: Operar a plataforma e garantir segurança Multi-tenant.\n4. Armazenamento: Servidores criptografados de alta segurança.\n5. Direitos: Acesso, correção e exclusão garantidos pela lei.`;
+        doc.text(doc.splitTextToSize(content, 170), 20, 40);
+        doc.save('Privacidade_Advus.pdf');
     };
 
+    const policies = [
+        {
+            icon: Lock,
+            title: 'Isolamento de Dados',
+            desc: 'Utilizamos arquitetura Multi-tenant de nível bancário, garantindo que os dados de seu escritório sejam logicamente isolados de qualquer outro usuário.'
+        },
+        {
+            icon: Database,
+            title: 'Armazenamento Seguro',
+            desc: 'Seus dados são armazenados em infraestrutura de nuvem certificada com redundância global e criptografia em repouso e em trânsito.'
+        },
+        {
+            icon: Eye,
+            title: 'Transparência Total',
+            desc: 'Coletamos apenas as informações necessárias para a operação da plataforma e nunca vendemos seus dados a terceiros.'
+        },
+        {
+            icon: ShieldCheck,
+            title: 'Conformidade LGPD',
+            desc: 'Estamos em conformidade integral com a Lei 13.709/2018, garantindo todos os direitos de privacidade aos nossos usuários.'
+        }
+    ];
+
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Header */}
-            <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-                <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button 
-                            onClick={() => navigate(-1)}
-                            className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        <BrandLogo variant="dark" />
+        <InstitutionalLayout 
+            title="Política de Privacidade" 
+            subtitle="Sua soberania digital e a proteção dos seus dados são as nossas maiores prioridades."
+        >
+            <div className="space-y-16">
+                {/* Intro Section */}
+                <div className="flex flex-col lg:flex-row gap-12 items-center">
+                    <div className="lg:w-1/2 space-y-6">
+                        <h2 className="text-3xl font-black uppercase tracking-tight text-accent">Privacidade por Design</h2>
+                        <p className="text-white/60 leading-relaxed font-medium">
+                            Na Advus, acreditamos que a privacidade não é um recurso, mas um direito fundamental. 
+                            Nossa plataforma foi construída com o princípio de "Privacy by Design", garantindo que a segurança esteja enraizada em cada linha de código.
+                        </p>
                     </div>
-                    <button 
-                        onClick={handleDownloadPDF}
-                        className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-900/10"
-                    >
-                        <Download size={16} />
-                        Baixar PDF
-                    </button>
+                    <div className="lg:w-1/2 grid grid-cols-2 gap-4">
+                        {policies.map((p, idx) => (
+                            <div key={idx} className="p-6 bg-white/5 rounded-3xl border border-white/5 hover:border-accent/20 transition-all">
+                                <p.icon size={24} className="text-accent mb-4" />
+                                <h4 className="text-xs font-black uppercase tracking-widest text-white mb-2">{p.title}</h4>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </header>
 
-            <main className="max-w-3xl mx-auto px-4 py-12">
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12"
-                >
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
-                            <ShieldCheck size={24} />
+                <hr className="border-white/5" />
+
+                {/* Detailed Text */}
+                <div className="prose prose-invert max-w-none space-y-12">
+                    <section>
+                        <h3 className="text-2xl font-black uppercase tracking-tight text-white mb-6">1. Coleta de Informações</h3>
+                        <p className="text-white/50 leading-relaxed font-medium">
+                            Coletamos informações de registro (nome, e-mail corporativo, CNPJ) e dados técnicos de uso para monitorar a saúde da plataforma e prevenir fraudes. 
+                            Não coletamos dados sensíveis desnecessários para a prestação do serviço jurídico.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h3 className="text-2xl font-black uppercase tracking-tight text-white mb-6">2. Uso dos Dados</h3>
+                        <p className="text-white/50 leading-relaxed font-medium">
+                            Seus dados são utilizados exclusivamente para:
+                        </p>
+                        <ul className="list-disc list-inside space-y-4 text-white/40 font-medium ml-4">
+                            <li>Processamento de informações judiciais e gestão de prazos;</li>
+                            <li>Autenticação de usuários e controle de acesso;</li>
+                            <li>Comunicações críticas sobre atualizações e faturamento;</li>
+                            <li>Treinamento de nossos modelos de IA (apenas com dados anonimizados e autorizados).</li>
+                        </ul>
+                    </section>
+
+                    <div className="p-10 bg-gradient-to-br from-primary-dark to-black rounded-[2.5rem] border border-white/10 flex flex-col md:flex-row items-center gap-10">
+                        <div className="w-20 h-20 bg-accent/20 rounded-3xl flex items-center justify-center shrink-0 border border-accent/20">
+                            <Shield size={40} className="text-accent" />
                         </div>
-                        <div>
-                            <h1 className="text-3xl font-bold text-slate-900">Política de Privacidade</h1>
-                            <p className="text-sm text-slate-500">Última atualização: 23 de Abril de 2024</p>
+                        <div className="flex-1 space-y-4">
+                            <h3 className="text-xl font-black uppercase tracking-tight">Direitos do Titular (LGPD)</h3>
+                            <p className="text-white/40 text-sm leading-relaxed">Você tem o direito de solicitar a confirmação, o acesso, a correção e a exclusão de seus dados a qualquer momento. Nossa equipe jurídica processará qualquer solicitação em até 72 horas úteis.</p>
                         </div>
+                        <button 
+                            onClick={handleDownloadPDF}
+                            className="px-8 py-4 bg-white/5 hover:bg-white hover:text-primary-dark border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shrink-0"
+                        >
+                            Baixar Política Completa
+                        </button>
                     </div>
+                </div>
 
-                    <div className="prose prose-slate max-w-none space-y-8">
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 bg-emerald-100 text-emerald-700 rounded text-xs">1</span>
-                                Introdução
-                            </h2>
-                            <p className="text-slate-600 leading-relaxed">
-                                A Advus está comprometida com a proteção da sua privacidade e de seus dados pessoais. 
-                                Esta Política de Privacidade explica como coletamos, usamos, compartilhamos e protegemos suas informações 
-                                em total conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).
-                            </p>
-                        </section>
-
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 bg-emerald-100 text-emerald-700 rounded text-xs">2</span>
-                                Dados que Coletamos
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <div className="flex items-center gap-2 mb-2 text-slate-900 font-bold text-sm">
-                                        <Lock size={16} /> Informações de Cadastro
-                                    </div>
-                                    <p className="text-xs text-slate-500">Nome completo, e-mail corporativo, CPF/CNPJ e dados de faturamento.</p>
-                                </div>
-                                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                    <div className="flex items-center gap-2 mb-2 text-slate-900 font-bold text-sm">
-                                        <Eye size={16} /> Dados de Utilização
-                                    </div>
-                                    <p className="text-xs text-slate-500">Endereço IP, tipo de navegador, tempo de uso e funcionalidades acessadas.</p>
-                                </div>
-                            </div>
-                        </section>
-
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 bg-emerald-100 text-emerald-700 rounded text-xs">3</span>
-                                Finalidade do Tratamento
-                            </h2>
-                            <p className="text-slate-600 leading-relaxed">
-                                Utilizamos seus dados para:
-                            </p>
-                            <ul className="list-disc list-inside text-slate-600 text-sm space-y-2 mt-2 ml-4">
-                                <li>Fornecer e operar os serviços de gestão jurídica;</li>
-                                <li>Garantir a segurança e integridade do seu isolamento de dados (Multi-tenancy);</li>
-                                <li>Processar pagamentos e assinaturas;</li>
-                                <li>Enviar atualizações críticas do sistema e lembretes de prazos;</li>
-                                <li>Melhorar continuamente a experiência do usuário através de análises anônimas.</li>
-                            </ul>
-                        </section>
-
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 bg-emerald-100 text-emerald-700 rounded text-xs">4</span>
-                                Armazenamento e Segurança
-                            </h2>
-                            <p className="text-slate-600 leading-relaxed">
-                                Seus dados são armazenados em servidores de alta segurança com criptografia de ponta a ponta. 
-                                Adotamos isolamento lógico rigoroso entre diferentes escritórios (Tenants) para garantir que ninguém 
-                                consiga acessar dados que não pertençam ao seu próprio escopo autorizado.
-                            </p>
-                        </section>
-
-                        <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 flex gap-4">
-                            <Database className="text-emerald-600 shrink-0" size={24} />
-                            <div>
-                                <h3 className="font-bold text-emerald-900 text-sm mb-1">Seus Direitos (LGPD)</h3>
-                                <p className="text-emerald-800 text-xs leading-relaxed">
-                                    Você tem o direito de solicitar a confirmação da existência de tratamento, o acesso, 
-                                    a correção de dados incompletos, a portabilidade e a exclusão de seus dados pessoais 
-                                    de nossa base a qualquer momento.
-                                </p>
-                            </div>
-                        </div>
-
-                        <section>
-                            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 bg-emerald-100 text-emerald-700 rounded text-xs">5</span>
-                                Compartilhamento com Terceiros
-                            </h2>
-                            <p className="text-slate-600 leading-relaxed">
-                                Não vendemos nem comercializamos seus dados pessoais. O compartilhamento ocorre apenas com provedores de 
-                                infraestrutura essenciais (ex: AWS, Google Cloud, Supabase) e processadores de pagamento (Stripe), 
-                                todos operando sob rígidos contratos de confidencialidade.
-                            </p>
-                        </section>
-
-                        <section className="pt-8 border-t border-slate-100">
-                            <p className="text-slate-500 text-sm text-center">
-                                Para exercer seus direitos de privacidade, entre em contato com nosso DPO através do e-mail: 
-                                <a href="mailto:privacidade@Advus.com.br" className="text-emerald-600 font-medium ml-1">privacidade@Advus.com.br</a>
-                            </p>
-                        </section>
-                    </div>
-                </motion.div>
-            </main>
-        </div>
+                <div className="pt-12 border-t border-white/5 text-center">
+                    <p className="text-white/30 text-xs font-medium italic">
+                        Última atualização: 27 de Abril de 2026. Dúvidas sobre privacidade: <span className="text-accent">dpo@advus.com.br</span>
+                    </p>
+                </div>
+            </div>
+        </InstitutionalLayout>
     );
 }

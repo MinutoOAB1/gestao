@@ -489,6 +489,7 @@ function CTASection() {
 
 // Footer
 function Footer() {
+    const navigate = useNavigate();
     return (
         <footer id="contact" className="py-24 bg-primary-dark border-t border-white/5 text-white/30">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -531,10 +532,10 @@ function Footer() {
                     <div>
                         <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Institucional</h4>
                         <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
-                            <li><a href="#" className="hover:text-accent transition-colors">Sobre</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Privacidade</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">LGPD</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Termos</a></li>
+                            <li><button onClick={() => navigate('/about')} className="hover:text-accent transition-colors text-left uppercase">Sobre</button></li>
+                            <li><button onClick={() => navigate('/privacy')} className="hover:text-accent transition-colors text-left uppercase">Privacidade</button></li>
+                            <li><button onClick={() => navigate('/lgpd')} className="hover:text-accent transition-colors text-left uppercase">LGPD</button></li>
+                            <li><button onClick={() => navigate('/terms')} className="hover:text-accent transition-colors text-left uppercase">Termos</button></li>
                         </ul>
                     </div>
                 </div>
