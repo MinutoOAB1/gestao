@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useDeferredValue } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Phone, Trash2, Printer, Briefcase, FileUp, Loader2 } from 'lucide-react';
+import { Plus, Search, Phone, Trash2, Printer, Briefcase, FileUp, Loader2, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as XLSX from 'xlsx';
 import api from '../../services/api';
@@ -119,6 +119,14 @@ export default function ClientListPage() {
         }
         setPullDistance(0);
         setTouchStart(0);
+    };
+
+    const handleWhatsAppClick = (e: React.MouseEvent, phone: string, name: string) => {
+        e.stopPropagation();
+        haptics.light();
+        const cleanPhone = phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Olá ${name.split(' ')[0]}, aqui é do escritório Advus. Gostaria de falar sobre o seu caso.`);
+        window.open(`https://wa.me/55${cleanPhone}?text=${message}`, '_blank');
     };
 
     const handleImportSpreadsheet = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -564,9 +572,18 @@ export default function ClientListPage() {
                                                     </td>
                                                     <td className="px-4 py-2.5">
                                                         {client.phone ? (
-                                                            <div className="flex items-center gap-1 text-[12px] text-app-text-muted">
-                                                                <Phone size={12} className="text-app-text-label" />
-                                                                {client.phone}
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="flex items-center gap-1 text-[12px] text-app-text-muted">
+                                                                    <Phone size={12} className="text-app-text-label" />
+                                                                    {client.phone}
+                                                                </div>
+                                                                <button 
+                                                                    onClick={(e) => handleWhatsAppClick(e, client.phone, client.name)}
+                                                                    className="p-1 hover:bg-emerald-500/10 text-emerald-500 rounded transition-colors"
+                                                                    title="Enviar WhatsApp"
+                                                                >
+                                                                    <MessageCircle size={14} />
+                                                                </button>
                                                             </div>
                                                         ) : (
                                                             <span className="text-[11px] text-app-text-label italic">Sem telefone</span>
@@ -700,9 +717,18 @@ export default function ClientListPage() {
 
                                         <div className="space-y-2">
                                             {client.phone && (
-                                                <div className="flex items-center gap-2 text-[13px] text-app-text-muted bg-app-bg px-2.5 py-1.5 rounded-lg border border-app-stroke/50">
-                                                    <Phone size={14} className="text-black dark:text-white" />
-                                                    {client.phone}
+                                                <div className="flex items-center justify-between gap-2 text-[13px] text-app-text-muted bg-app-bg px-2.5 py-1.5 rounded-lg border border-app-stroke/50">
+                                                    <div className="flex items-center gap-2">
+                                                        <Phone size={14} className="text-black dark:text-white" />
+                                                        {client.phone}
+                                                    </div>
+                                                    <button 
+                                                        onClick={(e) => handleWhatsAppClick(e, client.phone, client.name)}
+                                                        className="flex items-center gap-1 px-2 py-1 bg-emerald-500 text-white rounded-md text-[10px] font-bold"
+                                                    >
+                                                        <MessageCircle size={12} />
+                                                        WhatsApp
+                                                    </button>
                                                 </div>
                                             )}
                                             <div className="flex items-center gap-1.5 flex-wrap pt-1">

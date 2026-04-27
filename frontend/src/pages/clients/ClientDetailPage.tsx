@@ -9,8 +9,10 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { haptics } from '../../utils/haptics';
 import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle } from 'lucide-react';
 
 class ErrorBoundary extends React.Component<any, any> {
     constructor(props: any) {
@@ -240,6 +242,14 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
             console.error(error);
             addToast('Erro ao alterar status.', 'error');
         }
+    };
+
+    const handleWhatsAppClick = () => {
+        if (!client?.phone) return;
+        haptics.light();
+        const cleanPhone = String(client.phone).replace(/\D/g, '');
+        const message = encodeURIComponent(`Olá ${client.name.split(' ')[0]}, aqui é do escritório Advus. Gostaria de falar sobre o seu caso.`);
+        window.open(`https://wa.me/55${cleanPhone}?text=${message}`, '_blank');
     };
 
     const processes = useMemo(() => client?.processes || [], [client?.processes]);
@@ -504,9 +514,15 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
             {/* Quick Contact Bar */}
             <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-8 pt-6">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <a href={client.phone ? `https://wa.me/55${String(client.phone).replace(/\D/g, '')}` : '#'} target="_blank" rel="noopener noreferrer" onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border-black/10 dark:border-white/10" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
-                        <MessageSquare size={18} /><span className="text-sm font-bold">WhatsApp</span>
-                    </a>
+                    <button 
+                        onClick={handleWhatsAppClick}
+                        className={clsx(
+                            "flex items-center gap-3 p-3 rounded-xl border transition-all", 
+                            client.phone ? "bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border-black/10 dark:border-white/10 shadow-lg shadow-black/10" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed"
+                        )}
+                    >
+                        <MessageCircle size={18} /><span className="text-sm font-bold">WhatsApp</span>
+                    </button>
                     <a href={client.phone ? `tel:${client.phone}` : '#'} onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black hover:opacity-90 border-neutral-700" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
                         <Phone size={18} /><span className="text-sm font-bold">Ligar</span>
                     </a>
