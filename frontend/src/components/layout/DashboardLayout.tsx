@@ -271,7 +271,9 @@ export default function DashboardLayout() {
         if (user && (window as any).$crisp) {
             (window as any).$crisp.push(["set", "user:email", [user.email]]);
             (window as any).$crisp.push(["set", "user:nickname", [user.name]]);
-            if (user.avatar) {
+            // Only send avatar if it's a valid external URL (starts with http)
+            // Base64 avatars (starting with data:) cause Crisp to throw "Invalid avatar"
+            if (user.avatar && user.avatar.startsWith('http')) {
                 (window as any).$crisp.push(["set", "user:avatar", [user.avatar]]);
             }
         }
