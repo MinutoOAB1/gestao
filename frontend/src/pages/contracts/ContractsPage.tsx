@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, Download, Search, FileText, MoreVertical, Filter, TrendingUp, XCircle, CheckCircle2, Upload, Clock, Paperclip } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Download, Search, FileText, MoreVertical, Filter, TrendingUp, XCircle, CheckCircle2, Upload, Clock, Paperclip, PenTool } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import api from '../../services/api';
@@ -78,15 +79,7 @@ const FunnelBar = ({ label, value, total, color }: { label: string; value: numbe
 };
 
 export default function ContractsPage() {
-    const [showSignatureModal, setShowSignatureModal] = useState(false);
-    const [uploading, setUploading] = useState(false);
-    const [signatureFile, setSignatureFile] = useState<File | null>(null);
-    const [signatureData, setSignatureData] = useState({
-        title: '',
-        signerName: '',
-        signerEmail: ''
-    });
-
+    const navigate = useNavigate();
     const { addToast } = useToast();
     const [contracts, setContracts] = useState<Contract[]>([]);
     const [stats, setStats] = useState<Stats | null>(null);
@@ -120,6 +113,7 @@ export default function ContractsPage() {
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, []);
+
     const [newContract, setNewContract] = useState({
         title: '',
         description: '',
@@ -200,36 +194,6 @@ export default function ContractsPage() {
         }
     };
 
-    const handleManualSignature = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!signatureFile || !signatureData.signerEmail || !signatureData.title) {
-            addToast('Preencha todos os campos e selecione um arquivo.', 'error');
-            return;
-        }
-
-        setUploading(true);
-        const formData = new FormData();
-        formData.append('file', signatureFile);
-        formData.append('title', signatureData.title);
-        formData.append('signerName', signatureData.signerName);
-        formData.append('signerEmail', signatureData.signerEmail);
-
-        try {
-            await api.post('/contracts/upload-signature', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            addToast('Documento enviado para assinatura!', 'success');
-            setShowSignatureModal(false);
-            setSignatureFile(null);
-            setSignatureData({ title: '', signerName: '', signerEmail: '' });
-            fetchData();
-        } catch (error: any) {
-            addToast(error.response?.data?.message || 'Erro ao processar assinatura.', 'error');
-        } finally {
-            setUploading(false);
-        }
-    };
-
     const filterTabs = ['Todos', 'Feitos', 'Assinados', 'Fechados', 'Cancelados'];
 
     const filteredContracts = contracts.filter(contract => {
@@ -262,10 +226,10 @@ export default function ContractsPage() {
                 </div>
                 <div className="flex gap-3">
                     <button 
-                        onClick={() => setShowSignatureModal(true)}
+                        onClick={() => navigate('/app/contratos/assinatura')}
                         className="flex items-center gap-2 px-4 py-2 border border-app-stroke rounded-lg text-app-text-main text-sm font-medium hover:bg-app-stroke/30 transition-colors"
                     >
-                        <FileText size={16} />
+                        <PenTool size={16} />
                         Assinaturas
                     </button>
                     <button className="hidden sm:flex items-center gap-2 px-4 py-2 border border-app-stroke rounded-lg text-app-text-main text-sm font-medium hover:bg-app-stroke/30 transition-colors">
@@ -740,122 +704,6 @@ export default function ContractsPage() {
                         </div>
                     </div>
                 )}
-            </Modal>
-
-            {/* Manual Signature Modal */}
-            <Modal
-                isOpen={showSignatureModal}
-                onClose={() => !uploading && setShowSignatureModal(false)}
-                title="Nova Assinatura Digital"
-            >
-                <form onSubmit={handleManualSignature} className="space-y-4">
-                    <div className="space-y-4">
-                        {/* File Upload Area */}
-                        <div className={clsx(
-                            "relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 cursor-pointer",
-                            signatureFile ? "border-emerald-500/50 bg-emerald-500/5" : "border-app-stroke hover:border-primary/50 hover:bg-primary/5"
-                        )}>
-                            <input 
-                                type="file" 
-                                className="absolute inset-0 opacity-0 cursor-pointer" 
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        setSignatureFile(file);
-                                        if (!signatureData.title) setSignatureData(prev => ({ ...prev, title: file.name.split('.')[0] }));
-                                    }
-                                }}
-                            />
-                            {signatureFile ? (
-                                <>
-                                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500">
-                                        <CheckCircle2 size={24} />
-                                    </div>
-                                    <div className="text-center">
-                                        <p className="text-sm font-bold text-app-text-main line-clamp-1">{signatureFile.name}</p>
-                                        <p className="text-[10px] text-app-text-muted">{(signatureFile.size / 1024 / 1024).toFixed(2)} MB • Clique para trocar</p>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                        <Upload size={24} />
-                                    </div>
-                                    <div className="text-center">
-                                        <p className="text-sm font-bold text-app-text-main">Selecione o Documento</p>
-                                        <p className="text-[10px] text-app-text-muted uppercase font-black">PDF, DOCX ou Imagem</p>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Manual Inputs */}
-                        <div className="grid grid-cols-1 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-app-text-muted">Nome do Documento</label>
-                                <input 
-                                    type="text"
-                                    value={signatureData.title}
-                                    onChange={(e) => setSignatureData(prev => ({ ...prev, title: e.target.value }))}
-                                    placeholder="Ex: Contrato de Honorários - João Silva"
-                                    className="w-full bg-app-bg border border-app-stroke rounded-xl px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                />
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-app-text-muted">Nome do Signatário</label>
-                                    <input 
-                                        type="text"
-                                        value={signatureData.signerName}
-                                        onChange={(e) => setSignatureData(prev => ({ ...prev, signerName: e.target.value }))}
-                                        placeholder="Nome Completo"
-                                        className="w-full bg-app-bg border border-app-stroke rounded-xl px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-app-text-muted">E-mail do Signatário</label>
-                                    <input 
-                                        type="email"
-                                        value={signatureData.signerEmail}
-                                        onChange={(e) => setSignatureData(prev => ({ ...prev, signerEmail: e.target.value }))}
-                                        placeholder="email@cliente.com"
-                                        className="w-full bg-app-bg border border-app-stroke rounded-xl px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-app-stroke flex gap-3">
-                        <button 
-                            type="button"
-                            onClick={() => setShowSignatureModal(false)}
-                            disabled={uploading}
-                            className="flex-1 py-3 text-sm font-bold text-app-text-muted hover:bg-app-stroke/50 rounded-xl transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <button 
-                            type="submit"
-                            disabled={uploading}
-                            className={clsx(
-                                "flex-[2] py-3 text-sm font-bold text-white rounded-xl transition-all shadow-lg flex items-center justify-center gap-2",
-                                uploading ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary-dark shadow-primary/20"
-                            )}
-                        >
-                            {uploading ? (
-                                <>
-                                    <Clock size={18} className="animate-spin" /> Processando...
-                                </>
-                            ) : (
-                                <>
-                                    <Paperclip size={18} /> Iniciar Assinatura
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </form>
             </Modal>
         </div>
     );

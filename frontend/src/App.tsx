@@ -30,6 +30,7 @@ const AgendaPage = lazy(() => import('./pages/agenda/AgendaPage'));
 const FinancialListPage = lazy(() => import('./pages/financial/FinancialListPage'));
 const FinancialFormPage = lazy(() => import('./pages/financial/FinancialFormPage'));
 const ContractsPage = lazy(() => import('./pages/contracts/ContractsPage'));
+const SignaturePage = lazy(() => import('./pages/contracts/SignaturePage'));
 const IAAnalisePage = lazy(() => import('./pages/ai/IAAnalisePage'));
 const LandingPage = lazy(() => import('./pages/landing/LandingPage'));
 const TemplatesPage = lazy(() => import('./pages/templates/TemplatesPage'));
@@ -102,6 +103,7 @@ function App() {
                             <Route path="financeiro/novo" element={<FinancialFormPage />} />
                             <Route path="financeiro/:id/editar" element={<FinancialFormPage />} />
                             <Route path="contratos" element={<ContractsPage />} />
+                            <Route path="contratos/assinatura" element={<SignaturePage />} />
                             <Route path="analise-ia" element={<IAAnalisePage />} />
                             <Route path="documentos" element={<DocumentsPage />} />
                             <Route path="agenda" element={<AgendaPage />} />
