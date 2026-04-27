@@ -79,6 +79,8 @@ model User {
   timeEntries           TimeEntry[]
   googleRefreshToken    String?
   googleCalendarConnected Boolean           @default(false)
+  resetToken            String?
+  resetExpires          DateTime?
   tenant                Tenant            @relation(fields: [tenantId], references: [id])
   userFiles             UserFile[]
 }

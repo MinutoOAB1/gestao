@@ -199,6 +199,64 @@ export class AuthService {
     });
   }
 
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase().trim() },
+    });
+
+    if (!user) {
+      // Return success anyway to prevent email enumeration
+      return { message: 'Se o e-mail existir, um link de recuperação foi enviado.' };
+    }
+
+    // Generate a secure random token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1); // 1 hour expiration
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetToken: token,
+        resetExpires: expires,
+      },
+    });
+
+    // Send email
+    await this.emailService.sendPasswordReset(user.email, token, user.name);
+
+    return { message: 'Link de recuperação enviado com sucesso.' };
+  }
+
+  async resetPassword(token: string, password: string) {
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetExpires: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Token inválido ou expirado.');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetExpires: null,
+      },
+    });
+
+    return { message: 'Senha redefinida com sucesso.' };
+  }
+
   private generateDeviceHash(ip?: string, userAgent?: string): string {
     const data = `${ip || 'unknown'}-${userAgent || 'unknown'}`;
     return crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);
