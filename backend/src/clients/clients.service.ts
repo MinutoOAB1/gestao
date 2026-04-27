@@ -216,9 +216,9 @@ export class ClientsService {
     }
 
     async removeTag(tagId: string, tenantId: string) {
-        const tag = await this.prisma.clientTag.findFirst({ where: { id: tagId, tenantId } });
-        if (!tag) throw new Error('Tag não encontrada');
-        return this.prisma.clientTag.delete({ where: { id: tagId } });
+        return this.prisma.clientTag.deleteMany({ 
+            where: { id: tagId, tenantId } 
+        });
     }
 
     // === Notes ===
@@ -243,9 +243,9 @@ export class ClientsService {
     }
 
     async deleteNote(noteId: string, tenantId: string) {
-        const note = await this.prisma.clientNote.findFirst({ where: { id: noteId, tenantId } });
-        if (!note) throw new Error('Anotação não encontrada');
-        return this.prisma.clientNote.delete({ where: { id: noteId } });
+        return this.prisma.clientNote.deleteMany({ 
+            where: { id: noteId, tenantId } 
+        });
     }
 
     // === Service Logs (Atendimentos) ===
@@ -281,9 +281,9 @@ export class ClientsService {
     }
 
     async removeChecklistItem(itemId: string, tenantId: string) {
-        const item = await this.prisma.clientChecklistItem.findFirst({ where: { id: itemId, tenantId } });
-        if (!item) throw new Error('Item do checklist não encontrado');
-        return this.prisma.clientChecklistItem.delete({ where: { id: itemId } });
+        return this.prisma.clientChecklistItem.deleteMany({ 
+            where: { id: itemId, tenantId } 
+        });
     }
 
     // === Event Listeners ===

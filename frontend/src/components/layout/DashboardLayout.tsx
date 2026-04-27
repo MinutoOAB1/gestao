@@ -490,9 +490,12 @@ export default function DashboardLayout() {
                                         </div>
                                     ))}
                                     {teamMembers.filter(m => m.id !== user?.id).length > 3 && (
-                                        <div className="w-9 h-9 rounded-full border-2 border-[#0F172A] bg-white/10 flex items-center justify-center">
-                                            <span className="text-white/80 text-xs font-bold">+{teamMembers.filter(m => m.id !== user?.id).length - 3}</span>
-                                        </div>
+                                        <Avatar
+                                            src={user?.avatar || undefined}
+                                            name={user?.name}
+                                            size="sm"
+                                            className="border-2 border-[#0F172A]"
+                                        />
                                     )}
                                 </div>
                                 {/* Current user avatar on top */}

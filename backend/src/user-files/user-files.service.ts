@@ -196,8 +196,8 @@ export class UserFilesService {
             throw new BadRequestException('Arquivo não encontrado');
         }
 
-        return this.prisma.userFile.update({
-            where: { id },
+        return this.prisma.userFile.updateMany({
+            where: { id, userId, tenantId },
             data: {
                 name: dto.name,
                 folder: dto.folder,
@@ -217,8 +217,10 @@ export class UserFilesService {
         // Delete from storage
         await this.storageService.deleteFile(USER_FILES_BUCKET, file.url);
 
-        // Delete from database
-        await this.prisma.userFile.delete({ where: { id } });
+        // Delete from database (scoped)
+        await this.prisma.userFile.deleteMany({ 
+            where: { id, userId, tenantId } 
+        });
 
         // Update storage counters (negative to decrease)
         const fileSizeMb = Math.ceil(file.sizeBytes / (1024 * 1024));

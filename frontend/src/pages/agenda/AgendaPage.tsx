@@ -9,6 +9,7 @@ import { useToast } from '../../context/ToastContext';
 import { Avatar } from '../../components/ui/Avatar';
 import { ClientDetailPageContent } from '../clients/ClientDetailPage';
 import { ProcessDetailPageContent } from '../processes/ProcessDetailPage';
+import { EventDetailModal } from '../../components/agenda/EventDetailModal';
 
 interface EventAssignee {
     id: string;
@@ -369,43 +370,6 @@ export default function AgendaPage() {
 
     const [newChecklistItemText, setNewChecklistItemText] = useState('');
 
-    const handleAddChecklistItem = async (eventId: string) => {
-        if (!newChecklistItemText.trim()) return;
-        try {
-            await api.post(`/agenda/${eventId}/checklist`, { text: newChecklistItemText });
-            setNewChecklistItemText('');
-            // Optional: refresh just the editing event or all events
-            fetchEvents();
-            // Upate local editing event to prevent modal jump
-            if (editingEvent) {
-                const res = await api.get(`/agenda/${eventId}`);
-                setEditingEvent(res.data);
-            }
-        } catch (error) {
-            console.error('Erro ao adicionar item:', error);
-            addToast('Erro ao adicionar item ao checklist', 'error');
-        }
-    };
-
-    const handleToggleChecklistItem = async (itemId: string) => {
-        try {
-            // Optimistic update
-            if (editingEvent && editingEvent.checklistItems) {
-                setEditingEvent({
-                    ...editingEvent,
-                    checklistItems: editingEvent.checklistItems.map(item =>
-                        item.id === itemId ? { ...item, completed: !item.completed } : item
-                    )
-                });
-            }
-            await api.patch(`/agenda/checklist/${itemId}/toggle`);
-            fetchEvents();
-        } catch (error) {
-            console.error('Erro ao marcar item:', error);
-            fetchEvents(); // Revert optimistic update
-        }
-    };
-
     const handleDeleteChecklistItem = async (itemId: string) => {
         try {
             // Optimistic update
@@ -420,6 +384,42 @@ export default function AgendaPage() {
         } catch (error) {
             console.error('Erro ao remover item:', error);
             fetchEvents(); // Revert optimistic update
+        }
+    };
+
+    const handleAddChecklistItem = async (eventId: string) => {
+        if (!newChecklistItemText.trim()) return;
+        try {
+            const res = await api.post(`/agenda/${eventId}/checklist`, { text: newChecklistItemText });
+            if (editingEvent && editingEvent.id === eventId) {
+                setEditingEvent({
+                    ...editingEvent,
+                    checklistItems: [...(editingEvent.checklistItems || []), res.data]
+                });
+            }
+            setNewChecklistItemText('');
+            fetchEvents();
+        } catch (error) {
+            console.error('Erro ao adicionar item:', error);
+            addToast('Erro ao adicionar item ao checklist', 'error');
+        }
+    };
+
+    const handleToggleChecklistItem = async (itemId: string) => {
+        try {
+            if (editingEvent && editingEvent.checklistItems) {
+                setEditingEvent({
+                    ...editingEvent,
+                    checklistItems: editingEvent.checklistItems.map(item => 
+                        item.id === itemId ? { ...item, completed: !item.completed } : item
+                    )
+                });
+            }
+            await api.patch(`/agenda/checklist/${itemId}/toggle`);
+            fetchEvents();
+        } catch (error) {
+            console.error('Erro ao alternar item:', error);
+            fetchEvents();
         }
     };
 
@@ -1482,82 +1482,34 @@ export default function AgendaPage() {
             </aside>
 
             {/* Quick View Modal */}
-            <Modal
+            <EventDetailModal
                 isOpen={!!viewingEvent}
+                event={viewingEvent as any}
                 onClose={() => setViewingEvent(null)}
-                title="Detalhes do Evento"
-                footer={
-                    <>
-                        <button onClick={() => setViewingEvent(null)} className="px-5 py-2 border border-app-stroke rounded-lg text-sm font-medium text-app-text-muted hover:bg-app-stroke/30 transition-colors">Fechar</button>
-                        <button onClick={() => viewingEvent && handleEditClick(viewingEvent)} className="px-6 py-2 rounded-lg text-sm font-medium bg-primary text-white flex items-center gap-2 hover:bg-primary/90 transition-colors">
-                            <Edit3 size={16} /> Editar
-                        </button>
-                    </>
-                }
-            >
-                {viewingEvent && (
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 pb-4 border-b border-app-stroke">
-                            <div className={clsx("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", getEventColor(viewingEvent.type, viewingEvent.color).badge)}>
-                                {viewingEvent.type === 'deadline' ? <AlertTriangle size={24} /> : viewingEvent.type === 'hearing' ? <MessageSquare size={24} /> : <CalendarIcon size={24} />}
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-app-text-main leading-tight">{viewingEvent.title}</h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className={clsx("text-xs px-2 py-0.5 rounded-full font-medium", getEventColor(viewingEvent.type, viewingEvent.color).badge)}>{getEventColor(viewingEvent.type, viewingEvent.color).label}</span>
-                                    {viewingEvent.completed && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium">Concluído</span>}
-                                </div>
-                            </div>
-                        </div>
+                onRefresh={fetchEvents}
+                onEdit={(ev) => {
+                    setViewingEvent(null);
+                    setEditingEvent(ev as any);
+                    setNewEvent({
+                        title: ev.title,
+                        description: ev.description || '',
+                        start: new Date(ev.start).toISOString().slice(0, 16),
+                        end: ev.end ? new Date(ev.end).toISOString().slice(0, 16) : '',
+                        type: ev.type,
+                        priority: ev.priority || 'MEDIUM',
+                        location: ev.location || '',
+                        reminderMinutes: ev.reminderMinutes || 30,
+                        clientId: ev.clientId || '',
+                        clientName: ev.clientName || '',
+                        processNumber: ev.processNumber || '',
+                        assigneeIds: ev.assignees?.map((a: any) => a.userId) || [],
+                        status: ev.status || 'ATIVO',
+                        color: ev.color || ''
+                    });
+                    setIsNewEventOpen(true);
+                }}
+            />
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Início</p>
-                                <p className="text-sm font-medium text-app-text-main">{new Date(viewingEvent.start).toLocaleString('pt-BR')}</p>
-                            </div>
-                            {viewingEvent.end && (
-                                <div>
-                                    <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Fim</p>
-                                    <p className="text-sm font-medium text-app-text-main">{new Date(viewingEvent.end).toLocaleString('pt-BR')}</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {viewingEvent.description && (
-                            <div>
-                                <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Descrição</p>
-                                <div className="p-3 bg-app-bg rounded-lg border border-app-stroke text-sm text-app-text-main whitespace-pre-wrap">
-                                    {viewingEvent.description}
-                                </div>
-                            </div>
-                        )}
-
-                        {(viewingEvent.clientName || viewingEvent.processNumber) && (
-                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-app-stroke">
-                                {viewingEvent.clientName && (
-                                    <div>
-                                        <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Cliente</p>
-                                        <p className="text-sm font-medium text-app-text-main">{viewingEvent.clientName}</p>
-                                    </div>
-                                )}
-                                {viewingEvent.processNumber && (
-                                    <div>
-                                        <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Processo</p>
-                                        <p className="text-sm font-medium text-app-text-main">{viewingEvent.processNumber}</p>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                        
-                        {viewingEvent.location && (
-                            <div className="pt-4 border-t border-app-stroke">
-                                <p className="text-xs text-app-text-muted uppercase font-bold tracking-wider mb-1">Localização</p>
-                                <p className="text-sm font-medium text-app-text-main">{viewingEvent.location}</p>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </Modal>
 
             <Modal 
                 isOpen={isNewEventOpen} 

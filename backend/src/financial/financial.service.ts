@@ -355,10 +355,17 @@ export class FinancialService {
 
         const { partnerId, partnerPercentage, ...prismaData } = data;
 
-        const newRecord = await this.prisma.financialRecord.update({
-            where: { id },
+        await this.prisma.financialRecord.updateMany({
+            where: { id, tenantId },
             data: prismaData,
         });
+
+        const updatedRecord = await this.prisma.financialRecord.findFirst({ 
+            where: { id, tenantId },
+            include: { client: true }
+        });
+
+        if (!updatedRecord) throw new Error('Falha ao atualizar registro');
 
         // Audit log
         if (userId && oldRecord) {
@@ -376,27 +383,27 @@ export class FinancialService {
                     status: oldRecord.status,
                 },
                 newValues: {
-                    type: newRecord.type,
-                    amount: newRecord.amount,
-                    description: newRecord.description,
-                    status: newRecord.status,
+                    type: updatedRecord.type,
+                    amount: updatedRecord.amount,
+                    description: updatedRecord.description,
+                    status: updatedRecord.status,
                 },
-            }).catch(() => { }); // Don't fail if audit fails
+            }).catch(() => { });
         }
 
         // Handle Split Update
-        if (newRecord.type === 'INCOME') {
+        if (updatedRecord.type === 'INCOME') {
             await this.partnershipsService.handleSpecificSplit(
-                newRecord.id,
-                newRecord.amount,
+                updatedRecord.id,
+                updatedRecord.amount,
                 tenantId,
-                newRecord.description,
+                updatedRecord.description,
                 updateFinancialDto.partnerId,
                 updateFinancialDto.partnerPercentage
             );
         }
 
-        return newRecord;
+        return updatedRecord;
     }
 
     async remove(id: string, tenantId: string, userId?: string, userName?: string) {
@@ -406,8 +413,8 @@ export class FinancialService {
             throw new Error('Registro financeiro não encontrado');
         }
 
-        const deleted = await this.prisma.financialRecord.delete({
-            where: { id },
+        const deleted = await this.prisma.financialRecord.deleteMany({
+            where: { id, tenantId },
         });
 
         // Audit log

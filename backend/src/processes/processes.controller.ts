@@ -29,37 +29,37 @@ export class ProcessesController {
   }
 
   @Delete('labels/:labelId')
-  deleteLabel(@Param('labelId') labelId: string) {
-    return this.processesService.deleteLabel(labelId);
+  deleteLabel(@Request() req, @Param('labelId') labelId: string) {
+    return this.processesService.deleteLabel(labelId, req.user.tenantId);
   }
 
   // ─── Checklists (static) ─────────────────────────────────
 
   @Delete('checklists/:checklistId')
-  deleteChecklist(@Param('checklistId') checklistId: string) {
-    return this.processesService.deleteChecklist(checklistId);
+  deleteChecklist(@Request() req, @Param('checklistId') checklistId: string) {
+    return this.processesService.deleteChecklist(checklistId, req.user.tenantId);
   }
 
   @Post('checklists/:checklistId/items')
-  addChecklistItem(@Param('checklistId') checklistId: string, @Body() body: { text: string }) {
-    return this.processesService.addChecklistItem(checklistId, body.text);
+  addChecklistItem(@Request() req, @Param('checklistId') checklistId: string, @Body() body: { text: string }) {
+    return this.processesService.addChecklistItem(checklistId, body.text, req.user.tenantId);
   }
 
   @Patch('checklist-items/:itemId')
-  updateChecklistItem(@Param('itemId') itemId: string, @Body() body: { text?: string; completed?: boolean }) {
-    return this.processesService.updateChecklistItem(itemId, body);
+  updateChecklistItem(@Request() req, @Param('itemId') itemId: string, @Body() body: { text?: string; completed?: boolean }) {
+    return this.processesService.updateChecklistItem(itemId, body, req.user.tenantId);
   }
 
   @Delete('checklist-items/:itemId')
-  deleteChecklistItem(@Param('itemId') itemId: string) {
-    return this.processesService.deleteChecklistItem(itemId);
+  deleteChecklistItem(@Request() req, @Param('itemId') itemId: string) {
+    return this.processesService.deleteChecklistItem(itemId, req.user.tenantId);
   }
 
   // ─── Comments (static) ───────────────────────────────────
 
   @Delete('comments/:commentId')
-  deleteComment(@Param('commentId') commentId: string) {
-    return this.processesService.deleteComment(commentId);
+  deleteComment(@Request() req, @Param('commentId') commentId: string) {
+    return this.processesService.deleteComment(commentId, req.user.tenantId);
   }
 
   // ══════════════════════════════════════════════════════════
@@ -137,12 +137,12 @@ export class ProcessesController {
   }
 
   @Get(':id/comments')
-  getComments(@Param('id') id: string) {
-    return this.processesService.getComments(id);
+  getComments(@Request() req, @Param('id') id: string) {
+    return this.processesService.getComments(id, req.user.tenantId);
   }
 
   @Post(':id/comments')
   addComment(@Request() req, @Param('id') id: string, @Body() body: { content: string }) {
-    return this.processesService.addComment(id, req.user.sub, body.content);
+    return this.processesService.addComment(id, req.user.sub, body.content, req.user.tenantId);
   }
 }

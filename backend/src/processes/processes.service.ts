@@ -245,26 +245,52 @@ export class ProcessesService {
     });
   }
 
-  async deleteChecklist(checklistId: string) {
-    return this.prisma.processChecklist.delete({ where: { id: checklistId } });
+  async deleteChecklist(checklistId: string, tenantId: string) {
+    return this.prisma.processChecklist.deleteMany({ 
+      where: { 
+        id: checklistId, 
+        process: { tenantId } 
+      } 
+    });
   }
 
-  async addChecklistItem(checklistId: string, text: string) {
+  async addChecklistItem(checklistId: string, text: string, tenantId: string) {
+    // verify ownership through process
+    const checklist = await this.prisma.processChecklist.findUnique({
+      where: { id: checklistId },
+      include: { process: { select: { tenantId: true } } }
+    });
+    if (!checklist || checklist.process.tenantId !== tenantId) {
+      throw new Error('Checklist not found or access denied');
+    }
     const count = await this.prisma.processChecklistItem.count({ where: { checklistId } });
     return this.prisma.processChecklistItem.create({
       data: { checklistId, text, order: count },
     });
   }
 
-  async updateChecklistItem(itemId: string, data: { text?: string; completed?: boolean }) {
+  async updateChecklistItem(itemId: string, data: { text?: string; completed?: boolean }, tenantId: string) {
+    // verify ownership through checklist -> process
+    const item = await this.prisma.processChecklistItem.findUnique({
+      where: { id: itemId },
+      include: { checklist: { include: { process: { select: { tenantId: true } } } } }
+    });
+    if (!item || item.checklist.process.tenantId !== tenantId) {
+      throw new Error('Item not found or access denied');
+    }
     return this.prisma.processChecklistItem.update({
       where: { id: itemId },
       data,
     });
   }
 
-  async deleteChecklistItem(itemId: string) {
-    return this.prisma.processChecklistItem.delete({ where: { id: itemId } });
+  async deleteChecklistItem(itemId: string, tenantId: string) {
+    return this.prisma.processChecklistItem.deleteMany({ 
+      where: { 
+        id: itemId, 
+        checklist: { process: { tenantId } } 
+      } 
+    });
   }
 
   // ─── Labels ──────────────────────────────────────────────
@@ -282,8 +308,10 @@ export class ProcessesService {
     });
   }
 
-  async deleteLabel(labelId: string) {
-    return this.prisma.processLabel.delete({ where: { id: labelId } });
+  async deleteLabel(labelId: string, tenantId: string) {
+    return this.prisma.processLabel.deleteMany({ 
+      where: { id: labelId, tenantId } 
+    });
   }
 
   async addLabelToProcess(processId: string, labelId: string, tenantId: string) {
@@ -304,7 +332,9 @@ export class ProcessesService {
 
   // ─── Comments ────────────────────────────────────────────
 
-  async getComments(processId: string) {
+  async getComments(processId: string, tenantId: string) {
+    // verify ownership
+    await this.prisma.process.findFirstOrThrow({ where: { id: processId, tenantId } });
     return this.prisma.processComment.findMany({
       where: { processId },
       include: { user: { select: { id: true, name: true, avatar: true } } },
@@ -312,15 +342,22 @@ export class ProcessesService {
     });
   }
 
-  async addComment(processId: string, userId: string, content: string) {
+  async addComment(processId: string, userId: string, content: string, tenantId: string) {
+    // verify ownership
+    await this.prisma.process.findFirstOrThrow({ where: { id: processId, tenantId } });
     return this.prisma.processComment.create({
       data: { processId, userId, content },
       include: { user: { select: { id: true, name: true, avatar: true } } },
     });
   }
 
-  async deleteComment(commentId: string) {
-    return this.prisma.processComment.delete({ where: { id: commentId } });
+  async deleteComment(commentId: string, tenantId: string) {
+    return this.prisma.processComment.deleteMany({ 
+      where: { 
+        id: commentId, 
+        process: { tenantId } 
+      } 
+    });
   }
 }
 

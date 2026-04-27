@@ -8,22 +8,11 @@ import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type ViewMode = 'grid' | 'list' | 'kanban';
-type KanbanStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
+import { DocumentStatCard } from '../../components/documents/DocumentStatCard';
+import { DocumentActionsMenu } from '../../components/documents/DocumentActionsMenu';
+import { DocumentKanbanCard, DocumentKanbanColumn, FileItem, KanbanStatus } from '../../components/documents/DocumentKanban';
 
-interface FileItem {
-    id: string;
-    name: string;
-    type: string;
-    size: string;
-    url?: string;
-    folderId?: string;
-    createdAt: string;
-    kanbanStatus: KanbanStatus;
-    isLocked: boolean;
-    allowedRoles?: string;
-    createdBy?: { id: string; name: string; avatar?: string };
-}
+type ViewMode = 'grid' | 'list' | 'kanban';
 
 interface FolderItem {
     id: string;
@@ -41,137 +30,7 @@ interface AuditLog {
     createdAt: string;
 }
 
-// Stats Card Component
-const StatCard = ({ icon: Icon, label, value, subtext, color, delay = 0 }: { icon: any, label: string, value: string, subtext: string, color: string, delay?: number }) => (
-    <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay }}
-        className="bg-app-card border border-app-stroke rounded-xl p-4 flex items-center gap-4 hover:border-primary/30 hover:shadow-lg transition-all group"
-    >
-        <div className={clsx("w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3", color)}>
-            <Icon size={24} className="text-white drop-shadow-sm" />
-        </div>
-        <div>
-            <p className="text-app-text-muted text-xs font-medium uppercase tracking-wider mb-0.5">{label}</p>
-            <h3 className="text-xl font-black text-app-text-main tracking-tight">{value}</h3>
-            <p className="text-[10px] text-app-text-label mt-0.5 font-medium">{subtext}</p>
-        </div>
-    </motion.div>
-);
-
-// Actions Dropdown Component
-const ActionsMenu = ({ onPreview, onDownload, onDelete, onAudit, onLock, isLocked, onPermissions }: {
-    onPreview: () => void;
-    onDownload: () => void;
-    onDelete: () => void;
-    onAudit: () => void;
-    onLock: () => void;
-    isLocked: boolean;
-    onPermissions: () => void;
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        if (isOpen) document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [isOpen]);
-
-    return (
-        <div className="relative" ref={menuRef}>
-            <button
-                onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
-                className="text-app-text-label hover:text-app-text-main p-1.5 rounded-lg hover:bg-app-stroke/50 transition-colors"
-            >
-                <MoreVertical size={16} />
-            </button>
-            {isOpen && (
-                <div className="absolute right-0 top-8 z-[100] w-56 bg-app-card border border-app-stroke rounded-xl shadow-2xl py-1 animate-in fade-in slide-in-from-top-2">
-                    <button onClick={() => { onPreview(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
-                        <Eye size={14} className="text-primary" /> Visualizar
-                    </button>
-                    <button onClick={() => { onDownload(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
-                        <Download size={14} className="text-green-500" /> Baixar
-                    </button>
-                    <button onClick={() => { onLock(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
-                        {isLocked ? <Unlock size={14} className="text-amber-500" /> : <Lock size={14} className="text-amber-500" />}
-                        {isLocked ? 'Desbloquear' : 'Bloquear Edição'}
-                    </button>
-                    <button onClick={() => { onPermissions(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
-                        <Shield size={14} className="text-indigo-500" /> Permissões
-                    </button>
-                    <button onClick={() => { onAudit(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
-                        <History size={14} className="text-blue-400" /> Auditoria
-                    </button>
-                    <hr className="my-1 border-app-stroke" />
-                    <button onClick={() => { onDelete(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors">
-                        <Trash2 size={14} /> Excluir
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-};
-
-// Kanban Card Component
-const KanbanCard = ({ file, onMenuActions }: { file: FileItem, onMenuActions: (file: FileItem) => any }) => {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: file.id });
-    const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
-
-    return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes}
-            className={clsx("bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 mb-2 cursor-grab hover:shadow-md transition-all", file.isLocked && "border-amber-500/40")}>
-            <div className="flex justify-between items-start mb-2">
-                <div className="flex items-center gap-2">
-                    {file.type === 'pdf' ? <FileText size={16} className="text-red-500" /> : <FileText size={16} className="text-blue-500" />}
-                    {file.isLocked && <Lock size={12} className="text-amber-500" />}
-                </div>
-                <div onPointerDown={e => e.stopPropagation()}><ActionsMenu {...onMenuActions(file)} isLocked={file.isLocked} /></div>
-            </div>
-            <h4 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2">{file.name}</h4>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">{file.size}</p>
-            {file.createdBy && <p className="text-[9px] text-gray-400 mt-1">por {file.createdBy.name}</p>}
-        </div>
-    );
-};
-
-// Kanban Column Component with Editable Title
-const KanbanColumn = ({ id, title, files, onMenuActions, onTitleChange }: {
-    id: string, title: string, files: FileItem[], onMenuActions: (file: FileItem) => any, onTitleChange?: (id: string, title: string) => void
-}) => {
-    const { setNodeRef, isOver } = useDroppable({ id });
-    const [isEditing, setIsEditing] = useState(false);
-    const [editTitle, setEditTitle] = useState(title);
-
-    const handleSave = () => {
-        if (onTitleChange && editTitle.trim()) onTitleChange(id, editTitle.trim());
-        setIsEditing(false);
-    };
-
-    return (
-        <div ref={setNodeRef} className={clsx("flex-1 min-w-[180px] md:min-w-[220px] bg-gray-100 dark:bg-slate-800/50 rounded-xl p-2 md:p-3 flex flex-col", isOver && "ring-2 ring-primary")}>
-            <div className="flex justify-between items-center mb-2 md:mb-3">
-                {isEditing ? (
-                    <input value={editTitle} onChange={e => setEditTitle(e.target.value)} onBlur={handleSave} onKeyDown={e => e.key === 'Enter' && handleSave()} autoFocus
-                        className="text-xs font-bold uppercase bg-white dark:bg-slate-700 border border-primary rounded px-1 py-0.5 w-full max-w-[100px]" />
-                ) : (
-                    <span onDoubleClick={() => setIsEditing(true)} className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:text-primary" title="Duplo clique para editar">{title}</span>
-                )}
-                <span className="bg-gray-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-600 dark:text-gray-300 shrink-0">{files.length}</span>
-            </div>
-            <div className="flex-1 overflow-y-auto space-y-2 max-h-[50vh] md:max-h-none">
-                {files.map(file => <KanbanCard key={file.id} file={file} onMenuActions={onMenuActions} />)}
-                {files.length === 0 && <p className="text-center text-gray-400 text-xs py-4">Arraste aqui</p>}
-            </div>
-        </div>
-    );
-};
+;
 
 
 export default function DocumentsPage() {
@@ -579,10 +438,10 @@ export default function DocumentsPage() {
 
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 shrink-0">
-                <StatCard icon={Database} label="Armazenamento" value={`${storageInfo.usedGb} GB`} subtext={`/ ${storageInfo.quotaGb} GB`} color="bg-blue-600" />
-                <StatCard icon={FileCheck} label="Arquivos" value={files.length.toString()} subtext="Docs" color="bg-green-600" />
-                <StatCard icon={Lock} label="Protegidos" value={files.filter(f => f.isLocked).length.toString()} subtext="Arquivos" color="bg-amber-600" />
-                <StatCard icon={Folder} label="Pastas" value={folders.length.toString()} subtext="Total" color="bg-purple-600" />
+                <DocumentStatCard icon={Database} label="Armazenamento" value={`${storageInfo.usedGb} GB`} subtext={`/ ${storageInfo.quotaGb} GB`} color="bg-blue-600" />
+                <DocumentStatCard icon={FileCheck} label="Arquivos" value={files.length.toString()} subtext="Docs" color="bg-green-600" />
+                <DocumentStatCard icon={Lock} label="Protegidos" value={files.filter(f => f.isLocked).length.toString()} subtext="Arquivos" color="bg-amber-600" />
+                <DocumentStatCard icon={Folder} label="Pastas" value={folders.length.toString()} subtext="Total" color="bg-purple-600" />
             </div>
 
 
@@ -677,10 +536,10 @@ export default function DocumentsPage() {
                                 >
                                     <DndContext onDragEnd={handleDragEnd}>
                                         <div className="flex gap-2 md:gap-4 h-full min-h-[300px] md:min-h-[400px] overflow-x-auto pb-4">
-                                            <KanbanColumn id="TODO" title={kanbanTitles.TODO} files={filteredFiles.filter(f => f.kanbanStatus === 'TODO')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
-                                            <KanbanColumn id="IN_PROGRESS" title={kanbanTitles.IN_PROGRESS} files={filteredFiles.filter(f => f.kanbanStatus === 'IN_PROGRESS')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
-                                            <KanbanColumn id="REVIEW" title={kanbanTitles.REVIEW} files={filteredFiles.filter(f => f.kanbanStatus === 'REVIEW')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
-                                            <KanbanColumn id="DONE" title={kanbanTitles.DONE} files={filteredFiles.filter(f => f.kanbanStatus === 'DONE')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
+                                            <DocumentKanbanColumn id="TODO" title={kanbanTitles.TODO} files={filteredFiles.filter(f => f.kanbanStatus === 'TODO')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
+                                            <DocumentKanbanColumn id="IN_PROGRESS" title={kanbanTitles.IN_PROGRESS} files={filteredFiles.filter(f => f.kanbanStatus === 'IN_PROGRESS')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
+                                            <DocumentKanbanColumn id="REVIEW" title={kanbanTitles.REVIEW} files={filteredFiles.filter(f => f.kanbanStatus === 'REVIEW')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
+                                            <DocumentKanbanColumn id="DONE" title={kanbanTitles.DONE} files={filteredFiles.filter(f => f.kanbanStatus === 'DONE')} onMenuActions={getMenuActions} onTitleChange={updateKanbanTitle} />
                                         </div>
                                     </DndContext>
                                 </motion.div>
@@ -811,7 +670,7 @@ export default function DocumentsPage() {
 
                                             {/* Actions Menu */}
                                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <ActionsMenu {...getMenuActions(file)} isLocked={file.isLocked} />
+                                                <DocumentActionsMenu {...getMenuActions(file)} isLocked={file.isLocked} />
                                             </div>
                                         </div>
                                     ))}
@@ -852,7 +711,7 @@ export default function DocumentsPage() {
                                                     <td className="px-4 py-3 text-right">
                                                         <div className="flex justify-end relative h-4">
                                                             <div className="absolute -top-1" onClick={e => e.stopPropagation()}>
-                                                                <ActionsMenu {...getMenuActions(file)} isLocked={file.isLocked} />
+                                                                <DocumentActionsMenu {...getMenuActions(file)} isLocked={file.isLocked} />
                                                             </div>
                                                         </div>
                                                     </td>
