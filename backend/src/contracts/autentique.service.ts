@@ -20,13 +20,25 @@ export class AutentiqueService {
                 createDocument(sandbox: ${sandbox}, document: $document, signers: $signers, file: $file) {
                     id
                     name
+                    signatures {
+                        public_id
+                        email
+                        link {
+                            short_link
+                        }
+                    }
                 }
             }
         `;
 
         const variables = {
             document: { name: documentName },
-            signers: [{ email: signerEmail, name: signerName, action: 'SIGN' }],
+            signers: [{ 
+                email: signerEmail, 
+                name: signerName, 
+                action: 'SIGN',
+                delivery_method: 'DELIVERY_METHOD_EMAIL'
+            }],
             file: null,
         };
 
