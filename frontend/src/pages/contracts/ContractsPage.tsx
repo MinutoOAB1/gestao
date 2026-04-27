@@ -194,6 +194,19 @@ export default function ContractsPage() {
         }
     };
 
+    const handleDeleteContract = async (id: string) => {
+        if (!confirm('Deseja realmente excluir este contrato?')) return;
+        try {
+            await api.delete(`/contracts/${id}`);
+            addToast('Contrato excluído com sucesso', 'success');
+            fetchData();
+            setActiveMenuId(null);
+            if (selectedContract?.id === id) setSelectedContract(null);
+        } catch (error: any) {
+            addToast('Erro ao excluir contrato.', 'error');
+        }
+    };
+
     const filterTabs = ['Todos', 'Feitos', 'Assinados', 'Fechados', 'Cancelados'];
 
     const filteredContracts = contracts.filter(contract => {
@@ -455,7 +468,7 @@ export default function ContractsPage() {
                                                 <div className="absolute right-0 top-full mt-1 w-32 bg-app-card border border-app-stroke rounded-lg shadow-xl z-50 overflow-hidden text-sm">
                                                     <button className="w-full text-left px-4 py-2 hover:bg-app-stroke/30 transition-colors text-app-text-main" onClick={(e) => { e.stopPropagation(); setSelectedContract(contract); setActiveMenuId(null); }}>Ver Detalhes</button>
                                                     <button className="w-full text-left px-4 py-2 hover:bg-app-stroke/30 transition-colors text-blue-500" onClick={(e) => { e.stopPropagation(); setActiveMenuId(null); }}>Editar</button>
-                                                    <button className="w-full text-left px-4 py-2 hover:bg-app-stroke/30 transition-colors text-red-500" onClick={(e) => { e.stopPropagation(); setActiveMenuId(null); }}>Excluir</button>
+                                                    <button className="w-full text-left px-4 py-2 hover:bg-app-stroke/30 transition-colors text-red-500" onClick={(e) => { e.stopPropagation(); handleDeleteContract(contract.id); }}>Excluir</button>
                                                 </div>
                                             )}
                                         </td>
