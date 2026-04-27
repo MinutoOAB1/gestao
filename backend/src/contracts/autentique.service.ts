@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
-import * as FormData from 'form-data';
+import FormData from 'form-data';
 
 @Injectable()
 export class AutentiqueService {

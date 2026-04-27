@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download } from 'lucide-react';
+import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download, FileText } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
 import { useSearchParams } from 'react-router-dom';
