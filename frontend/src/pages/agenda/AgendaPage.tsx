@@ -6,6 +6,7 @@ import api from '../../services/api';
 import Modal from '../../components/ui/Modal';
 import { Drawer } from '../../components/ui/Drawer';
 import { useToast } from '../../context/ToastContext';
+import { Avatar } from '../../components/ui/Avatar';
 import { ClientDetailPageContent } from '../clients/ClientDetailPage';
 import { ProcessDetailPageContent } from '../processes/ProcessDetailPage';
 
@@ -887,12 +888,11 @@ export default function AgendaPage() {
                                             selectedUserFilter === member.id ? "border-primary bg-primary/10" : "border-transparent hover:bg-app-stroke/20"
                                         )}
                                     >
-                                        <div className={clsx(
-                                            "w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0",
-                                            member.role === 'ADMIN' ? "bg-gradient-to-br from-amber-500 to-orange-600" : "bg-gradient-to-br from-primary to-purple-600"
-                                        )}>
-                                            {member.avatar ? <img src={member.avatar} className="w-full h-full rounded-full object-cover" /> : member.name.charAt(0)}
-                                        </div>
+                                        <Avatar
+                                            src={member.avatar}
+                                            name={member.name}
+                                            size="sm"
+                                        />
                                         <span className={clsx("text-[10px] font-medium hidden md:block", selectedUserFilter === member.id ? "text-primary" : "text-app-text-main")}>
                                             {member.name.split(' ')[0]}
                                         </span>
@@ -1290,9 +1290,12 @@ export default function AgendaPage() {
                                                                     {event.assignees && event.assignees.length > 0 && (
                                                                         <div className="flex -space-x-2 mr-3 sm:mr-0 sm:mb-2" title={event.assignees.map(a => a.userName).join(', ')}>
                                                                             {event.assignees.slice(0, 3).map((assignee, i) => (
-                                                                                <div key={i} className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-purple-600 border-2 border-white dark:border-slate-800 flex items-center justify-center text-[9px] font-bold text-white shrink-0">
-                                                                                    {assignee.userName.charAt(0).toUpperCase()}
-                                                                                </div>
+                                                                                <Avatar
+                                                                                    key={i}
+                                                                                    name={assignee.userName}
+                                                                                    size="sm"
+                                                                                    className="w-6 h-6 border-2 border-white dark:border-slate-800"
+                                                                                />
                                                                             ))}
                                                                             {event.assignees.length > 3 && (
                                                                                 <div className="w-6 h-6 rounded-full bg-app-stroke border-2 border-white dark:border-slate-800 flex items-center justify-center text-[9px] font-bold text-app-text-main shrink-0">

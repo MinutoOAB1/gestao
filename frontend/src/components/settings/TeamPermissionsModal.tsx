@@ -3,6 +3,7 @@ import { X, Users, Shield, Search, Plus, Trash2, Edit2, Check, Crown, Scale, Use
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import { clsx } from 'clsx';
+import { Avatar } from '../ui/Avatar';
 
 interface User {
     id: string;
@@ -213,13 +214,11 @@ export default function TeamPermissionsModal({ isOpen, onClose }: TeamPermission
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
-                                                    {user.avatar ? (
-                                                        <img src={user.avatar} className="w-10 h-10 rounded-full" alt={user.name} />
-                                                    ) : (
-                                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                                                            {user.name.charAt(0).toUpperCase()}
-                                                        </div>
-                                                    )}
+                                                    <Avatar
+                                                        src={user.avatar}
+                                                        name={user.name}
+                                                        size="md"
+                                                    />
                                                     <div>
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-medium text-app-text-main">{user.name}</span>

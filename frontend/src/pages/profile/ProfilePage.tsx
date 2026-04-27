@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { User, Camera, Mail, Phone, MapPin, Shield, Save, X, BadgeCheck, Briefcase, ArrowLeft, Palette } from 'lucide-react';
+import { Avatar } from '../../components/ui/Avatar';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -175,15 +176,12 @@ export default function ProfilePage() {
                     <div className="absolute inset-0 flex items-center px-6 sm:px-10">
                         <div className="flex items-center gap-6 z-10 w-full">
                             <div className="relative group cursor-pointer flex-shrink-0" onClick={handleAvatarClick}>
-                                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white/20 shadow-xl overflow-hidden bg-slate-200 dark:bg-slate-700 relative z-10">
-                                    {formData.avatar ? (
-                                        <img src={formData.avatar} alt={formData.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-slate-400 bg-slate-100 dark:bg-slate-800">
-                                            {formData.name?.charAt(0) || 'U'}
-                                        </div>
-                                    )}
-                                </div>
+                                <Avatar
+                                    src={formData.avatar || undefined}
+                                    name={formData.name}
+                                    size="xl"
+                                    className="w-24 h-24 sm:w-28 sm:h-28 border-4 border-white/20 shadow-xl relative z-10"
+                                />
                                 <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20 m-1">
                                     <Camera size={24} className="text-white drop-shadow-md" />
                                 </div>

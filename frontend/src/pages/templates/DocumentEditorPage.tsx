@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-    Download, Printer, Undo, Redo,
-    Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    Search, History, Plus, User, Users, Gavel, FileText, File, Maximize2, X, Edit3,
-    ZoomIn, ZoomOut,
-    Sparkles, ChevronDown, ListOrdered, List, IndentDecrease, IndentIncrease, Baseline,
-    Trash2, Send, MessageSquare
+    ChevronDown, Sparkles, X, Maximize2, Download, Printer, FileText, File, 
+    Bold, Italic, Underline, Baseline, AlignLeft, AlignCenter, AlignRight, 
+    AlignJustify, List, ListOrdered, IndentDecrease, IndentIncrease, Search, 
+    Trash2, MessageSquare, Send, Undo, Redo, ZoomIn, ZoomOut, User, Users, 
+    History, Gavel, Calendar as CalendarIcon, MapPin, AlertTriangle, 
+    ChevronLeft, ChevronRight, Pause, Play, Check, Edit3, Plus
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import api from '../../services/api';
@@ -800,13 +800,11 @@ export default function DocumentEditorPage() {
                                         comments.map((comment) => (
                                             <div key={comment.id} className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-4 rounded-2xl relative group/comment">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                                        {comment.user?.avatar ? (
-                                                            <img src={comment.user.avatar} className="w-full h-full rounded-full object-cover" />
-                                                        ) : (
-                                                            comment.user?.name?.charAt(0) || 'U'
-                                                        )}
-                                                    </div>
+                                                    <Avatar
+                                                        src={comment.user?.avatar}
+                                                        name={comment.user?.name}
+                                                        size="sm"
+                                                    />
                                                     <div className="flex flex-col">
                                                         <span className="text-xs font-bold text-app-text-main">{comment.user?.name}</span>
                                                         <span className="text-[10px] text-app-text-muted">{new Date(comment.createdAt).toLocaleString()}</span>

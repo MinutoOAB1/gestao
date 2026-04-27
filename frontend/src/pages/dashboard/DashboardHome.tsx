@@ -8,6 +8,7 @@ import api from '../../services/api';
 import TeamPerformanceChart from '../../components/dashboard/TeamPerformanceChart';
 import WeeklyAgenda from '../../components/dashboard/WeeklyAgenda';
 import { useNotifications } from '../../context/NotificationContext';
+import { Avatar } from '../../components/ui/Avatar';
 
 import {
   DndContext,
@@ -609,14 +610,14 @@ export default function DashboardHome() {
                         <div className="bg-app-card rounded-2xl border border-app-stroke divide-y divide-app-stroke/50 transition-colors hover:border-black/10 dark:hover:border-white/10" style={{ boxShadow: premiumShadow }}>
                             {displayRecentClients.length > 0 ? (
                                 displayRecentClients.map((client: any, i: number) => {
-                                    const colors = ['bg-black', 'bg-neutral-800', 'bg-neutral-600', 'bg-neutral-400', 'bg-neutral-200'];
-                                    const avatarBg = colors[i % colors.length];
                                     const isNew = client.createdAt && (new Date().getTime() - new Date(client.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
                                     return (
                                         <div key={client.id || i} className="p-4 flex items-center gap-3 cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5 group" onClick={() => navigate(`/app/clientes/${client.id}`)}>
-                                            <div className={`w-10 h-10 rounded-full ${avatarBg} flex items-center justify-center shrink-0 shadow-md shadow-black/10`}>
-                                                <span className={`${avatarBg === 'bg-neutral-200' ? 'text-black' : 'text-white'} font-bold text-sm`}>{client.name?.charAt(0)?.toUpperCase() || 'C'}</span>
-                                            </div>
+                                            <Avatar 
+                                                 name={client.name} 
+                                                 size="md" 
+                                                 className="shrink-0 shadow-md shadow-black/10"
+                                            />
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2">
                                                     <h4 className="text-sm font-black text-app-text-main truncate">{client.name}</h4>

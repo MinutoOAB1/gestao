@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { PrefetchLink } from '../ui/PrefetchLink';
 import { BrandLogo } from '../ui/BrandLogo';
 import { Users, FileText, Calendar, DollarSign, Settings, LogOut, ChevronRight, Search, Menu, Home, Plus, Folder, Sun, Moon, ClipboardList, Shield, History, ChevronDown, User, X, MoreHorizontal, Clock, Pause } from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useAuth } from '../../context/AuthContext';
@@ -312,12 +313,14 @@ export default function DashboardLayout() {
                 {/* User Profile Card */}
                 <div className={cn("mx-3 mb-4 p-3 rounded-xl bg-white/[0.06] border border-white/[0.08]", collapsed && "mx-2 p-2")}>
                     <div className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-                        <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0 ring-2 ring-white/10">
-                            {user?.avatar ? (
-                                <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
-                            ) : (
-                                <span className="text-white font-black text-sm">{user?.name?.charAt(0)?.toUpperCase() || 'A'}</span>
-                            )}
+                        <div className="relative group cursor-pointer" onClick={() => navigate('/app/perfil')}>
+                            <Avatar
+                                src={user?.avatar || undefined}
+                                name={user?.name}
+                                size="md"
+                                className="ring-2 ring-white/10 group-hover:ring-primary/50 transition-all duration-300"
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-[#0F172A] rounded-full shadow-lg" />
                         </div>
                         {!collapsed && (
                             <div className="min-w-0 flex-1">
@@ -473,14 +476,15 @@ export default function DashboardLayout() {
                                     {teamMembers.filter(m => m.id !== user?.id).slice(0, 3).map((member) => (
                                         <div
                                             key={member.id}
-                                            className="w-9 h-9 rounded-full border-2 border-[#0F172A] flex items-center justify-center overflow-hidden bg-white/15 hover:z-10 transition-transform hover:scale-110"
+                                            className="transition-transform hover:scale-110 hover:z-10"
                                             title={`${member.name} - ${member.role}`}
                                         >
-                                            {member.avatar ? (
-                                                <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <span className="text-white text-xs font-bold">{member.name?.charAt(0) || 'U'}</span>
-                                            )}
+                                            <Avatar
+                                                src={member.avatar || undefined}
+                                                name={member.name}
+                                                size="sm"
+                                                className="border-2 border-[#0F172A]"
+                                            />
                                         </div>
                                     ))}
                                     {teamMembers.filter(m => m.id !== user?.id).length > 3 && (
@@ -490,16 +494,12 @@ export default function DashboardLayout() {
                                     )}
                                 </div>
                                 {/* Current user avatar on top */}
-                                <div
-                                    className="w-10 h-10 rounded-full border-2 border-white/20 flex items-center justify-center overflow-hidden bg-white/15 -ml-3 z-10 ring-2 ring-[#0F172A]"
-                                    title={user?.name || 'Usuário'}
-                                >
-                                    {user?.avatar ? (
-                                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span className="text-white font-bold text-sm">{user?.name?.charAt(0) || 'A'}</span>
-                                    )}
-                                </div>
+                                <Avatar
+                                    src={user?.avatar || undefined}
+                                    name={user?.name}
+                                    size="md"
+                                    className="border-2 border-white/20 ring-2 ring-[#0F172A]"
+                                />
                             </div>
                             <div className="flex items-center gap-3">
                                 {/* Timer Button - Shows running state */}
@@ -539,13 +539,12 @@ export default function DashboardLayout() {
                 {!isFullScreenPage && (
                     <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/5 bg-[#0F172A]">
                         <div className="flex items-center gap-3.5" onClick={() => navigate('/app/perfil')}>
-                            <div className="w-11 h-11 rounded-full bg-white/20 overflow-hidden flex items-center justify-center ring-2 ring-white/10 shadow-lg transition-transform active:scale-95">
-                                {user?.avatar ? (
-                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="text-base font-bold text-white uppercase">{user?.name?.charAt(0) || 'A'}</span>
-                                )}
-                            </div>
+                            <Avatar
+                                src={user?.avatar || undefined}
+                                name={user?.name}
+                                size="md"
+                                className="ring-2 ring-white/10 shadow-lg transition-transform active:scale-95"
+                            />
                             <div>
                                 <p className="text-[10px] uppercase tracking-wider font-bold text-white/40">Meu Escritório</p>
                                 <p className="text-base font-bold text-white leading-tight">{user?.name || 'Dr. Silva'}</p>

@@ -8,6 +8,7 @@ import { clsx } from 'clsx';
 import api from '../../services/api';
 import { Protect } from '../../components/auth/Protect';
 import { useToast } from '../../context/ToastContext';
+import { Avatar } from '../../components/ui/Avatar';
 
 interface User {
     id: string;
@@ -280,9 +281,7 @@ export default function UsersPage() {
                                         <tr key={user.id} className="hover:bg-app-bg/30 transition-colors">
                                             <td className="px-4 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold">
-                                                        {user.name.charAt(0).toUpperCase()}
-                                                    </div>
+                                                    <Avatar name={user.name} size="md" />
                                                     <div>
                                                         <p className="font-medium text-app-text-main">{user.name}</p>
                                                         <p className="text-sm text-app-text-muted">{user.email}</p>

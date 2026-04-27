@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState, useEffect } from 'react';
 import type { HTMLAttributes } from 'react';
 import { clsx } from 'clsx';
 
@@ -44,18 +44,32 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
             away: 'bg-amber-500',
         };
 
+        const [imgError, setImgError] = useState(false);
+
+        // Reset error state if src changes
+        useEffect(() => {
+            setImgError(false);
+        }, [src]);
+
         // Get initials from name
-        const getInitials = (name: string) => {
-            return name
-                .split(' ')
-                .map((word) => word.charAt(0))
-                .join('')
-                .toUpperCase()
-                .slice(0, 2);
+        const getInitials = (name: any) => {
+            if (typeof name !== 'string' || !name) return 'A';
+            try {
+                return name
+                    .trim()
+                    .split(' ')
+                    .filter(Boolean)
+                    .map((word) => word.charAt(0))
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+            } catch (e) {
+                return 'A';
+            }
         };
 
         // Generate color from name
-        const getColorFromName = (name: string) => {
+        const getColorFromName = (name: any) => {
             const colors = [
                 'bg-blue-500',
                 'bg-green-500',
@@ -66,7 +80,9 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
                 'bg-indigo-500',
                 'bg-teal-500',
             ];
-            const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            
+            const stringName = typeof name === 'string' ? name : String(name || '');
+            const index = stringName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
             return colors[index % colors.length];
         };
 
@@ -80,11 +96,12 @@ const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
                 )}
                 {...props}
             >
-                {src ? (
+                {src && !imgError ? (
                     <img
                         src={src}
                         alt={alt || name || 'Avatar'}
                         className="w-full h-full object-cover"
+                        onError={() => setImgError(true)}
                     />
                 ) : name ? (
                     <div
