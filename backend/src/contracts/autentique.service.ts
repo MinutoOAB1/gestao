@@ -36,8 +36,7 @@ export class AutentiqueService {
             signers: [{ 
                 email: signerEmail, 
                 name: signerName, 
-                action: 'SIGN',
-                delivery_method: 'DELIVERY_METHOD_EMAIL'
+                action: 'SIGN'
             }],
             file: null,
         };
