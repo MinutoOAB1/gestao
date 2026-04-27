@@ -265,6 +265,17 @@ export default function DashboardLayout() {
         fetchTeamMembers();
     }, []);
 
+    // Crisp User Identification
+    useEffect(() => {
+        if (user && (window as any).$crisp) {
+            (window as any).$crisp.push(["set", "user:email", [user.email]]);
+            (window as any).$crisp.push(["set", "user:nickname", [user.name]]);
+            if (user.avatar) {
+                (window as any).$crisp.push(["set", "user:avatar", [user.avatar]]);
+            }
+        }
+    }, [user]);
+
     // Format timer display
     const formatTimerDisplay = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
