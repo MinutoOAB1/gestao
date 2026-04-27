@@ -237,4 +237,25 @@ Este documento é uma solicitação de assinatura gerada via Plataforma Advus.
 
         return doc;
     }
+
+    async handleWebhook(body: any) {
+        // Autentique v2 webhook payload
+        // Body usually contains { part, event, document, ... }
+        const eventType = body?.event?.type;
+        const documentId = body?.document?.id;
+
+        if (!documentId) return { success: false, message: 'No document ID' };
+
+        if (eventType === 'DOCUMENT_SIGNED' || eventType === 'DOCUMENT_COMPLETED') {
+            await this.prisma.contract.updateMany({
+                where: { autentiqueId: documentId },
+                data: {
+                    autentiqueStatus: 'SIGNED',
+                    status: 'SIGNED'
+                }
+            });
+        }
+
+        return { success: true };
+    }
 }
