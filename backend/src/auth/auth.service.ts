@@ -199,63 +199,7 @@ export class AuthService {
     });
   }
 
-  async forgotPassword(email: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
-    });
 
-    if (!user) {
-      // Return success anyway to prevent email enumeration
-      return { message: 'Se o e-mail existir, um link de recuperação foi enviado.' };
-    }
-
-    // Generate a secure random token
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date();
-    expires.setHours(expires.getHours() + 1); // 1 hour expiration
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        resetToken: token,
-        resetExpires: expires,
-      },
-    });
-
-    // Send email
-    await this.emailService.sendPasswordReset(user.email, token, user.name);
-
-    return { message: 'Link de recuperação enviado com sucesso.' };
-  }
-
-  async resetPassword(token: string, password: string) {
-
-    const user = await this.prisma.user.findFirst({
-      where: {
-        resetToken: token,
-        resetExpires: {
-          gt: new Date(),
-        },
-      },
-    });
-
-    if (!user) {
-      throw new BadRequestException('Token inválido ou expirado.');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-        resetToken: null,
-        resetExpires: null,
-      },
-    });
-
-    return { message: 'Senha redefinida com sucesso.' };
-  }
 
   private generateDeviceHash(ip?: string, userAgent?: string): string {
     const data = `${ip || 'unknown'}-${userAgent || 'unknown'}`;
@@ -264,45 +208,62 @@ export class AuthService {
 
   async forgotPassword(email: string) {
     return this.tenantContext.runWithTenant(null, true, async () => {
-      const user = await this.prisma.user.findUnique({ where: { email } });
+      const user = await this.prisma.user.findUnique({
+        where: { email: email.toLowerCase().trim() },
+      });
+
       if (!user) {
-        // Don't reveal if user exists or not for security
-        return { message: 'If an account exists, a reset link will be sent.' };
+        // Return success anyway to prevent email enumeration
+        return { message: 'Se o e-mail existir, um link de recuperação foi enviado.' };
       }
 
-      // Generate a reset token
-      const resetToken = this.jwtService.sign(
-        { email: user.email, sub: user.id, type: 'password_reset' },
-        { expiresIn: '1h' }
-      );
+      // Generate a secure random token
+      const token = crypto.randomBytes(32).toString('hex');
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 1); // 1 hour expiration
 
-      // Send password reset email
-      await this.emailService.sendPasswordReset(user.email, resetToken, user.name);
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          resetToken: token,
+          resetExpires: expires,
+        },
+      });
 
-      return {
-        message: 'If an account exists, a reset link will be sent.',
-      };
+      // Send email
+      await this.emailService.sendPasswordReset(user.email, token, user.name);
+
+      return { message: 'Link de recuperação enviado com sucesso.' };
     });
   }
 
-  async resetPassword(token: string, newPassword: string) {
+  async resetPassword(token: string, password: string) {
     return this.tenantContext.runWithTenant(null, true, async () => {
-      try {
-        const decoded = this.jwtService.verify(token) as any;
-        if (decoded.type !== 'password_reset') {
-          throw new UnauthorizedException('Invalid reset token');
-        }
+      const user = await this.prisma.user.findFirst({
+        where: {
+          resetToken: token,
+          resetExpires: {
+            gt: new Date(),
+          },
+        },
+      });
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await this.prisma.user.update({
-          where: { id: decoded.sub },
-          data: { password: hashedPassword },
-        });
-
-        return { message: 'Password updated successfully' };
-      } catch {
-        throw new UnauthorizedException('Invalid or expired reset token');
+      if (!user) {
+        throw new BadRequestException('Token inválido ou expirado.');
       }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          resetToken: null,
+          resetExpires: null,
+        },
+      });
+
+      return { message: 'Senha redefinida com sucesso.' };
     });
   }
 
