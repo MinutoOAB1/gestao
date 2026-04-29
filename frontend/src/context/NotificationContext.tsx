@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo } 
 import type { ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'sonner';
+import { supabase } from '../services/supabase';
 
 export interface Notification {
     id: string;
@@ -128,6 +129,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     // Setup for realtime notifications - WebSockets
     useEffect(() => {
         let socket: Socket;
+        let supabaseChannel: any;
 
         const setupSocket = async () => {
             try {
@@ -150,6 +152,29 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                 if (converted.length > 0) {
                     setNotifications(converted);
                 }
+
+                // Supabase Realtime fallback/addition
+                supabaseChannel = supabase
+                    .channel('public:Notification')
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Notification' }, (payload) => {
+                        const n = payload.new as any;
+                        setNotifications(prev => {
+                            if (prev.some(item => item.id === n.id)) return prev;
+                            const newNotification: Notification = {
+                                id: n.id,
+                                type: n.type === 'MENTION' ? 'message' : 'info',
+                                title: n.title,
+                                message: n.message || '',
+                                timestamp: new Date(n.createdAt || new Date()),
+                                read: n.isRead || false,
+                                entityId: n.entityId,
+                                link: n.entityType === 'PROCESS_NOTE' ? '/processos' :
+                                      n.entityType === 'EVENT' ? '/agenda' : undefined
+                            };
+                            return [newNotification, ...prev].slice(0, 50);
+                        });
+                    })
+                    .subscribe();
 
                 // Connect WebSocket
                 const token = localStorage.getItem('token');
@@ -179,14 +204,17 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
                             payload.entityType === 'FINANCIAL' ? '/financeiro' : undefined
                     };
                     
-                    setNotifications(prev => [newNotification, ...prev].slice(0, 50));
+                    setNotifications(prev => {
+                        if (prev.some(item => item.id === newNotification.id)) return prev;
+                        return [newNotification, ...prev].slice(0, 50);
+                    });
                     
                     // Play sound and show visual toast ONLY if not an AI Suggestion
                     const isAiSuggestion = payload.title?.includes('[IA]') || payload.title?.includes('Copiloto');
                     
                     if (!isAiSuggestion) {
                         try {
-                            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleB4EPZbjwXxIITaC8ut0RAo5juz6fEN8PTiZ+OplUE8yqP/jY1hALq7/3l1SSy+w/9daT0Uvr//XXE9GL6//1lxPRi+v/9ZdT0Uvr//WXU9FL6//1l1PRS+v/9ZdT0Uvr//WXU9FL6//1l1PRS+v/9ZdTkUvr//WXU5FL6//1l1ORS+v/9ZdTkUvr//WXU5FL6//1l1ORS+v/9ZdTkUvsP/VXU5FLq//1V5NRi6w/9VfTUYurf/VYE1GLa7/1WBNRi2u/9VgTUYtrv/VYE1GLa7/1WBNRi2u/9VgTEYtrv/VYEtGLa7/1WBLRi2u/9VgS0Ytrv/VYEtGLa7/1WBLRi2u/9VgS0Ytrv/VYEtGLa7/1WBLRi2u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/VYEpGLq7/1WBKRi6u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/UYEpGLa7/1GBKRi2u/9RgSkYtrv/UYEpGLa7/1GBKRi2u/9RgSkYtrv/UYEpGLa7/1GBKRi2v/9RgSkYtr//UYEpGLa//1GBKRi2v/9RgSkYtr//UYEpGLa//1GBKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2x/9RhSkYtsf/UYUpGLbH/1GFKRi2x/9RhSkYtsf/UYUpGLbH/1GFKRi2x/9RhSkYtsf/UYUpGLbH/1GFKRi2x/9RhSkYtsf/TYUpGLbH/02FKRi2x/9NhSkYtsf/TYUpGLbH/02FKRi2x/9NhSkYtsf/TYUpGLbH/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/SAAA=');
+                            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleB4EPZbjwXxIITaC8ut0RAo5juz6fEN8PTiZ+OplUE8yqP/jY1hALq7/3l1SSy+w/9daT0Uvr//XXE9GL6//1lxPRi+v/9ZdT0Uvr//WXU9FL6//1l1PRS+v/9ZdT0Uvr//WXU9FL6//1l1PRS+v/9ZdTkUvr//WXU5FL6//1l1ORS+v/9ZdTkUvr//WXU5FL6//1l1ORS+v/9ZdTkUvsP/VXU5FLq//1V5NRi6w/9VfTUYurf/VYE1GLa7/1WBNRi2u/9VgTUYtrv/VYE1GLa7/1WBNRi2u/9VgTEYtrv/VYEtGLa7/1WBLRi2u/9VgS0Ytrv/VYEtGLa7/1WBLRi2u/9VgS0Ytrv/VYEtGLa7/1WBLRi2u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/VYEpGLq7/1WBKRi6u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/VYEpGLa7/1WBKRi2u/9VgSkYtrv/UYEpGLa7/1GBKRi2u/9RgSkYtrv/UYEpGLa7/1GBKRi2u/9RgSkYtrv/UYEpGLa7/1GBKRi2v/9RgSkYtr//UYEpGLa//1GBKRi2v/9RgSkYtr//UYEpGLa//1GBKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLa//1GFKRi2v/9RhSkYtr//UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2w/9RhSkYtsP/UYUpGLbD/1GFKRi2x/9RhSkYtsf/UYUpGLbH/1GFKRi2x/9RhSkYtsf/UYUpGLbH/1GFKRi2x/9RhSkYtsf/UYUpGLbH/1GFKRi2x/9RhSkYtsf/TYUpGLbH/02FKRi2x/9NhSkYtsf/TYUpGLbH/02FKRi2x/9NhSkYtsf/TYUpGLbH/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLL/02FKRiyy/9NhSkYssv/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/TYUpGLLH/02FKRiyx/9NhSkYssf/SAAA=');
                             audio.volume = 0.3;
                             audio.play().catch(() => { });
                         } catch (e) { }
@@ -211,6 +239,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
         return () => {
             if (socket) socket.disconnect();
+            if (supabaseChannel) supabase.removeChannel(supabaseChannel);
         };
     }, []);
 

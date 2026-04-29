@@ -25,6 +25,7 @@ import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 import { Protect } from '../../components/auth/Protect';
 import CardDetailModal from '../../components/kanban/CardDetailModal';
+import { supabase } from '../../services/supabase';
 
 // Types
 interface Label {
@@ -655,11 +656,26 @@ export default function KanbanPage() {
         searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(value), 250);
     }, []);
 
+
     useEffect(() => {
         fetchProcesses();
         fetchTeamMembers();
         fetchLabels();
         fetchClients();
+
+        // Supabase Realtime Listener for Process table
+        const channel = supabase
+            .channel('kanban-processes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'Process' }, (payload) => {
+                console.log('Process Realtime update:', payload);
+                // Re-fetch all processes to maintain relations (client, labels, checklists)
+                fetchProcesses();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const fetchTeamMembers = async () => {
