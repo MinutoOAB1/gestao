@@ -163,7 +163,7 @@ export default function GlobalSearch() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: -20 }}
                             transition={{ duration: 0.15 }}
-                            className="fixed top-[15%] left-1/2 -translate-x-1/2 w-full max-w-xl z-50"
+                            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl z-50"
                         >
                             <div className="bg-app-card border border-app-stroke rounded-2xl shadow-2xl overflow-hidden">
                                 {/* Search Input */}

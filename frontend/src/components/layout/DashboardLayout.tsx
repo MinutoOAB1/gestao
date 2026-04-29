@@ -451,11 +451,14 @@ export default function DashboardLayout() {
                 {/* Desktop Header - Glass effect */}
                 {!isFullScreenPage && (
                     <header className="hidden md:flex h-20 items-center justify-between px-8 z-20 flex-shrink-0 bg-[#0F172A] border-b border-white/5">
+                        {/* Left Spacer to balance header */}
+                        <div className="flex-1"></div>
+
                         {/* Search Bar - Replaced with Global Search Trigger to enforce ecosystem approach */}
-                        <div className="flex-1 max-w-2xl relative">
+                        <div className="flex-[2] max-w-2xl flex justify-center relative">
                             <button
                                 onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-                                className="group w-full flex items-center justify-between px-4 py-2.5 bg-white/[0.06] hover:bg-white/[0.09] border border-white/10 rounded-xl text-white/50 hover:text-white/80 transition-all text-xs font-medium"
+                                className="group w-full max-w-xl flex items-center justify-between px-4 py-2.5 bg-white/[0.06] hover:bg-white/[0.09] border border-white/10 rounded-xl text-white/50 hover:text-white/80 transition-all text-xs font-medium"
                             >
                                 <div className="flex items-center gap-3">
                                     <Search size={18} className="text-white/40 group-hover:text-white/70 transition-colors" />
@@ -470,7 +473,7 @@ export default function DashboardLayout() {
                         </div>
 
                         {/* Right Actions */}
-                        <div className="flex items-center gap-6 ml-4">
+                        <div className="flex-1 flex items-center justify-end gap-6 ml-4">
                             {/* Team Avatars - Stacked with current user on top */}
                             <div className="flex items-center">
                                 {/* Other team members behind */}
