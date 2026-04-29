@@ -25,3 +25,6 @@ tsc_errors*.txt
 scripts/backup/
 .backup/
 api/nest-app/
+mcp-config.json
+scratch/
+backend/*.js
