@@ -5,9 +5,9 @@ import { BrandLogo } from '../../components/ui/BrandLogo';
 import {
     FileText, Users, DollarSign, Calendar, Shield,
     Check, ArrowRight, Menu, X, Sparkles,
-    Globe, Clock, MessageSquare, Folder
+    Globe, Clock, MessageSquare, Folder, ChevronDown
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Navbar Component
 function Navbar() {
@@ -33,6 +33,9 @@ function Navbar() {
                         </a>
                         <a href="#testimonials" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
                             Ecossistema
+                        </a>
+                        <a href="#faq" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                            FAQ
                         </a>
                     </div>
 
@@ -68,6 +71,7 @@ function Navbar() {
                             <a href="#features" className="text-white/80 font-medium text-lg">Recursos</a>
                             <a href="#pricing" className="text-white/80 font-medium text-lg">Assinatura</a>
                             <a href="#testimonials" className="text-white/80 font-medium text-lg">Ecossistema</a>
+                            <a href="#faq" className="text-white/80 font-medium text-lg">FAQ</a>
                             <div className="flex flex-col gap-3 pt-6 border-t border-white/10">
                                 <button onClick={() => navigate('/login')} className="py-4 text-center text-white font-bold border border-white/10 rounded-2xl">
                                     ENTRAR
@@ -572,6 +576,160 @@ function TestimonialsSection() {
     );
 }
 
+// FAQ Section
+function FAQSection() {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+    const faqs = [
+        {
+            question: 'O que é o Advus e para quem é indicado?',
+            answer: 'O Advus é uma plataforma de gestão jurídica completa, criada para escritórios de advocacia de todos os tamanhos. Centralizamos processos, clientes, controle financeiro, agenda de prazos, documentos com assinatura digital e IA jurídica em um único lugar — eliminando planilhas e ferramentas dispersas.'
+        },
+        {
+            question: 'Quanto custa o plano ADV Plus Elite?',
+            answer: 'O plano ADV Plus Elite está disponível por R$ 47/mês (de R$ 147). Você tem acesso completo a todos os recursos: usuários e clientes ilimitados, IA Jurídica sem restrições, controle financeiro executivo, assinaturas digitais via Autentique, armazenamento em nuvem e suporte Concierge 24/7. Sem limites artificiais.'
+        },
+        {
+            question: 'Como funciona a IA Jurídica da plataforma?',
+            answer: 'A IA Jurídica do Advus analisa contratos, petições e documentos em profundidade, identificando cláusulas de risco, inconsistências e pontos de atenção com precisão de 98%. Você pode fazer perguntas em linguagem natural sobre qualquer documento carregado e receber análises estruturadas em segundos.'
+        },
+        {
+            question: 'Meus dados estão seguros na plataforma?',
+            answer: 'Absolutamente. O Advus utiliza criptografia AES-256-GCM em todas as camadas — o mesmo padrão adotado por instituições bancárias. Seus dados são armazenados com segurança em nuvem, com backups automáticos. Estamos em conformidade com a LGPD e não compartilhamos suas informações com terceiros.'
+        },
+        {
+            question: 'Posso assinar documentos diretamente pela plataforma?',
+            answer: 'Sim! O Advus possui integração nativa com a Autentique, permitindo envio, assinatura e gestão de documentos com validade jurídica total, tudo dentro da plataforma. Sem precisar de outras ferramentas ou plataformas externas.'
+        },
+        {
+            question: 'Como funciona o controle financeiro?',
+            answer: 'O módulo financeiro do Advus permite controlar honorários, despesas processuais, lançamentos recorrentes e gerar relatórios executivos. Você visualiza o fluxo de caixa, inadimplências e projeções em dashboards intuitivos, com filtros por cliente, processo ou período.'
+        },
+        {
+            question: 'Quantos usuários posso cadastrar?',
+            answer: 'No plano ADV Plus Elite, você cadastra usuários ilimitados. Cada usuário tem perfil e permissões configuráveis, permitindo que sócios, associados e estagiários acessem apenas o que é relevante para cada função no escritório.'
+        },
+        {
+            question: 'É possível cancelar a assinatura a qualquer momento?',
+            answer: 'Sim. O Advus não tem fidelidade ou multas de cancelamento. Você pode cancelar sua assinatura a qualquer momento diretamente nas configurações da conta. Nosso processo de cancelamento é simples e sem burocracia — porque confiamos que você ficará pela qualidade do produto.'
+        },
+        {
+            question: 'Como é feito o onboarding e implantação?',
+            answer: 'Todos os planos incluem treinamento de implantação com nossa equipe. O processo é guiado: cadastro de clientes, importação de processos, configuração da agenda de prazos, integração financeira e configuração de equipe. Nossa equipe de Concierge acompanha você em cada etapa.'
+        },
+        {
+            question: 'O Advus funciona em dispositivos móveis?',
+            answer: 'Sim. A plataforma é totalmente responsiva e funciona em smartphones, tablets e desktops. Você acessa todas as funcionalidades pelo navegador sem precisar instalar aplicativos adicionais, com a mesma experiência premium em qualquer dispositivo.'
+        },
+    ];
+
+    const toggle = (idx: number) => {
+        setOpenIndex(openIndex === idx ? null : idx);
+    };
+
+    return (
+        <section id="faq" className="py-32 md:py-48 bg-black relative">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_30%,rgba(212,175,55,0.04),transparent_60%)]" />
+
+            <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* Section Header */}
+                <div className="text-center mb-24">
+                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-accent rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 backdrop-blur-md">
+                        <MessageSquare size={14} />
+                        Perguntas Frequentes
+                    </div>
+                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display leading-[0.9] mb-8">
+                        Suas Dúvidas <br />
+                        <span className="text-white/30">Respondidas</span>
+                    </h2>
+                    <p className="text-xl text-white/40 leading-relaxed font-medium max-w-2xl mx-auto">
+                        Tudo o que você precisa saber antes de transformar a gestão do seu escritório.
+                    </p>
+                </div>
+
+                {/* FAQ Accordion */}
+                <div className="space-y-4">
+                    {faqs.map((faq, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.05 }}
+                        >
+                            <button
+                                id={`faq-item-${idx}`}
+                                onClick={() => toggle(idx)}
+                                className={`w-full text-left p-8 rounded-[1.75rem] border transition-all duration-300 group ${
+                                    openIndex === idx
+                                        ? 'bg-white/[0.05] border-accent/30 shadow-[0_0_40px_rgba(212,175,55,0.05)]'
+                                        : 'bg-white/[0.02] border-white/5 hover:bg-white/[0.04] hover:border-white/10'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between gap-6">
+                                    <span className={`text-base md:text-lg font-bold tracking-tight transition-colors ${
+                                        openIndex === idx ? 'text-white' : 'text-white/70 group-hover:text-white'
+                                    }`}>
+                                        {faq.question}
+                                    </span>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                                        openIndex === idx
+                                            ? 'bg-accent text-primary-dark rotate-180'
+                                            : 'bg-white/5 text-white/40 group-hover:bg-white/10 group-hover:text-white'
+                                    }`}>
+                                        <ChevronDown size={16} />
+                                    </div>
+                                </div>
+
+                                <AnimatePresence initial={false}>
+                                    {openIndex === idx && (
+                                        <motion.div
+                                            key="content"
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                            className="overflow-hidden"
+                                        >
+                                            <p className="pt-6 text-white/50 leading-relaxed font-medium text-sm md:text-base border-t border-white/5 mt-6">
+                                                {faq.answer}
+                                            </p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </button>
+                        </motion.div>
+                    ))}
+                </div>
+
+                {/* Bottom CTA */}
+                <div className="mt-20 text-center p-12 rounded-[2.5rem] bg-white/[0.02] border border-white/5">
+                    <p className="text-white/50 text-base mb-2 font-medium">Ainda tem dúvidas?</p>
+                    <p className="text-white font-black text-xl mb-8 uppercase tracking-tight">Nossa equipe Concierge está disponível 24/7</p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a
+                            href="https://wa.me/5511999999999"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-xs"
+                        >
+                            <MessageSquare size={16} />
+                            Falar no WhatsApp
+                        </a>
+                        <a
+                            href="mailto:contato@advus.app"
+                            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 text-white font-black rounded-2xl border border-white/10 hover:bg-white/10 transition-all uppercase tracking-widest text-xs"
+                        >
+                            <Globe size={16} />
+                            Enviar E-mail
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
+
 // CTA Section
 function CTASection() {
     const navigate = useNavigate();
@@ -686,6 +844,7 @@ export default function LandingPage() {
             <EngagementSection />
             <PricingSection />
             <TestimonialsSection />
+            <FAQSection />
             <CTASection />
             <Footer />
         </div>
