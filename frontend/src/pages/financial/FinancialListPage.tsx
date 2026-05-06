@@ -9,6 +9,7 @@ import { useToast } from '../../context/ToastContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { GenerateInvoiceModal } from '../../components/financial/GenerateInvoiceModal';
 import { InvoiceManagementTab } from '../../components/financial/InvoiceManagementTab';
+import { InadimplenciaTab } from '../../components/financial/InadimplenciaTab';
 
 interface FinancialRecord {
     id: string;
@@ -150,7 +151,7 @@ export default function FinancialListPage() {
     const [dateFilterStart, setDateFilterStart] = useState('');
     const [dateFilterEnd, setDateFilterEnd] = useState('');
     const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '1A'>('1M');
-    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices'>('transactions');
+    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices' | 'inadimplencia'>('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isReconModalOpen, setIsReconModalOpen] = useState(false);
     const [bankBalance, setBankBalance] = useState('');
@@ -1261,6 +1262,17 @@ export default function FinancialListPage() {
                     >
                         Repasses / Parcerias
                     </button>
+                    <button
+                        onClick={() => setActiveTab('inadimplencia')}
+                        className={clsx(
+                            "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                            activeTab === 'inadimplencia'
+                                ? "bg-[#C4A052] text-white shadow-lg shadow-[#C4A052]/20 border-transparent"
+                                : "bg-app-card text-app-text-muted hover:text-[#C4A052] border border-app-stroke"
+                        )}
+                    >
+                        Inadimplência
+                    </button>
                 </div>
             </div>
 
@@ -1339,6 +1351,8 @@ export default function FinancialListPage() {
                     </div>
                 ) : activeTab === 'invoices' ? (
                     <InvoiceManagementTab />
+                ) : activeTab === 'inadimplencia' ? (
+                    <InadimplenciaTab records={records} />
                 ) : (
                     <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden mt-4">
 
