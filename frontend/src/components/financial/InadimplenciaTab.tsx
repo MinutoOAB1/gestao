@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Send, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
-import { format } from 'date-fns';
 
 interface Record {
     id: string;
@@ -59,12 +58,20 @@ export const InadimplenciaTab: React.FC<InadimplenciaTabProps> = ({ records }) =
         }).format(value);
     };
 
+    const formatDate = (dateObj: Date) => {
+        const day = dateObj.getDate().toString().padStart(2, '0');
+        const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        const year = dateObj.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     const handleSendReminder = (record: any) => {
         const clientName = record.client?.name || 'Cliente';
         const amount = formatBRL(record.amount);
-        const date = format(record.dueDateObj, 'dd/MM/yyyy');
+        const date = formatDate(record.dueDateObj);
         
         const message = `Olá ${clientName}, tudo bem? Identificamos um valor em aberto no valor de ${amount} com vencimento em ${date}. Caso já tenha efetuado o pagamento, por favor desconsidere esta mensagem.`;
+
         
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
@@ -116,7 +123,7 @@ export const InadimplenciaTab: React.FC<InadimplenciaTabProps> = ({ records }) =
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-500 font-medium">
-                                            {format(record.dueDateObj, 'dd/MM/yyyy')}
+                                            {formatDate(record.dueDateObj)}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <button
