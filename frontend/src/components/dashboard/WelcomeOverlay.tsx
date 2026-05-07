@@ -42,15 +42,15 @@ const WelcomeOverlay = memo(({ isOpen, onClose, userName, stats, onShowAgainChan
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    className="relative w-full max-w-5xl bg-[#0F172A] rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5 flex flex-col lg:flex-row max-h-[90vh]"
+                    className="relative w-full max-w-5xl bg-[#0F172A] rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5 flex flex-col lg:flex-row max-h-[90vh]"
                 >
                     {/* Header/Left Section - Dark & Elite */}
-                    <div className="lg:w-1/3 bg-black/40 p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col justify-between">
+                    <div className="lg:w-1/3 bg-black/40 p-6 md:p-8 lg:p-12 border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col justify-between shrink-0">
                         <div>
                             <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mb-8">
                                 <Zap size={32} className="text-white fill-white/10" />
                             </div>
-                            <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight mb-4 font-display tracking-tight">
+                            <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight mb-4 font-display tracking-tight">
                                 Bem-vindo,<br />
                                 <span className="text-white/60">{userName}</span>
                             </h2>
@@ -82,11 +82,11 @@ const WelcomeOverlay = memo(({ isOpen, onClose, userName, stats, onShowAgainChan
                     </div>
 
                     {/* Stats/Right Section */}
-                    <div className="lg:w-2/3 p-8 lg:p-12 overflow-y-auto custom-scrollbar bg-[#0F172A]">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="lg:w-2/3 p-6 md:p-8 lg:p-12 overflow-y-auto custom-scrollbar bg-[#0F172A] flex-1">
+                        <div className="grid grid-cols-2 gap-4 md:gap-6 mb-8">
                             {/* Urgent Block */}
-                            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
-                                <div className="flex items-center justify-between mb-6">
+                            <div className="p-4 md:p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
                                     <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <Clock size={20} className="text-white" />
                                     </div>
@@ -97,8 +97,8 @@ const WelcomeOverlay = memo(({ isOpen, onClose, userName, stats, onShowAgainChan
                             </div>
 
                             {/* New Processes */}
-                            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
-                                <div className="flex items-center justify-between mb-6">
+                            <div className="p-4 md:p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
                                     <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <FileText size={20} className="text-white" />
                                     </div>
@@ -109,8 +109,8 @@ const WelcomeOverlay = memo(({ isOpen, onClose, userName, stats, onShowAgainChan
                             </div>
 
                             {/* Comments/Engagement */}
-                            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
-                                <div className="flex items-center justify-between mb-6">
+                            <div className="p-4 md:p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
                                     <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <MessageSquare size={20} className="text-white" />
                                     </div>
@@ -121,8 +121,8 @@ const WelcomeOverlay = memo(({ isOpen, onClose, userName, stats, onShowAgainChan
                             </div>
 
                             {/* Updates */}
-                            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
-                                <div className="flex items-center justify-between mb-6">
+                            <div className="p-4 md:p-6 rounded-3xl bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all group">
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
                                     <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                                         <Bell size={20} className="text-white" />
                                     </div>
@@ -161,7 +161,7 @@ const WelcomeOverlay = memo(({ isOpen, onClose, userName, stats, onShowAgainChan
                     {/* Close button - Top Right */}
                     <button
                         onClick={onClose}
-                        className="absolute top-6 right-6 p-2 rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-all z-20"
+                        className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-white/10 transition-all z-20"
                     >
                         <X size={20} />
                     </button>

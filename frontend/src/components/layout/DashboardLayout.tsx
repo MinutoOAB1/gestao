@@ -535,8 +535,12 @@ export default function DashboardLayout() {
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
                     <header className="h-16 flex md:hidden items-center justify-between px-5 z-50 sticky top-0 bg-[#0B1121]">
-                        <div className="flex items-center cursor-pointer" onClick={() => navigate('/app')}>
-                            <img src="/Logo-PWA.png" alt="Advus" className="h-8 object-contain" />
+                        <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/app')}>
+                            <img src="/Logo-PWA.png" alt="Advus Icon" className="h-8 w-auto object-contain rounded-lg shadow-sm" draggable={false} />
+                            <div className="flex items-baseline tracking-[-0.05em] font-black leading-none text-2xl">
+                                <span className="text-white">ADV</span>
+                                <span className="text-white/60">US</span>
+                            </div>
                         </div>
                         <div className="flex items-center relative">
                             <NotificationPanel />
