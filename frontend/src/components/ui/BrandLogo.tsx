@@ -23,9 +23,9 @@ export const BrandLogo = memo(({ className = '', variant = 'dark', size = 'md', 
     return (
         <div className={`flex items-center ${current.gap} select-none group ${className}`}>
             <img 
-                src="/Logo-PWA.png" 
+                src="/Logo-pwa2.png" 
                 alt="Advus Icon" 
-                className={`${current.img} w-auto object-contain rounded-lg shadow-sm transition-transform duration-500 group-hover:scale-105`}
+                className={`${current.img} w-auto object-contain rounded-xl shadow-sm transition-transform duration-500 group-hover:scale-105`}
                 draggable={false}
             />
             
