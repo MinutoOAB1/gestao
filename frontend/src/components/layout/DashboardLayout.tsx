@@ -534,11 +534,11 @@ export default function DashboardLayout() {
 
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
-                    <header className="h-16 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 bg-[#0B1121]">
+                    <header className="h-16 flex md:hidden items-center justify-between px-5 z-50 sticky top-0 bg-[#0B1121]">
                         <div className="flex items-center cursor-pointer" onClick={() => navigate('/app')}>
-                            <img src="/Logo-advus.png" alt="Advus" className="h-6 object-contain" />
+                            <img src="/Logo-PWA.png" alt="Advus" className="h-8 object-contain" />
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center relative">
                             <NotificationPanel />
                         </div>
                     </header>
@@ -554,7 +554,7 @@ export default function DashboardLayout() {
                             !isFullScreenPage ? "max-w-7xl mx-auto" : "w-full h-full flex flex-col"
                         )}>
                             {!isFullScreenPage && pathSegments.length > 0 && (
-                                <div className="flex items-center gap-2 mb-6 text-[11px] font-black uppercase tracking-[0.1em]">
+                                <div className="hidden md:flex items-center gap-2 mb-6 text-[11px] font-black uppercase tracking-[0.1em]">
                                     <Link to="/app" className="text-slate-400 hover:text-primary transition-colors">Dashboard</Link>
                                     {pathSegments.map((segment, idx) => (
                                         <div key={idx} className="flex items-center gap-2">
