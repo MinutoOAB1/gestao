@@ -189,30 +189,19 @@ const BottomNavItem = memo(({ icon: Icon, label, path, isMain = false, onClick }
 
     if (onClick) {
         return (
-            <button onClick={onClick} className="flex-1 flex flex-col items-center justify-center py-2 gap-1 text-xs font-medium touch-manipulation no-tap-highlight active:scale-95 transition-fast">
-                <Icon size={22} className={active ? "text-primary" : "text-app-text-muted"} />
-                <span className={active ? "text-primary font-bold" : "text-app-text-muted"}>{label}</span>
+            <button onClick={onClick} className="flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[10px] touch-manipulation no-tap-highlight active:scale-95 transition-fast">
+                <Icon size={20} className={active ? "text-[#0066FF]" : "text-slate-400"} />
+                <span className={active ? "text-[#0066FF]" : "text-slate-400"}>{label}</span>
             </button>
-        )
-    }
-
-    if (isMain) {
-        return (
-            <PrefetchLink to={path} className="relative -top-5 touch-manipulation no-tap-highlight">
-                <div className="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/40 flex items-center justify-center text-white transform transition-fast active:scale-90 will-animate">
-                    <Icon size={28} />
-                </div>
-            </PrefetchLink>
         )
     }
 
     return (
         <PrefetchLink to={path} className={cn(
-            "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[9px] touch-manipulation no-tap-highlight active:scale-95 transition-fast",
-            active && "bg-primary/5 rounded-xl"
+            "flex-1 flex flex-col items-center justify-center py-2 gap-1 text-[10px] touch-manipulation no-tap-highlight active:scale-95 transition-fast"
         )}>
-            <Icon size={22} className={cn("transition-fast", active ? "text-primary" : "text-slate-400")} />
-            <span className={cn("transition-fast font-black uppercase tracking-widest", active ? "text-primary" : "text-slate-400")}>{label}</span>
+            <Icon size={20} className={cn("transition-fast", active ? "text-[#0066FF]" : "text-slate-400")} />
+            <span className={cn("transition-fast", active ? "text-[#0066FF]" : "text-slate-400")}>{label}</span>
         </PrefetchLink>
     )
 });
@@ -545,33 +534,18 @@ export default function DashboardLayout() {
 
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
-                    <header className="h-20 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 border-b border-white/5 bg-[#0F172A]">
-                        <div className="flex items-center gap-3.5" onClick={() => navigate('/app/perfil')}>
-                            <Avatar
-                                src={user?.avatar || undefined}
-                                name={user?.name}
-                                size="md"
-                                className="ring-2 ring-white/10 shadow-lg transition-transform active:scale-95"
-                            />
-                            <div>
-                                <p className="text-[10px] uppercase tracking-wider font-bold text-white/40">Meu Escritório</p>
-                                <p className="text-base font-bold text-white leading-tight">{user?.name || 'Dr. Silva'}</p>
-                            </div>
+                    <header className="h-16 flex md:hidden items-center justify-between px-5 z-10 sticky top-0 bg-[#0B1121]">
+                        <div className="flex items-center cursor-pointer" onClick={() => navigate('/app')}>
+                            <img src="/Logo-advus.png" alt="Advus" className="h-6 object-contain" />
                         </div>
-                        <div className="flex items-center gap-1.5">
-                            <button
-                                onClick={() => window.dispatchEvent(new CustomEvent('open-global-search'))}
-                                className="p-2.5 text-white/70 hover:text-white rounded-full transition-colors active:bg-white/10"
-                            >
-                                <Search size={22} />
-                            </button>
+                        <div className="flex items-center">
                             <NotificationPanel />
                         </div>
                     </header>
                 )}
 
-                {/* THE CURVE: Main content with rounded-tl-[40px] creates the organic curved corner */}
-                <main className="flex-1 relative z-10 bg-app-bg rounded-tl-[40px] md:rounded-tl-[40px] overflow-hidden flex flex-col pb-20 md:pb-0">
+                {/* Main content - Removed rounded corners for mobile to match flat design */}
+                <main className="flex-1 relative z-10 bg-[#0B1121] md:bg-app-bg rounded-none md:rounded-tl-[40px] overflow-hidden flex flex-col pb-20 md:pb-0">
                     <div className={cn(
                         "flex-1 custom-scrollbar scroll-smooth",
                         !isFullScreenPage ? "p-4 sm:p-6 lg:p-8 overflow-y-auto" : "flex flex-col h-full overflow-hidden"
@@ -617,11 +591,11 @@ export default function DashboardLayout() {
             </div>
 
             {/* Mobile Bottom Nav */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-app-card border-t border-app-stroke flex items-center justify-between px-2 z-50 pb-safe">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0B1121] border-t border-white/5 flex items-center justify-between px-2 z-50 pb-safe">
                 <BottomNavItem icon={Home} label="Início" path="/app" />
                 <BottomNavItem icon={FileText} label="Processos" path="/app/processos" />
-                <BottomNavItem icon={Plus} label="" path="/app/processos/novo" isMain />
-                <BottomNavItem icon={DollarSign} label="Finanças" path="/app/financeiro" />
+                <BottomNavItem icon={Users} label="Clientes" path="/app/clientes" />
+                <BottomNavItem icon={ClipboardList} label="Atividades" path="/app/agenda" />
                 <BottomNavItem icon={MoreHorizontal} label="Mais" path="#" onClick={() => setIsMobileDrawerOpen(true)} />
             </div>
 

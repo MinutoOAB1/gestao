@@ -306,7 +306,7 @@ export default function IAAnalisePage() {
         try {
             // Load logo
             const logoImg = new Image();
-            logoImg.src = '/Advus.png';
+            logoImg.src = '/Logo-advus.png';
             await new Promise((resolve, reject) => {
                 logoImg.onload = resolve;
                 logoImg.onerror = reject;
