@@ -183,16 +183,11 @@ function HeroSection() {
                 >
                     <div className="absolute inset-0 bg-gradient-to-t from-primary-dark via-transparent to-transparent z-10 pointer-events-none" style={{ top: '60%' }} />
                     <div className="relative rounded-[2.5rem] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-white/10 bg-black/40 backdrop-blur-md p-2">
-                        <video
+                        <img
+                            src="/home-image.png"
+                            alt="Advus Platform Preview"
                             className="w-full rounded-[2.2rem] aspect-video object-cover"
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            poster=""
-                        >
-                            <source src="/landingpage.mp4" type="video/mp4" />
-                        </video>
+                        />
                         {/* Glass Overlays */}
                         <div className="absolute top-10 left-10 p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 hidden lg:block animate-bounce-slow">
                             <div className="flex items-center gap-4">
