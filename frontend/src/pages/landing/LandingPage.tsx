@@ -88,6 +88,61 @@ function Navbar() {
     );
 }
 
+// Typewriter animated text hook
+function useTypewriter(words: string[], typingSpeed = 80, erasingSpeed = 50, pauseMs = 1800) {
+    const [displayText, setDisplayText] = useState('');
+    const [wordIndex, setWordIndex] = useState(0);
+    const [isErasing, setIsErasing] = useState(false);
+
+    useEffect(() => {
+        const currentWord = words[wordIndex];
+        let timeout: ReturnType<typeof setTimeout>;
+
+        if (!isErasing && displayText.length < currentWord.length) {
+            timeout = setTimeout(() => {
+                setDisplayText(currentWord.slice(0, displayText.length + 1));
+            }, typingSpeed);
+        } else if (!isErasing && displayText.length === currentWord.length) {
+            timeout = setTimeout(() => setIsErasing(true), pauseMs);
+        } else if (isErasing && displayText.length > 0) {
+            timeout = setTimeout(() => {
+                setDisplayText(displayText.slice(0, -1));
+            }, erasingSpeed);
+        } else if (isErasing && displayText.length === 0) {
+            setIsErasing(false);
+            setWordIndex((prev) => (prev + 1) % words.length);
+        }
+
+        return () => clearTimeout(timeout);
+    }, [displayText, isErasing, wordIndex, words, typingSpeed, erasingSpeed, pauseMs]);
+
+    return displayText;
+}
+
+// Typewriter Headline Component
+const TYPEWRITER_WORDS = [
+    'Gestão Financeira',
+    'Gestão de Clientes',
+    'Gestão de Processos',
+    'Agenda de Prazos',
+    'Assinaturas Digitais',
+    'Controle de Honorários',
+    'IA Jurídica',
+    'Relatórios Executivos',
+];
+
+function TypewriterHeadline() {
+    const text = useTypewriter(TYPEWRITER_WORDS, 75, 45, 2000);
+    return (
+        <span className="inline-block min-h-[1.2em]">
+            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/40 lowercase">
+                {text}
+            </span>
+            <span className="inline-block w-[3px] h-[0.85em] ml-1 bg-accent align-middle rounded-sm animate-pulse" />
+        </span>
+    );
+}
+
 // Hero Section
 function HeroSection() {
     const navigate = useNavigate();
@@ -110,17 +165,15 @@ function HeroSection() {
                         Inteligência Jurídica de Elite
                     </motion.div>
 
-                    {/* Headline */}
-                    <motion.h1 
+                    {/* Headline with Typewriter */}
+                    <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-10 font-display"
+                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-tight mb-10 font-display"
                     >
-                        A Nova Era da <br className="hidden md:block" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/40 lowercase">
-                            gestão de escritórios de advocacia
-                        </span>
+                        A Nova Era da sua{' '}<br className="hidden md:block" />
+                        <TypewriterHeadline />
                     </motion.h1>
 
                     {/* Subheadline */}
@@ -140,16 +193,24 @@ function HeroSection() {
                         transition={{ delay: 0.3 }}
                         className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20"
                     >
-                        <button
+                        <motion.button
                             onClick={() => navigate('/register')}
-                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl hover:bg-white hover:text-primary transition-all shadow-[0_20px_50px_rgba(79,115,245,0.15)] group uppercase tracking-widest text-sm"
+                            whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(79,115,245,0.45)' }}
+                            whileTap={{ scale: 0.97 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl shadow-[0_20px_50px_rgba(79,115,245,0.15)] group uppercase tracking-widest text-sm"
                         >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                        </button>
-                        <button className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all backdrop-blur-md uppercase tracking-widest text-sm">
+                        </motion.button>
+                        <motion.button
+                            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(212,175,55,0.2)' }}
+                            whileTap={{ scale: 0.97 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 backdrop-blur-md uppercase tracking-widest text-sm"
+                        >
                             Solicite uma Demo
-                        </button>
+                        </motion.button>
                     </motion.div>
 
                     {/* Social Proof */}
