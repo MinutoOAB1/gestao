@@ -186,7 +186,7 @@ function HeroSection() {
                         <img
                             src="/home-image.png"
                             alt="Advus Platform Preview"
-                            className="w-full rounded-[2.2rem] aspect-video object-cover"
+                            className="w-full h-auto rounded-xl object-contain"
                         />
                         {/* Glass Overlays */}
                         <div className="absolute top-10 left-10 p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 hidden lg:block animate-bounce-slow">
