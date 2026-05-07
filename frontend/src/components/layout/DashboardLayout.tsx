@@ -542,7 +542,14 @@ export default function DashboardLayout() {
                                 <span className="text-white/60">US</span>
                             </div>
                         </div>
-                        <div className="flex items-center relative">
+                        <div className="flex items-center gap-2 relative">
+                            <button
+                                onClick={toggleTheme}
+                                className="text-white/40 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all"
+                                title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
+                            >
+                                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                            </button>
                             <NotificationPanel />
                         </div>
                     </header>
