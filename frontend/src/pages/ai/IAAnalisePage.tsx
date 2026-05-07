@@ -703,7 +703,7 @@ export default function IAAnalisePage() {
                                         <div className="whitespace-pre-wrap">
                                             {(() => {
                                                 // Render the full contract text with clause highlighting
-                                                let fullText = contractText;
+                                                const fullText = contractText;
                                                 const highlights: Array<{ start: number, end: number, clause: any }> = [];
 
                                                 // Find all clauses that need highlighting

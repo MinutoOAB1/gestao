@@ -10,118 +10,15 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { GenerateInvoiceModal } from '../../components/financial/GenerateInvoiceModal';
 import { InvoiceManagementTab } from '../../components/financial/InvoiceManagementTab';
 import { InadimplenciaTab } from '../../components/financial/InadimplenciaTab';
+import { TransactionModal } from '../../components/financial/TransactionModal';
+import { PartnerModal } from '../../components/financial/PartnerModal';
 
-interface FinancialRecord {
-    id: string;
-    type: 'INCOME' | 'EXPENSE';
-    category: string;
-    amount: number;
-    description: string;
-    date: string;
-    status: string;
-    processRef?: string;
-    partnerId?: string;
-    clientId?: string;
-    client?: { id: string; name: string };
-    // Recurring payment fields
-    isRecurring?: boolean;
-    recurrenceType?: string;
-    totalInstallments?: number;
-    currentInstallment?: number;
-    parentRecordId?: string | null;
-    isUrgent?: boolean;
-    notes?: string;
-    paymentMethod?: string;
-}
-
-interface Partner {
-    id: string;
-    name: string;
-    initials: string;
-    type: string;
-    percentage: number | null;
-    fixedAmount: number | null;
-    pendingAmount: number;
-    color: string;
-    email?: string;
-    phone?: string;
-    notes?: string;
-}
-
-interface FinancialStats {
-    balance: number;
-    pendingIncome: number;
-    pendingIncomeCount: number;
-    receivedPercent: number;
-    pendingExpense: number;
-    dueTodayCount: number;
-    dueTodayAmount: number;
-    totalRepasses?: number;
-}
-
-interface ProcessItem {
-    id: string;
-    number: string;
-    title: string;
-    status: string;
-}
-
-interface ClientItem {
-    id: string;
-    name: string;
-    email?: string;
-}
-
-interface NewTransaction {
-    type: 'INCOME' | 'EXPENSE';
-    category: string;
-    amount: string;
-    description: string;
-    date: string;
-    status: string;
-    recurrence: 'UNICA' | 'MENSAL' | 'ANUAL' | 'PERSONALIZADO';
-    installments: number; // Number of installments for recurring payments
-    urgent: boolean;
-    notes: string;
-    linkTo: string;
-    partnerId?: string;
-    partnerPercentage?: number;
-}
-
-interface NewPartner {
-    name: string;
-    initials: string;
-    type: string;
-    percentage: string;
-    fixedAmount: string;
-    color: string;
-    email: string;
-    phone: string;
-    notes: string;
-}
-
-// Brazilian currency formatter
-const formatBRL = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(value);
-};
-
-const INCOME_CATEGORIES = ['Honorários Contratuais', 'Honorários Sucumbenciais', 'Consultoria', 'Parecer Jurídico', 'Custas Reembolsadas', 'Acordo Judicial', 'Outros'];
-const EXPENSE_CATEGORY_LIST = ['Pessoal / Salários', 'Custas Processuais', 'Infraestrutura / Aluguel', 'Marketing / Softwares', 'Impostos', 'Token / Assinatura Digital', 'Viagens / Deslocamento', 'Outros'];
-const PARTNER_TYPES = ['TRABALHISTA', 'CÍVEL', 'TRIBUTÁRIO', 'CRIMINAL', 'PREVIDENCIÁRIO', 'FAMÍLIA', 'MARKETING', 'ADMINISTRATIVO', 'OUTROS'];
-const PARTNER_COLORS = [
-    '#3B82F6', // Blue
-    '#10B981', // Emerald
-    '#F59E0B', // Amber
-    '#EF4444', // Red
-    '#8B5CF6', // Violet
-    '#EC4899', // Pink
-    '#06B6D4', // Cyan
-];
+import { 
+    FinancialRecord, Partner, FinancialStats, ProcessItem, ClientItem, 
+    NewTransaction, NewPartner, INCOME_CATEGORIES, EXPENSE_CATEGORY_LIST, 
+    PARTNER_TYPES, PARTNER_COLORS 
+} from '../../types/financial';
+import { formatBRL } from '../../utils/formatters';
 
 export default function FinancialListPage() {
     const { addToast } = useToast();
@@ -153,8 +50,7 @@ export default function FinancialListPage() {
     const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '1A'>('1M');
     const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices' | 'inadimplencia'>('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isReconModalOpen, setIsReconModalOpen] = useState(false);
-    const [bankBalance, setBankBalance] = useState('');
+
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
     const [selectedClientForInvoice, setSelectedClientForInvoice] = useState<{id: string, name: string, amount?: number, financialRecordId?: string} | undefined>();
 
@@ -812,47 +708,7 @@ export default function FinancialListPage() {
 
 
 
-    // Bank Reconciliation Logic
-    const handleReconciliation = useCallback(() => {
-        // Parse the input balance (Brazilian format to float)
-        const cleanVal = bankBalance.replace(/\./g, '').replace(',', '.');
-        const bankVal = parseFloat(cleanVal);
 
-        if (isNaN(bankVal)) {
-            addToast('Por favor, informe um valor válido para o saldo.', 'error');
-            return;
-        }
-
-        const sysVal = stats?.balance || 0;
-        const diff = bankVal - sysVal;
-
-        if (Math.abs(diff) < 0.01) {
-            addToast('O sistema está perfeitamente alinhado com o banco!', 'success');
-            setIsReconModalOpen(false);
-            setBankBalance('');
-            return;
-        }
-
-        // Open transaction modal to create adjustment
-        setIsReconModalOpen(false);
-        setBankBalance('');
-        setEditingRecord(null);
-        setNewTransaction({
-            type: diff > 0 ? 'INCOME' : 'EXPENSE',
-            category: 'Outros',
-            amount: Math.abs(diff).toFixed(2),
-            description: 'Ajuste de Reconciliação Bancária',
-            date: new Date().toISOString().split('T')[0],
-            status: 'PAID',
-            recurrence: 'UNICA',
-            installments: 1,
-            urgent: false,
-            notes: 'Ajuste automático gerado pela ferramenta de Reconciliação Bancária para equiparar o saldo do sistema ao do banco.',
-            linkTo: ''
-        });
-        setIsModalOpen(true);
-        addToast(`Diferença de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.abs(diff))} encontrada. Preenchendo ajuste...`, 'info');
-    }, [bankBalance, stats, addToast]);
 
     if (loading) {
         return (
@@ -907,17 +763,11 @@ export default function FinancialListPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-app-text-main">Gestão Financeira</h1>
                     <p className="text-app-text-muted text-sm mt-1">
-                        Central de controle de fluxo de caixa, contratos de parceria e reconciliação.
+                        Central de controle de fluxo de caixa e contratos de parceria.
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <button
-                        onClick={() => setIsReconModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-app-card border border-app-stroke rounded-xl text-app-text-main text-sm font-medium hover:bg-app-stroke/30 transition-colors"
-                    >
-                        <RefreshCw size={16} />
-                        Reconciliação Bancária
-                    </button>
+
                     <Protect roles={['ADMIN', 'LAWYER']}>
                         <button
                             onClick={openReport}
@@ -1452,509 +1302,29 @@ export default function FinancialListPage() {
             )}
 
             {/* Transaction Modal */}
-            <Modal
+            <TransactionModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title=""
-                size="xl"
-            >
-
-                <div className="space-y-5">
-                    {/* Header */}
-                    <div className="mb-2">
-                        <h2 className="text-xl font-bold text-app-text-main">Nova Movimentação Financeira</h2>
-                        <p className="text-xs text-app-text-muted mt-1">Preencha os dados da transação para registro no fluxo de caixa.</p>
-                    </div>
-
-                    {/* Transaction Type Toggle */}
-                    <div>
-                        <p className="text-xs font-medium text-app-text-muted mb-2">Tipo de Transação</p>
-                        <div className="flex gap-3">
-                            <button
-                                className={clsx(
-                                    "flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
-                                    newTransaction.type === 'INCOME'
-                                        ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                        : "bg-app-bg/50 text-app-text-muted border border-app-stroke hover:border-primary/50"
-                                )}
-                                onClick={() => setNewTransaction({ ...newTransaction, type: 'INCOME' })}
-                            >
-                                <TrendingUp size={16} />
-                                Receita (Entrada)
-                            </button>
-                            <button
-                                className={clsx(
-                                    "flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
-                                    newTransaction.type === 'EXPENSE'
-                                        ? "bg-neutral-800 text-white border-2 border-black"
-                                        : "bg-app-bg/50 text-app-text-muted border border-app-stroke hover:border-black/50"
-                                )}
-                                onClick={() => setNewTransaction({ ...newTransaction, type: 'EXPENSE' })}
-                            >
-                                <TrendingDown size={16} />
-                                Despesa (Saída)
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    <div>
-                        <label className="block text-xs font-medium text-app-text-muted mb-1">
-                            DESCRIÇÃO DA TRANSAÇÃO <span className="text-red-400">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={newTransaction.description}
-                            onChange={e => setNewTransaction({ ...newTransaction, description: e.target.value })}
-                            className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors placeholder:text-app-text-muted/50"
-                            placeholder="Ex: Pagamento de Honorários..."
-                        />
-                    </div>
-
-                    {/* Value and Date */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">
-                                VALOR (R$) <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={newTransaction.amount}
-                                onChange={e => setNewTransaction({ ...newTransaction, amount: e.target.value })}
-                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="R$ 0.00"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">
-                                DATA DE VENCIMENTO <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                value={newTransaction.date}
-                                onChange={e => setNewTransaction({ ...newTransaction, date: e.target.value })}
-                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Classification & Links Section */}
-                    <div className="bg-app-bg/30 border border-app-stroke rounded-xl p-4">
-                        <h3 className="text-sm font-semibold text-app-text-main mb-3 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-black rounded-full" />
-                            Classificação & Vínculos
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Categoria</label>
-                                <select
-                                    value={newTransaction.category}
-                                    onChange={e => setNewTransaction({ ...newTransaction, category: e.target.value })}
-                                    className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                >
-                                    <option value="">Selecione uma categoria...</option>
-                                    {(newTransaction.type === 'INCOME' ? INCOME_CATEGORIES : EXPENSE_CATEGORY_LIST).map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Vincular a (Opcional)</label>
-                                <select
-                                    value={newTransaction.linkTo}
-                                    onChange={e => setNewTransaction({ ...newTransaction, linkTo: e.target.value })}
-                                    className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                >
-                                    <option value="">Selecione...</option>
-                                    {processes.length > 0 && (
-                                        <optgroup label="📋 Processos Ativos">
-                                            {processes.filter(p => p.status !== 'ARQUIVADO' && p.status !== 'ENCERRADO').map(process => (
-                                                <option key={`process-${process.id}`} value={`process:${process.id}`}>
-                                                    {process.number} - {process.title}
-                                                </option>
-                                            ))}
-                                        </optgroup>
-                                    )}
-                                    {clients.length > 0 && (
-                                        <optgroup label="👤 Clientes">
-                                            {clients.map(client => (
-                                                <option key={`client-${client.id}`} value={`client:${client.id}`}>
-                                                    {client.name}
-                                                </option>
-                                            ))}
-                                        </optgroup>
-                                    )}
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Posição dinâmica: Repasse para Parceiros SÓ se for RECEITA */}
-                        {newTransaction.type === 'INCOME' && (
-                            <div className="mt-4 pt-4 border-t border-app-stroke border-dashed grid grid-cols-1 sm:grid-cols-12 gap-4">
-                                <div className="sm:col-span-8">
-                                    <label className="block text-[10px] font-medium text-app-text-muted flex items-center gap-1 mb-1 uppercase">
-                                        <Users size={12} className="text-primary" /> Advogado Parceiro / Indicador (Repasse)
-                                    </label>
-                                    <select
-                                        value={newTransaction.partnerId || ''}
-                                        onChange={e => {
-                                            const partnerId = e.target.value;
-                                            const partner = partners.find(p => p.id === partnerId);
-                                            setNewTransaction({
-                                                ...newTransaction,
-                                                partnerId,
-                                                partnerPercentage: partner ? (partner.percentage || 0) : 0
-                                            });
-                                        }}
-                                        className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors text-primary font-medium"
-                                    >
-                                        <option value="">Nenhum repasse</option>
-                                        {partners.map(partner => (
-                                            <option key={`partner-${partner.id}`} value={partner.id}>
-                                                {partner.name} ({partner.type})
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {newTransaction.partnerId && (
-                                    <div className="sm:col-span-4">
-                                        <label className="block text-[10px] whitespace-nowrap font-medium text-app-text-muted mb-1 uppercase">
-                                            Porcentagem do Repasse
-                                        </label>
-                                        <div className="flex relative items-center">
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                max="100"
-                                                step="0.01"
-                                                value={newTransaction.partnerPercentage || ''}
-                                                onChange={e => setNewTransaction({ ...newTransaction, partnerPercentage: parseFloat(e.target.value) || 0 })}
-                                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg pl-4 pr-10 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors font-mono"
-                                                placeholder="Ex: 30"
-                                            />
-                                            <span className="absolute right-4 text-app-text-muted select-none pointer-events-none">%</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Status and Recurrence Row */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                        {/* Payment Status */}
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-2 uppercase">Status do Pagamento</label>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setNewTransaction({ ...newTransaction, status: 'PENDING' })}
-                                    className={clsx(
-                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                        newTransaction.status === 'PENDING'
-                                            ? "bg-app-bg border-2 border-app-text-main text-app-text-main"
-                                            : "bg-app-bg/50 border border-app-stroke text-app-text-muted hover:border-app-text-main"
-                                    )}
-                                >
-                                    <div className={clsx(
-                                        "w-4 h-4 rounded-full border-2 flex items-center justify-center",
-                                        newTransaction.status === 'PENDING' ? "border-app-text-main" : "border-app-text-muted"
-                                    )}>
-                                        {newTransaction.status === 'PENDING' && <div className="w-2 h-2 rounded-full bg-app-text-main" />}
-                                    </div>
-                                    Pendente
-                                </button>
-                                <button
-                                    onClick={() => setNewTransaction({ ...newTransaction, status: 'PAID' })}
-                                    className={clsx(
-                                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
-                                        newTransaction.status === 'PAID'
-                                            ? "bg-app-bg border-2 border-app-text-main text-app-text-main"
-                                            : "bg-app-bg/50 border border-app-stroke text-app-text-muted hover:border-app-text-main"
-                                    )}
-                                >
-                                    <div className={clsx(
-                                        "w-4 h-4 rounded-full border-2 flex items-center justify-center",
-                                        newTransaction.status === 'PAID' ? "border-app-text-main" : "border-app-text-muted"
-                                    )}>
-                                        {newTransaction.status === 'PAID' && <div className="w-2 h-2 rounded-full bg-app-text-main" />}
-                                    </div>
-                                    Pago
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Recurrence */}
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-2 uppercase">Recorrência</label>
-                            <div className="flex gap-1 flex-wrap">
-                                {(['UNICA', 'MENSAL', 'ANUAL', 'PERSONALIZADO'] as const).map((rec) => (
-                                    <button
-                                        key={rec}
-                                        onClick={() => setNewTransaction({ ...newTransaction, recurrence: rec, installments: rec === 'UNICA' ? 1 : newTransaction.installments })}
-                                        className={clsx(
-                                            "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-                                            newTransaction.recurrence === rec
-                                                ? "bg-app-bg border border-app-text-main text-app-text-main"
-                                                : "bg-app-bg/50 border border-app-stroke text-app-text-muted hover:border-app-text-main"
-                                        )}
-                                    >
-                                        {rec === 'UNICA' ? 'Única' : rec === 'MENSAL' ? 'Mensal' : rec === 'ANUAL' ? 'Anual' : 'Personalizado'}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Installments input - only show when recurrence is not UNICA */}
-                            {newTransaction.recurrence !== 'UNICA' && (
-                                <div className="mt-3 flex items-center gap-3">
-                                    <label className="text-xs text-app-text-muted">Quantidade de Parcelas:</label>
-                                    <input
-                                        type="number"
-                                        min="2"
-                                        max="60"
-                                        value={newTransaction.installments}
-                                        onChange={e => setNewTransaction({ ...newTransaction, installments: parseInt(e.target.value) || 2 })}
-                                        className="w-20 bg-app-bg/50 border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors text-center"
-                                    />
-                                    <span className="text-xs text-app-text-muted">
-                                        (Serão criadas {newTransaction.installments} parcelas: 1/{newTransaction.installments}, 2/{newTransaction.installments}...)
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Attach and Urgent Row */}
-                    <div className="flex items-center justify-between">
-                        <button className="flex items-center gap-2 text-primary text-sm font-medium hover:underline">
-                            <Paperclip size={14} />
-                            Anexar Comprovante / Nota Fiscal
-                        </button>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={newTransaction.urgent}
-                                onChange={e => setNewTransaction({ ...newTransaction, urgent: e.target.checked })}
-                                className="w-4 h-4 rounded border-app-stroke text-primary focus:ring-primary"
-                            />
-                            <span className="text-sm text-app-text-muted">Marcar como Urgente</span>
-                        </label>
-                    </div>
-
-                    {/* Notes */}
-                    <div>
-                        <label className="block text-xs font-medium text-app-text-muted mb-1 uppercase">Notas Adicionais</label>
-                        <textarea
-                            value={newTransaction.notes}
-                            onChange={e => setNewTransaction({ ...newTransaction, notes: e.target.value })}
-                            className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors resize-none placeholder:text-app-text-muted/50"
-                            rows={3}
-                            placeholder="Observações internas sobre esta movimentação..."
-                        />
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-app-stroke">
-                        <button
-                            onClick={() => setIsModalOpen(false)}
-                            className="order-2 sm:order-1 px-5 py-2.5 bg-app-bg border border-app-stroke rounded-lg text-sm font-medium text-app-text-main hover:bg-app-stroke/50 transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <div className="order-1 sm:order-2 flex flex-col sm:flex-row gap-2">
-                            <button
-                                className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-primary/10 border border-primary text-primary rounded-lg text-sm font-medium hover:bg-primary/20 transition-colors"
-                            >
-                                <Download size={14} />
-                                Gerar Boleto/Fatura
-                            </button>
-                            <button
-                                onClick={handleSaveTransaction}
-                                disabled={isSubmitting}
-                                className={clsx(
-                                    "flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-lg text-sm font-bold transition-colors shadow-lg",
-                                    isSubmitting ? "bg-black/50 cursor-not-allowed" : "bg-black hover:opacity-90 shadow-black/20"
-                                )}
-                            >
-                                {isSubmitting ? 'Salvando...' : '✓ Salvar Movimentação'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
+                newTransaction={newTransaction}
+                setNewTransaction={setNewTransaction}
+                processes={processes}
+                clients={clients}
+                partners={partners}
+                isSubmitting={isSubmitting}
+                handleSaveTransaction={handleSaveTransaction}
+            />
 
             {/* Partner Modal */}
-            <Modal
+            <PartnerModal
                 isOpen={isPartnerModalOpen}
                 onClose={() => setIsPartnerModalOpen(false)}
-                title={editingPartner ? 'Editar Parceiro' : 'Novo Parceiro'}
-            >
-                <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Nome *</label>
-                            <input
-                                type="text"
-                                value={newPartner.name}
-                                onChange={e => setNewPartner({ ...newPartner, name: e.target.value })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="Ex: Adv. Ana Maria"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Iniciais *</label>
-                            <input
-                                type="text"
-                                value={newPartner.initials}
-                                maxLength={2}
-                                onChange={e => setNewPartner({ ...newPartner, initials: e.target.value.toUpperCase() })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="AM"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Tipo *</label>
-                            <select
-                                value={newPartner.type}
-                                onChange={e => setNewPartner({ ...newPartner, type: e.target.value })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                            >
-                                {PARTNER_TYPES.map(t => (
-                                    <option key={t} value={t}>{t}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Cor</label>
-                            <div className="flex gap-1 flex-wrap">
-                                {PARTNER_COLORS.map(color => (
-                                    <button
-                                        key={color}
-                                        onClick={() => setNewPartner({ ...newPartner, color })}
-                                        className={clsx(
-                                            "w-6 h-6 rounded-md transition-all",
-                                            color,
-                                            newPartner.color === color && "ring-2 ring-offset-2 ring-primary"
-                                        )}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="relative group">
-                            <label className="block text-xs font-medium text-app-text-muted mb-1 flex items-center justify-between">
-                                Percentual (%)
-                                <span className={clsx(
-                                    "px-1.5 py-0.5 rounded text-[10px] uppercase font-bold",
-                                    newPartner.percentage ? "bg-black/20 text-black" : "bg-app-stroke text-app-text-muted"
-                                )}>
-                                    Repasse Automático
-                                </span>
-                            </label>
-                            <input
-                                type="number"
-                                value={newPartner.percentage}
-                                onChange={e => setNewPartner({ ...newPartner, percentage: e.target.value, fixedAmount: '' })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="Ex: 30"
-                            />
-                            {newPartner.percentage && (
-                                <p className="text-[10px] text-primary mt-1 leading-tight">
-                                    Cálculo automático ativado. Este parceiro receberá exatamente {newPartner.percentage}% de repasse de todas as receitas.
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Ou Valor Fixo (R$)</label>
-                            <input
-                                type="number"
-                                value={newPartner.fixedAmount}
-                                onChange={e => setNewPartner({ ...newPartner, fixedAmount: e.target.value, percentage: '' })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="Ex: 1500"
-                            />
-                            {newPartner.fixedAmount && (
-                                <p className="text-[10px] text-app-text-muted mt-1 leading-tight">
-                                    Valores fixos não ativam cálculo automático no cadastro de receitas.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Email</label>
-                            <input
-                                type="email"
-                                value={newPartner.email}
-                                onChange={e => setNewPartner({ ...newPartner, email: e.target.value })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="email@exemplo.com"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-app-text-muted mb-1">Telefone</label>
-                            <input
-                                type="tel"
-                                value={newPartner.phone}
-                                onChange={e => setNewPartner({ ...newPartner, phone: e.target.value })}
-                                className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                                placeholder="(11) 99999-9999"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-medium text-app-text-muted mb-1">Observações</label>
-                        <textarea
-                            value={newPartner.notes}
-                            onChange={e => setNewPartner({ ...newPartner, notes: e.target.value })}
-                            className="w-full bg-app-bg border border-app-stroke rounded-lg px-3 py-2 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
-                            rows={2}
-                            placeholder="Notas sobre a parceria..."
-                        />
-                    </div>
-
-                    <div className="flex justify-between items-center mt-4">
-                        {editingPartner && (
-                            <Protect roles={['ADMIN', 'LAWYER']}>
-                                <button
-                                    onClick={() => {
-                                        handleDeletePartner(editingPartner.id);
-                                        setIsPartnerModalOpen(false);
-                                    }}
-                                    className="px-4 py-2 text-sm text-red-500 hover:text-red-600 transition-colors"
-                                >
-                                    Desativar Parceiro
-                                </button>
-                            </Protect>
-                        )}
-                        <div className="flex gap-2 ml-auto">
-                            <button
-                                onClick={() => setIsPartnerModalOpen(false)}
-                                className="px-4 py-2 text-sm text-app-text-muted hover:text-app-text-main transition-colors"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSavePartner}
-                                disabled={isSubmitting}
-                                className={clsx(
-                                    "px-4 py-2 text-white text-sm font-bold rounded-lg transition-colors",
-                                    isSubmitting ? "bg-black/50 cursor-not-allowed" : "bg-black hover:opacity-90"
-                                )}
-                            >
-                                {isSubmitting ? 'Salvando...' : 'Salvar'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </Modal>
+                newPartner={newPartner}
+                setNewPartner={setNewPartner}
+                editingPartner={editingPartner}
+                isSubmitting={isSubmitting}
+                handleSavePartner={handleSavePartner}
+                handleDeletePartner={handleDeletePartner}
+            />
 
             {/* Delete Confirmation Modal */}
             <Modal
@@ -1981,63 +1351,7 @@ export default function FinancialListPage() {
                 </div>
             </Modal>
 
-            {/* Reconciliation Modal */}
-            <Modal
-                isOpen={isReconModalOpen}
-                onClose={() => {
-                    setIsReconModalOpen(false);
-                    setBankBalance('');
-                }}
-                title="Reconciliação Bancária"
-            >
-                <div>
-                    <p className="text-app-text-muted mb-6 text-sm">
-                        A reconciliação compara o seu Saldo Atual no sistema com o saldo real no seu banco principal.
-                        Se houver diferença, o sistema criará automaticamente um lançamento de ajuste para você aprovar.
-                    </p>
 
-                    <div className="bg-app-bg border border-app-stroke rounded-xl p-4 mb-6 flex justify-between items-center">
-                        <span className="text-sm text-app-text-muted">Saldo no Sistema:</span>
-                        <span className="text-lg font-bold text-app-text-main">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats?.balance || 0)}
-                        </span>
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-app-text-main mb-2">Saldo Real no Banco (R$)</label>
-                        <input
-                            type="text"
-                            value={bankBalance}
-                            onChange={(e) => setBankBalance(e.target.value)}
-                            placeholder="Ex: 5.000,00"
-                            className="w-full bg-app-bg border border-app-stroke rounded-xl p-3 text-app-text-main focus:border-primary focus:outline-none transition-colors"
-                        />
-                    </div>
-
-                    <div className="flex justify-end gap-2">
-                        <button
-                            onClick={() => {
-                                setIsReconModalOpen(false);
-                                setBankBalance('');
-                            }}
-                            className="px-4 py-2 text-sm text-app-text-muted hover:text-app-text-main transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            onClick={handleReconciliation}
-                            disabled={!bankBalance}
-                            className={clsx(
-                                "px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2",
-                                !bankBalance ? "bg-primary/50 cursor-not-allowed" : "bg-primary hover:bg-primary-dark"
-                            )}
-                        >
-                            <RefreshCw size={16} />
-                            Verificar Diferença
-                        </button>
-                    </div>
-                </div>
-            </Modal>
 
             {/* Note View Modal */}
             <Modal

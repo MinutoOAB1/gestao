@@ -557,19 +557,7 @@ export default function DashboardLayout() {
                         <div className={cn(
                             !isFullScreenPage ? "max-w-7xl mx-auto" : "w-full h-full flex flex-col"
                         )}>
-                            {!isFullScreenPage && pathSegments.length > 0 && (
-                                <div className="hidden md:flex items-center gap-2 mb-6 text-[11px] font-black uppercase tracking-[0.1em]">
-                                    <Link to="/app" className="text-slate-400 hover:text-primary transition-colors">Dashboard</Link>
-                                    {pathSegments.map((segment, idx) => (
-                                        <div key={idx} className="flex items-center gap-2">
-                                            <ChevronRight size={10} className="text-slate-300 dark:text-white/20" />
-                                            <span className={idx === pathSegments.length - 1 ? "text-slate-900 dark:text-white" : "text-slate-400"}>
-                                                {segment === 'processos' ? 'Processos' : segment === 'clientes' ? 'Clientes' : segment === 'financeiro' ? 'Financeiro' : segment === 'configuracoes' ? 'Configurações' : segment.length > 15 ? 'Detalhes' : segment}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+
 
                             <AnimatePresence mode="wait">
                                 <motion.div
