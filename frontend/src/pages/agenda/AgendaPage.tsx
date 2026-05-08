@@ -762,7 +762,7 @@ export default function AgendaPage() {
     }, [filteredEvents, currentMonth, currentYear]);
 
     return (
-        <div className="flex flex-col md:flex-row h-full w-full p-2 sm:p-4 gap-4 bg-app-bg overflow-hidden">
+        <div className="flex flex-col md:flex-row h-[calc(100dvh-140px)] min-h-[650px] md:min-h-0 md:h-full w-full p-2 sm:p-4 gap-4 bg-app-bg overflow-hidden">
             {notification && <NotificationToast event={notification} onDismiss={() => setNotification(null)} />}
 
             {/* Main Calendar Area */}
@@ -943,7 +943,7 @@ export default function AgendaPage() {
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="grid grid-cols-7 flex-1 auto-rows-fr">
+                                    <div className="grid grid-cols-7 flex-1 auto-rows-fr overflow-y-auto custom-scrollbar">
                                         {calendarDays.map((day, idx) => {
                                             const dayEvents = day ? (eventsByDay.get(day) || []) : [];
                                             const isToday = day === new Date().getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear();
@@ -965,7 +965,7 @@ export default function AgendaPage() {
                                                         }
                                                     }}
                                                     className={clsx(
-                                                        "relative min-h-[100px] sm:min-h-[120px] p-1 border-r border-b border-app-stroke cursor-pointer transition-all hover:bg-app-stroke/5 group",
+                                                        "relative min-h-[80px] sm:min-h-[120px] p-1 border-r border-b border-app-stroke cursor-pointer transition-all hover:bg-app-stroke/5 group",
                                                         (idx + 1) % 7 === 0 && "border-r-0",
                                                         !day && "bg-app-stroke/5 pointer-events-none"
                                                     )}

@@ -270,7 +270,7 @@ export default function KanbanPage() {
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-gray-50 dark:bg-slate-900">
+        <div className="flex flex-col h-[calc(100dvh-140px)] min-h-[600px] md:min-h-0 md:h-[calc(100vh-4rem)] bg-gray-50 dark:bg-slate-900">
             {/* Header */}
             <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-4 sm:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 w-full">
