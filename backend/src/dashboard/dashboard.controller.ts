@@ -8,7 +8,6 @@ export class DashboardController {
     constructor(private prisma: PrismaService) { }
 
     @Get('stats')
-    @Header('Cache-Control', 'private, max-age=300') // 5 minutes cache
     async getStats(@Request() req) {
         const tenantId = req.user?.tenantId;
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
@@ -290,7 +289,6 @@ export class DashboardController {
     }
 
     @Get('summary')
-    @Header('Cache-Control', 'private, max-age=300')
     async getSummary(@Request() req) {
         const tenantId = req.user?.tenantId;
         
