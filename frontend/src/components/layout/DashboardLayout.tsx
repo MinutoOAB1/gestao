@@ -423,7 +423,7 @@ export default function DashboardLayout() {
                     <div className={cn("flex items-center gap-1", collapsed ? "justify-center" : "justify-end px-2")}>
                         <button
                             onClick={toggleTheme}
-                            className="text-white/40 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all"
+                            className="text-slate-500 dark:text-white/40 hover:text-slate-800 dark:hover:text-white p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
                             title={theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}
                         >
                             {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
@@ -534,12 +534,12 @@ export default function DashboardLayout() {
 
                 {/* Mobile Header */}
                 {!isFullScreenPage && (
-                    <header className="h-16 flex md:hidden items-center justify-between px-5 z-50 sticky top-0 bg-[#0B1121]">
+                    <header className="h-16 flex md:hidden items-center justify-between px-5 z-50 sticky top-0 bg-white dark:bg-[#0B1121] border-b border-gray-100 dark:border-white/5 shadow-sm dark:shadow-none">
                         <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => navigate('/app')}>
                             <img src="/Logo-PWA.png" alt="Advus Icon" className="h-8 w-auto object-contain rounded-lg shadow-sm" draggable={false} />
                             <div className="flex items-baseline tracking-[-0.05em] font-black leading-none text-2xl">
-                                <span className="text-white">ADV</span>
-                                <span className="text-white/60">US</span>
+                                <span className="text-slate-900 dark:text-white">ADV</span>
+                                <span className="text-slate-500 dark:text-white/60">US</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 relative">
@@ -556,7 +556,7 @@ export default function DashboardLayout() {
                 )}
 
                 {/* Main content - Removed rounded corners for mobile to match flat design */}
-                <main className="flex-1 relative z-10 bg-[#0B1121] md:bg-app-bg rounded-none md:rounded-tl-[40px] overflow-hidden flex flex-col pb-20 md:pb-0">
+                <main className="flex-1 relative z-10 bg-slate-50 dark:bg-[#0B1121] md:bg-app-bg md:dark:bg-app-bg rounded-none md:rounded-tl-[40px] overflow-hidden flex flex-col pb-20 md:pb-0">
                     <div className={cn(
                         "flex-1 custom-scrollbar scroll-smooth",
                         !isFullScreenPage ? "p-4 sm:p-6 lg:p-8 overflow-y-auto" : "flex flex-col h-full overflow-hidden"
@@ -590,7 +590,7 @@ export default function DashboardLayout() {
             </div>
 
             {/* Mobile Bottom Nav */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#0B1121] border-t border-white/5 flex items-center justify-between px-2 z-50 pb-safe">
+            <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#0B1121] border-t border-gray-100 dark:border-white/5 flex items-center justify-between px-2 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)] dark:shadow-none">
                 <BottomNavItem icon={Home} label="Início" path="/app" />
                 <BottomNavItem icon={FileText} label="Processos" path="/app/processos" />
                 <BottomNavItem icon={Users} label="Clientes" path="/app/clientes" />
@@ -614,12 +614,12 @@ export default function DashboardLayout() {
                             animate={{ y: 0 }}
                             exit={{ y: '100%' }}
                             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                            className="md:hidden fixed bottom-0 left-0 right-0 bg-app-card rounded-t-3xl z-[70] pb-safe max-h-[70vh] overflow-y-auto"
+                            className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-app-card rounded-t-3xl z-[70] pb-safe max-h-[70vh] overflow-y-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-none"
                         >
-                            <div className="flex items-center justify-between p-4 border-b border-app-stroke">
-                                <h3 className="font-bold text-app-text-main">Menu</h3>
-                                <button onClick={() => setIsMobileDrawerOpen(false)} className="p-2 rounded-full hover:bg-app-input transition-colors">
-                                    <X size={20} className="text-app-text-muted" />
+                            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-app-stroke">
+                                <h3 className="font-bold text-slate-900 dark:text-app-text-main">Menu</h3>
+                                <button onClick={() => setIsMobileDrawerOpen(false)} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-app-input transition-colors">
+                                    <X size={20} className="text-slate-500 dark:text-app-text-muted" />
                                 </button>
                             </div>
                             <div className="grid grid-cols-4 gap-2 p-4">
