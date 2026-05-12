@@ -10,15 +10,12 @@ WORKDIR /app
 # Install OpenSSL (required by Prisma)
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Copy .npmrc first (needed for legacy-peer-deps)
-COPY .npmrc ./
-
 # Copy package files for better caching
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
-# Install all dependencies (including devDependencies for build)
-RUN npm install
+# Install all dependencies with legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Generate Prisma Client
 RUN npx prisma generate --schema=prisma/schema.prisma
@@ -37,14 +34,13 @@ WORKDIR /app
 # Install OpenSSL (required by Prisma at runtime)
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Copy .npmrc and package files
-COPY .npmrc ./
+# Copy package files
 COPY package.json package-lock.json* ./
 
 # Install only production dependencies
-RUN npm install --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
-# Copy Prisma schema and migrations
+# Copy Prisma schema
 COPY prisma ./prisma/
 
 # Re-generate Prisma Client for production
