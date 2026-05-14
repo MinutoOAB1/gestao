@@ -25,8 +25,8 @@ export const PortalAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('@LexGuard:portalToken');
-    const storedUser = localStorage.getItem('@LexGuard:portalUser');
+    const storedToken = localStorage.getItem('@Advus:portalToken');
+    const storedUser = localStorage.getItem('@Advus:portalUser');
 
     if (storedToken && storedUser) {
       setToken(storedToken);
@@ -38,16 +38,16 @@ export const PortalAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   const login = (newToken: string, newUser: PortalUser) => {
-    localStorage.setItem('@LexGuard:portalToken', newToken);
-    localStorage.setItem('@LexGuard:portalUser', JSON.stringify(newUser));
+    localStorage.setItem('@Advus:portalToken', newToken);
+    localStorage.setItem('@Advus:portalUser', JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
   };
 
   const logout = () => {
-    localStorage.removeItem('@LexGuard:portalToken');
-    localStorage.removeItem('@LexGuard:portalUser');
+    localStorage.removeItem('@Advus:portalToken');
+    localStorage.removeItem('@Advus:portalUser');
     setToken(null);
     setUser(null);
     delete api.defaults.headers.common['Authorization'];

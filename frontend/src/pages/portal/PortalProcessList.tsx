@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, ChevronLeft, ChevronRight, Plus, Briefcase } from 'lucide-react';
+import { Search, ChevronRight, Briefcase, Scale, Filter } from 'lucide-react';
 import api from '../../services/api';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const PortalProcessList = () => {
   const [processes, setProcesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
 
   useEffect(() => {
     const fetchProcesses = async () => {
@@ -22,149 +25,141 @@ const PortalProcessList = () => {
   }, []);
 
   if (loading) {
-    return <div className="flex h-64 items-center justify-center">
-      <div className="w-8 h-8 border-4 border-[#0F172A] border-t-transparent rounded-full animate-spin"></div>
-    </div>;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
   }
+
+  const filtered = processes.filter((p) => {
+    const matchSearch = search === '' || 
+      (p.number && p.number.toLowerCase().includes(search.toLowerCase())) ||
+      (p.title && p.title.toLowerCase().includes(search.toLowerCase()));
+
+    const matchStatus = filterStatus === 'ALL' ||
+      (filterStatus === 'ATIVO' && (p.status === 'OPEN' || p.status === 'ATIVO')) ||
+      (filterStatus === 'ENCERRADO' && p.status !== 'OPEN' && p.status !== 'ATIVO');
+
+    return matchSearch && matchStatus;
+  });
 
   const activeProcesses = processes.filter(p => p.status === 'OPEN' || p.status === 'ATIVO').length;
 
-  return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      
-      <div>
-        <h2 className="text-2xl font-bold text-[#0F172A]">Processos do Cliente</h2>
-        <p className="text-[#64748B] mt-1 text-sm">Visualize e gerencie todos os processos jurídicos em andamento e encerrados.</p>
-      </div>
+  const getStatusBadge = (status: string) => {
+    if (status === 'OPEN' || status === 'ATIVO') {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400">Ativo</span>;
+    }
+    if (status === 'SUSPENSO') {
+      return <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400">Suspenso</span>;
+    }
+    return <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-slate-500/10 text-slate-500 dark:text-slate-400">{status}</span>;
+  };
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-sm border border-[#E2E8F0] shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative flex-1 w-full max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-[#94A3B8]" />
-          </div>
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Meus Processos</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">
+            {processes.length} processos encontrados • {activeProcesses} ativos
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Search & Filters */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-white dark:bg-white/[0.06] rounded-2xl p-4 border border-slate-200/80 dark:border-white/[0.08] flex flex-col sm:flex-row gap-3 items-center"
+      >
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-white/30" />
           <input
             type="text"
-            placeholder="Buscar por número ou tipo..."
-            className="w-full pl-10 pr-3 py-2 border border-[#E2E8F0] rounded-sm text-sm text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-1 focus:ring-[#0F172A] focus:border-[#0F172A]"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por número ou título..."
+            className="w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
           />
         </div>
-
-        <div className="flex space-x-4 w-full sm:w-auto">
-          <select className="flex-1 sm:flex-none border border-[#E2E8F0] rounded-sm px-3 py-2 text-sm text-[#0F172A] focus:outline-none focus:ring-1 focus:ring-[#0F172A]">
-            <option>Status: Todos</option>
-            <option>Ativos</option>
-            <option>Encerrados</option>
-          </select>
-          <button className="bg-[#0F172A] text-white px-4 py-2 rounded-sm text-sm font-semibold flex items-center hover:bg-[#1E293B] transition-colors">
-            <Filter className="w-4 h-4 mr-2" /> Filtrar
-          </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          {['ALL', 'ATIVO', 'ENCERRADO'].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                filterStatus === status
+                  ? 'bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A]'
+                  : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10'
+              }`}
+            >
+              {status === 'ALL' ? 'Todos' : status === 'ATIVO' ? 'Ativos' : 'Encerrados'}
+            </button>
+          ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Table */}
-      <div className="bg-white rounded-sm border border-[#E2E8F0] shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-[#E2E8F0]">
-            <thead className="bg-[#F8FAFC]">
-              <tr>
-                <th className="px-6 py-4 text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Número do Processo</th>
-                <th className="px-6 py-4 text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Tipo de Ação</th>
-                <th className="px-6 py-4 text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Tribunal</th>
-                <th className="px-6 py-4 text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Última Atualização</th>
-                <th className="px-6 py-4 text-right text-[11px] font-bold text-[#64748B] uppercase tracking-wider">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-[#E2E8F0]">
-              {processes.map((process) => (
-                <tr key={process.id} className="hover:bg-[#F8FAFC] transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <p className="text-sm font-bold text-[#0F172A]">{process.number || 'Sem número'}</p>
-                    <p className="text-xs text-[#64748B] mt-0.5">{process.title}</p>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[#64748B]">
-                    {process.area || 'Não informado'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[#64748B]">
-                    {process.court || 'Não informado'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      process.status === 'OPEN' || process.status === 'ATIVO' 
-                        ? 'bg-[#E0E7FF] text-[#4F46E5]' 
-                        : process.status === 'SUSPENSO'
-                        ? 'bg-[#F1F5F9] text-[#64748B]'
-                        : 'bg-[#FEF3C7] text-[#D97706]'
-                    }`}>
-                      {process.status === 'OPEN' ? 'Ativo' : process.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-[#64748B]">
-                    {process.updates && process.updates[0] ? (
-                      <>
-                        <p>{new Date(process.updates[0].date).toLocaleDateString()}</p>
-                        <p className="text-xs mt-0.5">{new Date(process.updates[0].date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                      </>
-                    ) : (
-                      'Nenhuma atualização'
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link to={`/portal/processos/${process.id}`} className="text-[#0F172A] hover:underline font-bold">Ver Detalhes</Link>
-                  </td>
-                </tr>
-              ))}
-              {processes.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-sm text-[#64748B]">
-                    Nenhum processo encontrado.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {/* Process Cards */}
+      {filtered.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white dark:bg-white/[0.06] rounded-2xl p-12 border border-slate-200/80 dark:border-white/[0.08] text-center"
+        >
+          <Scale className="w-12 h-12 text-slate-300 dark:text-white/20 mx-auto mb-4" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">Nenhum processo encontrado</h3>
+          <p className="text-sm text-slate-400 dark:text-white/40">Ajuste os filtros para ver seus processos.</p>
+        </motion.div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((process, idx) => (
+            <motion.div
+              key={process.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: idx * 0.05 }}
+            >
+              <Link
+                to={`/portal/processos/${process.id}`}
+                className="block bg-white dark:bg-white/[0.06] rounded-2xl p-5 border border-slate-200/80 dark:border-white/[0.08] hover:shadow-md dark:hover:bg-white/[0.08] transition-all group"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-4 min-w-0 flex-1">
+                    <div className="p-2.5 rounded-xl bg-blue-500/10 flex-shrink-0 mt-0.5">
+                      <Briefcase size={20} className="text-blue-500" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">{process.title}</h3>
+                        {getStatusBadge(process.status)}
+                      </div>
+                      <p className="text-xs text-slate-400 dark:text-white/40">
+                        {process.number ? `Nº ${process.number}` : 'Sem número'} 
+                        {process.area && ` • ${process.area}`}
+                        {process.court && ` • ${process.court}`}
+                      </p>
+                      {process.updates && process.updates[0] && (
+                        <p className="text-xs text-slate-400 dark:text-white/30 mt-2">
+                          Última atualização: {new Date(process.updates[0].date).toLocaleDateString('pt-BR')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-300 dark:text-white/20 flex-shrink-0 group-hover:text-blue-500 transition-colors mt-2" />
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </div>
-        <div className="bg-white px-6 py-4 border-t border-[#E2E8F0] flex items-center justify-between">
-          <p className="text-sm text-[#64748B]">Mostrando {processes.length} processos</p>
-          <div className="flex space-x-1">
-            <button className="px-3 py-1 border border-[#E2E8F0] rounded-sm text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
-            <button className="px-3 py-1 bg-[#0F172A] text-white rounded-sm text-sm font-medium">1</button>
-            <button className="px-3 py-1 border border-[#E2E8F0] rounded-sm text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-        <div className="bg-[#0F172A] rounded-sm p-6 text-white relative overflow-hidden flex flex-col justify-between h-48 shadow-sm">
-          <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
-             <Briefcase className="w-48 h-48" />
-          </div>
-          <p className="text-xs font-bold tracking-wider text-[#94A3B8] uppercase">Total de Ativos</p>
-          <p className="text-6xl font-bold mt-2 relative z-10">{activeProcesses}</p>
-        </div>
-
-        <div className="bg-white rounded-sm border border-[#E2E8F0] p-6 shadow-sm flex flex-col justify-between h-48">
-          <div>
-            <h3 className="text-lg font-bold text-[#0F172A]">Informação Importante</h3>
-            <p className="text-sm text-[#64748B] mt-2 leading-relaxed">
-              Seus processos estão sendo monitorados 24/7. Novas movimentações são notificadas automaticamente via e-mail e push.
-            </p>
-          </div>
-          <div className="flex justify-end mt-4">
-             <button className="bg-[#D97706] hover:bg-[#B45309] text-white text-sm font-bold py-2 px-4 rounded-sm transition-colors">
-               Agendar Reunião com Advogado
-             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Floating Action Button */}
-      <button className="fixed bottom-8 right-8 w-14 h-14 bg-[#0F172A] rounded-sm shadow-lg flex items-center justify-center text-white hover:bg-[#1E293B] transition-colors z-50">
-        <Plus className="w-6 h-6" />
-      </button>
-
+      )}
     </div>
   );
 };

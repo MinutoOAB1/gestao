@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Shield, HelpCircle, FileText } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePortalAuth } from '../../context/PortalAuthContext';
 import { useToast } from '../../context/ToastContext';
+import { motion } from 'framer-motion';
 import api from '../../services/api';
 
 const PortalLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = usePortalAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
@@ -16,105 +19,188 @@ const PortalLogin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
     try {
       const response = await api.post('/portal/login', { email, password });
       login(response.data.token, response.data.client);
-      addToast('Login realizado com sucesso.', 'success');
+      addToast('Login realizado com sucesso!', 'success');
       navigate('/portal');
     } catch (error: any) {
-      addToast(error.response?.data?.message || 'E-mail ou senha inválidos.', 'error');
+      const msg = error.response?.data?.message || 'E-mail ou senha inválidos.';
+      setError(msg);
+      addToast(msg, 'error');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      {/* Decorative background overlay */}
-      <div className="absolute inset-0 z-0 opacity-10" style={{ backgroundImage: 'linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)', backgroundSize: '100px 100px' }}></div>
-      
-      <div className="bg-white w-full max-w-[480px] rounded-sm shadow-[0_8px_30px_rgb(0,0,0,0.04)] z-10 p-10 flex flex-col">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-[#0F172A] mb-2 tracking-tight">LexGuard</h1>
-          <p className="text-xs font-semibold tracking-[0.2em] text-[#64748B] uppercase">Portal do Cliente</p>
-        </div>
+    <div className="min-h-screen flex bg-[#0B1121]">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden">
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A]" />
+        <div className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)'
+          }}
+        />
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-[#475569]">E-mail Corporativo</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-[#94A3B8]" />
-              </div>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="exemplo@lexguard.com"
-                required
-                className="w-full pl-10 pr-3 py-3 border border-[#E2E8F0] rounded-sm text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#0F172A] focus:border-transparent transition-all"
-              />
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative z-10"
+        >
+          <div className="flex items-center gap-3">
+            <img src="/Logo-pwa2.png" alt="Advus" className="h-10 w-auto rounded-xl shadow-lg" />
+            <div className="flex items-baseline tracking-[-0.05em] font-black text-3xl">
+              <span className="text-white">ADV</span>
+              <span className="text-white/60">US</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Center Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative z-10 max-w-md"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Shield className="w-5 h-5 text-blue-400" />
+            <span className="text-xs font-bold text-blue-400 uppercase tracking-[0.2em]">Portal do Cliente</span>
+          </div>
+          <h2 className="text-4xl font-black text-white leading-tight mb-4 tracking-tight">
+            Acompanhe seus processos com <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">transparência total</span>
+          </h2>
+          <p className="text-white/50 text-base leading-relaxed">
+            Acesse movimentações, documentos e informações do seu processo jurídico de forma segura e em tempo real.
+          </p>
+        </motion.div>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="relative z-10"
+        >
+          <p className="text-white/30 text-xs font-medium">
+            © 2026 Advus. Todos os direitos reservados.
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-[#0B1121] relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.02),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)] pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md relative z-10"
+        >
+          {/* Mobile Logo */}
+          <div className="flex items-center gap-3 mb-8 lg:hidden">
+            <img src="/Logo-pwa2.png" alt="Advus" className="h-8 w-auto rounded-xl shadow-sm" />
+            <div className="flex items-baseline tracking-[-0.05em] font-black text-2xl">
+              <span className="text-slate-900 dark:text-white">ADV</span>
+              <span className="text-slate-400 dark:text-white/60">US</span>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-[#475569]">Senha</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-[#94A3B8]" />
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+              Portal do Cliente
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400">
+              Entre com as credenciais fornecidas pelo seu escritório.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                E-mail
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  required
+                  className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
+                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40" size={20} />
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full pl-10 pr-3 py-3 border border-[#E2E8F0] rounded-sm text-[#0F172A] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#0F172A] focus:border-transparent transition-all"
-              />
             </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input type="checkbox" className="form-checkbox h-4 w-4 text-[#0F172A] rounded-sm border-[#CBD5E1] focus:ring-[#0F172A]" />
-              <span className="text-sm text-[#64748B]">Lembrar de mim</span>
-            </label>
-            <a href="#" className="text-sm font-semibold text-[#0F172A] hover:underline">
-              Esqueci minha senha
-            </a>
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold py-3 px-4 rounded-sm transition-colors duration-200 uppercase tracking-wide text-sm flex justify-center items-center"
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              'Acessar Portal'
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-600 dark:text-red-400 text-sm text-center"
+              >
+                {error}
+              </motion.div>
             )}
-          </button>
-        </form>
 
-        <div className="mt-10 text-center">
-          <p className="text-sm text-[#64748B] mb-4">Não possui uma conta?</p>
-          <button className="w-full border border-[#CBD5E1] hover:bg-[#F8FAFC] text-[#0F172A] font-semibold py-2 px-4 rounded-sm transition-colors duration-200 text-sm">
-            Solicitar Acesso
-          </button>
-        </div>
-      </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#0F172A] hover:bg-[#1E293B] dark:bg-white dark:hover:bg-slate-200 text-white dark:text-[#0F172A] font-bold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-black/10 dark:shadow-white/10"
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 dark:border-slate-400/30 border-t-white dark:border-t-slate-900 rounded-full animate-spin" />
+              ) : (
+                <>
+                  Acessar Portal
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
 
-      <div className="mt-8 flex items-center space-x-6 text-[#94A3B8] z-10">
-        <Shield className="w-5 h-5 hover:text-[#64748B] cursor-pointer transition-colors" />
-        <HelpCircle className="w-5 h-5 hover:text-[#64748B] cursor-pointer transition-colors" />
-        <FileText className="w-5 h-5 hover:text-[#64748B] cursor-pointer transition-colors" />
+          <div className="mt-8 text-center">
+            <p className="text-slate-400 dark:text-slate-500 text-sm">
+              Acesso exclusivo para clientes cadastrados pelo escritório.
+            </p>
+          </div>
+
+          <p className="text-center text-slate-400 dark:text-slate-600 text-xs mt-12">
+            © 2026 Advus. Todos os direitos reservados.
+          </p>
+        </motion.div>
       </div>
-      
-      <p className="mt-6 text-xs text-[#94A3B8] font-medium z-10 uppercase tracking-wider">
-        © 2024 LEXGUARD LEGAL. TODOS OS DIREITOS RESERVADOS.
-      </p>
     </div>
   );
 };
