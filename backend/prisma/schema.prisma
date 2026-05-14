@@ -120,6 +120,9 @@ model Process {
   updatedAt     DateTime           @updatedAt
   completedAt   DateTime?
   googleEventId String?
+  datajudId     String?
+  isMonitored   Boolean            @default(false)
+  lastSyncAt    DateTime?
   client        Client?            @relation(fields: [clientId], references: [id])
   tenant        Tenant             @relation(fields: [tenantId], references: [id])
   checklists    ProcessChecklist[]

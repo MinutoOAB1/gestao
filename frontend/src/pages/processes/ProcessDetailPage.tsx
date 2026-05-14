@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Edit, FileText, Users, Calendar, DollarSign, MapPin, Tag, Trash2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Edit, FileText, Users, Calendar, DollarSign, MapPin, Tag, Trash2, CheckCircle, RefreshCw, Activity } from 'lucide-react';
 import api from '../../services/api';
 import { clsx } from 'clsx';
 import { useToast } from '../../context/ToastContext';
@@ -27,6 +27,8 @@ interface Process {
     createdAt: string;
     updatedAt: string;
     completedAt?: string;
+    isMonitored?: boolean;
+    lastSyncAt?: string;
 }
 
 const statusColors:Record<string, string> = {
@@ -44,6 +46,32 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
     const { addToast } = useToast();
     const [process, setProcess] = useState<Process | null>(null);
     const [loading, setLoading] = useState(true);
+    const [syncing, setSyncing] = useState(false);
+
+    const handleSyncDatajud = async () => {
+        if (!process) return;
+        setSyncing(true);
+        try {
+            const response = await api.post(`/datajud/process/${process.id}/sync`);
+            addToast(response.data.message || 'Sincronizado com sucesso!', 'success');
+            fetchProcess();
+        } catch (error: any) {
+            addToast(error.response?.data?.message || 'Erro ao sincronizar', 'error');
+        } finally {
+            setSyncing(false);
+        }
+    };
+
+    const handleToggleMonitor = async (enable: boolean) => {
+        if (!process) return;
+        try {
+            await api.post(`/datajud/process/${process.id}/monitor`, { enable });
+            addToast(enable ? 'Monitoramento ativado!' : 'Monitoramento desativado', 'success');
+            fetchProcess();
+        } catch (error: any) {
+            addToast(error.response?.data?.message || 'Erro ao alterar monitoramento', 'error');
+        }
+    };
 
     useEffect(() => {
         if (id) fetchProcess();
@@ -236,8 +264,58 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-app-text-muted text-sm">Nenhum cliente vinculado.</p>
                         )}
+                    </div>
+
+                    {/* Datajud Monitor Card */}
+                    <div className="bg-app-card border border-app-stroke rounded-2xl p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-sm font-black text-app-text-main flex items-center gap-2 uppercase tracking-widest">
+                                <Activity size={16} className="text-black dark:text-white" />
+                                Monitoramento CNJ
+                            </h2>
+                            <button
+                                onClick={() => handleToggleMonitor(!process.isMonitored)}
+                                className={clsx(
+                                    "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
+                                    process.isMonitored ? "bg-black dark:bg-white" : "bg-neutral-300 dark:bg-neutral-600"
+                                )}
+                            >
+                                <span className={clsx(
+                                    "inline-block h-3 w-3 transform rounded-full bg-white dark:bg-black transition-transform",
+                                    process.isMonitored ? "translate-x-5" : "translate-x-1"
+                                )} />
+                            </button>
+                        </div>
+                        
+                        <p className="text-app-text-muted text-xs mb-4">
+                            {process.isMonitored 
+                                ? "O sistema buscará andamentos diários no Datajud automaticamente." 
+                                : "Ative para monitorar andamentos diretamente na fonte oficial."}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs text-app-text-muted">
+                                {process.lastSyncAt 
+                                    ? `Última sincronização: ${new Date(process.lastSyncAt).toLocaleString('pt-BR')}`
+                                    : "Nunca sincronizado"}
+                            </span>
+                            
+                            <button
+                                onClick={handleSyncDatajud}
+                                disabled={syncing || !process.number}
+                                className={clsx(
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors",
+                                    !process.number 
+                                        ? "bg-neutral-100 text-neutral-400 cursor-not-allowed" 
+                                        : "bg-black text-white dark:bg-white dark:text-black hover:opacity-90"
+                                )}
+                                title={!process.number ? "Número do CNJ não preenchido" : "Sincronizar agora"}
+                            >
+                                <RefreshCw size={12} className={clsx(syncing && "animate-spin")} />
+                                {syncing ? "Buscando..." : "Sincronizar"}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Process Timeline */}

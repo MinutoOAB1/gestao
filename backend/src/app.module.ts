@@ -36,6 +36,7 @@ import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 import { SecurityModule } from './common/security/security.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { PortalModule } from './portal/portal.module';
+import { DatajudModule } from './integrations/datajud/datajud.module';
 
 
 @Module({
@@ -58,6 +59,7 @@ import { PortalModule } from './portal/portal.module';
     ClientsModule,
     FinancialModule,
     DocumentsModule,
+    DatajudModule,
     AgendaModule,
     ContractsModule,
     AiModule,
