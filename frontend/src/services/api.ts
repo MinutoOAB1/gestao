@@ -8,9 +8,15 @@ const api = axios.create({
 
 // Interceptor para adicionar token JWT se existir
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    // For portal API calls, use the portal token
+    const isPortalRequest = config.url?.startsWith('/portal') || config.url?.includes('/portal');
+    const portalToken = localStorage.getItem('@Advus:portalToken');
+    const adminToken = localStorage.getItem('token');
+
+    if (isPortalRequest && portalToken) {
+        config.headers.Authorization = `Bearer ${portalToken}`;
+    } else if (adminToken) {
+        config.headers.Authorization = `Bearer ${adminToken}`;
     }
     return config;
 });
