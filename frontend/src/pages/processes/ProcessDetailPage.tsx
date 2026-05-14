@@ -264,6 +264,7 @@ export function ProcessDetailPageContent({ processIdProp, isDrawer = false }: { 
                                 </div>
                             </div>
                         ) : (
+                            <p className="text-app-text-muted text-sm">Nenhum cliente vinculado.</p>
                         )}
                     </div>
 
