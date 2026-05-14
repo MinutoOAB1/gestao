@@ -10,48 +10,65 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import OfflineIndicator from './components/ui/OfflineIndicator';
 
+// Auto-retry dynamic imports on chunk load failure (stale cache after deploy)
+function lazyWithRetry(factory: () => Promise<any>) {
+  return lazy(() =>
+    factory().catch(() => {
+      // If chunk fails to load, reload the page once to get fresh assets
+      const hasReloaded = sessionStorage.getItem('chunk-reload');
+      if (!hasReloaded) {
+        sessionStorage.setItem('chunk-reload', '1');
+        window.location.reload();
+        return new Promise(() => {}); // Never resolves, page will reload
+      }
+      sessionStorage.removeItem('chunk-reload');
+      return factory(); // Try once more, will throw if still fails
+    })
+  );
+}
+
 // Lazy load all pages for better performance (code splitting)
-const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
-const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'));
-const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'));
+const LoginPage = lazyWithRetry(() => import('./pages/auth/LoginPage'));
+const RegisterPage = lazyWithRetry(() => import('./pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazyWithRetry(() => import('./pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazyWithRetry(() => import('./pages/auth/ResetPasswordPage'));
 import DashboardLayout from './components/layout/DashboardLayout';
-const DashboardHome = lazy(() => import('./pages/dashboard/DashboardHome'));
-const ProcessListPage = lazy(() => import('./pages/processes/ProcessListPage'));
-const ProcessFormPage = lazy(() => import('./pages/processes/ProcessFormPage'));
-const ProcessDetailPage = lazy(() => import('./pages/processes/ProcessDetailPage'));
-const KanbanPage = lazy(() => import('./pages/processes/KanbanPage'));
-const ClientListPage = lazy(() => import('./pages/clients/ClientListPage'));
-const ClientFormPage = lazy(() => import('./pages/clients/ClientFormPage'));
-const ClientDetailPage = lazy(() => import('./pages/clients/ClientDetailPage'));
-const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'));
-const DocumentsPage = lazy(() => import('./pages/documents/DocumentsPage'));
-const AgendaPage = lazy(() => import('./pages/agenda/AgendaPage'));
-const FinancialListPage = lazy(() => import('./pages/financial/FinancialListPage'));
-const FinancialFormPage = lazy(() => import('./pages/financial/FinancialFormPage'));
-const ContractsPage = lazy(() => import('./pages/contracts/ContractsPage'));
-const SignaturePage = lazy(() => import('./pages/contracts/SignaturePage'));
-const IAAnalisePage = lazy(() => import('./pages/ai/IAAnalisePage'));
-const LandingPage = lazy(() => import('./pages/landing/LandingPage'));
-const TemplatesPage = lazy(() => import('./pages/templates/TemplatesPage'));
-const DocumentEditorPage = lazy(() => import('./pages/templates/DocumentEditorPage'));
-const UsersPage = lazy(() => import('./pages/users/UsersPage'));
-const TimesheetPage = lazy(() => import('./pages/timesheet/TimesheetPage'));
-const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
-const BillingPage = lazy(() => import('./pages/settings/BillingPage'));
-const TermsPage = lazy(() => import('./pages/legal/TermsPage'));
-const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage'));
-const LGPDPage = lazy(() => import('./pages/legal/LGPDPage'));
-const AboutPage = lazy(() => import('./pages/landing/AboutPage'));
+const DashboardHome = lazyWithRetry(() => import('./pages/dashboard/DashboardHome'));
+const ProcessListPage = lazyWithRetry(() => import('./pages/processes/ProcessListPage'));
+const ProcessFormPage = lazyWithRetry(() => import('./pages/processes/ProcessFormPage'));
+const ProcessDetailPage = lazyWithRetry(() => import('./pages/processes/ProcessDetailPage'));
+const KanbanPage = lazyWithRetry(() => import('./pages/processes/KanbanPage'));
+const ClientListPage = lazyWithRetry(() => import('./pages/clients/ClientListPage'));
+const ClientFormPage = lazyWithRetry(() => import('./pages/clients/ClientFormPage'));
+const ClientDetailPage = lazyWithRetry(() => import('./pages/clients/ClientDetailPage'));
+const SettingsPage = lazyWithRetry(() => import('./pages/settings/SettingsPage'));
+const DocumentsPage = lazyWithRetry(() => import('./pages/documents/DocumentsPage'));
+const AgendaPage = lazyWithRetry(() => import('./pages/agenda/AgendaPage'));
+const FinancialListPage = lazyWithRetry(() => import('./pages/financial/FinancialListPage'));
+const FinancialFormPage = lazyWithRetry(() => import('./pages/financial/FinancialFormPage'));
+const ContractsPage = lazyWithRetry(() => import('./pages/contracts/ContractsPage'));
+const SignaturePage = lazyWithRetry(() => import('./pages/contracts/SignaturePage'));
+const IAAnalisePage = lazyWithRetry(() => import('./pages/ai/IAAnalisePage'));
+const LandingPage = lazyWithRetry(() => import('./pages/landing/LandingPage'));
+const TemplatesPage = lazyWithRetry(() => import('./pages/templates/TemplatesPage'));
+const DocumentEditorPage = lazyWithRetry(() => import('./pages/templates/DocumentEditorPage'));
+const UsersPage = lazyWithRetry(() => import('./pages/users/UsersPage'));
+const TimesheetPage = lazyWithRetry(() => import('./pages/timesheet/TimesheetPage'));
+const ProfilePage = lazyWithRetry(() => import('./pages/profile/ProfilePage'));
+const BillingPage = lazyWithRetry(() => import('./pages/settings/BillingPage'));
+const TermsPage = lazyWithRetry(() => import('./pages/legal/TermsPage'));
+const PrivacyPage = lazyWithRetry(() => import('./pages/legal/PrivacyPage'));
+const LGPDPage = lazyWithRetry(() => import('./pages/legal/LGPDPage'));
+const AboutPage = lazyWithRetry(() => import('./pages/landing/AboutPage'));
 import GlobalAgendaNotifications from './components/notifications/GlobalAgendaNotifications';
 
 import { PortalAuthProvider } from './context/PortalAuthContext';
 import { PortalPrivateRoute } from './components/PortalPrivateRoute';
-const PortalLogin = lazy(() => import('./pages/portal/PortalLogin'));
-const PortalLayout = lazy(() => import('./components/layout/PortalLayout'));
-const PortalDashboard = lazy(() => import('./pages/portal/PortalDashboard'));
-const PortalProcessList = lazy(() => import('./pages/portal/PortalProcessList'));
-const PortalProcessDetail = lazy(() => import('./pages/portal/PortalProcessDetail'));
+const PortalLogin = lazyWithRetry(() => import('./pages/portal/PortalLogin'));
+const PortalLayout = lazyWithRetry(() => import('./components/layout/PortalLayout'));
+const PortalDashboard = lazyWithRetry(() => import('./pages/portal/PortalDashboard'));
+const PortalProcessList = lazyWithRetry(() => import('./pages/portal/PortalProcessList'));
+const PortalProcessDetail = lazyWithRetry(() => import('./pages/portal/PortalProcessDetail'));
 
 // Loading fallback component
 const PageLoader = () => (
