@@ -20,18 +20,10 @@ const PortalLogin = () => {
     try {
       const response = await api.post('/portal/login', { email, password });
       login(response.data.token, response.data.client);
-      addToast({
-        title: 'Sucesso',
-        description: 'Login realizado com sucesso.',
-        type: 'success',
-      });
+      addToast('Login realizado com sucesso.', 'success');
       navigate('/portal');
     } catch (error: any) {
-      addToast({
-        title: 'Erro de Autenticação',
-        description: error.response?.data?.message || 'E-mail ou senha inválidos.',
-        type: 'error',
-      });
+      addToast(error.response?.data?.message || 'E-mail ou senha inválidos.', 'error');
     } finally {
       setIsLoading(false);
     }

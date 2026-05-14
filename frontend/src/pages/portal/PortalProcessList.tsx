@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Plus, Briefcase } from 'lucide-react';
 import api from '../../services/api';
 import { Link } from 'react-router-dom';
 
