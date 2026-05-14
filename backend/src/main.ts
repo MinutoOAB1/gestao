@@ -75,3 +75,4 @@ if (!process.env.VERCEL) {
   }
   bootstrap();
 }
+// Trigger Hot Reload
