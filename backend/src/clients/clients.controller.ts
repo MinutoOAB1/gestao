@@ -4,6 +4,7 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { AiService } from '../ai/ai.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { SecurityService } from '../common/security/security.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UseGuards } from '@nestjs/common';
 import { Roles } from '../auth/roles.decorator';
@@ -20,6 +21,7 @@ export class ClientsController {
         private readonly clientsService: ClientsService,
         private readonly aiService: AiService,
         private readonly prisma: PrismaService,
+        private readonly security: SecurityService,
     ) { }
 
     @Post()
@@ -84,6 +86,12 @@ export class ClientsController {
                 checklistItems: { orderBy: { createdAt: 'asc' } }
             },
         });
+
+        // Decrypt sensitive fields before returning
+        if (client) {
+            if (client.email) client.email = this.security.decrypt(client.email);
+            if (client.document) client.document = this.security.decrypt(client.document);
+        }
 
         return client;
     }
@@ -238,7 +246,13 @@ export class ClientsController {
     async createPortalAccess(@Request() req, @Param('id') id: string, @Body() body: any) {
         const tenantId = req.user?.tenantId;
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-        return this.clientsService.createPortalAccess(id, body.email, body.password, tenantId);
+        
+        // Always read the decrypted email from the DB to avoid using encrypted values from frontend
+        const client = await this.clientsService.findOne(id, tenantId);
+        if (!client) throw new UnauthorizedException('Cliente não encontrado');
+        
+        const email = client.email;
+        return this.clientsService.createPortalAccess(id, email, body.password, tenantId);
     }
 
     @Get(':id/portal-access')
