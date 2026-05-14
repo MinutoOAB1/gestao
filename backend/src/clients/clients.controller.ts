@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, BadRequestException } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -252,6 +252,7 @@ export class ClientsController {
         if (!client) throw new UnauthorizedException('Cliente não encontrado');
         
         const email = client.email;
+        if (!email) throw new BadRequestException('O cliente não possui um e-mail cadastrado.');
         return this.clientsService.createPortalAccess(id, email, body.password, tenantId);
     }
 
