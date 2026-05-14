@@ -134,13 +134,14 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
             return;
         }
         try {
-            await api.post(`/clients/${id}/portal-access`, { password: portalPassword });
+            await api.post(`/clients/${id}/portal-access`, { password: portalPassword, email: client?.email });
             addToast('Acesso ao portal configurado com sucesso', 'success');
             setPortalPassword('');
             fetchPortalAccess();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            addToast('Erro ao configurar acesso ao portal', 'error');
+            const errorMessage = error.response?.data?.message || 'Erro ao configurar acesso ao portal';
+            addToast(errorMessage, 'error');
         }
     };
 

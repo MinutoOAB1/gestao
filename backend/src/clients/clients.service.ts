@@ -322,8 +322,20 @@ export class ClientsService {
 
     // === Portal Access ===
     async createPortalAccess(clientId: string, email: string, passwordPlain: string, tenantId: string) {
+        if (!email) {
+            throw new BadRequestException('O cliente não possui um e-mail cadastrado.');
+        }
+        
         const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
         if (!client) throw new Error('Cliente não encontrado');
+
+        // Check if another client already uses this email for portal access
+        const existingAccess = await this.prisma.clientPortalAccess.findFirst({
+            where: { email, clientId: { not: clientId } }
+        });
+        if (existingAccess) {
+            throw new BadRequestException('Este e-mail já está sendo utilizado por outro cliente para acesso ao portal.');
+        }
 
         const salt = await bcrypt.genSalt(10);
         const hashed = await bcrypt.hash(passwordPlain, salt);
@@ -334,7 +346,7 @@ export class ClientsService {
             create: { clientId, email, passwordHash: hashed },
         });
 
-        await this.logActivity(clientId, tenantId, 'PORTAL_ACCESS_CREATED', `Acesso ao portal criado/atualizado para o email ${email}.`);
+        await this.logActivity(clientId, tenantId, 'PORTAL_ACCESS_CREATED', `Acesso ao portal configurado.`);
         
         return { success: true, email: access.email };
     }
