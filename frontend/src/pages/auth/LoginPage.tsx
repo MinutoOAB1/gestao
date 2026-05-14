@@ -12,10 +12,25 @@ const officeImages = [
     '/office3.png'
 ];
 
-const quotes = [
-    "A tecnologia que transforma a gestão do seu escritório, permitindo que você foque no que realmente importa: a justiça.",
-    "Simplifique a gestão do seu escritório com ferramentas inteligentes e automatizadas para advogados modernos.",
-    "Conecte processos, clientes e documentos em uma única plataforma segura e eficiente para seu escritório."
+const slogans = [
+    {
+        badge: 'Gestão Inteligente',
+        title: 'Sua advocacia com',
+        highlight: 'poder absoluto',
+        subtitle: 'Conecte processos, clientes e documentos em uma única plataforma segura e eficiente para seu escritório.'
+    },
+    {
+        badge: 'IA Jurídica',
+        title: 'Análise de documentos com',
+        highlight: 'precisão cirúrgica',
+        subtitle: 'A tecnologia que transforma a gestão do seu escritório, permitindo que você foque no que realmente importa: a justiça.'
+    },
+    {
+        badge: 'Portal do Cliente',
+        title: 'Transmita segurança e',
+        highlight: 'transparência total',
+        subtitle: 'Ofereça um portal exclusivo para seus clientes acompanharem as movimentações em tempo real.'
+    }
 ];
 
 export default function LoginPage() {
@@ -36,8 +51,8 @@ export default function LoginPage() {
     // Auto-rotate images and quotes every 5 seconds
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % officeImages.length);
-        }, 5000);
+            setCurrentIndex((prev) => (prev + 1) % slogans.length);
+        }, 6000);
         return () => clearInterval(interval);
     }, []);
 
@@ -99,63 +114,68 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex">
             {/* Left Side - Dark with Image Carousel (Hidden on Mobile) */}
-            <div className="hidden lg:flex lg:w-1/2 bg-black flex-col p-8 relative">
+            {/* Left Side - Premium Dark Branding */}
+            <div className="hidden lg:flex lg:w-1/2 bg-[#0F172A] flex-col p-12 relative overflow-hidden">
+                {/* Background effect */}
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+
                 {/* Logo */}
-                <div className="absolute top-8 left-8 z-20">
+                <div className="relative z-20 mb-auto">
                     <BrandLogo variant="light" />
                 </div>
 
-                {/* Background Image Carousel */}
-                <div className="absolute inset-0">
+                {/* Content Carousel */}
+                <div className="relative z-20 max-w-lg">
                     <AnimatePresence mode="wait">
-                        <motion.img
+                        <motion.div
                             key={currentIndex}
-                            src={officeImages[currentIndex]}
-                            alt="Escritório de advocacia"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.35 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 1 }}
-                            className="absolute inset-0 w-full h-full object-cover"
-                        />
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="space-y-6"
+                        >
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                                <Shield size={14} className="text-primary" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">
+                                    {slogans[currentIndex].badge}
+                                </span>
+                            </div>
+
+                            <h2 className="text-5xl font-black text-white leading-[1.1] tracking-tight">
+                                {slogans[currentIndex].title} <br />
+                                <span className="bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                                    {slogans[currentIndex].highlight}
+                                </span>
+                            </h2>
+
+                            <p className="text-white/50 text-lg leading-relaxed font-medium">
+                                {slogans[currentIndex].subtitle}
+                            </p>
+                        </motion.div>
                     </AnimatePresence>
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
+
+                    {/* Indicators */}
+                    <div className="flex gap-2 mt-12">
+                        {slogans.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentIndex(index)}
+                                className={`h-1 rounded-full transition-all duration-500 ${index === currentIndex
+                                    ? 'w-12 bg-primary'
+                                    : 'w-4 bg-white/10 hover:bg-white/20'
+                                    }`}
+                            />
+                        ))}
+                    </div>
                 </div>
 
-                {/* Spacer */}
-                <div className="flex-1" />
-
-                {/* Quote Card with better visibility */}
-                <div className="z-10 relative">
-                    <div className="bg-black/90 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl shadow-white/5">
-                        <AnimatePresence mode="wait">
-                            <motion.p
-                                key={currentIndex}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                transition={{ duration: 0.5 }}
-                                className="text-white text-lg leading-relaxed font-medium"
-                            >
-                                "{quotes[currentIndex]}"
-                            </motion.p>
-                        </AnimatePresence>
-
-                        {/* Indicators */}
-                        <div className="flex gap-2 mt-6">
-                            {officeImages.map((_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                        ? 'w-8 bg-white'
-                                        : 'w-2 bg-neutral-700 hover:bg-neutral-600'
-                                        }`}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                {/* Footer Footer */}
+                <div className="relative z-20 mt-auto pt-12 border-t border-white/5">
+                    <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.2em]">
+                        © 2026 Advus Global Legal Technology
+                    </p>
                 </div>
             </div>
 
