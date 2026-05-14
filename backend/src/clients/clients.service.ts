@@ -322,45 +322,59 @@ export class ClientsService {
 
     // === Portal Access ===
     async createPortalAccess(clientId: string, email: string, passwordPlain: string, tenantId: string) {
-        if (!email) {
-            throw new BadRequestException('O cliente não possui um e-mail cadastrado.');
+        try {
+            if (!email) {
+                throw new BadRequestException('O cliente não possui um e-mail cadastrado.');
+            }
+            if (!passwordPlain || passwordPlain.length < 6) {
+                throw new BadRequestException('A senha deve ter no mínimo 6 caracteres.');
+            }
+            
+            const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
+            if (!client) throw new BadRequestException('Cliente não encontrado');
+
+            // Check if another client already uses this email for portal access
+            const existingAccess = await this.prisma.clientPortalAccess.findFirst({
+                where: { email, clientId: { not: clientId } }
+            });
+            if (existingAccess) {
+                throw new BadRequestException('Este e-mail já está sendo utilizado por outro cliente para acesso ao portal.');
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const hashed = await bcrypt.hash(passwordPlain, salt);
+
+            const access = await this.prisma.clientPortalAccess.upsert({
+                where: { clientId },
+                update: { email, passwordHash: hashed },
+                create: { clientId, email, passwordHash: hashed },
+            });
+
+            await this.logActivity(clientId, tenantId, 'PORTAL_ACCESS_CREATED', `Acesso ao portal configurado.`);
+            
+            return { success: true, email: access.email };
+        } catch (error) {
+            console.error('[PortalAccess] createPortalAccess error:', error.message);
+            if (error instanceof BadRequestException) throw error;
+            throw new BadRequestException(error.message || 'Erro ao configurar acesso ao portal');
         }
-        
-        const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
-        if (!client) throw new Error('Cliente não encontrado');
-
-        // Check if another client already uses this email for portal access
-        const existingAccess = await this.prisma.clientPortalAccess.findFirst({
-            where: { email, clientId: { not: clientId } }
-        });
-        if (existingAccess) {
-            throw new BadRequestException('Este e-mail já está sendo utilizado por outro cliente para acesso ao portal.');
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashed = await bcrypt.hash(passwordPlain, salt);
-
-        const access = await this.prisma.clientPortalAccess.upsert({
-            where: { clientId },
-            update: { email, passwordHash: hashed },
-            create: { clientId, email, passwordHash: hashed },
-        });
-
-        await this.logActivity(clientId, tenantId, 'PORTAL_ACCESS_CREATED', `Acesso ao portal configurado.`);
-        
-        return { success: true, email: access.email };
     }
 
     async getPortalAccess(clientId: string, tenantId: string) {
-        const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
-        if (!client) throw new Error('Cliente não encontrado');
+        try {
+            const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
+            if (!client) return null;
 
-        const access = await this.prisma.clientPortalAccess.findUnique({
-            where: { clientId },
-            select: { email: true, createdAt: true, updatedAt: true }
-        });
+            const access = await this.prisma.clientPortalAccess.findUnique({
+                where: { clientId },
+                select: { email: true, createdAt: true, updatedAt: true }
+            });
 
-        return access;
+            return access;
+        } catch (error) {
+            console.error('[PortalAccess] getPortalAccess error:', error.message);
+            return null;
+        }
     }
 
     // === Event Listeners ===
