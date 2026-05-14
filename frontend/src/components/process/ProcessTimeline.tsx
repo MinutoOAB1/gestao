@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Gavel, Scale, Calendar, AlertTriangle, FileText, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Gavel, Scale, Calendar, AlertTriangle, FileText, Clock, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import api from '../../services/api';
 import Modal from '../ui/Modal';
@@ -90,6 +90,19 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
         }
     };
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('Tem certeza que deseja excluir esta movimentação?')) return;
+
+        try {
+            await api.delete(`/process-updates/${id}`);
+            addToast('Movimentação excluída com sucesso', 'success');
+            fetchUpdates();
+        } catch (error) {
+            console.error('Erro ao excluir movimentação:', error);
+            addToast('Erro ao excluir movimentação', 'error');
+        }
+    };
+
     const getTypeInfo = (type: string) => {
         return UPDATE_TYPES.find(t => t.key === type) || UPDATE_TYPES[0];
     };
@@ -174,13 +187,22 @@ export default function ProcessTimeline({ processId }: ProcessTimelineProps) {
                                                     )}>
                                                         {typeInfo.label}
                                                     </span>
-                                                    <span className="text-xs text-app-text-muted">
-                                                        {new Date(update.date).toLocaleDateString('pt-BR', {
-                                                            day: '2-digit',
-                                                            month: 'short',
-                                                            year: 'numeric'
-                                                        })}
-                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-app-text-muted">
+                                                            {new Date(update.date).toLocaleDateString('pt-BR', {
+                                                                day: '2-digit',
+                                                                month: 'short',
+                                                                year: 'numeric'
+                                                            })}
+                                                        </span>
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); handleDelete(update.id); }}
+                                                            className="p-1 text-app-text-muted hover:text-red-500 transition-colors"
+                                                            title="Excluir movimentação"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 <p className="text-sm text-app-text-main leading-relaxed">
                                                     {update.description}

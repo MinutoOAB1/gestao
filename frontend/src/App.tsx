@@ -9,6 +9,7 @@ import { TimerProvider } from './context/TimerContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import OfflineIndicator from './components/ui/OfflineIndicator';
+import { CookieBanner } from './components/ui/CookieBanner';
 
 // Auto-retry dynamic imports on chunk load failure (stale cache after deploy)
 function lazyWithRetry(factory: () => Promise<any>) {
@@ -164,6 +165,7 @@ function App() {
                 </NotificationProvider>
               </ToastProvider>
           </TimerProvider>
+          <CookieBanner />
         </BrowserRouter>
         </PortalAuthProvider>
       </AuthProvider>
@@ -172,4 +174,5 @@ function App() {
 }
 
 export default App;
+
 
