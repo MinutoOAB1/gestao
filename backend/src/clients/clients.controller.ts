@@ -232,4 +232,19 @@ export class ClientsController {
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.clientsService.removeChecklistItem(itemId, tenantId);
     }
+
+    // === Portal Access ===
+    @Post(':id/portal-access')
+    async createPortalAccess(@Request() req, @Param('id') id: string, @Body() body: any) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.clientsService.createPortalAccess(id, body.email, body.password, tenantId);
+    }
+
+    @Get(':id/portal-access')
+    async getPortalAccess(@Request() req, @Param('id') id: string) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.clientsService.getPortalAccess(id, tenantId);
+    }
 }

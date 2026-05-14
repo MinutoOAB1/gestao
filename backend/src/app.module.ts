@@ -35,6 +35,7 @@ import { HealthController } from './health/health.controller';
 import { GoogleCalendarModule } from './google-calendar/google-calendar.module';
 import { SecurityModule } from './common/security/security.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { PortalModule } from './portal/portal.module';
 
 
 @Module({
@@ -73,6 +74,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     PaymentsModule,
     GoogleCalendarModule,
     SubscriptionsModule,
+    PortalModule,
   ],
   controllers: [AppController, HealthController],
   providers: [

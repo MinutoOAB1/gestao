@@ -239,6 +239,7 @@ model Client {
   financialRecords FinancialRecord[]
   invoices         Invoice[]
   processes        Process[]
+  portalAccess     ClientPortalAccess?
 
   @@index([tenantId])
   @@index([status])
@@ -685,6 +686,17 @@ model UserFile {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
   @@index([tenantId, folder])
+}
+
+model ClientPortalAccess {
+  id           String   @id @default(uuid())
+  clientId     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([email])
 }

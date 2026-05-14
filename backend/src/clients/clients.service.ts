@@ -4,6 +4,7 @@ import { UpdateClientDto } from './dto/update-client.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { OnEvent, EventEmitter2 } from '@nestjs/event-emitter';
 import { SecurityService } from '../common/security/security.service';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class ClientsService {
@@ -317,6 +318,37 @@ export class ClientsService {
         return this.prisma.clientChecklistItem.deleteMany({ 
             where: { id: itemId, tenantId } 
         });
+    }
+
+    // === Portal Access ===
+    async createPortalAccess(clientId: string, email: string, passwordPlain: string, tenantId: string) {
+        const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
+        if (!client) throw new Error('Cliente não encontrado');
+
+        const salt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(passwordPlain, salt);
+
+        const access = await this.prisma.clientPortalAccess.upsert({
+            where: { clientId },
+            update: { email, passwordHash: hashed },
+            create: { clientId, email, passwordHash: hashed },
+        });
+
+        await this.logActivity(clientId, tenantId, 'PORTAL_ACCESS_CREATED', `Acesso ao portal criado/atualizado para o email ${email}.`);
+        
+        return { success: true, email: access.email };
+    }
+
+    async getPortalAccess(clientId: string, tenantId: string) {
+        const client = await this.prisma.client.findFirst({ where: { id: clientId, tenantId } });
+        if (!client) throw new Error('Cliente não encontrado');
+
+        const access = await this.prisma.clientPortalAccess.findUnique({
+            where: { clientId },
+            select: { email: true, createdAt: true, updatedAt: true }
+        });
+
+        return access;
     }
 
     // === Event Listeners ===

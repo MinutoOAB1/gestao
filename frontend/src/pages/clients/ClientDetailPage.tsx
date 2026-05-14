@@ -5,7 +5,7 @@ import {
     Plus, X, MapPin, Mail, Phone,
     AlertCircle, ChevronRight, Edit2, Trash2, StickyNote, History, User,
     CheckCircle, Circle, CheckSquare, Clock, FileBadge, Send, Check, Headset,
-    Tag, MessageSquare, ArrowDownRight, ArrowUpRight, RefreshCcw
+    Tag, MessageSquare, ArrowDownRight, ArrowUpRight, RefreshCcw, Key, Lock
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -77,6 +77,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
         { id: 'financeiro', label: 'Financeiro', icon: DollarSign },
         { id: 'notas', label: 'Anotações', icon: StickyNote },
         { id: 'timeline', label: 'Linha do Tempo', icon: History },
+        { id: 'portal', label: 'Portal', icon: Key },
     ];
 
     useEffect(() => {
@@ -101,6 +102,45 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
             navigate('/app/clientes');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const [portalAccess, setPortalAccess] = useState<any>(null);
+    const [loadingPortal, setLoadingPortal] = useState(false);
+    const [portalPassword, setPortalPassword] = useState('');
+
+    useEffect(() => {
+        if (activeTab === 'portal' && id) {
+            fetchPortalAccess();
+        }
+    }, [activeTab, id]);
+
+    const fetchPortalAccess = async () => {
+        setLoadingPortal(true);
+        try {
+            const response = await api.get(`/clients/${id}/portal-access`);
+            setPortalAccess(response.data);
+        } catch (error: any) {
+            setPortalAccess(null);
+        } finally {
+            setLoadingPortal(false);
+        }
+    };
+
+    const handleSavePortalAccess = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!portalPassword || portalPassword.length < 6) {
+            addToast('A senha deve ter no mínimo 6 caracteres', 'warning');
+            return;
+        }
+        try {
+            await api.post(`/clients/${id}/portal-access`, { password: portalPassword });
+            addToast('Acesso ao portal configurado com sucesso', 'success');
+            setPortalPassword('');
+            fetchPortalAccess();
+        } catch (error) {
+            console.error(error);
+            addToast('Erro ao configurar acesso ao portal', 'error');
         }
     };
 
@@ -951,6 +991,83 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                                         </div>
                                     );
                                 })
+                            )}
+                        </div>
+                    </div>
+                    )}
+
+                    {/* === TAB: PORTAL DO CLIENTE === */}
+                    {activeTab === 'portal' && (
+                    <div className="space-y-6 max-w-2xl mx-auto animate-in slide-in-from-bottom-4">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-6 opacity-5"><Key size={100} /></div>
+                            
+                            <h3 className="text-xl font-bold flex items-center gap-2 mb-2 text-slate-800 dark:text-slate-200 relative z-10">
+                                <Key size={24} className="text-blue-600" />
+                                Acesso ao Portal do Cliente
+                            </h3>
+                            <p className="text-sm text-slate-500 mb-8 relative z-10">
+                                Configure as credenciais para que este cliente possa acessar o painel exclusivo para clientes.
+                            </p>
+
+                            {loadingPortal ? (
+                                <div className="flex justify-center p-8"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div></div>
+                            ) : (
+                                <div className="relative z-10 space-y-6">
+                                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">E-mail de Acesso</p>
+                                        <p className="font-medium text-slate-800 dark:text-slate-200">{client?.email || 'Nenhum e-mail cadastrado'}</p>
+                                        {!client?.email && (
+                                            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1"><AlertCircle size={12}/> O cliente precisa ter um e-mail cadastrado para acessar o portal.</p>
+                                        )}
+                                    </div>
+
+                                    {portalAccess ? (
+                                        <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-xl">
+                                            <div className="flex items-start gap-3">
+                                                <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" />
+                                                <div>
+                                                    <h4 className="font-bold text-emerald-800 dark:text-emerald-400">Acesso Ativo</h4>
+                                                    <p className="text-sm text-emerald-600 dark:text-emerald-500 mt-1">Este cliente já possui acesso ao portal configurado.</p>
+                                                    <p className="text-xs text-emerald-500/80 mt-2 font-medium">Configurado em: {new Date(portalAccess.updatedAt || portalAccess.createdAt).toLocaleString('pt-BR')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl">
+                                            <p className="text-sm font-medium text-amber-800 dark:text-amber-400">O cliente ainda não tem acesso ao portal configurado.</p>
+                                        </div>
+                                    )}
+
+                                    <form onSubmit={handleSavePortalAccess} className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                        <h4 className="font-bold text-slate-700 dark:text-slate-300">
+                                            {portalAccess ? 'Redefinir Senha do Cliente' : 'Criar Acesso'}
+                                        </h4>
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Nova Senha</label>
+                                            <div className="relative">
+                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <input 
+                                                    type="text" 
+                                                    value={portalPassword}
+                                                    onChange={e => setPortalPassword(e.target.value)}
+                                                    placeholder="Digite uma senha forte"
+                                                    disabled={!client?.email}
+                                                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:opacity-50"
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-slate-400 mt-1.5">A senha não ficará visível para você após ser salva.</p>
+                                        </div>
+                                        <button 
+                                            type="submit" 
+                                            disabled={!portalPassword || !client?.email}
+                                            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+                                        >
+                                            <Key size={16} />
+                                            {portalAccess ? 'Atualizar Senha' : 'Salvar Acesso'}
+                                        </button>
+                                    </form>
+                                </div>
                             )}
                         </div>
                     </div>

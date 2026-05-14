@@ -45,6 +45,14 @@ const LGPDPage = lazy(() => import('./pages/legal/LGPDPage'));
 const AboutPage = lazy(() => import('./pages/landing/AboutPage'));
 import GlobalAgendaNotifications from './components/notifications/GlobalAgendaNotifications';
 
+import { PortalAuthProvider } from './context/PortalAuthContext';
+import { PortalPrivateRoute } from './components/PortalPrivateRoute';
+const PortalLogin = lazy(() => import('./pages/portal/PortalLogin'));
+const PortalLayout = lazy(() => import('./components/layout/PortalLayout'));
+const PortalDashboard = lazy(() => import('./pages/portal/PortalDashboard'));
+const PortalProcessList = lazy(() => import('./pages/portal/PortalProcessList'));
+const PortalProcessDetail = lazy(() => import('./pages/portal/PortalProcessDetail'));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="absolute inset-0 flex items-center justify-center bg-app-bg animate-in fade-in duration-200 z-50">
@@ -67,6 +75,7 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <PortalAuthProvider>
         <BrowserRouter>
           <TimerProvider>
               <ToastProvider>
@@ -119,6 +128,17 @@ function App() {
                             <Route path="configuracoes" element={<SettingsPage />} />
                           </Route>
 
+                          <Route path="/portal/login" element={<PortalLogin />} />
+                          <Route path="/portal" element={
+                            <PortalPrivateRoute>
+                              <PortalLayout />
+                            </PortalPrivateRoute>
+                          }>
+                            <Route index element={<PortalDashboard />} />
+                            <Route path="processos" element={<PortalProcessList />} />
+                            <Route path="processos/:id" element={<PortalProcessDetail />} />
+                          </Route>
+
                           <Route path="*" element={<Navigate to="/app" replace />} />
                         </Routes>
                       </ErrorBoundary>
@@ -128,6 +148,7 @@ function App() {
               </ToastProvider>
           </TimerProvider>
         </BrowserRouter>
+        </PortalAuthProvider>
       </AuthProvider>
     </ThemeProvider>
   );
