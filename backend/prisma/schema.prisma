@@ -43,6 +43,8 @@ model Tenant {
   timeEntries          TimeEntry[]
   users                User[]
   financialCategories  FinancialCategory[]
+  chatChannels         ChatChannel[]
+  directMessages       DirectMessage[]
 }
 
 model User {
@@ -739,4 +741,56 @@ model FinancialCategory {
 
   @@unique([name, type, tenantId, parentId])
   @@index([tenantId])
+}
+
+model ChatChannel {
+  id        String        @id @default(uuid())
+  name      String
+  type      String        @default("GENERAL")
+  processId String?
+  tenantId  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+  tenant    Tenant        @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([processId])
+}
+
+model ChatMessage {
+  id           String      @id @default(uuid())
+  content      String
+  channelId    String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  fileName     String?
+  fileUrl      String?
+  fileSize     String?
+  fileType     String?
+  replyToId    String?
+  reactions    String?
+  isPinned     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  channel      ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([channelId])
+}
+
+model DirectMessage {
+  id           String   @id @default(uuid())
+  content      String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  recipientId  String
+  isRead       Boolean  @default(false)
+  tenantId     String
+  createdAt    DateTime @default(now())
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([senderId, recipientId])
 }
