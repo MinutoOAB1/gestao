@@ -114,6 +114,21 @@ export class FinancialController {
         return this.financialService.findOverdue(tenantId);
     }
 
+    @Get('report/dre')
+    async getDRE(
+        @Request() req,
+        @Query('startDate') startDate?: string,
+        @Query('endDate') endDate?: string
+    ) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+
+        const start = startDate ? new Date(startDate) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const end = endDate ? new Date(endDate) : new Date();
+
+        return this.financialService.getDREReport(tenantId, start, end);
+    }
+
     @Get('report/pdf')
     @Get('export/pdf')
     @Get('export')

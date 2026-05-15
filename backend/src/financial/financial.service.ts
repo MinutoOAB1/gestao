@@ -107,6 +107,81 @@ export class FinancialService {
         };
     }
 
+    async getDREReport(tenantId: string, startDate: Date, endDate: Date) {
+        // Fetch all records within range using accrualDate (Regime de Competência)
+        const records = await this.prisma.financialRecord.findMany({
+            where: {
+                tenantId,
+                accrualDate: { gte: startDate, lte: endDate },
+                status: { not: 'CANCELLED' }
+            },
+            include: {
+                categoryRef: true
+            }
+        });
+
+        // Group by category code/name
+        const incomeMap = new Map<string, { name: string, amount: number, code?: string }>();
+        const expenseMap = new Map<string, { name: string, amount: number, code?: string }>();
+
+        let totalGrossIncome = 0;
+        let totalIss = 0;
+        let totalIrrf = 0;
+        let totalPis = 0;
+        let totalCofins = 0;
+        let totalOperatingExpenses = 0;
+
+        records.forEach(record => {
+            const amount = record.amount || 0;
+            const categoryName = record.category || 'Outros';
+            const categoryCode = record.categoryRef?.code || '';
+            const categoryKey = categoryCode ? `${categoryCode} - ${categoryName}` : categoryName;
+
+            if (record.type === 'INCOME') {
+                totalGrossIncome += amount;
+                totalIss += record.issAmount || 0;
+                totalIrrf += record.irrfAmount || 0;
+                totalPis += record.pisAmount || 0;
+                totalCofins += record.cofinsAmount || 0;
+
+                const existing = incomeMap.get(categoryKey) || { name: categoryName, amount: 0, code: categoryCode };
+                existing.amount += amount;
+                incomeMap.set(categoryKey, existing);
+            } else {
+                totalOperatingExpenses += amount;
+                const existing = expenseMap.get(categoryKey) || { name: categoryName, amount: 0, code: categoryCode };
+                existing.amount += amount;
+                expenseMap.set(categoryKey, existing);
+            }
+        });
+
+        const totalTaxes = totalIss + totalIrrf + totalPis + totalCofins;
+        const netRevenue = totalGrossIncome - totalTaxes;
+        const netProfit = netRevenue - totalOperatingExpenses;
+
+        return {
+            period: { start: startDate, end: endDate },
+            grossRevenue: {
+                total: totalGrossIncome,
+                categories: Array.from(incomeMap.values()).sort((a, b) => (a.code || '').localeCompare(b.code || ''))
+            },
+            taxes: {
+                total: totalTaxes,
+                iss: totalIss,
+                irrf: totalIrrf,
+                pis: totalPis,
+                cofins: totalCofins
+            },
+            netRevenue,
+            operatingExpenses: {
+                total: totalOperatingExpenses,
+                categories: Array.from(expenseMap.values()).sort((a, b) => (a.code || '').localeCompare(b.code || ''))
+            },
+            netProfit,
+            profitMargin: netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0
+        };
+    }
+
     // --- CRUD ---
 
     async create(createFinancialDto: CreateFinancialDto, tenantId: string, userId?: string, userName?: string) {
