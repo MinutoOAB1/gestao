@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, DollarSign, Calendar, Users, Plus, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
-import { useEffect } from 'react';
 
 export default function FinancialFormPage() {
     const navigate = useNavigate();
@@ -14,7 +14,10 @@ export default function FinancialFormPage() {
         description: '',
         amount: '',
         category: 'Honorários',
-        date: new Date().toISOString().split('T')[0],
+        date: new Date().toISOString().split('T')[0], // Data de Vencimento/Previsão
+        accrualDate: new Date().toISOString().split('T')[0], // Data de Competência
+        paymentDate: '', // Data de Liquidação
+        costCenter: '',
         status: 'PAID',
         clientId: ''
     });
@@ -59,7 +62,12 @@ export default function FinancialFormPage() {
                 ...formData,
                 amount: parseFloat(formData.amount),
                 date: new Date(formData.date).toISOString(),
+                accrualDate: new Date(formData.accrualDate).toISOString(),
             };
+
+            if (formData.paymentDate) {
+                payload.paymentDate = new Date(formData.paymentDate).toISOString();
+            }
 
             if (!payload.clientId) {
                 delete payload.clientId; // Remove empty clientId
@@ -140,7 +148,7 @@ export default function FinancialFormPage() {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-legal-700 mb-1">Data</label>
+                        <label className="block text-sm font-medium text-legal-700 mb-1">Vencimento / Previsão</label>
                         <div className="relative">
                             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-legal-400" size={18} />
                             <input
@@ -152,6 +160,35 @@ export default function FinancialFormPage() {
                                 required
                             />
                         </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-legal-700 mb-1">Data de Competência</label>
+                        <div className="relative">
+                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-legal-400" size={18} />
+                            <input
+                                type="date"
+                                name="accrualDate"
+                                value={formData.accrualDate}
+                                onChange={handleChange}
+                                className="w-full pl-10 pr-4 py-2 border border-legal-300 rounded-md focus:ring-2 focus:ring-legal-900 focus:border-transparent outline-none"
+                                required
+                            />
+                        </div>
+                        <p className="text-[10px] text-legal-400 mt-1">Mês em que o fato gerador ocorreu</p>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-legal-700 mb-1">Centro de Custo</label>
+                        <input
+                            type="text"
+                            name="costCenter"
+                            value={formData.costCenter}
+                            onChange={handleChange}
+                            placeholder="Ex: Operacional, Marketing..."
+                            className="w-full px-4 py-2 border border-legal-300 rounded-md focus:ring-2 focus:ring-legal-900 focus:border-transparent outline-none"
+                        />
                     </div>
                 </div>
 
@@ -195,6 +232,26 @@ export default function FinancialFormPage() {
                         </select>
                     </div>
                 </div>
+
+                {formData.status === 'PAID' && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <label className="block text-sm font-medium text-legal-700 mb-1">Data da Liquidação (Pagamento)</label>
+                        <div className="relative">
+                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-legal-400" size={18} />
+                            <input
+                                type="date"
+                                name="paymentDate"
+                                value={formData.paymentDate}
+                                onChange={handleChange}
+                                placeholder="Deixe vazio para usar a data de hoje"
+                                className="w-full pl-10 pr-4 py-2 border border-legal-300 rounded-md focus:ring-2 focus:ring-legal-900 focus:border-transparent outline-none"
+                            />
+                        </div>
+                    </motion.div>
+                )}
 
                 <div>
                     <label className="block text-sm font-medium text-legal-700 mb-1">

@@ -326,6 +326,9 @@ model FinancialRecord {
   amount             Float
   description        String
   date               DateTime  @default(now())
+  accrualDate        DateTime  @default(now()) // Regime de Competência
+  paymentDate        DateTime?                   // Regime de Caixa (Liquidação)
+  costCenter         String?                     // Centro de Custo
   status             String    @default("PENDING")
   isRecurring        Boolean   @default(false)
   recurrenceType     String?
@@ -338,6 +341,7 @@ model FinancialRecord {
   clientId           String?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  cancelledAt        DateTime?                   // Data de estorno/cancelamento
   notes              String?
   client             Client?   @relation(fields: [clientId], references: [id])
   tenant             Tenant    @relation(fields: [tenantId], references: [id])
@@ -347,6 +351,8 @@ model FinancialRecord {
   @@index([clientId])
   @@index([status])
   @@index([date])
+  @@index([accrualDate])
+  @@index([paymentDate])
   @@index([tenantId, createdAt])
   @@index([tenantId, status, type])
 }

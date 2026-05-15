@@ -529,6 +529,16 @@ export class FinancialController {
         return this.generatePdfReport(req, res, startDate, endDate, status, search);
     }
 
+    @Post(':id/cancel')
+    @Roles(Role.ADMIN, Role.LAWYER)
+    async cancel(@Request() req, @Param('id') id: string) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        const userId = req.user?.sub;
+        const userName = req.user?.name;
+        return this.financialService.cancel(id, tenantId, userId, userName);
+    }
+
     @Get(':id')
     findOne(@Request() req, @Param('id') id: string) {
         const tenantId = req.user?.tenantId;

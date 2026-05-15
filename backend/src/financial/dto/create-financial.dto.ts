@@ -3,8 +3,11 @@ export class CreateFinancialDto {
     category: string;
     amount: number;
     description: string;
-    date?: string; // ISO Date
-    status?: string; // 'PENDING' | 'PAID'
+    date?: string; // ISO Date (Expected/Due Date)
+    accrualDate?: string; // ISO Date (Competência)
+    paymentDate?: string; // ISO Date (Liquidação)
+    costCenter?: string; // Centro de Custo
+    status?: string; // 'PENDING' | 'PAID' | 'CANCELLED'
     clientId?: string; // Optional Relation
 
     // Recurring payment fields
@@ -23,3 +26,4 @@ export class CreateFinancialDto {
     // Additional notes
     notes?: string;
 }
+

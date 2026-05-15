@@ -17,6 +17,21 @@ export class FinancialService {
         private eventEmitter: EventEmitter2
     ) { }
 
+    private parseDate(dateStr?: string | Date): Date {
+        if (!dateStr) {
+            const d = new Date();
+            d.setHours(12, 0, 0, 0);
+            return d;
+        }
+        if (dateStr instanceof Date) {
+            const d = new Date(dateStr);
+            d.setHours(12, 0, 0, 0);
+            return d;
+        }
+        const [year, month, day] = dateStr.split('-').map(Number);
+        return new Date(year, month - 1, day, 12, 0, 0);
+    }
+
     // --- Aggregation Helpers ---
 
     async getTotalsByType(tenantId: string) {
@@ -79,16 +94,25 @@ export class FinancialService {
     // --- CRUD ---
 
     async create(createFinancialDto: CreateFinancialDto, tenantId: string, userId?: string, userName?: string) {
-        let baseDate: Date;
+        const baseDate = this.parseDate(createFinancialDto.date);
+        const accrualDate = this.parseDate(createFinancialDto.accrualDate);
+        const paymentDate = createFinancialDto.status === 'PAID' 
+            ? this.parseDate(createFinancialDto.paymentDate || createFinancialDto.date)
+            : createFinancialDto.paymentDate ? this.parseDate(createFinancialDto.paymentDate) : null;
 
-        if (createFinancialDto.date) {
-            // Parse YYYY-MM-DD manually to avoid UTC shift
-            const [year, month, day] = createFinancialDto.date.split('-').map(Number);
-            baseDate = new Date(year, month - 1, day, 12, 0, 0);
-        } else {
-            baseDate = new Date();
-            baseDate.setHours(12, 0, 0, 0);
-        }
+        const commonData = {
+            type: createFinancialDto.type,
+            category: createFinancialDto.category,
+            amount: createFinancialDto.amount,
+            description: createFinancialDto.description,
+            costCenter: createFinancialDto.costCenter || null,
+            accrualDate,
+            paymentDate,
+            clientId: createFinancialDto.clientId || null,
+            isUrgent: createFinancialDto.isUrgent || false,
+            notes: createFinancialDto.notes || null,
+            tenantId,
+        };
 
         // Handle recurring payments - create all installments
         if (createFinancialDto.recurrenceType &&
@@ -102,20 +126,13 @@ export class FinancialService {
             // Create parent record (first installment)
             const parentRecord = await this.prisma.financialRecord.create({
                 data: {
-                    type: createFinancialDto.type,
-                    category: createFinancialDto.category,
-                    amount: createFinancialDto.amount,
-                    description: createFinancialDto.description,
+                    ...commonData,
                     date: baseDate,
                     status: createFinancialDto.status || 'PENDING',
-                    clientId: createFinancialDto.clientId || null,
                     isRecurring: true,
                     recurrenceType: createFinancialDto.recurrenceType,
                     totalInstallments: installments,
                     currentInstallment: 1,
-                    isUrgent: createFinancialDto.isUrgent || false,
-                    notes: createFinancialDto.notes || null,
-                    tenantId,
                 } as any,
             });
             records.push(parentRecord);
@@ -123,33 +140,31 @@ export class FinancialService {
             // Create remaining installments
             for (let i = 2; i <= installments; i++) {
                 const installmentDate = new Date(baseDate);
+                const installmentAccrual = new Date(accrualDate);
 
                 if (createFinancialDto.recurrenceType === 'MENSAL') {
                     installmentDate.setMonth(installmentDate.getMonth() + (i - 1));
+                    installmentAccrual.setMonth(installmentAccrual.getMonth() + (i - 1));
                 } else if (createFinancialDto.recurrenceType === 'ANUAL') {
                     installmentDate.setFullYear(installmentDate.getFullYear() + (i - 1));
+                    installmentAccrual.setFullYear(installmentAccrual.getFullYear() + (i - 1));
                 } else {
-                    // PERSONALIZADO - default to monthly
                     installmentDate.setMonth(installmentDate.getMonth() + (i - 1));
+                    installmentAccrual.setMonth(installmentAccrual.getMonth() + (i - 1));
                 }
 
                 const installmentRecord = await this.prisma.financialRecord.create({
                     data: {
-                        type: createFinancialDto.type,
-                        category: createFinancialDto.category,
-                        amount: createFinancialDto.amount,
-                        description: createFinancialDto.description,
+                        ...commonData,
                         date: installmentDate,
+                        accrualDate: installmentAccrual,
+                        paymentDate: null, // Future installments are always pending
                         status: 'PENDING',
-                        clientId: createFinancialDto.clientId || null,
                         isRecurring: true,
                         recurrenceType: createFinancialDto.recurrenceType,
                         totalInstallments: installments,
                         currentInstallment: i,
                         parentRecordId: parentRecord.id,
-                        isUrgent: createFinancialDto.isUrgent || false,
-                        notes: createFinancialDto.notes || null,
-                        tenantId,
                     } as any,
                 });
                 records.push(installmentRecord);
@@ -175,20 +190,13 @@ export class FinancialService {
         // Single payment (UNICA) or no recurrence
         const record = await this.prisma.financialRecord.create({
             data: {
-                type: createFinancialDto.type,
-                category: createFinancialDto.category,
-                amount: createFinancialDto.amount,
-                description: createFinancialDto.description,
+                ...commonData,
                 date: baseDate,
                 status: createFinancialDto.status || 'PENDING',
-                clientId: createFinancialDto.clientId || null,
                 isRecurring: false,
                 recurrenceType: 'UNICA',
                 totalInstallments: 1,
                 currentInstallment: 1,
-                isUrgent: createFinancialDto.isUrgent || false,
-                notes: createFinancialDto.notes || null,
-                tenantId,
             } as any,
         });
 
@@ -201,13 +209,8 @@ export class FinancialService {
                 userId,
                 userName,
                 tenantId,
-                newValues: {
-                    type: record.type,
-                    amount: record.amount,
-                    description: record.description,
-                    category: record.category,
-                },
-            }).catch(() => { }); // Don't fail if audit fails
+                newValues: commonData,
+            }).catch(() => { });
         }
 
         // Create specific split if it's an income and partner is provided
@@ -335,13 +338,18 @@ export class FinancialService {
         }
 
         const data: any = { ...updateFinancialDto };
-        if (data.date && typeof data.date === 'string') {
-            const [year, month, day] = data.date.split('-').map(Number);
-            data.date = new Date(year, month - 1, day, 12, 0, 0);
-        } else if (data.date) {
-            data.date = new Date(data.date);
-            data.date.setHours(12, 0, 0, 0);
+        
+        // Use helper for all date fields
+        if (data.date) data.date = this.parseDate(data.date);
+        if (data.accrualDate) data.accrualDate = this.parseDate(data.accrualDate);
+        if (data.paymentDate) data.paymentDate = this.parseDate(data.paymentDate);
+
+        // Logic for marking as paid
+        if (data.status === 'PAID' && oldRecord.status !== 'PAID' && !data.paymentDate) {
+            data.paymentDate = new Date();
+            data.paymentDate.setHours(12, 0, 0, 0);
         }
+
         // Sanitize empty strings to null
         for (const key of Object.keys(data)) {
             if (data[key] === '') {
@@ -376,18 +384,8 @@ export class FinancialService {
                 userId,
                 userName,
                 tenantId,
-                oldValues: {
-                    type: oldRecord.type,
-                    amount: oldRecord.amount,
-                    description: oldRecord.description,
-                    status: oldRecord.status,
-                },
-                newValues: {
-                    type: updatedRecord.type,
-                    amount: updatedRecord.amount,
-                    description: updatedRecord.description,
-                    status: updatedRecord.status,
-                },
+                oldValues: oldRecord,
+                newValues: updatedRecord,
             }).catch(() => { });
         }
 
@@ -404,6 +402,33 @@ export class FinancialService {
         }
 
         return updatedRecord;
+    }
+
+    async cancel(id: string, tenantId: string, userId?: string, userName?: string) {
+        const record = await this.prisma.financialRecord.findFirst({ where: { id, tenantId } });
+        if (!record) throw new Error('Registro não encontrado');
+
+        const updated = await this.prisma.financialRecord.update({
+            where: { id },
+            data: {
+                status: 'CANCELLED',
+                cancelledAt: new Date(),
+            }
+        });
+
+        if (userId) {
+            await this.auditLogService.log({
+                action: AuditAction.UPDATE,
+                entityType: 'FinancialRecord',
+                entityId: id,
+                userId,
+                userName,
+                tenantId,
+                details: 'Registro estornado/cancelado contabilmente',
+            }).catch(() => {});
+        }
+
+        return updated;
     }
 
     async remove(id: string, tenantId: string, userId?: string, userName?: string) {

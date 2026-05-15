@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
-import { Plus, TrendingUp, TrendingDown, Download, Search, Filter, RefreshCw, Paperclip, AlertTriangle, Building, Users, DollarSign, Trash2, Calendar, MessageSquare, Info, CheckCircle2, Hourglass, Repeat, QrCode, ExternalLink, FileText } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, Download, Search, Filter, RefreshCw, Paperclip, AlertTriangle, Building, Users, DollarSign, Trash2, Calendar, MessageSquare, Info, CheckCircle2, Hourglass, Repeat, QrCode, ExternalLink, FileText, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { clsx } from 'clsx';
@@ -326,6 +326,18 @@ export default function FinancialListPage() {
             console.error('Erro ao excluir parceria:', error);
         }
     }, [fetchData]);
+
+    const handleCancel = useCallback(async (id: string) => {
+        if (!confirm('Tem certeza que deseja estornar/cancelar contabilmente este lançamento? Isso manterá o registro para auditoria com status CANCELADO.')) return;
+        try {
+            await api.post(`/financial/${id}/cancel`);
+            fetchData();
+            addToast('Lançamento estornado com sucesso', 'success');
+        } catch (error) {
+            console.error('Erro ao estornar:', error);
+            addToast('Erro ao estornar lançamento.', 'error');
+        }
+    }, [fetchData, addToast]);
 
     const handlePayRepasse = useCallback(async (id: string) => {
         try {
@@ -1186,6 +1198,7 @@ export default function FinancialListPage() {
                                                 setSelectedClientForInvoice={setSelectedClientForInvoice}
                                                 setIsInvoiceModalOpen={setIsInvoiceModalOpen}
                                                 handleGenerateReceipt={handleGenerateReceipt}
+                                                handleCancel={handleCancel}
                                             />
                                         ))
                                     ) : (
@@ -1415,7 +1428,7 @@ export default function FinancialListPage() {
 
 const FinancialTableRow = memo(({
     record, expandedGroups, toggleGroup, handleEdit, handleDelete, deleteConfirm, setDeleteConfirm, isOverdue, setActiveNoteRecord,
-    setSelectedClientForInvoice, setIsInvoiceModalOpen, handleGenerateReceipt
+    setSelectedClientForInvoice, setIsInvoiceModalOpen, handleGenerateReceipt, handleCancel
 }: any) => {
     const isGroup = record._isGroupHeader === true;
     const isExpanded = isGroup && expandedGroups?.has(record.id);
@@ -1517,7 +1530,16 @@ const FinancialTableRow = memo(({
                         </div>
                     </div>
                 </td>
-                <td className="px-5 py-4 whitespace-nowrap"><span className="px-2.5 py-1 bg-app-bg/50 border border-app-stroke rounded-lg text-xs font-medium text-app-text-muted">{record.category}</span></td>
+                <td className="px-5 py-4 whitespace-nowrap">
+                    <div className="flex flex-col gap-1">
+                        <span className="px-2.5 py-1 bg-app-bg/50 border border-app-stroke rounded-lg text-xs font-medium text-app-text-muted w-fit">{record.category}</span>
+                        {record.costCenter && (
+                            <span className="px-2 py-0.5 bg-blue-500/5 text-blue-500 text-[10px] font-bold rounded border border-blue-500/20 w-fit uppercase">
+                                {record.costCenter}
+                            </span>
+                        )}
+                    </div>
+                </td>
                 <td className="px-5 py-3 whitespace-nowrap text-center">
                     {isGroup ? (
                         <span className="text-xs font-medium bg-black/5 dark:bg-white/10 text-black dark:text-white px-2.5 py-1 rounded-full border border-black/10 dark:border-white/20 shadow-sm flex items-center gap-1 justify-center w-fit mx-auto">
@@ -1546,12 +1568,14 @@ const FinancialTableRow = memo(({
                         "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit shadow-sm",
                         record.status === 'PAID'
                             ? "bg-black/10 dark:bg-white/20 text-black dark:text-white border border-black/10 dark:border-white/20"
-                            : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status))
-                                ? "bg-neutral-800 text-white border border-neutral-700"
-                                : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700"
+                            : record.status === 'CANCELLED'
+                                ? "bg-red-500/10 text-red-600 border border-red-200"
+                                : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status))
+                                    ? "bg-neutral-800 text-white border border-neutral-700"
+                                    : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700"
                     )}>
-                        {record.status === 'PAID' ? <CheckCircle2 size={12} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={12} /> : <Hourglass size={12} />}
-                        {record.status === 'PAID' ? 'Pago' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
+                        {record.status === 'PAID' ? <CheckCircle2 size={12} /> : record.status === 'CANCELLED' ? <X size={12} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={12} /> : <Hourglass size={12} />}
+                        {record.status === 'PAID' ? 'Pago' : record.status === 'CANCELLED' ? 'Estornado' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
                     </span>
                 </td>
                 <td className="px-5 py-4 text-right whitespace-nowrap">
@@ -1607,6 +1631,13 @@ const FinancialTableRow = memo(({
                                         className="px-2 py-1.5 text-xs font-medium text-app-text-muted hover:text-white bg-app-bg hover:bg-app-stroke rounded-lg transition-colors border border-app-stroke"
                                     >
                                         Editar
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleCancel(record.id); }}
+                                        className="px-2 py-1.5 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-200"
+                                        title="Estornar Lançamento"
+                                    >
+                                        Estornar
                                     </button>
                                 </>
                             )}
@@ -1667,6 +1698,7 @@ const FinancialMobileRow = memo(({
                         <div className="flex items-center gap-2 text-xs text-app-text-muted">
                             <span className={(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "text-red-500 font-medium" : ""}>{(isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) && "⚠ "}{getDateLabel(record.date)}</span>
                             <span>•</span><span>{record.category}</span>
+                            {record.costCenter && <><span className="text-[10px]">•</span><span className="text-blue-500 font-bold uppercase text-[10px]">{record.costCenter}</span></>}
                             {!isGroup && record.isRecurring && record.totalInstallments && record.totalInstallments > 1 && <><span>•</span><span className="text-black dark:text-white">{record.currentInstallment || 1}/{record.totalInstallments}</span></>}
                         </div>
                         {record.client && <p className="text-xs text-app-text-muted mt-1">Cliente: {record.client.name}</p>}
