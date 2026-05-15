@@ -83,7 +83,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 </div>
 
                 {/* Value and Date */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label className="block text-xs font-medium text-app-text-muted mb-1">
                             VALOR (R$) <span className="text-red-400">*</span>
@@ -98,12 +98,23 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-app-text-muted mb-1">
-                            DATA DE VENCIMENTO <span className="text-red-400">*</span>
+                            VENCIMENTO <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="date"
                             value={newTransaction.date}
                             onChange={e => setNewTransaction({ ...newTransaction, date: e.target.value })}
+                            className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-app-text-muted mb-1">
+                            COMPETÊNCIA <span className="text-primary/50 text-[10px] ml-1">(Referência)</span>
+                        </label>
+                        <input
+                            type="date"
+                            value={newTransaction.accrualDate || newTransaction.date}
+                            onChange={e => setNewTransaction({ ...newTransaction, accrualDate: e.target.value })}
                             className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-3 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
                         />
                     </div>
@@ -115,8 +126,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                         <div className="w-2 h-2 bg-black rounded-full" />
                         Classificação & Vínculos
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="sm:col-span-1">
                             <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Categoria</label>
                             <select
                                 value={newTransaction.category}
@@ -129,7 +140,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                 ))}
                             </select>
                         </div>
-                        <div>
+                        <div className="sm:col-span-1">
                             <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Vincular a (Opcional)</label>
                             <select
                                 value={newTransaction.linkTo}
@@ -156,6 +167,16 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                     </optgroup>
                                 )}
                             </select>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Centro de Custo</label>
+                            <input
+                                type="text"
+                                value={newTransaction.costCenter || ''}
+                                onChange={e => setNewTransaction({ ...newTransaction, costCenter: e.target.value })}
+                                className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
+                                placeholder="Ex: Operacional, Marketing..."
+                            />
                         </div>
                     </div>
 
@@ -236,7 +257,14 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                 Pendente
                             </button>
                             <button
-                                onClick={() => setNewTransaction({ ...newTransaction, status: 'PAID' })}
+                                onClick={() => {
+                                    const today = new Date().toISOString().split('T')[0];
+                                    setNewTransaction({ 
+                                        ...newTransaction, 
+                                        status: 'PAID',
+                                        paymentDate: newTransaction.paymentDate || today
+                                    });
+                                }}
                                 className={clsx(
                                     "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
                                     newTransaction.status === 'PAID'
@@ -252,6 +280,18 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                 </div>
                                 Pago
                             </button>
+
+                            {newTransaction.status === 'PAID' && (
+                                <div className="ml-4 flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
+                                    <label className="text-[10px] font-bold text-app-text-muted uppercase">Data do Pagamento:</label>
+                                    <input 
+                                        type="date"
+                                        value={newTransaction.paymentDate || ''}
+                                        onChange={e => setNewTransaction({ ...newTransaction, paymentDate: e.target.value })}
+                                        className="bg-app-bg border border-app-stroke rounded px-2 py-1 text-xs text-app-text-main outline-none focus:border-primary"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
 

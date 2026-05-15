@@ -71,6 +71,9 @@ export interface NewTransaction {
     urgent: boolean;
     notes: string;
     linkTo: string;
+    accrualDate?: string;
+    paymentDate?: string;
+    costCenter?: string;
     partnerId?: string;
     partnerPercentage?: number;
 }
