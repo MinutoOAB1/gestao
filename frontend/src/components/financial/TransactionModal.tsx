@@ -215,10 +215,17 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                                 value={newTransaction.category}
                                 onChange={e => {
                                     const selectedCat = allFiltered.find(c => c.name === e.target.value);
+                                    const baseAmount = parseFloat(newTransaction.amount) || 0;
+                                    
                                     setNewTransaction({ 
                                         ...newTransaction, 
                                         category: e.target.value,
-                                        categoryId: selectedCat?.id 
+                                        categoryId: selectedCat?.id,
+                                        // Auto-calculate taxes based on category defaults
+                                        issAmount: selectedCat?.defaultIss ? (baseAmount * selectedCat.defaultIss / 100) : newTransaction.issAmount,
+                                        irrfAmount: selectedCat?.defaultIrrf ? (baseAmount * selectedCat.defaultIrrf / 100) : newTransaction.irrfAmount,
+                                        pisAmount: selectedCat?.defaultPis ? (baseAmount * selectedCat.defaultPis / 100) : newTransaction.pisAmount,
+                                        cofinsAmount: selectedCat?.defaultCofins ? (baseAmount * selectedCat.defaultCofins / 100) : newTransaction.cofinsAmount
                                     });
                                 }}
                                 className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"

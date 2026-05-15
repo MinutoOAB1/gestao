@@ -25,7 +25,7 @@ export class FinancialCategoryService {
         return categories;
     }
 
-    async create(data: { name: string, type: string, parentId?: string, code?: string }, tenantId: string) {
+    async create(data: { name: string, type: string, parentId?: string, code?: string, defaultIss?: number, defaultIrrf?: number, defaultPis?: number, defaultCofins?: number }, tenantId: string) {
         return this.prisma.financialCategory.create({
             data: {
                 ...data,
@@ -36,7 +36,7 @@ export class FinancialCategoryService {
 
     async seedDefaults(tenantId: string) {
         const incomeDefaults = [
-            { name: 'Honorários', code: '1.1', children: ['Contratuais', 'Sucumbenciais', 'Consultoria'] },
+            { name: 'Honorários', code: '1.1', iss: 5, children: ['Contratuais', 'Sucumbenciais', 'Consultoria'] },
             { name: 'Reembolsos', code: '1.2', children: ['Custas', 'Viagens'] },
             { name: 'Outras Receitas', code: '1.3', children: ['Rendimentos', 'Venda de Ativos'] }
         ];
@@ -50,7 +50,13 @@ export class FinancialCategoryService {
 
         for (const cat of incomeDefaults) {
             const parent = await this.prisma.financialCategory.create({
-                data: { name: cat.name, code: cat.code, type: 'INCOME', tenantId }
+                data: { 
+                    name: cat.name, 
+                    code: cat.code, 
+                    type: 'INCOME', 
+                    tenantId,
+                    defaultIss: (cat as any).iss || 0 
+                }
             });
             for (const [idx, child] of cat.children.entries()) {
                 await this.prisma.financialCategory.create({

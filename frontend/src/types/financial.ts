@@ -39,6 +39,10 @@ export interface FinancialCategory {
     code?: string;
     parentId?: string;
     children?: FinancialCategory[];
+    defaultIss?: number;
+    defaultIrrf?: number;
+    defaultPis?: number;
+    defaultCofins?: number;
 }
 
 export interface Partner {

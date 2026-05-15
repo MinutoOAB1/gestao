@@ -182,6 +182,17 @@ export class FinancialService {
         };
     }
 
+    async getFinancialAudit(tenantId: string) {
+        return this.prisma.auditLog.findMany({
+            where: {
+                tenantId,
+                entityType: 'FinancialRecord'
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 100
+        });
+    }
+
     // --- CRUD ---
 
     async create(createFinancialDto: CreateFinancialDto, tenantId: string, userId?: string, userName?: string) {

@@ -727,6 +727,10 @@ model FinancialCategory {
   tenantId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  defaultIss      Float?    @default(0)
+  defaultIrrf     Float?    @default(0)
+  defaultPis      Float?    @default(0)
+  defaultCofins   Float?    @default(0)
   
   parent    FinancialCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children  FinancialCategory[] @relation("CategoryHierarchy")

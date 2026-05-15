@@ -129,6 +129,13 @@ export class FinancialController {
         return this.financialService.getDREReport(tenantId, start, end);
     }
 
+    @Get('report/audit')
+    async getFinancialAudit(@Request() req) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.financialService.getFinancialAudit(tenantId);
+    }
+
     @Get('report/pdf')
     @Get('export/pdf')
     @Get('export')

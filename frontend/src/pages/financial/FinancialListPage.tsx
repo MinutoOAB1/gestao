@@ -13,6 +13,7 @@ import { InadimplenciaTab } from '../../components/financial/InadimplenciaTab';
 import { TransactionModal } from '../../components/financial/TransactionModal';
 import { PartnerModal } from '../../components/financial/PartnerModal';
 import { DREReportTab } from '../../components/financial/DREReportTab';
+import { FinancialAuditTab } from '../../components/financial/FinancialAuditTab';
 
 import { 
     FinancialRecord, Partner, FinancialStats, ProcessItem, ClientItem, 
@@ -1178,6 +1179,18 @@ export default function FinancialListPage() {
                         <TrendingUp size={14} />
                         DRE Contábil
                     </button>
+                    <button
+                        onClick={() => setActiveTab('audit')}
+                        className={clsx(
+                            "px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2",
+                            activeTab === 'audit'
+                                ? "bg-slate-700 text-white shadow-lg shadow-slate-700/20 border-transparent"
+                                : "bg-app-card text-app-text-muted hover:text-slate-700 border border-app-stroke"
+                        )}
+                    >
+                        <RefreshCw size={14} />
+                        Auditoria
+                    </button>
                 </div>
             </div>
 
@@ -1352,10 +1365,13 @@ export default function FinancialListPage() {
                                     </tr>
                                 )}
                             </tbody>
+                        </table>
                     </div>
                 </div>
             ) : activeTab === 'dre' ? (
                 <DREReportTab />
+            ) : activeTab === 'audit' ? (
+                <FinancialAuditTab />
             ) : null}
 
             {/* Transaction Modal */}
