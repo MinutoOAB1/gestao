@@ -520,9 +520,8 @@ export class FinancialController {
 </body>
 </html>`;
 
-        // Return HTML report (can be printed to PDF by browser)
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=relatorio.pdf');
+        // Return HTML report (intended for browser printing)
+        res.setHeader('Content-Type', 'text/html');
         return res.send(html);
     }
 
