@@ -28,8 +28,24 @@ export class FinancialService {
             d.setHours(12, 0, 0, 0);
             return d;
         }
-        const [year, month, day] = dateStr.split('-').map(Number);
-        return new Date(year, month - 1, day, 12, 0, 0);
+        
+        // Handle ISO strings (T separator) or simple YYYY-MM-DD
+        const baseDate = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+        const parts = baseDate.split('-').map(Number);
+        
+        if (parts.length === 3 && !parts.some(isNaN)) {
+            return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+        }
+        
+        // Fallback to standard Date parsing if parts logic fails
+        const fallback = new Date(dateStr);
+        if (isNaN(fallback.getTime())) {
+            const d = new Date();
+            d.setHours(12, 0, 0, 0);
+            return d;
+        }
+        fallback.setHours(12, 0, 0, 0);
+        return fallback;
     }
 
     // --- Aggregation Helpers ---
