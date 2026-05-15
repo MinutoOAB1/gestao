@@ -368,7 +368,7 @@ export default function DashboardHome() {
                                 Detalhado
                             </button>
                         </div>
-                        <div className="bg-app-card rounded-[2.5rem] border border-app-stroke p-8 relative overflow-hidden group shadow-xl shadow-black/5">
+                        <div className="bg-app-card rounded-[1.5rem] md:rounded-[2rem] border border-app-stroke p-6 md:p-8 relative overflow-hidden group shadow-xl shadow-black/5">
                             <button
                                 onClick={() => { setIsFinanceHidden(!isFinanceHidden); haptics.light(); }}
                                 className="absolute top-8 right-8 z-20 p-3 rounded-2xl bg-app-bg border border-app-stroke hover:border-primary/30 transition-all text-app-text-muted hover:text-primary active:scale-90"
@@ -378,9 +378,9 @@ export default function DashboardHome() {
 
                             <div className="relative z-10 space-y-4">
                                 <p className="text-[11px] font-black uppercase tracking-[0.25em] text-app-text-muted">Saldo Atual</p>
-                                <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-4">
                                     <h3 className={clsx(
-                                        "text-5xl font-black text-app-text-main font-display tracking-tighter transition-all duration-700",
+                                        "text-4xl font-black text-app-text-main font-display tracking-tighter transition-all duration-700",
                                         isFinanceHidden && "blur-2xl opacity-10 scale-95"
                                     )}>
                                         {formatBRL(data.balance)}
@@ -399,16 +399,16 @@ export default function DashboardHome() {
                                 <MovingWaveChart />
                             </div>
 
-                            <div className="mt-12 pt-8 border-t border-app-stroke/50 grid grid-cols-2 gap-12 relative z-10">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em]">Receitas Pendentes</p>
-                                    <p className={clsx("text-2xl font-black text-app-text-main tracking-tighter transition-all", isFinanceHidden && "blur-lg")}>
+                            <div className="mt-8 pt-6 border-t border-app-stroke/50 grid grid-cols-2 gap-8 relative z-10">
+                                <div className="space-y-0.5">
+                                    <p className="text-[9px] font-black text-app-text-muted uppercase tracking-[0.2em]">Receitas Pendentes</p>
+                                    <p className={clsx("text-xl font-black text-app-text-main tracking-tighter transition-all", isFinanceHidden && "blur-lg")}>
                                         {formatBRLCompact(data.totalIncome)}
                                     </p>
                                 </div>
-                                <div className="space-y-1 text-right">
-                                    <p className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em]">Despesas do Mês</p>
-                                    <p className={clsx("text-2xl font-black text-app-text-main tracking-tighter transition-all", isFinanceHidden && "blur-lg")}>
+                                <div className="space-y-0.5 text-right">
+                                    <p className="text-[9px] font-black text-app-text-muted uppercase tracking-[0.2em]">Despesas do Mês</p>
+                                    <p className={clsx("text-xl font-black text-app-text-main tracking-tighter transition-all", isFinanceHidden && "blur-lg")}>
                                         {formatBRLCompact(data.totalExpense)}
                                     </p>
                                 </div>
@@ -427,7 +427,7 @@ export default function DashboardHome() {
                             <div
                                 key={i}
                                 onClick={() => { navigate(stat.path); haptics.light(); }}
-                                className="bg-app-card rounded-[2rem] border border-app-stroke p-6 transition-all hover:border-primary/30 hover:scale-[1.02] cursor-pointer group shadow-lg shadow-black/5 relative overflow-hidden"
+                                className="bg-app-card rounded-xl md:rounded-2xl border border-app-stroke p-5 md:p-6 transition-all hover:border-primary/30 hover:scale-[1.02] cursor-pointer group shadow-lg shadow-black/5 relative overflow-hidden"
                             >
                                 <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-125 transition-transform duration-700">
                                     <stat.icon size={120} />
@@ -442,7 +442,7 @@ export default function DashboardHome() {
                                     <ArrowUpRight size={18} className="text-app-text-muted group-hover:text-primary transition-colors" />
                                 </div>
                                 <div className="relative z-10">
-                                    <p className="text-4xl font-black text-app-text-main font-display tracking-tighter">{stat.value}</p>
+                                    <p className="text-3xl font-black text-app-text-main font-display tracking-tighter">{stat.value}</p>
                                     <div className="flex items-center gap-2 mt-1">
                                         <p className="text-[11px] font-black text-app-text-muted uppercase tracking-widest">{stat.label}</p>
                                         <span className="w-1 h-1 rounded-full bg-app-stroke"></span>
@@ -469,13 +469,13 @@ export default function DashboardHome() {
                                 { value: productivity.activeClients, label: 'Retenção', icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                                 { value: productivity.newComments, label: 'Interações', icon: TrendingUp, color: 'text-amber-500', bg: 'bg-amber-500/10' }
                             ].map((p, i) => (
-                                <div key={i} className="bg-app-card rounded-[2rem] border border-app-stroke p-6 flex flex-col justify-between group hover:border-app-stroke/80 transition-all shadow-sm">
-                                    <div className={clsx("w-10 h-10 rounded-xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", p.bg)}>
-                                        <p.icon size={20} className={p.color} />
+                                <div key={i} className="bg-app-card rounded-xl md:rounded-2xl border border-app-stroke p-5 md:p-6 flex flex-col justify-between group hover:border-app-stroke/80 transition-all shadow-sm">
+                                    <div className={clsx("w-9 h-9 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center mb-4 md:mb-6 transition-transform group-hover:scale-110", p.bg)}>
+                                        <p.icon size={18} className={p.color} />
                                     </div>
                                     <div>
-                                        <p className="text-3xl font-black text-app-text-main tracking-tighter">{p.value}</p>
-                                        <p className="text-[10px] font-black text-app-text-muted uppercase tracking-widest mt-1">{p.label}</p>
+                                        <p className="text-2xl font-black text-app-text-main tracking-tighter">{p.value}</p>
+                                        <p className="text-[9px] font-black text-app-text-muted uppercase tracking-widest mt-1">{p.label}</p>
                                     </div>
                                 </div>
                             ))}
@@ -485,41 +485,41 @@ export default function DashboardHome() {
             case 'urgent':
                 return productivity.urgentPayments && productivity.urgentPayments.length > 0 ? (
                     <motion.div variants={itemVariants}>
-                        <div className="bg-rose-500/5 border border-rose-500/20 rounded-[2.5rem] p-8">
-                            <div className="flex items-center justify-between mb-8">
+                        <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl md:rounded-2xl p-6 md:p-8">
+                            <div className="flex items-center justify-between mb-6 md:mb-8">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-rose-500 rounded-[1.25rem] flex items-center justify-center shadow-lg shadow-rose-500/30">
-                                        <AlertTriangle size={28} className="text-white" />
+                                    <div className="w-12 h-12 md:w-14 md:h-14 bg-rose-500 rounded-xl md:rounded-[1.25rem] flex items-center justify-center shadow-lg shadow-rose-500/30">
+                                        <AlertTriangle size={24} className="text-white" />
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-black text-app-text-main tracking-tighter uppercase">Alertas Financeiros</h3>
-                                        <p className="text-xs text-app-text-muted font-bold">{productivity.urgentPayments.length} pendências críticas localizadas</p>
+                                    <div className="space-y-0.5">
+                                        <h3 className="text-lg font-black text-app-text-main tracking-tighter uppercase">Alertas Financeiros</h3>
+                                        <p className="text-[10px] text-app-text-muted font-bold">{productivity.urgentPayments.length} pendências críticas localizadas</p>
                                     </div>
                                 </div>
-                                <button onClick={() => { navigate('/app/financeiro'); haptics.light(); }} className="px-6 py-3 bg-rose-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 shadow-lg shadow-rose-500/20 active:scale-95">
+                                <button onClick={() => { navigate('/app/financeiro'); haptics.light(); }} className="px-4 py-2.5 md:px-6 md:py-3 bg-rose-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:opacity-90 shadow-lg shadow-rose-500/20 active:scale-95">
                                     Resolver Agora
                                 </button>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {displayUrgentPayments.map((payment: any, i: number) => (
-                                    <div key={payment.id || i} className="bg-app-card/60 backdrop-blur-md border border-app-stroke rounded-3xl p-5 flex items-center justify-between group hover:border-rose-500/30 transition-all">
+                                    <div key={payment.id || i} className="bg-app-card/60 backdrop-blur-md border border-app-stroke rounded-2xl p-4 flex items-center justify-between group hover:border-rose-500/30 transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-app-bg border border-app-stroke rounded-2xl flex items-center justify-center">
-                                                <Calculator size={20} className="text-app-text-muted" />
+                                            <div className="w-10 h-10 bg-app-bg border border-app-stroke rounded-xl flex items-center justify-center">
+                                                <Calculator size={18} className="text-app-text-muted" />
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-black text-app-text-main uppercase tracking-tight">{payment.description}</p>
+                                            <div className="space-y-0.5">
+                                                <p className="text-xs font-black text-app-text-main uppercase tracking-tight">{payment.description}</p>
                                                 <div className="flex items-center gap-2 mt-1">
-                                                    <Clock size={14} className="text-rose-500" />
-                                                    <p className="text-xs text-rose-500 font-black">
+                                                    <Clock size={12} className="text-rose-500" />
+                                                    <p className="text-[10px] text-rose-500 font-black">
                                                         Vencimento: {new Date(payment.date).toLocaleDateString('pt-BR')}
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-lg font-black text-app-text-main tracking-tighter">{formatBRL(payment.amount)}</p>
-                                            <span className="text-[9px] font-black text-app-text-muted uppercase tracking-widest bg-app-stroke/30 px-2 py-0.5 rounded-md">ID {payment.id?.slice(0, 8)}</span>
+                                            <p className="text-base font-black text-app-text-main tracking-tighter">{formatBRL(payment.amount)}</p>
+                                            <span className="text-[8px] font-black text-app-text-muted uppercase tracking-widest bg-app-stroke/30 px-2 py-0.5 rounded-md">ID {payment.id?.slice(0, 8)}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -551,14 +551,14 @@ export default function DashboardHome() {
                                 Listagem
                             </button>
                         </div>
-                        <div className="bg-app-card rounded-[2.5rem] border border-app-stroke overflow-hidden shadow-xl shadow-black/5 divide-y divide-app-stroke/30">
+                        <div className="bg-app-card rounded-xl md:rounded-2xl border border-app-stroke overflow-hidden shadow-xl shadow-black/5 divide-y divide-app-stroke/30">
                             {displayRecentClients.length > 0 ? (
                                 displayRecentClients.map((client: any, i: number) => {
                                     const isNew = client.createdAt && (new Date().getTime() - new Date(client.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
                                     return (
                                         <div 
                                             key={client.id || i} 
-                                            className="p-6 flex items-center justify-between cursor-pointer transition-all hover:bg-app-stroke/20 group" 
+                                            className="p-4 md:p-5 flex items-center justify-between cursor-pointer transition-all hover:bg-app-stroke/20 group" 
                                             onClick={() => { navigate(`/app/clientes/${client.id}`); haptics.light(); }}
                                         >
                                             <div className="flex items-center gap-5">
@@ -621,9 +621,9 @@ export default function DashboardHome() {
             className="space-y-10 px-1 sm:px-0 pb-24 md:pb-12 bg-app-bg/50"
         >
             <div className="pt-4 flex items-end justify-between px-4">
-                <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-app-text-muted">Painel de Controle</p>
-                    <h1 className="text-5xl font-black text-app-text-main font-display tracking-tighter leading-none">Visão Geral</h1>
+                <div className="space-y-0.5">
+                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-app-text-muted">Painel de Controle</p>
+                    <h1 className="text-3xl font-black text-app-text-main font-display tracking-tighter leading-none">Visão Geral</h1>
                 </div>
                 <button
                     onClick={() => { setIsEditMode(!isEditMode); haptics.medium(); }}
@@ -644,21 +644,21 @@ export default function DashboardHome() {
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="mx-4 p-8 bg-[#0F172A] rounded-[3rem] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden group shadow-2xl shadow-primary/20"
+                    className="mx-4 p-5 md:p-6 bg-[#0F172A] rounded-2xl md:rounded-[2rem] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden group shadow-2xl shadow-primary/20"
                 >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/15 via-transparent to-transparent pointer-events-none" />
-                    <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left relative z-10">
-                        <div className="w-16 h-16 bg-primary/20 border border-primary/30 rounded-[1.5rem] flex items-center justify-center shrink-0 shadow-2xl shadow-primary/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                            <Zap size={32} className="text-primary fill-primary/20" />
+                    <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left relative z-10">
+                        <div className="w-12 h-12 bg-primary/20 border border-primary/30 rounded-xl flex items-center justify-center shrink-0 shadow-2xl shadow-primary/20 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <Zap size={24} className="text-primary fill-primary/20" />
                         </div>
-                        <div className="space-y-1">
-                            <p className="font-black text-2xl text-white font-display tracking-tight uppercase">Desbloqueie o potencial máximo</p>
-                            <p className="text-base text-white/50 font-medium">IA para análise de petições, usuários ilimitados e relatórios premium.</p>
+                        <div className="space-y-0.5">
+                            <p className="font-black text-xl text-white font-display tracking-tight uppercase">Desbloqueie o potencial máximo</p>
+                            <p className="text-sm text-white/50 font-medium">IA para análise de petições, usuários ilimitados e relatórios premium.</p>
                         </div>
                     </div>
                     <button 
                         onClick={() => { navigate('/app/configuracoes?tab=billing'); haptics.medium(); }}
-                        className="px-10 py-4 bg-white text-black font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-neutral-100 transition-all shadow-2xl shadow-white/10 active:scale-95 shrink-0"
+                        className="px-6 py-3 bg-white text-black font-black uppercase tracking-widest text-[10px] rounded-xl hover:bg-neutral-100 transition-all shadow-2xl shadow-white/10 active:scale-95 shrink-0"
                     >
                         Experimentar Plus
                     </button>

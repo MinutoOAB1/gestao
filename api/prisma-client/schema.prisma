@@ -1,0 +1,620 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../../api/prisma-client"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id                String                @id @default(uuid())
+  name              String
+  slug              String                @unique
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  storageQuotaGb    Int                   @default(30)
+  usedStorageMb     Int                   @default(0)
+  maxUsers          Int                   @default(3)
+  aiAnalysisLogs    AiAnalysisLog[]
+  clients           Client[]
+  clientNotes       ClientNote[]
+  clientTags        ClientTag[]
+  clientServiceLogs ClientServiceLog[]
+  clientChecklists  ClientChecklistItem[]
+  contracts         Contract[]
+  documents         Document[]
+  auditLogs         DocumentAuditLog[]
+  events            Event[]
+  financialRecords  FinancialRecord[]
+  folders           Folder[]
+  notifications     Notification[]
+  partnerships      Partnership[]
+  processes         Process[]
+  processLabels     ProcessLabel[]
+  templates         Template[]
+  settings          TenantSettings?
+  timeEntries       TimeEntry[]
+  users             User[]
+}
+
+model User {
+  id                    String            @id @default(uuid())
+  email                 String            @unique
+  password              String
+  name                  String
+  role                  String            @default("LAWYER")
+  avatar                String?
+  cpf                   String?
+  birthDate             DateTime?
+  bio                   String?
+  phone                 String?
+  mobile                String?
+  address               String?
+  oabNumber             String?
+  oabState              String?
+  specialties           String?
+  twoFactorSecret       String?
+  twoFactorEnabled      Boolean           @default(false)
+  permissions           String?
+  tenantId              String
+  storageQuotaGb        Int               @default(10)
+  usedStorageMb         Int               @default(0)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  aiAnalysisLogs        AiAnalysisLog[]
+  documents             Document[]        @relation("DocumentCreator")
+  documentComments      DocumentComment[]
+  loginHistory          LoginHistory[]
+  sentNotifications     Notification[]    @relation("SentNotifications")
+  receivedNotifications Notification[]    @relation("ReceivedNotifications")
+  processComments       ProcessComment[]
+  timeEntries           TimeEntry[]
+  tenant                Tenant            @relation(fields: [tenantId], references: [id])
+  userFiles             UserFile[]
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  type        String   @default("MENTION")
+  title       String
+  message     String?
+  isRead      Boolean  @default(false)
+  entityType  String?
+  entityId    String?
+  userId      String
+  createdById String?
+  tenantId    String
+  createdAt   DateTime @default(now())
+  createdBy   User?    @relation("SentNotifications", fields: [createdById], references: [id])
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  user        User     @relation("ReceivedNotifications", fields: [userId], references: [id])
+}
+
+model Process {
+  id           String             @id @default(uuid())
+  number       String
+  title        String
+  description  String?
+  status       String             @default("OPEN")
+  value        Float?
+  court        String?
+  area         String?
+  deadline     DateTime?
+  assignedTo   String?
+  kanbanColumn String             @default("novo")
+  kanbanOrder  Int                @default(0)
+  clientId     String?
+  tenantId     String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  client       Client?            @relation(fields: [clientId], references: [id])
+  tenant       Tenant             @relation(fields: [tenantId], references: [id])
+  checklists   ProcessChecklist[]
+  comments     ProcessComment[]
+  notes        ProcessNote[]
+  updates      ProcessUpdate[]
+  timeEntries  TimeEntry[]
+  labels       ProcessLabel[]     @relation("ProcessLabels")
+}
+
+model ProcessNote {
+  id        String   @id @default(uuid())
+  content   String
+  color     String   @default("yellow")
+  isPinned  Boolean  @default(false)
+  processId String
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  process   Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+}
+
+model ProcessUpdate {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  description String
+  type        String   @default("MOVIMENTO")
+  isImportant Boolean  @default(false)
+  processId   String
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  process     Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+}
+
+model ProcessChecklist {
+  id        String                 @id @default(uuid())
+  title     String                 @default("Checklist")
+  processId String
+  createdAt DateTime               @default(now())
+  process   Process                @relation(fields: [processId], references: [id], onDelete: Cascade)
+  items     ProcessChecklistItem[]
+}
+
+model ProcessChecklistItem {
+  id          String           @id @default(uuid())
+  text        String
+  completed   Boolean          @default(false)
+  order       Int              @default(0)
+  checklistId String
+  checklist   ProcessChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+}
+
+model ProcessLabel {
+  id        String    @id @default(uuid())
+  name      String
+  color     String    @default("#3B82F6")
+  tenantId  String
+  createdAt DateTime  @default(now())
+  tenant    Tenant    @relation(fields: [tenantId], references: [id])
+  processes Process[] @relation("ProcessLabels")
+}
+
+model ProcessComment {
+  id        String   @id @default(uuid())
+  content   String
+  processId String
+  userId    String
+  createdAt DateTime @default(now())
+  process   Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Client {
+  id               String                @id @default(uuid())
+  name             String
+  email            String?
+  phone            String?
+  document         String?
+  address          String?
+  leadSource       String?
+  referredBy       String?
+  demandType       String?
+  demandSummary    String?
+  factsDescription String?
+  urgencyLevel     String?
+  rg               String?
+  birthDate        DateTime?
+  city             String?
+  state            String?
+  zipCode          String?
+  occupation       String?
+  leadStatus       String                @default("NOVO")
+  nextAction       String?
+  nextActionDate   DateTime?
+  internalNotes    String?
+  tenantId         String
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  status           String                @default("ATIVO")
+  customFields     Json?
+  tenant           Tenant                @relation(fields: [tenantId], references: [id])
+  notes            ClientNote[]
+  tags             ClientTag[]
+  serviceLogs      ClientServiceLog[]
+  checklistItems   ClientChecklistItem[]
+  contracts        Contract[]
+  financialRecords FinancialRecord[]
+  processes        Process[]
+}
+
+model ClientTag {
+  id        String   @id @default(uuid())
+  name      String
+  color     String   @default("#6366f1")
+  order     Int      @default(0)
+  clientId  String
+  tenantId  String
+  createdAt DateTime @default(now())
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model ClientNote {
+  id          String   @id @default(uuid())
+  content     String
+  priority    String   @default("NORMAL")
+  isUrgent    Boolean  @default(false)
+  clientId    String
+  createdBy   String
+  createdById String
+  tenantId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model ClientServiceLog {
+  id              String   @id @default(uuid())
+  date            DateTime @default(now())
+  type            String   @default("MEETING")
+  durationMinutes Int?
+  summary         String
+  clientId        String
+  tenantId        String
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model ClientChecklistItem {
+  id        String   @id @default(uuid())
+  text      String
+  completed Boolean  @default(false)
+  clientId  String
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model FinancialRecord {
+  id                 String    @id @default(uuid())
+  type               String
+  category           String
+  amount             Float
+  description        String
+  date               DateTime  @default(now())
+  status             String    @default("PENDING")
+  isRecurring        Boolean   @default(false)
+  recurrenceType     String?
+  totalInstallments  Int?
+  currentInstallment Int?
+  recurringEndDate   DateTime?
+  parentRecordId     String?
+  isUrgent           Boolean   @default(false)
+  tenantId           String
+  clientId           String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  notes              String?
+  client             Client?   @relation(fields: [clientId], references: [id])
+  tenant             Tenant    @relation(fields: [tenantId], references: [id])
+}
+
+model Folder {
+  id        String     @id @default(uuid())
+  name      String
+  parentId  String?
+  tenantId  String
+  isLocked  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  documents Document[]
+  parent    Folder?    @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children  Folder[]   @relation("FolderHierarchy")
+  tenant    Tenant     @relation(fields: [tenantId], references: [id])
+}
+
+model Document {
+  id           String             @id @default(uuid())
+  name         String
+  type         String
+  size         String
+  url          String?
+  folderId     String?
+  tenantId     String
+  createdById  String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  kanbanStatus String             @default("TODO")
+  isLocked     Boolean            @default(false)
+  allowedRoles String?
+  createdBy    User?              @relation("DocumentCreator", fields: [createdById], references: [id])
+  folder       Folder?            @relation(fields: [folderId], references: [id])
+  tenant       Tenant             @relation(fields: [tenantId], references: [id])
+  auditLogs    DocumentAuditLog[]
+  comments     DocumentComment[]
+}
+
+model DocumentComment {
+  id         String   @id @default(uuid())
+  content    String
+  documentId String
+  userId     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model DocumentAuditLog {
+  id         String    @id @default(uuid())
+  action     String
+  details    String?
+  documentId String?
+  userId     String
+  userName   String?
+  tenantId   String
+  createdAt  DateTime  @default(now())
+  document   Document? @relation(fields: [documentId], references: [id])
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+}
+
+model Event {
+  id              String               @id @default(uuid())
+  title           String
+  description     String?
+  start           DateTime
+  end             DateTime
+  type            String
+  color           String?
+  completed       Boolean              @default(false)
+  priority        String               @default("MEDIUM")
+  location        String?
+  reminderMinutes Int?                 @default(30)
+  createdById     String?
+  createdByName   String?
+  processId       String?
+  processNumber   String?
+  tenantId        String
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  status          String               @default("ATIVO")
+  reminderSent    Boolean              @default(false)
+  clientId        String?
+  clientName      String?
+  tenant          Tenant               @relation(fields: [tenantId], references: [id])
+  assignees       EventAssignee[]
+  checklistItems  EventChecklistItem[]
+}
+
+model EventChecklistItem {
+  id        String   @id @default(uuid())
+  text      String
+  completed Boolean  @default(false)
+  order     Int      @default(0)
+  eventId   String
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventAssignee {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  userName  String
+  userEmail String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+}
+
+model Contract {
+  id          String   @id @default(uuid())
+  number      String
+  title       String
+  description String?
+  status      String   @default("INITIATED")
+  value       Float
+  clientId    String?
+  tenantId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  area        String?
+  client      Client?  @relation(fields: [clientId], references: [id])
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Partnership {
+  id           String                   @id @default(uuid())
+  name         String
+  initials     String
+  type         String
+  percentage   Float?
+  fixedAmount  Float?
+  color        String                   @default("bg-blue-500")
+  email        String?
+  phone        String?
+  notes        String?
+  active       Boolean                  @default(true)
+  tenantId     String
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  tenant       Tenant                   @relation(fields: [tenantId], references: [id])
+  transactions PartnershipTransaction[]
+}
+
+model PartnershipTransaction {
+  id                String      @id @default(uuid())
+  amount            Float
+  description       String?
+  status            String      @default("PENDING")
+  dueDate           DateTime?
+  paidDate          DateTime?
+  partnerId         String
+  financialRecordId String?
+  tenantId          String
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  partner           Partnership @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}
+
+model Template {
+  id               String   @id @default(uuid())
+  title            String
+  description      String?
+  content          String
+  category         String
+  icon             String   @default("FileText")
+  iconColor        String   @default("blue")
+  variables        String?
+  docxPath         String?
+  previewImagePath String?
+  tenantId         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tenant           Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model ChatChannel {
+  id        String        @id @default(uuid())
+  name      String
+  type      String        @default("PROCESS")
+  processId String?
+  tenantId  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id           String      @id @default(uuid())
+  content      String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  channelId    String
+  fileName     String?
+  fileUrl      String?
+  fileSize     String?
+  fileType     String?
+  replyToId    String?
+  reactions    String?
+  isPinned     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  channel      ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+}
+
+model DirectMessage {
+  id           String   @id @default(uuid())
+  content      String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  recipientId  String
+  tenantId     String
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model TenantSettings {
+  id                 String  @id @default(uuid())
+  officeName         String  @default("My Office")
+  cnpj               String?
+  email              String?
+  website            String?
+  language           String  @default("pt-BR")
+  timezone           String  @default("America/Sao_Paulo")
+  dateFormat         String  @default("DD/MM/YYYY")
+  emailNotifications Boolean @default(true)
+  processUpdates     Boolean @default(true)
+  deadlineReminders  Boolean @default(true)
+  twoFactor          Boolean @default(false)
+  loginAlerts        Boolean @default(true)
+  tenantId           String  @unique
+  letterheadUrl      String?
+  tenant             Tenant  @relation(fields: [tenantId], references: [id])
+}
+
+model TimeEntry {
+  id           String   @id @default(uuid())
+  description  String
+  duration     Int
+  date         DateTime
+  processId    String?
+  processTitle String?
+  userId       String
+  tenantId     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  process      Process? @relation(fields: [processId], references: [id])
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model AiAnalysisLog {
+  id             String   @id @default(uuid())
+  contractName   String?
+  contractText   String
+  analysisResult String
+  overallScore   Int
+  userId         String?
+  tenantId       String
+  createdAt      DateTime @default(now())
+  tenant         Tenant   @relation(fields: [tenantId], references: [id])
+  user           User?    @relation(fields: [userId], references: [id])
+}
+
+model LoginHistory {
+  id         String   @id @default(uuid())
+  userId     String
+  ipAddress  String?
+  userAgent  String?
+  deviceHash String?
+  location   String?
+  success    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deviceHash])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String
+  entityType String
+  entityId   String?
+  userId     String
+  userName   String?
+  tenantId   String
+  details    String?
+  oldValues  String?
+  newValues  String?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model UserFile {
+  id        String   @id @default(uuid())
+  name      String
+  fileName  String
+  mimeType  String
+  sizeBytes Int
+  url       String
+  folder    String?
+  userId    String
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tenantId, folder])
+}
