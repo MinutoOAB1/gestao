@@ -343,11 +343,11 @@ export default function ClientListPage() {
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-black dark:bg-white flex items-center justify-center shadow-xl shadow-black/20 dark:shadow-white/10">
-                            <Users size={24} className="text-white dark:text-black" />
+                        <div className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-xl shadow-black/20 dark:shadow-white/10">
+                            <Users size={20} className="text-white dark:text-black" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black tracking-tight text-app-text-main flex items-center gap-3">
+                            <h1 className="text-2xl font-black tracking-tight text-app-text-main flex items-center gap-3">
                                 Clientes
                                 {hasAnyUrgent && (
                                     <span className="flex h-3 w-3">
@@ -373,9 +373,9 @@ export default function ClientListPage() {
                     
                     <button
                         onClick={() => navigate('/app/clientes/novo')}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-2xl font-bold shadow-2xl shadow-black/20 dark:shadow-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold shadow-2xl shadow-black/20 dark:shadow-white/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
-                        <Plus size={20} strokeWidth={3} />
+                        <Plus size={18} strokeWidth={3} />
                         Novo Cliente
                     </button>
                 </div>
@@ -384,8 +384,8 @@ export default function ClientListPage() {
             {/* Glassmorphic Search & Filters */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 <div className="lg:col-span-6 relative group">
-                    <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                    <div className="relative bg-app-card/30 backdrop-blur-xl border border-app-stroke/50 rounded-2xl p-1 focus-within:border-primary/50 transition-all shadow-sm">
+                    <div className="absolute inset-0 bg-primary/5 rounded-xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                    <div className="relative bg-app-card/30 backdrop-blur-xl border border-app-stroke/50 rounded-xl p-1 focus-within:border-primary/50 transition-all shadow-sm">
                         <div className="relative flex items-center">
                             <Search className="absolute left-4 text-app-text-label transition-colors group-focus-within:text-primary" size={20} />
                             <input
@@ -393,7 +393,7 @@ export default function ClientListPage() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Nome, CPF ou E-mail..."
-                                className="w-full bg-transparent border-none focus:ring-0 text-app-text-main pl-12 pr-4 py-3 text-base placeholder:text-app-text-label"
+                                className="w-full bg-transparent border-none focus:ring-0 text-app-text-main pl-12 pr-4 py-2.5 text-sm placeholder:text-app-text-label"
                             />
                         </div>
                     </div>
@@ -404,7 +404,7 @@ export default function ClientListPage() {
                         <select
                             value={typeFilter}
                             onChange={(e) => setTypeFilter(e.target.value)}
-                            className="w-full bg-app-card/50 backdrop-blur-md border border-app-stroke/50 rounded-2xl px-4 py-3.5 appearance-none text-sm font-semibold outline-none focus:border-primary/50 transition-all cursor-pointer"
+                            className="w-full bg-app-card/50 backdrop-blur-md border border-app-stroke/50 rounded-xl px-4 py-2.5 appearance-none text-sm font-semibold outline-none focus:border-primary/50 transition-all cursor-pointer"
                         >
                             <option value="all">Todos Tipos</option>
                             <option value="PF">Pessoa Física</option>
@@ -416,7 +416,7 @@ export default function ClientListPage() {
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full bg-app-card/50 backdrop-blur-md border border-app-stroke/50 rounded-2xl px-4 py-3.5 appearance-none text-sm font-semibold outline-none focus:border-primary/50 transition-all cursor-pointer"
+                            className="w-full bg-app-card/50 backdrop-blur-md border border-app-stroke/50 rounded-xl px-4 py-2.5 appearance-none text-sm font-semibold outline-none focus:border-primary/50 transition-all cursor-pointer"
                         >
                             <option value="all">Todos Status</option>
                             <option value="ATIVO">Ativos</option>
@@ -428,9 +428,9 @@ export default function ClientListPage() {
                 </div>
 
                 <div className="lg:col-span-2">
-                    <button className="w-full h-full flex items-center justify-center gap-2 px-4 py-3 bg-app-card/50 border border-app-stroke/50 rounded-2xl text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-all font-bold text-sm uppercase tracking-wider">
+                    <button className="w-full h-full flex items-center justify-center gap-2 px-3 py-2.5 bg-app-card/50 border border-app-stroke/50 rounded-xl text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-all font-bold text-sm uppercase tracking-wider">
                         <Filter size={16} />
-                        Mais Filtros
+                        Filtros
                     </button>
                 </div>
             </div>
@@ -440,7 +440,7 @@ export default function ClientListPage() {
                 <button
                     onClick={() => setSelectedLetter('all')}
                     className={clsx(
-                        "px-5 py-2 rounded-xl text-xs font-black transition-all border shrink-0",
+                        "px-4 py-1.5 rounded-lg text-xs font-black transition-all border shrink-0",
                         selectedLetter === 'all'
                             ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-lg"
                             : "bg-app-card/30 text-app-text-muted border-app-stroke/30 hover:border-app-stroke"
@@ -453,7 +453,7 @@ export default function ClientListPage() {
                         key={letter}
                         onClick={() => { setSelectedLetter(letter); haptics.light(); }}
                         className={clsx(
-                            "w-10 h-10 rounded-xl text-xs font-black transition-all border shrink-0 flex items-center justify-center",
+                            "w-8 h-8 rounded-lg text-xs font-black transition-all border shrink-0 flex items-center justify-center",
                             selectedLetter === letter
                                 ? "bg-black dark:bg-white text-white dark:text-black border-transparent shadow-lg"
                                 : "bg-app-card/30 text-app-text-muted border-app-stroke/30 hover:border-app-stroke"
@@ -485,21 +485,21 @@ export default function ClientListPage() {
                                     key={client.id}
                                     variants={itemVariants}
                                     onClick={() => navigate(`/app/clientes/${client.id}`)}
-                                    className="group relative bg-app-card/40 hover:bg-app-card/80 border border-app-stroke/40 hover:border-primary/30 rounded-[2rem] p-5 transition-all cursor-pointer shadow-sm hover:shadow-xl hover:shadow-black/5"
+                                    className="group relative bg-app-card/40 hover:bg-app-card/80 border border-app-stroke/40 hover:border-primary/30 rounded-[1.25rem] p-4 transition-all cursor-pointer shadow-sm hover:shadow-xl hover:shadow-black/5"
                                 >
                                     <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                                         {/* Profile Info */}
                                         <div className="flex items-center gap-5 flex-1 min-w-0">
                                             <div className="relative shrink-0">
-                                                <div className={clsx("w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white font-black text-2xl shadow-2xl bg-gradient-to-br", getAvatarGradient(client.id))}>
+                                                <div className={clsx("w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-2xl bg-gradient-to-br", getAvatarGradient(client.id))}>
                                                     {(client.name || '?').charAt(0).toUpperCase()}
                                                 </div>
-                                                <div className={clsx("absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-app-card flex items-center justify-center", st.dot)} />
+                                                <div className={clsx("absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-4 border-app-card flex items-center justify-center", st.dot)} />
                                             </div>
 
                                             <div className="min-w-0 space-y-1">
                                                 <div className="flex items-center gap-3">
-                                                    <h3 className="text-lg font-bold text-app-text-main truncate group-hover:text-primary transition-colors">
+                                                    <h3 className="text-base font-bold text-app-text-main truncate group-hover:text-primary transition-colors">
                                                         {client.name || 'Sem Nome'}
                                                     </h3>
                                                     {urgent && (
@@ -525,21 +525,21 @@ export default function ClientListPage() {
                                                 {client.phone && (
                                                     <button 
                                                         onClick={(e) => handleWhatsAppClick(e, client.phone, client.name)}
-                                                        className="p-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-2xl transition-all"
+                                                        className="p-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 rounded-xl transition-all"
                                                         title="Chamar no WhatsApp"
                                                     >
-                                                        <MessageCircle size={20} />
+                                                        <MessageCircle size={16} />
                                                     </button>
                                                 )}
-                                                <div className={clsx(st.bg, st.text, st.border, "px-4 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider border shadow-sm")}>
+                                                <div className={clsx(st.bg, st.text, st.border, "px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border shadow-sm")}>
                                                     {st.label}
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 lg:opacity-10 transition-all duration-300">
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 lg:opacity-10 transition-all duration-300">
                                                 <button 
                                                     onClick={(e) => { e.stopPropagation(); navigate(`/app/processos/kanban?newProcess=true&clientId=${client.id}`); }}
-                                                    className="p-2.5 text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/50 rounded-xl"
+                                                    className="p-2 text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/50 rounded-lg"
                                                 >
                                                     <Plus size={18} />
                                                 </button>

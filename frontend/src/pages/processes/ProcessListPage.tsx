@@ -100,13 +100,13 @@ export default function ProcessListPage() {
                 <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
                     <div className="space-y-1">
                         <div className="flex items-center gap-3 mb-1">
-                            <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
-                                <FileText className="text-primary" size={20} />
+                            <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <FileText className="text-primary" size={16} />
                             </div>
-                            <h1 className="text-4xl font-black text-app-text-main tracking-tighter">Processos</h1>
+                            <h1 className="text-3xl font-black text-app-text-main tracking-tighter">Processos</h1>
                         </div>
-                        <p className="text-app-text-muted text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                        <p className="text-app-text-muted text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                             {filteredProcesses.length} casos {activeFilter !== 'Todos' ? `em ${activeFilter}` : 'localizados'}
                         </p>
                     </div>
@@ -119,20 +119,20 @@ export default function ProcessListPage() {
                                 placeholder="Buscar processo, número ou cliente..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3.5 bg-app-card border border-app-stroke rounded-2xl text-sm font-bold text-app-text-main focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all shadow-sm group-hover:border-app-stroke/80"
+                                className="w-full pl-12 pr-4 py-2.5 bg-app-card border border-app-stroke rounded-xl text-sm font-bold text-app-text-main focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all shadow-sm group-hover:border-app-stroke/80"
                             />
                         </div>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => { navigate('/app/processos/kanban'); haptics.light(); }}
-                                className="flex-1 sm:flex-none bg-app-card border border-app-stroke text-app-text-main px-6 py-3.5 rounded-2xl items-center gap-2 hover:bg-app-stroke/30 transition-all font-black text-[10px] uppercase tracking-widest active:scale-95 shadow-sm"
+                                className="flex-1 sm:flex-none bg-app-card border border-app-stroke text-app-text-main px-4 py-2.5 rounded-xl items-center gap-2 hover:bg-app-stroke/30 transition-all font-black text-[10px] uppercase tracking-widest active:scale-95 shadow-sm"
                             >
                                 <Layout size={18} />
                                 Quadro
                             </button>
                             <button
                                 onClick={() => { navigate('/app/processos/novo'); haptics.medium(); }}
-                                className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-6 py-3.5 rounded-2xl items-center gap-2 font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-black/20 active:scale-95"
+                                className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-4 py-2.5 rounded-xl items-center gap-2 font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-black/20 active:scale-95"
                             >
                                 <Plus size={18} />
                                 Novo
@@ -149,7 +149,7 @@ export default function ProcessListPage() {
                                 key={filter}
                                 onClick={() => { setActiveFilter(filter); haptics.light(); }}
                                 className={clsx(
-                                    "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap",
+                                    "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap",
                                     activeFilter === filter
                                         ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
                                         : "text-app-text-muted hover:bg-app-stroke/50 hover:text-app-text-main"
@@ -164,7 +164,7 @@ export default function ProcessListPage() {
                         ))}
                     </div>
                     <div className="h-8 w-px bg-app-stroke/50 hidden sm:block mx-2"></div>
-                    <button className="p-3 bg-app-card border border-app-stroke rounded-2xl text-app-text-muted hover:text-primary transition-all shadow-sm active:scale-90">
+                    <button className="p-2.5 bg-app-card border border-app-stroke rounded-xl text-app-text-muted hover:text-primary transition-all shadow-sm active:scale-90">
                         <Filter size={18} />
                     </button>
                 </div>
@@ -387,7 +387,7 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
             variants={itemVariants}
             layout
             className={clsx(
-                "bg-app-card rounded-[2.5rem] border p-8 transition-all cursor-pointer shadow-sm relative overflow-hidden group touch-manipulation",
+                "bg-app-card rounded-[1.5rem] border p-6 transition-all cursor-pointer shadow-sm relative overflow-hidden group touch-manipulation",
                 isSelected ? "border-primary shadow-2xl shadow-primary/10 ring-4 ring-primary/5" : "border-app-stroke hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
             )}
             onClick={onSelect}
@@ -416,7 +416,7 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
             </div>
 
             <div className="mb-6 space-y-2">
-                <h3 className="text-2xl font-black text-app-text-main tracking-tighter line-clamp-2 leading-tight group-hover:text-primary transition-colors">{proc.title}</h3>
+                <h3 className="text-xl font-black text-app-text-main tracking-tighter line-clamp-2 leading-tight group-hover:text-primary transition-colors">{proc.title}</h3>
                 <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-app-stroke/20 rounded-lg flex items-center justify-center shrink-0">
                         <Users size={12} className="text-app-text-muted" />
@@ -433,7 +433,7 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] font-black text-app-text-main uppercase tracking-widest">{proc.kanbanColumn?.replace('_', ' ') || 'Processo Ativo'}</span>
                     </div>
-                    <span className="text-lg font-black text-app-text-main tracking-tighter">{progress}%</span>
+                    <span className="text-base font-black text-app-text-main tracking-tighter">{progress}%</span>
                 </div>
                 <div className="h-3 w-full bg-app-stroke/20 rounded-full overflow-hidden p-0.5 border border-app-stroke/30">
                     <motion.div 
@@ -460,7 +460,7 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
                 </div>
                 <button 
                     onClick={(e) => { e.stopPropagation(); onNavigate(); }}
-                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-app-text-main bg-app-stroke/20 hover:bg-primary hover:text-white px-5 py-2.5 rounded-2xl transition-all active:scale-95 border border-app-stroke/50 hover:border-primary shadow-sm"
+                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-app-text-main bg-app-stroke/20 hover:bg-primary hover:text-white px-4 py-2 rounded-xl transition-all active:scale-95 border border-app-stroke/50 hover:border-primary shadow-sm"
                 >
                     Acessar <ChevronRight size={14} />
                 </button>
