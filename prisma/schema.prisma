@@ -42,6 +42,7 @@ model Tenant {
   settings             TenantSettings?
   timeEntries          TimeEntry[]
   users                User[]
+  financialCategories  FinancialCategory[]
 }
 
 model User {
@@ -339,10 +340,17 @@ model FinancialRecord {
   isUrgent           Boolean   @default(false)
   tenantId           String
   clientId           String?
+  issAmount          Float?    @default(0)
+  irrfAmount         Float?    @default(0)
+  pisAmount          Float?    @default(0)
+  cofinsAmount       Float?    @default(0)
+  netAmount          Float?    // Valor líquido após retenções
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   cancelledAt        DateTime?                   // Data de estorno/cancelamento
   notes              String?
+  categoryId         String?
+  categoryRef        FinancialCategory? @relation(fields: [categoryId], references: [id])
   client             Client?   @relation(fields: [clientId], references: [id])
   tenant             Tenant    @relation(fields: [tenantId], references: [id])
   invoices           Invoice[]
@@ -708,4 +716,23 @@ model ClientPortalAccess {
   client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([email])
+}
+
+model FinancialCategory {
+  id        String   @id @default(uuid())
+  name      String
+  type      String   // 'INCOME' | 'EXPENSE'
+  code      String?  // Ex: 1.1.1
+  parentId  String?
+  tenantId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  parent    FinancialCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  FinancialCategory[] @relation("CategoryHierarchy")
+  records   FinancialRecord[]
+  tenant    Tenant              @relation(fields: [tenantId], references: [id])
+
+  @@unique([name, type, tenantId, parentId])
+  @@index([tenantId])
 }

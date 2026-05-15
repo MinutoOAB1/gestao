@@ -127,7 +127,18 @@ export class FinancialService {
             clientId: createFinancialDto.clientId || null,
             isUrgent: createFinancialDto.isUrgent || false,
             notes: createFinancialDto.notes || null,
+            categoryId: createFinancialDto.categoryId || null,
             tenantId,
+            issAmount: createFinancialDto.issAmount || 0,
+            irrfAmount: createFinancialDto.irrfAmount || 0,
+            pisAmount: createFinancialDto.pisAmount || 0,
+            cofinsAmount: createFinancialDto.cofinsAmount || 0,
+            netAmount: (createFinancialDto.amount || 0) - (
+                (createFinancialDto.issAmount || 0) + 
+                (createFinancialDto.irrfAmount || 0) + 
+                (createFinancialDto.pisAmount || 0) + 
+                (createFinancialDto.cofinsAmount || 0)
+            )
         };
 
         // Handle recurring payments - create all installments
@@ -376,6 +387,14 @@ export class FinancialService {
         if (data.amount !== undefined && data.amount !== null) {
             data.amount = parseFloat(data.amount);
         }
+
+        // Recalculate Net Amount on update if any tax field changed
+        const amount = data.amount ?? oldRecord.amount;
+        const iss = data.issAmount ?? oldRecord.issAmount ?? 0;
+        const irrf = data.irrfAmount ?? oldRecord.irrfAmount ?? 0;
+        const pis = data.pisAmount ?? oldRecord.pisAmount ?? 0;
+        const cofins = data.cofinsAmount ?? oldRecord.cofinsAmount ?? 0;
+        data.netAmount = amount - (iss + irrf + pis + cofins);
 
         const { partnerId, partnerPercentage, ...prismaData } = data;
 

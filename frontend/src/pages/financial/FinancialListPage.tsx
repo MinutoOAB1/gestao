@@ -15,7 +15,7 @@ import { PartnerModal } from '../../components/financial/PartnerModal';
 
 import { 
     FinancialRecord, Partner, FinancialStats, ProcessItem, ClientItem, 
-    NewTransaction, NewPartner, INCOME_CATEGORIES, EXPENSE_CATEGORY_LIST, 
+    NewTransaction, NewPartner, FinancialCategory, INCOME_CATEGORIES, EXPENSE_CATEGORY_LIST, 
     PARTNER_TYPES, PARTNER_COLORS 
 } from '../../types/financial';
 import { formatBRL } from '../../utils/formatters';
@@ -27,6 +27,7 @@ export default function FinancialListPage() {
     const [processes, setProcesses] = useState<ProcessItem[]>([]);
     const [clients, setClients] = useState<ClientItem[]>([]);
     const [repasses, setRepasses] = useState<any[]>([]);
+    const [categories, setCategories] = useState<FinancialCategory[]>([]);
     const [stats, setStats] = useState<FinancialStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,13 +89,14 @@ export default function FinancialListPage() {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const [recordsRes, statsRes, partnersRes, processesRes, clientsRes, repassesRes] = await Promise.all([
+            const [recordsRes, statsRes, partnersRes, processesRes, clientsRes, repassesRes, categoriesRes] = await Promise.all([
                 api.get('/financial'),
                 api.get('/financial/stats'),
                 api.get('/partnerships').catch(() => ({ data: [] })),
                 api.get('/processes').catch(() => ({ data: [] })),
                 api.get('/clients').catch(() => ({ data: [] })),
-                api.get('/partnerships/transactions/all').catch(() => ({ data: [] }))
+                api.get('/partnerships/transactions/all').catch(() => ({ data: [] })),
+                api.get('/financial-categories').catch(() => ({ data: [] }))
             ]);
             setRecords(recordsRes.data);
             setStats(statsRes.data);
@@ -102,6 +104,7 @@ export default function FinancialListPage() {
             setProcesses(processesRes.data);
             setClients(clientsRes.data);
             setRepasses(repassesRes.data);
+            setCategories(categoriesRes.data);
         } catch (error) {
             console.error('Erro ao buscar dados:', error);
         } finally {
@@ -248,11 +251,16 @@ export default function FinancialListPage() {
                 accrualDate: newTransaction.accrualDate || newTransaction.date,
                 paymentDate: newTransaction.status === 'PAID' ? (newTransaction.paymentDate || newTransaction.date) : null,
                 costCenter: newTransaction.costCenter,
+                categoryId: newTransaction.categoryId,
                 status: newTransaction.status || 'PENDING',
                 recurrenceType: newTransaction.recurrence,
                 totalInstallments: newTransaction.recurrence !== 'UNICA' ? newTransaction.installments : 1,
                 isUrgent: newTransaction.urgent,
                 notes: newTransaction.notes,
+                issAmount: newTransaction.issAmount || 0,
+                irrfAmount: newTransaction.irrfAmount || 0,
+                pisAmount: newTransaction.pisAmount || 0,
+                cofinsAmount: newTransaction.cofinsAmount || 0,
             };
 
             if (newTransaction.linkTo && newTransaction.linkTo.startsWith('client:')) {
@@ -498,9 +506,10 @@ export default function FinancialListPage() {
             amount: record.amount.toString(),
             description: record.description,
             date: record.date ? record.date.substring(0, 10) : new Date().toISOString().split('T')[0],
-            accrualDate: (record as any).accrualDate ? (record as any).accrualDate.substring(0, 10) : (record.date ? record.date.substring(0, 10) : new Date().toISOString().split('T')[0]),
-            paymentDate: (record as any).paymentDate ? (record as any).paymentDate.substring(0, 10) : '',
-            costCenter: (record as any).costCenter || '',
+            accrualDate: record.accrualDate ? record.accrualDate.substring(0, 10) : (record.date ? record.date.substring(0, 10) : new Date().toISOString().split('T')[0]),
+            paymentDate: record.paymentDate ? record.paymentDate.substring(0, 10) : '',
+            costCenter: record.costCenter || '',
+            categoryId: record.categoryId || '',
             status: record.status,
             recurrence: (record.recurrenceType as 'UNICA' | 'MENSAL' | 'ANUAL' | 'PERSONALIZADO') || 'UNICA',
             installments: record.totalInstallments || 1,
@@ -508,7 +517,11 @@ export default function FinancialListPage() {
             notes: record.notes || '',
             linkTo: record.clientId ? `client:${record.clientId}` : '',
             partnerId: record.partnerId || '',
-            partnerPercentage: (record as any).partnerPercentage || 0
+            partnerPercentage: (record as any).partnerPercentage || 0,
+            issAmount: record.issAmount || 0,
+            irrfAmount: record.irrfAmount || 0,
+            pisAmount: record.pisAmount || 0,
+            cofinsAmount: record.cofinsAmount || 0,
         });
         setIsModalOpen(true);
     }, []);
@@ -541,6 +554,7 @@ export default function FinancialListPage() {
         }
     }, [fetchData, addToast]);
 
+
     const resetTransactionForm = () => {
         setNewTransaction({
             type: 'INCOME',
@@ -558,7 +572,11 @@ export default function FinancialListPage() {
             notes: '',
             linkTo: '',
             partnerId: '',
-            partnerPercentage: 0
+            partnerPercentage: 0,
+            issAmount: 0,
+            irrfAmount: 0,
+            pisAmount: 0,
+            cofinsAmount: 0,
         });
     };
 
@@ -1335,6 +1353,7 @@ export default function FinancialListPage() {
                 processes={processes}
                 clients={clients}
                 partners={partners}
+                categories={categories}
                 isSubmitting={isSubmitting}
                 handleSaveTransaction={handleSaveTransaction}
             />
@@ -1591,9 +1610,14 @@ const FinancialTableRow = memo(({
                     </span>
                 </td>
                 <td className="px-5 py-4 text-right whitespace-nowrap">
-                    <span className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>
-                        {record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}
-                    </span>
+                    <div className="flex flex-col items-end">
+                        <span className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>
+                            {record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}
+                        </span>
+                        {record.netAmount !== undefined && record.netAmount !== null && record.netAmount !== record.amount && (
+                            <span className="text-[10px] text-red-500 font-medium leading-none mt-1">Líq: {formatBRL(record.netAmount)}</span>
+                        )}
+                    </div>
                 </td>
                 <td className="px-5 py-4 text-right whitespace-nowrap">
                     {!isGroup && (
@@ -1716,8 +1740,13 @@ const FinancialMobileRow = memo(({
                         {record.client && <p className="text-xs text-app-text-muted mt-1">Cliente: {record.client.name}</p>}
                     </div>
                     <div className="text-right shrink-0">
-                        <p className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>{record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}</p>
-                        <span className={clsx("inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full", record.status === 'PAID' ? "bg-black/10 dark:bg-white/20 text-black dark:text-white" : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "bg-neutral-800 text-white" : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200")}>
+                        <p className={clsx("text-sm font-bold", record.type === 'INCOME' ? "text-black dark:text-white" : "text-neutral-500")}>
+                            {record.type === 'INCOME' ? '+' : '-'}{formatBRL(record.amount)}
+                        </p>
+                        {record.netAmount !== undefined && record.netAmount !== null && record.netAmount !== record.amount && (
+                            <p className="text-[10px] text-red-500 font-medium leading-none mb-1">Líq: {formatBRL(record.netAmount)}</p>
+                        )}
+                        <span className={clsx("inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full", record.status === 'PAID' ? "bg-black/10 dark:bg-white/20 text-black dark:text-white" : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? "bg-neutral-800 text-white" : "bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200")}>
                             {record.status === 'PAID' ? <CheckCircle2 size={10} /> : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? <AlertTriangle size={10} /> : <Hourglass size={10} />}
                             {record.status === 'PAID' ? 'Pago' : (isGroup ? record._anyOverdue : isOverdue(record.date, record.status)) ? 'Atrasado' : 'Pendente'}
                         </span>

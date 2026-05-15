@@ -19,6 +19,26 @@ export interface FinancialRecord {
     isUrgent?: boolean;
     notes?: string;
     paymentMethod?: string;
+    accrualDate?: string;
+    paymentDate?: string | null;
+    costCenter?: string | null;
+    cancelledAt?: string | null;
+    categoryId?: string;
+    categoryRef?: FinancialCategory;
+    issAmount?: number;
+    irrfAmount?: number;
+    pisAmount?: number;
+    cofinsAmount?: number;
+    netAmount?: number;
+}
+
+export interface FinancialCategory {
+    id: string;
+    name: string;
+    type: 'INCOME' | 'EXPENSE';
+    code?: string;
+    parentId?: string;
+    children?: FinancialCategory[];
 }
 
 export interface Partner {
@@ -74,8 +94,13 @@ export interface NewTransaction {
     accrualDate?: string;
     paymentDate?: string;
     costCenter?: string;
+    categoryId?: string;
     partnerId?: string;
     partnerPercentage?: number;
+    issAmount?: number;
+    irrfAmount?: number;
+    pisAmount?: number;
+    cofinsAmount?: number;
 }
 
 export interface NewPartner {

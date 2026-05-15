@@ -2,18 +2,10 @@ import React, { useMemo } from 'react';
 import { Send, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
 
-interface Record {
-    id: string;
-    description: string;
-    amount: number;
-    date: string;
-    status: string;
-    client?: { id: string; name: string };
-    type: 'INCOME' | 'EXPENSE';
-}
+import { FinancialRecord } from '../../types/financial';
 
 interface InadimplenciaTabProps {
-    records: Record[];
+    records: FinancialRecord[];
 }
 
 export const InadimplenciaTab: React.FC<InadimplenciaTabProps> = ({ records }) => {

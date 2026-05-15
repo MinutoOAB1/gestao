@@ -1,6 +1,7 @@
 export class CreateFinancialDto {
     type: string; // 'INCOME' | 'EXPENSE'
     category: string;
+    categoryId?: string;
     amount: number;
     description: string;
     date?: string; // ISO Date (Expected/Due Date)
@@ -25,5 +26,12 @@ export class CreateFinancialDto {
 
     // Additional notes
     notes?: string;
+
+    // Phase 2: Taxes and Retentions
+    issAmount?: number;
+    irrfAmount?: number;
+    pisAmount?: number;
+    cofinsAmount?: number;
+    netAmount?: number;
 }
 

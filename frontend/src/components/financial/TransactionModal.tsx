@@ -2,9 +2,10 @@ import React from 'react';
 import { TrendingUp, TrendingDown, Users, Paperclip, Download } from 'lucide-react';
 import { clsx } from 'clsx';
 import Modal from '../ui/Modal';
+import { formatBRL } from '../../utils/formatters';
 import { 
     NewTransaction, Partner, ProcessItem, ClientItem, 
-    INCOME_CATEGORIES, EXPENSE_CATEGORY_LIST 
+    INCOME_CATEGORIES, EXPENSE_CATEGORY_LIST, FinancialCategory 
 } from '../../types/financial';
 
 interface TransactionModalProps {
@@ -15,14 +16,37 @@ interface TransactionModalProps {
     processes: ProcessItem[];
     clients: ClientItem[];
     partners: Partner[];
+    categories: FinancialCategory[];
     isSubmitting: boolean;
     handleSaveTransaction: () => void;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
     isOpen, onClose, newTransaction, setNewTransaction,
-    processes, clients, partners, isSubmitting, handleSaveTransaction
+    processes, clients, partners, categories, isSubmitting, handleSaveTransaction
 }) => {
+    const renderCategoryOptions = (cats: FinancialCategory[], depth = 0) => {
+        return cats.map(cat => (
+            <React.Fragment key={cat.id}>
+                <option value={cat.name} data-id={cat.id}>
+                    {'\u00A0'.repeat(depth * 4)}{cat.code ? `${cat.code} - ` : ''}{cat.name}
+                </option>
+                {/* Note: In a real implementation we might want to prevent selection of parent categories if they are just groups */}
+            </React.Fragment>
+        ));
+    };
+
+    // Filter categories by type
+    const filteredCategories = categories.filter(c => c.type === newTransaction.type && !c.parentId);
+    // Sort by code
+    const sortedCategories = [...filteredCategories].sort((a, b) => (a.code || '').localeCompare(b.code || ''));
+    
+    // Flatten categories for simpler select if needed, or use the hierarchical rendering
+    // For now, let's just show them all in order
+    const allFiltered = categories
+        .filter(c => c.type === newTransaction.type)
+        .sort((a, b) => (a.code || '').localeCompare(b.code || ''));
+
     return (
         <Modal
             isOpen={isOpen}
@@ -119,6 +143,64 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                         />
                     </div>
                 </div>
+                
+                {/* Taxes Section (Phase 2) */}
+                <div className="bg-red-50/30 border border-red-100 rounded-xl p-4">
+                    <h3 className="text-sm font-semibold text-red-900 mb-3 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-400 rounded-full" />
+                        Impostos e Retenções (Opcional)
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div>
+                            <label className="block text-[10px] font-medium text-red-700/60 mb-1 uppercase">ISS (R$)</label>
+                            <input
+                                type="number"
+                                value={newTransaction.issAmount || ''}
+                                onChange={e => setNewTransaction({ ...newTransaction, issAmount: parseFloat(e.target.value) || 0 })}
+                                className="w-full bg-white/50 border border-red-100 rounded-lg px-3 py-2 text-sm text-red-900 outline-none focus:border-red-400 transition-colors"
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-medium text-red-700/60 mb-1 uppercase">IRRF (R$)</label>
+                            <input
+                                type="number"
+                                value={newTransaction.irrfAmount || ''}
+                                onChange={e => setNewTransaction({ ...newTransaction, irrfAmount: parseFloat(e.target.value) || 0 })}
+                                className="w-full bg-white/50 border border-red-100 rounded-lg px-3 py-2 text-sm text-red-900 outline-none focus:border-red-400 transition-colors"
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-medium text-red-700/60 mb-1 uppercase">PIS (R$)</label>
+                            <input
+                                type="number"
+                                value={newTransaction.pisAmount || ''}
+                                onChange={e => setNewTransaction({ ...newTransaction, pisAmount: parseFloat(e.target.value) || 0 })}
+                                className="w-full bg-white/50 border border-red-100 rounded-lg px-3 py-2 text-sm text-red-900 outline-none focus:border-red-400 transition-colors"
+                                placeholder="0.00"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-medium text-red-700/60 mb-1 uppercase">COFINS (R$)</label>
+                            <input
+                                type="number"
+                                value={newTransaction.cofinsAmount || ''}
+                                onChange={e => setNewTransaction({ ...newTransaction, cofinsAmount: parseFloat(e.target.value) || 0 })}
+                                className="w-full bg-white/50 border border-red-100 rounded-lg px-3 py-2 text-sm text-red-900 outline-none focus:border-red-400 transition-colors"
+                                placeholder="0.00"
+                            />
+                        </div>
+                    </div>
+                    {(newTransaction.issAmount || 0) + (newTransaction.irrfAmount || 0) + (newTransaction.pisAmount || 0) + (newTransaction.cofinsAmount || 0) > 0 && (
+                        <div className="mt-3 pt-3 border-t border-red-100 flex justify-between items-center">
+                            <span className="text-xs font-medium text-red-800">Valor Líquido Estimado:</span>
+                            <span className="text-sm font-black text-red-900">
+                                {formatBRL((parseFloat(newTransaction.amount) || 0) - ((newTransaction.issAmount || 0) + (newTransaction.irrfAmount || 0) + (newTransaction.pisAmount || 0) + (newTransaction.cofinsAmount || 0)))}
+                            </span>
+                        </div>
+                    )}
+                </div>
 
                 {/* Classification & Links Section */}
                 <div className="bg-app-bg/30 border border-app-stroke rounded-xl p-4">
@@ -131,13 +213,31 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                             <label className="block text-[10px] font-medium text-app-text-muted mb-1 uppercase">Categoria</label>
                             <select
                                 value={newTransaction.category}
-                                onChange={e => setNewTransaction({ ...newTransaction, category: e.target.value })}
+                                onChange={e => {
+                                    const selectedCat = allFiltered.find(c => c.name === e.target.value);
+                                    setNewTransaction({ 
+                                        ...newTransaction, 
+                                        category: e.target.value,
+                                        categoryId: selectedCat?.id 
+                                    });
+                                }}
                                 className="w-full bg-app-bg/50 border border-app-stroke rounded-lg px-4 py-2.5 text-sm text-app-text-main outline-none focus:border-primary transition-colors"
                             >
                                 <option value="">Selecione uma categoria...</option>
-                                {(newTransaction.type === 'INCOME' ? INCOME_CATEGORIES : EXPENSE_CATEGORY_LIST).map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
+                                {allFiltered.length > 0 ? (
+                                    allFiltered.map(cat => {
+                                        const depth = (cat.code?.split('.').length || 1) - 1;
+                                        return (
+                                            <option key={cat.id} value={cat.name}>
+                                                {'\u00A0'.repeat(depth * 4)}{cat.code ? `${cat.code} - ` : ''}{cat.name}
+                                            </option>
+                                        );
+                                    })
+                                ) : (
+                                    (newTransaction.type === 'INCOME' ? INCOME_CATEGORIES : EXPENSE_CATEGORY_LIST).map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))
+                                )}
                             </select>
                         </div>
                         <div className="sm:col-span-1">
