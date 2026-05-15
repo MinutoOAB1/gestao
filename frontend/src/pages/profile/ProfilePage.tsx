@@ -1,23 +1,34 @@
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
-import { User, Camera, Mail, Phone, MapPin, Shield, Save, X, BadgeCheck, Briefcase, ArrowLeft, Palette } from 'lucide-react';
+import { User, Camera, Mail, Phone, MapPin, Shield, Save, X, BadgeCheck, Briefcase, ArrowLeft, Palette, CheckCircle2, AlertCircle, Sparkles, UserCircle } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx } from 'clsx';
+import { motion, AnimatePresence } from 'framer-motion';
+import { haptics } from '../../utils/haptics';
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+const PremiumInput = memo(({ label, icon: Icon, ...props }: any) => (
+    <div className="space-y-2 group">
+        <label className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] ml-1 group-focus-within:text-primary transition-colors">{label}</label>
+        <div className="relative">
+            {Icon && <Icon size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-app-text-muted group-focus-within:text-primary transition-colors" />}
+            <input
+                {...props}
+                className={clsx(
+                    "w-full bg-app-bg border border-app-stroke rounded-[1.5rem] py-4 text-app-text-main text-sm font-bold focus:border-primary outline-none transition-all shadow-inner focus:ring-4 focus:ring-primary/10",
+                    Icon ? "pl-14 pr-5" : "px-6"
+                )}
+            />
+        </div>
+    </div>
+));
 
 export default function ProfilePage() {
     const { user, updateUser } = useAuth();
     const navigate = useNavigate();
-    const { collapsed } = useOutletContext<{ collapsed: boolean }>() || { collapsed: false };
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(true);
-
     const [formData, setFormData] = useState({
         name: user?.name || '',
         email: user?.email || '',
@@ -51,7 +62,6 @@ export default function ProfilePage() {
         }
     }, [bannerColor, user?.id]);
 
-    // Fetch profile data on mount
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -81,6 +91,7 @@ export default function ProfilePage() {
     }, []);
 
     const handleAvatarClick = () => {
+        haptics.light();
         fileInputRef.current?.click();
     };
 
@@ -97,6 +108,7 @@ export default function ProfilePage() {
     };
 
     const handleSave = async () => {
+        haptics.medium();
         setSaving(true);
         setMessage(null);
         try {
@@ -115,9 +127,9 @@ export default function ProfilePage() {
             });
             updateUser({ name: res.data.name, avatar: res.data.avatar });
             setMessage({ type: 'success', text: 'Perfil atualizado com sucesso!' });
+            setTimeout(() => setMessage(null), 3000);
         } catch (error) {
-            console.error('Error updating profile:', error);
-            setMessage({ type: 'error', text: 'Erro ao atualizar perfil. Tente novamente.' });
+            setMessage({ type: 'error', text: 'Erro ao atualizar. Tente novamente.' });
         } finally {
             setSaving(false);
         }
@@ -134,333 +146,359 @@ export default function ProfilePage() {
     };
 
     const tabs = [
-        { id: 'personal', label: 'Dados Pessoais' },
-        { id: 'professional', label: 'Profissional' },
-        { id: 'contact', label: 'Contato' },
-        { id: 'security', label: 'Segurança' },
+        { id: 'personal', label: 'Dados Pessoais', icon: UserCircle },
+        { id: 'professional', label: 'Profissional', icon: Briefcase },
+        { id: 'contact', label: 'Contato', icon: Mail },
+        { id: 'security', label: 'Segurança', icon: Shield },
     ];
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-app-input flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4 animate-in fade-in duration-300">
-                    <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-lg" />
-                    <p className="text-app-text-muted font-bold tracking-wide">Carregando perfil...</p>
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-6">
+                    <motion.div 
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full" 
+                    />
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-app-text-muted animate-pulse">Sincronizando perfil...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="animate-in fade-in duration-500">
-            <div className="bg-app-card/40 dark:bg-app-input/20 backdrop-blur-md rounded-[2.5rem] border border-app-stroke/30 shadow-2xl overflow-hidden mb-12">
-                <div className="px-6 sm:px-10 py-10">
-                {/* Profile Header Banner */}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-[1200px] mx-auto space-y-10 pb-20"
+        >
+            <div className="bg-app-card rounded-[3rem] border border-app-stroke shadow-2xl overflow-hidden relative group">
+                {/* Visual Banner */}
                 <div 
-                    className="rounded-[2rem] shadow-lg mb-10 overflow-hidden relative group/banner transition-all duration-500 hover:shadow-primary/10"
-                    style={{ backgroundColor: bannerColor, minHeight: '180px' }}
+                    className="h-64 relative overflow-hidden transition-all duration-700"
+                    style={{ backgroundColor: bannerColor }}
                 >
-                    <div className="absolute top-4 right-4 z-20">
-                        <label className="cursor-pointer bg-black/20 hover:bg-black/40 text-white px-3 py-2 rounded-lg backdrop-blur-sm transition-colors flex items-center gap-2">
-                            <Palette size={16} />
-                            <span className="text-xs font-medium">Cor</span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <motion.div 
+                        animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
+                        transition={{ duration: 10, repeat: Infinity }}
+                        className="absolute -top-20 -right-20 w-96 h-96 bg-white rounded-full blur-[100px]" 
+                    />
+                    
+                    <div className="absolute top-8 right-8 z-20">
+                        <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-2xl backdrop-blur-md border border-white/10 transition-all flex items-center gap-3 active:scale-95 group/color">
+                            <Palette size={18} className="group-hover/color:rotate-12 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Personalizar</span>
                             <input 
                                 type="color" 
                                 value={bannerColor}
-                                onChange={(e) => setBannerColor(e.target.value)}
+                                onChange={(e) => { haptics.light(); setBannerColor(e.target.value); }}
                                 className="opacity-0 w-0 h-0 absolute"
                             />
                         </label>
                     </div>
-                    
-                    <div className="absolute inset-0 flex items-center px-6 sm:px-10">
-                        <div className="flex items-center gap-6 z-10 w-full">
-                            <div className="relative group cursor-pointer flex-shrink-0" onClick={handleAvatarClick}>
-                                <Avatar
-                                    src={formData.avatar || undefined}
-                                    name={formData.name}
-                                    size="xl"
-                                    className="w-24 h-24 sm:w-28 sm:h-28 border-4 border-white/20 shadow-xl relative z-10"
-                                />
-                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20 m-1">
-                                    <Camera size={24} className="text-white drop-shadow-md" />
-                                </div>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleAvatarChange}
-                                    className="hidden"
-                                />
-                            </div>
 
-                            <div className="flex flex-col text-left text-white drop-shadow-lg flex-1">
-                                <h2 className="text-3xl sm:text-4xl font-black tracking-tight">{formData.name || 'Seu Nome'}</h2>
-                                <p className="font-bold mt-1 text-white/90 text-sm sm:text-base bg-black/10 self-start px-3 py-1 rounded-full backdrop-blur-sm">{getRoleLabel(user?.role || 'LAWYER')}</p>
+                    <div className="absolute bottom-8 left-10 flex items-center gap-8 z-10 w-full">
+                        <div className="relative group cursor-pointer shrink-0" onClick={handleAvatarClick}>
+                            <Avatar
+                                src={formData.avatar || undefined}
+                                name={formData.name}
+                                size="xl"
+                                className="w-32 h-32 sm:w-40 sm:h-40 border-8 border-white/10 shadow-2xl relative z-10 rounded-[2.5rem]"
+                            />
+                            <div className="absolute inset-0 bg-black/40 rounded-[2.5rem] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20 m-1 border-2 border-white/20">
+                                <Camera size={32} className="text-white drop-shadow-lg" />
                             </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleAvatarChange}
+                                className="hidden"
+                            />
                         </div>
-                    </div>
-                </div>
 
-                {/* Minimalist Tabs */}
-                <div className="mb-8 border-b border-app-stroke/50">
-                    <div className="flex gap-6 overflow-x-auto scrollbar-hide px-2">
-                        {tabs.map(tab => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={cn(
-                                    "px-1 py-4 text-sm font-bold whitespace-nowrap transition-all border-b-2 relative -bottom-px",
-                                    activeTab === tab.id
-                                        ? "text-primary border-primary"
-                                        : "text-app-text-muted border-transparent hover:text-app-text-main hover:border-app-stroke"
-                                )}
+                        <div className="space-y-3 pb-2">
+                            <motion.h2 
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                className="text-4xl sm:text-5xl font-black text-white tracking-tighter leading-none"
                             >
-                                {tab.label}
-                            </button>
-                        ))}
+                                {formData.name || 'Seu Nome'}
+                            </motion.h2>
+                            <div className="flex items-center gap-3">
+                                <span className="px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                    <Sparkles size={12} className="text-yellow-400" />
+                                    {getRoleLabel(user?.role || 'LAWYER')}
+                                </span>
+                                {formData.oabNumber && (
+                                    <span className="px-4 py-1.5 bg-black/20 backdrop-blur-md border border-white/5 rounded-full text-[10px] font-black text-white/80 uppercase tracking-widest">
+                                        OAB {formData.oabNumber}/{formData.oabState}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Content Area */}
-                <div className="max-w-4xl pb-24">
-                    {/* Personal Info Card */}
-                    {activeTab === 'personal' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="mb-6">
-                                <h3 className="text-xl font-bold text-app-text-main">Informações Pessoais</h3>
-                                <p className="text-sm text-app-text-muted mt-1">Atualize seus dados básicos e biografia.</p>
-                            </div>
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-app-text-main mb-2">Nome Completo</label>
-                                    <input
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                        className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">CPF</label>
-                                        <input
-                                            type="text"
-                                            value={formData.cpf}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
-                                            placeholder="000.000.000-00"
-                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Data de Nascimento</label>
-                                        <input
-                                            type="date"
-                                            value={formData.birthDate}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, birthDate: e.target.value }))}
-                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-app-text-main mb-2">Bio Profissional</label>
-                                    <textarea
-                                        value={formData.bio}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                                        placeholder="Descreva sua experiência, currículo e especialidades..."
-                                        rows={4}
-                                        className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm resize-y"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                <div className="px-10 py-12 space-y-12">
+                    {/* Modern Tabs */}
+                    <div className="flex gap-2 p-1.5 bg-app-bg border border-app-stroke rounded-3xl w-fit">
+                        {tabs.map(tab => {
+                            const Icon = tab.icon;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => { haptics.light(); setActiveTab(tab.id); }}
+                                    className={clsx(
+                                        "flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        activeTab === tab.id
+                                            ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                            : "text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30"
+                                    )}
+                                >
+                                    <Icon size={16} />
+                                    <span className="hidden sm:inline">{tab.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
 
-                    {/* Contact Card */}
-                    {activeTab === 'contact' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="mb-6">
-                                <h3 className="text-xl font-bold text-app-text-main">Contato & Endereço</h3>
-                                <p className="text-sm text-app-text-muted mt-1">Onde clientes e equipe podem te encontrar.</p>
-                            </div>
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-bold text-app-text-main mb-2">Email Oficial</label>
-                                    <div className="relative">
-                                        <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
-                                        <input
-                                            type="email"
-                                            value={formData.email}
-                                            disabled
-                                            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input/50 border border-app-stroke/50 text-app-text-muted text-sm font-medium cursor-not-allowed"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-app-text-muted mt-2 ml-1">Para alterar o e-mail oficial procure o administrador.</p>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Telefone Comercial</label>
-                                        <div className="relative">
-                                            <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
-                                            <input
-                                                type="tel"
-                                                value={formData.phone}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                                                placeholder="(00) 0000-0000"
-                                                className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                        <div className="lg:col-span-2">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={activeTab}
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="space-y-10"
+                                >
+                                    {activeTab === 'personal' && (
+                                        <div className="space-y-8">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                                <PremiumInput 
+                                                    label="Nome Completo"
+                                                    value={formData.name}
+                                                    onChange={(e: any) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                                />
+                                                <PremiumInput 
+                                                    label="CPF"
+                                                    value={formData.cpf}
+                                                    placeholder="000.000.000-00"
+                                                    onChange={(e: any) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
+                                                />
+                                                <PremiumInput 
+                                                    label="Data de Nascimento"
+                                                    type="date"
+                                                    value={formData.birthDate}
+                                                    onChange={(e: any) => setFormData(prev => ({ ...prev, birthDate: e.target.value }))}
+                                                />
+                                            </div>
+                                            <div className="space-y-2 group">
+                                                <label className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] ml-1 group-focus-within:text-primary transition-colors">Bio Profissional</label>
+                                                <textarea
+                                                    value={formData.bio}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                                                    placeholder="Sua trajetória, expertises e visão..."
+                                                    rows={6}
+                                                    className="w-full bg-app-bg border border-app-stroke rounded-[2rem] px-8 py-6 text-app-text-main text-sm font-bold focus:border-primary outline-none transition-all shadow-inner resize-none focus:ring-4 focus:ring-primary/10"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'contact' && (
+                                        <div className="space-y-8">
+                                            <PremiumInput 
+                                                label="Email Oficial"
+                                                icon={Mail}
+                                                value={formData.email}
+                                                disabled
+                                            />
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                                <PremiumInput 
+                                                    label="Telefone Comercial"
+                                                    icon={Phone}
+                                                    value={formData.phone}
+                                                    onChange={(e: any) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                                                />
+                                                <PremiumInput 
+                                                    label="WhatsApp"
+                                                    icon={Phone}
+                                                    value={formData.mobile}
+                                                    onChange={(e: any) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                                                />
+                                            </div>
+                                            <PremiumInput 
+                                                label="Endereço de Atendimento"
+                                                icon={MapPin}
+                                                value={formData.address}
+                                                onChange={(e: any) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                                             />
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Celular / WhatsApp</label>
-                                        <div className="relative">
-                                            <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
-                                            <input
-                                                type="tel"
-                                                value={formData.mobile}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                                                placeholder="(00) 00000-0000"
-                                                className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-app-text-main mb-2">Endereço de Atendimento</label>
-                                    <div className="relative">
-                                        <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
-                                        <input
-                                            type="text"
-                                            value={formData.address}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                                            placeholder="Rua, número, bairro, cidade - UF"
-                                            className="w-full pl-12 pr-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                                    )}
 
-                    {/* Professional Card */}
-                    {activeTab === 'professional' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="mb-6">
-                                <h3 className="text-xl font-bold text-app-text-main">Dados Profissionais</h3>
-                                <p className="text-sm text-app-text-muted mt-1">Suas credenciais na OAB e áreas de expertise.</p>
-                            </div>
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Número da OAB</label>
-                                        <input
-                                            type="text"
-                                            value={formData.oabNumber}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, oabNumber: e.target.value }))}
-                                            placeholder="Ex: 123456"
-                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono"
-                                        />
+                                    {activeTab === 'professional' && (
+                                        <div className="space-y-10">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                                <PremiumInput 
+                                                    label="Número da OAB"
+                                                    icon={BadgeCheck}
+                                                    value={formData.oabNumber}
+                                                    onChange={(e: any) => setFormData(prev => ({ ...prev, oabNumber: e.target.value }))}
+                                                />
+                                                <div className="space-y-2 group">
+                                                    <label className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] ml-1 group-focus-within:text-primary transition-colors">Seccional (UF)</label>
+                                                    <select
+                                                        value={formData.oabState}
+                                                        onChange={(e) => setFormData(prev => ({ ...prev, oabState: e.target.value }))}
+                                                        className="w-full bg-app-bg border border-app-stroke rounded-[1.5rem] px-6 py-4 text-app-text-main text-sm font-bold focus:border-primary outline-none transition-all shadow-inner appearance-none"
+                                                    >
+                                                        {['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'].map(uf => (
+                                                            <option key={uf} value={uf}>{uf}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="space-y-6">
+                                                <div className="flex items-center justify-between">
+                                                    <label className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] ml-1">Especialidades</label>
+                                                    <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">+ Adicionar Nova</button>
+                                                </div>
+                                                <div className="flex flex-wrap gap-4">
+                                                    {formData.specialties.map((spec, i) => (
+                                                        <motion.span 
+                                                            key={i} 
+                                                            initial={{ scale: 0.8, opacity: 0 }}
+                                                            animate={{ scale: 1, opacity: 1 }}
+                                                            className="flex items-center gap-3 bg-app-bg border border-app-stroke text-app-text-main px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:border-primary transition-all group/spec"
+                                                        >
+                                                            {spec}
+                                                            <button
+                                                                onClick={() => { haptics.light(); setFormData(prev => ({ ...prev, specialties: prev.specialties.filter((_, idx) => idx !== i) })); }}
+                                                                className="text-app-text-muted hover:text-rose-500 transition-colors"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        </motion.span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'security' && (
+                                        <div className="space-y-8">
+                                            <PremiumInput 
+                                                label="Senha Atual"
+                                                type="password"
+                                                placeholder="••••••••••••"
+                                            />
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                                <PremiumInput 
+                                                    label="Nova Senha"
+                                                    type="password"
+                                                    placeholder="Nova senha poderosa"
+                                                />
+                                                <PremiumInput 
+                                                    label="Confirmar Senha"
+                                                    type="password"
+                                                    placeholder="Repita para confirmar"
+                                                />
+                                            </div>
+                                            <div className="bg-primary/5 border border-primary/20 rounded-[2rem] p-8 flex gap-6 items-start">
+                                                <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                                                    <Shield size={24} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h4 className="text-sm font-black text-app-text-main uppercase tracking-tight">Segurança Reforçada</h4>
+                                                    <p className="text-sm text-app-text-muted font-medium leading-relaxed">
+                                                        Sua senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+
+                        <div className="space-y-10">
+                            <div className="bg-app-bg border border-app-stroke rounded-[2.5rem] p-8 space-y-8">
+                                <div className="space-y-1">
+                                    <h3 className="text-sm font-black text-app-text-main uppercase tracking-widest">Resumo do Perfil</h3>
+                                    <p className="text-xs text-app-text-muted font-medium">Status da sua presença digital</p>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-app-card rounded-2xl border border-app-stroke/50">
+                                        <div className="flex items-center gap-3">
+                                            <CheckCircle2 size={18} className="text-emerald-500" />
+                                            <span className="text-xs font-bold text-app-text-main">Email Verificado</span>
+                                        </div>
+                                        <BadgeCheck size={16} className="text-primary" />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Seccional (UF)</label>
-                                        <select
-                                            value={formData.oabState}
-                                            onChange={(e) => setFormData(prev => ({ ...prev, oabState: e.target.value }))}
-                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm cursor-pointer"
+                                    <div className="flex items-center justify-between p-4 bg-app-card rounded-2xl border border-app-stroke/50">
+                                        <div className="flex items-center gap-3">
+                                            <CheckCircle2 size={18} className="text-emerald-500" />
+                                            <span className="text-xs font-bold text-app-text-main">Status da Conta</span>
+                                        </div>
+                                        <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full">Ativa</span>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-app-stroke/50">
+                                    <div className="flex items-start gap-4 text-app-text-muted">
+                                        <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                                        <p className="text-[10px] font-medium leading-relaxed italic">
+                                            Alguns dados como cargo e email oficial requerem validação do administrador para serem alterados.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <button
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                    className="w-full bg-primary text-white font-black uppercase text-[10px] tracking-[0.2em] py-5 rounded-[1.5rem] hover:opacity-90 transition-all shadow-xl shadow-primary/30 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                                >
+                                    {saving ? (
+                                        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                                    ) : <Save size={18} />}
+                                    Salvar Alterações
+                                </button>
+                                <button
+                                    onClick={() => navigate(-1)}
+                                    className="w-full bg-app-bg border border-app-stroke text-app-text-muted font-black uppercase text-[10px] tracking-[0.2em] py-5 rounded-[1.5rem] hover:text-app-text-main hover:bg-app-stroke/30 transition-all"
+                                >
+                                    Descartar
+                                </button>
+                                <AnimatePresence>
+                                    {message && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0 }}
+                                            className={clsx(
+                                                "flex items-center gap-3 p-4 rounded-2xl border",
+                                                message.type === 'success' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" : "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                                            )}
                                         >
-                                            {['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'].map(uf => (
-                                                <option key={uf} value={uf}>{uf}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-app-text-main mb-3">Áreas de Atuação</label>
-                                    <div className="flex flex-wrap gap-2.5">
-                                        {formData.specialties.map((spec, i) => (
-                                            <span key={i} className="inline-flex items-center gap-1.5 bg-primary/10 border border-primary/20 text-primary px-3.5 py-1.5 rounded-full text-sm font-bold shadow-sm">
-                                                {spec}
-                                                <button
-                                                    onClick={() => setFormData(prev => ({ ...prev, specialties: prev.specialties.filter((_, idx) => idx !== i) }))}
-                                                    className="hover:text-red-500 hover:bg-red-50 p-0.5 rounded-full transition-colors ml-1"
-                                                >
-                                                    <X size={14} />
-                                                </button>
-                                            </span>
-                                        ))}
-                                        <button className="inline-flex items-center gap-1.5 border-2 border-dashed border-app-stroke bg-app-input text-app-text-muted px-4 py-1.5 rounded-full text-sm font-bold hover:border-primary hover:text-primary transition-colors shadow-sm">
-                                            + Adicionar Área
-                                        </button>
-                                    </div>
-                                </div>
+                                            {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                                            <span className="text-xs font-bold">{message.text}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
-                    )}
-
-                    {/* Security Card */}
-                    {activeTab === 'security' && (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="mb-6">
-                                <h3 className="text-xl font-bold text-app-text-main">Segurança da Conta</h3>
-                                <p className="text-sm text-app-text-muted mt-1">Gerencie sua senha de acesso.</p>
-                            </div>
-                            <div className="space-y-6">
-                                <div className="max-w-md">
-                                    <label className="block text-sm font-bold text-app-text-main mb-2">Senha Atual</label>
-                                    <input
-                                        type="password"
-                                        placeholder="••••••••••••"
-                                        className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm font-mono tracking-widest"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Nova Senha</label>
-                                        <input
-                                            type="password"
-                                            placeholder="Mínimo 8 caracteres"
-                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold text-app-text-main mb-2">Confirmar Nova Senha</label>
-                                        <input
-                                            type="password"
-                                            placeholder="Repetir nova senha"
-                                            className="w-full px-4 py-3 rounded-2xl bg-app-input border border-app-stroke focus:border-primary focus:ring-4 focus:ring-primary/10 text-app-text-main text-sm font-medium transition-all shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {/* Action Buttons */}
-                    <div className="mt-10 pt-8 border-t border-app-stroke/50 flex flex-col sm:flex-row items-center gap-4 sm:justify-start">
-                        <button
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="px-8 py-3 rounded-2xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:hover:translate-y-0 flex items-center justify-center min-w-[160px]"
-                        >
-                            {saving ? (
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                            ) : null}
-                            Salvar Alterações
-                        </button>
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="px-8 py-3 rounded-2xl text-sm font-bold text-app-text-muted hover:text-app-text-main hover:bg-app-input transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        {message && (
-                            <div className={`ml-auto text-sm font-bold flex items-center gap-2 ${message.type === 'success' ? 'text-emerald-500' : 'text-red-500'}`}>
-                                {message.text}
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
-        </div>
-        </div>
+        </motion.div>
     );
 }

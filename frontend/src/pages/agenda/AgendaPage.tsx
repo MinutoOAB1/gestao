@@ -10,6 +10,7 @@ import { Avatar } from '../../components/ui/Avatar';
 import { ClientDetailPageContent } from '../clients/ClientDetailPage';
 import { ProcessDetailPageContent } from '../processes/ProcessDetailPage';
 import { EventDetailModal } from '../../components/agenda/EventDetailModal';
+import { haptics } from '../../utils/haptics';
 
 interface EventAssignee {
     id: string;
@@ -766,76 +767,95 @@ export default function AgendaPage() {
             {notification && <NotificationToast event={notification} onDismiss={() => setNotification(null)} />}
 
             {/* Main Calendar Area */}
-            <main className="flex-1 bg-white dark:bg-[#111111] border border-app-stroke rounded-[2rem] flex flex-col overflow-hidden shadow-sm">
+            <main className="flex-1 bg-app-card border border-app-stroke rounded-[2.5rem] flex flex-col overflow-hidden shadow-sm transition-all duration-500">
 
-                {/* Header */}
-                <div className="p-4 border-b border-app-stroke bg-[#0F172A] flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex-1 flex items-center justify-between">
-                        <h2 className="text-xl font-black !text-white capitalize tracking-tight">
-                            {getMonthName(currentMonth)} {currentYear}
-                        </h2>
-                        <div className="flex items-center gap-3">
-                            <button onClick={goToToday} className="text-xs font-bold text-white/60 hover:text-white transition-colors uppercase tracking-widest">Hoje</button>
-                            <div className="flex items-center gap-1">
-                                <button onClick={goToPrevMonth} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"><ChevronLeft size={20} /></button>
-                                <button onClick={goToNextMonth} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"><ChevronRight size={20} /></button>
+                {/* Premium Header */}
+                <div className="p-5 border-b border-app-stroke/50 bg-app-card/30 backdrop-blur-md flex flex-col lg:flex-row justify-between items-center gap-6">
+                    <div className="flex-1 flex items-center justify-between w-full">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-black text-app-text-main capitalize tracking-tight flex items-center gap-2">
+                                <CalendarIcon className="text-primary" size={24} />
+                                {getMonthName(currentMonth)} <span className="text-app-text-muted font-light">{currentYear}</span>
+                            </h2>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[10px] font-black text-app-text-muted uppercase tracking-widest">Sincronizado</span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <button onClick={goToToday} className="px-4 py-1.5 rounded-xl border border-app-stroke text-[10px] font-black text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-all uppercase tracking-widest">Hoje</button>
+                            <div className="flex items-center bg-app-stroke/20 p-1 rounded-2xl border border-app-stroke/50">
+                                <button onClick={goToPrevMonth} className="p-2 rounded-xl hover:bg-app-card text-app-text-muted hover:text-app-text-main transition-all"><ChevronLeft size={20} /></button>
+                                <button onClick={goToNextMonth} className="p-2 rounded-xl hover:bg-app-card text-app-text-muted hover:text-app-text-main transition-all"><ChevronRight size={20} /></button>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 shadow-inner">
-                        {(['day', 'week', 'month', 'list'] as const).map(v => (
-                            <button
-                                key={v}
-                                onClick={() => setView(v)}
-                                className={clsx(
-                                    "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 flex items-center gap-2", 
-                                    view === v ? "bg-white text-slate-900 shadow-lg" : "text-white/60 hover:text-white hover:bg-white/5"
-                                )}
-                            >
-                                {v === 'list' && <List size={14} />}
-                                {v === 'day' ? 'Dia' : v === 'week' ? 'Semana' : v === 'month' ? 'Mês' : 'Pauta'}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex gap-2">
-                        <div className="relative" ref={filterRef}>
-                            <button
-                                onClick={() => setShowFilterMenu(!showFilterMenu)}
-                                className={clsx("p-2 border border-app-stroke rounded-lg transition-colors", typeFilter !== 'all' ? "text-primary bg-primary/10 border-primary/50" : "text-app-text-muted hover:text-app-text-main")}
-                            >
-                                <Filter size={16} />
-                            </button>
-                            {showFilterMenu && (
-                                <div className="absolute right-0 top-10 z-50 w-40 bg-app-card border border-app-stroke rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1">
-                                    {EVENT_TYPES.map(t => (
-                                        <button
-                                            key={t.key}
-                                            onClick={() => { setTypeFilter(t.key); setShowFilterMenu(false); }}
-                                            className={clsx("w-full text-left px-3 py-2 text-xs transition-colors", typeFilter === t.key ? "bg-primary/10 text-primary" : "text-app-text-main hover:bg-app-stroke/30")}
-                                        >
-                                            {t.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                        <div className="flex items-center gap-1 bg-app-stroke/30 p-1.5 rounded-2xl border border-app-stroke/50 shadow-inner w-full sm:w-auto">
+                            {(['day', 'week', 'month', 'list'] as const).map(v => (
+                                <button
+                                    key={v}
+                                    onClick={() => { setView(v); }}
+                                    className={clsx(
+                                        "flex-1 sm:flex-none px-4 py-2 rounded-xl text-[10px] font-black transition-all duration-300 flex items-center justify-center gap-2 uppercase tracking-tighter", 
+                                        view === v ? "bg-black dark:bg-white text-white dark:text-black shadow-xl" : "text-app-text-muted hover:text-app-text-main"
+                                    )}
+                                >
+                                    {v === 'list' ? 'Pauta' : v === 'day' ? 'Dia' : v === 'week' ? 'Semana' : 'Mês'}
+                                </button>
+                            ))}
                         </div>
-                        <button onClick={() => setIsNewEventOpen(true)} className="bg-white text-slate-900 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 transition-all shadow-lg active:scale-95 uppercase tracking-tighter">
-                            <Plus size={18} /> Novo Evento
-                        </button>
+
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            <div className="relative flex-1 sm:flex-none" ref={filterRef}>
+                                <button
+                                    onClick={() => setShowFilterMenu(!showFilterMenu)}
+                                    className={clsx("w-full sm:w-auto p-3 border border-app-stroke rounded-2xl transition-all shadow-sm hover:shadow-md", typeFilter !== 'all' ? "text-primary bg-primary/10 border-primary/50" : "bg-app-card text-app-text-muted hover:text-app-text-main")}
+                                >
+                                    <Filter size={18} />
+                                </button>
+                                <AnimatePresence>
+                                    {showFilterMenu && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute right-0 top-14 z-50 w-48 bg-app-card/80 backdrop-blur-xl border border-app-stroke rounded-2xl shadow-2xl p-2"
+                                        >
+                                            <p className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-app-text-label border-b border-app-stroke/50 mb-1 text-center">Filtrar Categoria</p>
+                                            {EVENT_TYPES.map(t => (
+                                                <button
+                                                    key={t.key}
+                                                    onClick={() => { setTypeFilter(t.key); setShowFilterMenu(false); }}
+                                                    className={clsx("w-full text-left px-3 py-2.5 text-xs font-bold rounded-xl transition-all", typeFilter === t.key ? "bg-black dark:bg-white text-white dark:text-black" : "text-app-text-main hover:bg-app-stroke/30")}
+                                                >
+                                                    {t.label}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                            <button onClick={() => setIsNewEventOpen(true)} className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-2xl text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-2xl shadow-black/20 dark:shadow-white/10 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-tighter">
+                                <Plus size={20} strokeWidth={3} /> Novo Evento
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* ⚠ FULL-WIDTH RED BANNER: Prazos Fatais */}
+
+                {/* ⚠ PREMIUM RED BANNER: Prazos Fatais */}
                 {urgentDeadlines.length > 0 && (
-                    <div className="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white px-4 py-1.5 flex items-center gap-3 overflow-hidden shadow-md">
-                        <div className="flex items-center gap-2 shrink-0">
-                            <AlertTriangle size={14} className="shrink-0" />
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider shrink-0">Prazos Fatais</span>
+                    <div className="bg-gradient-to-r from-red-600 via-rose-500 to-red-600 text-white px-6 py-2.5 flex items-center gap-4 overflow-hidden shadow-2xl relative">
+                        <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none" />
+                        <div className="flex items-center gap-2 shrink-0 relative z-10">
+                            <AlertTriangle size={18} className="shrink-0 text-white animate-bounce" />
+                            <span className="text-[11px] font-black uppercase tracking-[0.2em] shrink-0">Prazos Fatais</span>
                         </div>
-                        <div className="h-3 w-px bg-white/30 shrink-0" />
-                        <div className="flex items-center gap-3 overflow-x-auto custom-scrollbar no-scrollbar scrollbar-hide pb-0">
+                        <div className="h-4 w-px bg-white/30 shrink-0 relative z-10" />
+                        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar relative z-10">
                             {urgentDeadlines.map(event => {
                                 const eventDate = new Date(event.start);
                                 const today = new Date();
@@ -850,17 +870,18 @@ export default function AgendaPage() {
                                             setCurrentYear(eventDate.getFullYear());
                                             setIsSidebarOpenMobile(true);
                                         }}
-                                        className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/10 text-[10px] font-semibold whitespace-nowrap hover:bg-white/20 transition-all"
+                                        className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white/20 text-[10px] font-black whitespace-nowrap hover:bg-white/30 transition-all border border-white/20 backdrop-blur-sm"
                                     >
-                                        <span className="font-extrabold">{dateLabel}</span>
-                                        <span className="opacity-80">·</span>
-                                        <span className="truncate max-w-[150px]">{event.title}</span>
+                                        <span className="text-white uppercase">{dateLabel}</span>
+                                        <span className="opacity-50">|</span>
+                                        <span className="truncate max-w-[200px] text-white/90">{event.title}</span>
                                     </button>
                                 );
                             })}
                         </div>
                     </div>
                 )}
+
 
                 {/* User Avatar Filter Bar */}
                 {teamMembers.length > 0 && (
@@ -903,25 +924,49 @@ export default function AgendaPage() {
                     </div>
                 )}
 
-                {/* Monthly Stats Dashboard */}
-                <div className="px-4 py-1.5 border-b border-app-stroke bg-app-bg/30 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-                    <div className="flex items-center gap-1.5 bg-blue-500/5 border border-blue-500/10 rounded-md px-2 py-1 shrink-0">
-                        <Gavel size={12} className="text-blue-400" />
-                        <span className="text-[11px] font-bold text-blue-400">{monthlyStats.hearings}</span>
+                {/* Premium Monthly Stats Dashboard */}
+                <div className="px-5 py-3 border-b border-app-stroke/30 bg-app-bg/10 flex items-center gap-4 overflow-x-auto no-scrollbar scroll-smooth">
+                    <div className="flex items-center gap-3 bg-app-card border border-app-stroke/50 rounded-2xl px-4 py-2 shrink-0 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                            <Gavel size={16} className="text-blue-500" />
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-black text-app-text-muted uppercase tracking-widest leading-none mb-1">Audiências</p>
+                            <p className="text-sm font-black text-app-text-main leading-none">{monthlyStats.hearings}</p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-red-500/5 border border-red-500/10 rounded-md px-2 py-1 shrink-0">
-                        <AlertTriangle size={12} className="text-red-400" />
-                        <span className="text-[11px] font-bold text-red-400">{monthlyStats.deadlines}</span>
+
+                    <div className="flex items-center gap-3 bg-app-card border border-app-stroke/50 rounded-2xl px-4 py-2 shrink-0 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-8 h-8 rounded-xl bg-red-500/10 flex items-center justify-center">
+                            <AlertTriangle size={16} className="text-red-500" />
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-black text-app-text-muted uppercase tracking-widest leading-none mb-1">Prazos</p>
+                            <p className="text-sm font-black text-app-text-main leading-none">{monthlyStats.deadlines}</p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-emerald-500/5 border border-emerald-500/10 rounded-md px-2 py-1 shrink-0">
-                        <Users size={12} className="text-emerald-400" />
-                        <span className="text-[11px] font-bold text-emerald-400">{monthlyStats.meetings}</span>
+
+                    <div className="flex items-center gap-3 bg-app-card border border-app-stroke/50 rounded-2xl px-4 py-2 shrink-0 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                            <Users size={16} className="text-emerald-500" />
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-black text-app-text-muted uppercase tracking-widest leading-none mb-1">Reuniões</p>
+                            <p className="text-sm font-black text-app-text-main leading-none">{monthlyStats.meetings}</p>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-app-stroke/20 border border-app-stroke rounded-md px-2 py-1 shrink-0 ml-auto">
-                        <CalendarIcon size={12} className="text-app-text-muted" />
-                        <span className="text-[11px] font-bold text-app-text-main">{monthlyStats.total}</span>
+
+                    <div className="ml-auto flex items-center gap-3 bg-app-card border border-app-stroke/50 rounded-2xl px-4 py-2 shrink-0 shadow-sm">
+                        <div className="w-8 h-8 rounded-xl bg-app-stroke/30 flex items-center justify-center">
+                            <CalendarIcon size={16} className="text-app-text-muted" />
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-black text-app-text-muted uppercase tracking-widest leading-none mb-1">Total</p>
+                            <p className="text-sm font-black text-app-text-main leading-none">{monthlyStats.total}</p>
+                        </div>
                     </div>
                 </div>
+
 
                 {/* Calendar Content */}
                 <div className="flex-1 flex flex-col min-h-0">
@@ -935,15 +980,15 @@ export default function AgendaPage() {
                             className="flex-1 flex flex-col min-h-0"
                         >
                             {view === 'month' && (
-                                <div className="border border-app-stroke rounded-xl bg-app-bg overflow-hidden flex flex-col h-full">
-                                    <div className="grid grid-cols-7 bg-white dark:bg-[#111111] border-b border-app-stroke">
+                                <div className="border border-app-stroke/50 rounded-[2rem] bg-app-bg/50 overflow-hidden flex flex-col h-full shadow-inner">
+                                    <div className="grid grid-cols-7 bg-app-card/50 backdrop-blur-sm border-b border-app-stroke/50">
                                         {DAYS_SHORT.map(day => (
-                                            <div key={day} className="text-center text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] py-4 border-r border-app-stroke last:border-r-0 bg-app-bg/5">
+                                            <div key={day} className="text-center text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] py-5 border-r border-app-stroke last:border-r-0">
                                                 {day}
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="grid grid-cols-7 flex-1 auto-rows-fr overflow-y-auto custom-scrollbar">
+                                    <div className="grid grid-cols-7 flex-1 auto-rows-fr overflow-y-auto no-scrollbar">
                                         {calendarDays.map((day, idx) => {
                                             const dayEvents = day ? (eventsByDay.get(day) || []) : [];
                                             const isToday = day === new Date().getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear();
@@ -965,43 +1010,42 @@ export default function AgendaPage() {
                                                         }
                                                     }}
                                                     className={clsx(
-                                                        "relative min-h-[80px] sm:min-h-[120px] p-1 border-r border-b border-app-stroke cursor-pointer transition-all hover:bg-app-stroke/5 group",
+                                                        "relative min-h-[100px] p-2 border-r border-b border-app-stroke cursor-pointer transition-all hover:bg-app-card/40 group",
                                                         (idx + 1) % 7 === 0 && "border-r-0",
                                                         !day && "bg-app-stroke/5 pointer-events-none"
                                                     )}
                                                 >
                                                     {day && (
                                                         <>
-                                                            <div className="flex justify-end mb-1">
+                                                            <div className="flex justify-end mb-2">
                                                                 <span className={clsx(
-                                                                    "w-6 h-6 flex items-center justify-center text-xs font-bold rounded-full transition-all",
-                                                                    isToday ? "bg-primary text-white shadow-sm ring-4 ring-primary/10" : 
-                                                                    isSelected ? "bg-slate-200 dark:bg-slate-700 text-app-text-main" : 
+                                                                    "w-7 h-7 flex items-center justify-center text-[11px] font-black rounded-xl transition-all",
+                                                                    isToday ? "bg-black dark:bg-white text-white dark:text-black shadow-lg scale-110 ring-4 ring-primary/10" : 
+                                                                    isSelected ? "bg-app-stroke text-app-text-main" : 
                                                                     "text-app-text-muted group-hover:text-app-text-main"
                                                                 )}>
                                                                     {day}
                                                                 </span>
                                                             </div>
 
-                                                            <div className="space-y-1 overflow-hidden">
-                                                                {sortedDayEvents.slice(0, 4).map((event) => (
+                                                            <div className="space-y-1.5 overflow-hidden">
+                                                                {sortedDayEvents.slice(0, 3).map((event) => (
                                                                     <div 
                                                                         key={event.id}
                                                                         onClick={(e) => { e.stopPropagation(); handleViewClick(event, e); }}
                                                                         className={clsx(
-                                                                            "text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded border truncate cursor-pointer",
-                                                                            "transition-all duration-200 hover:scale-[1.05] hover:shadow-md hover:z-50",
-                                                                            event.completed ? "opacity-40 grayscale italic line-through bg-slate-100 border-slate-200 text-slate-500" : 
+                                                                            "text-[9px] px-2 py-1 rounded-lg border truncate cursor-pointer font-bold",
+                                                                            "transition-all duration-300 hover:scale-[1.05] hover:shadow-lg hover:z-50",
+                                                                            event.completed ? "opacity-30 grayscale italic line-through bg-app-stroke/50 border-app-stroke text-app-text-muted" : 
                                                                             getEventColor(event.type, event.color).pillLight
                                                                         )}
                                                                     >
-                                                                        {event.time && <span className="font-bold mr-1">{event.time}</span>}
                                                                         {event.title}
                                                                     </div>
                                                                 ))}
-                                                                {dayEvents.length > 4 && (
-                                                                    <div className="text-[8px] font-bold text-app-text-muted text-center py-0.5 bg-app-stroke/20 rounded">
-                                                                        + {dayEvents.length - 4} mais
+                                                                {dayEvents.length > 3 && (
+                                                                    <div className="text-[8px] font-black text-app-text-muted text-center py-1 bg-app-stroke/20 rounded-lg uppercase tracking-widest">
+                                                                        + {dayEvents.length - 3} mais
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -1013,6 +1057,7 @@ export default function AgendaPage() {
                                     </div>
                                 </div>
                             )}
+
 
                             {view === 'week' && (
                                 <div className="flex-1 flex flex-col border border-app-stroke rounded-xl bg-app-bg overflow-hidden relative min-h-0">
@@ -1144,56 +1189,71 @@ export default function AgendaPage() {
                             )}
 
                             {view === 'day' && (
-                                <div className="space-y-2">
-                                    <div className="text-center py-4 border-b border-app-stroke mb-4">
-                                        <p className="text-sm text-app-text-muted">{DAYS[(new Date(currentYear, currentMonth, selectedDate).getDay() + 6) % 7]}</p>
-                                        <p className="text-3xl font-bold text-app-text-main">{selectedDate}</p>
-                                        <p className="text-sm text-app-text-muted capitalize">{getMonthName(currentMonth)} {currentYear}</p>
+                                <div className="max-w-4xl mx-auto w-full py-8">
+                                    <div className="text-center mb-12">
+                                        <p className="text-[11px] font-black text-app-text-muted uppercase tracking-[0.3em] mb-3">{DAYS[(new Date(currentYear, currentMonth, selectedDate).getDay() + 6) % 7]}</p>
+                                        <h1 className="text-7xl font-black text-app-text-main tracking-tighter mb-2">{selectedDate}</h1>
+                                        <p className="text-sm font-black text-primary uppercase tracking-widest">{getMonthName(currentMonth)} {currentYear}</p>
                                     </div>
                                     {todaysEvents.length === 0 ? (
-                                        <div className="text-center py-12 text-app-text-muted">
-                                            <CalendarIcon size={48} className="mx-auto mb-3 opacity-20" />
-                                            <p>Nenhum evento para este dia.</p>
+                                        <div className="text-center py-20 bg-app-card/30 rounded-[3rem] border border-app-stroke/50 border-dashed">
+                                            <CalendarIcon size={64} className="mx-auto mb-4 text-app-text-muted opacity-20" />
+                                            <p className="text-lg font-black text-app-text-muted uppercase tracking-widest">Agenda Vazia</p>
+                                            <p className="text-xs text-app-text-muted/60 mt-2">Aproveite seu tempo livre!</p>
                                         </div>
                                     ) : (
-                                        todaysEvents.map(event => (
-                                            <div key={event.id} className={clsx("group flex items-start gap-3 p-4 rounded-xl border transition-all", event.completed ? "bg-app-stroke/10 border-app-stroke" : "bg-app-bg border-app-stroke hover:border-primary/50")}>
-                                                <button onClick={() => toggleEventCompleted(event)} className={clsx("w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors mt-1", event.completed ? "bg-green-500 border-green-500 text-white" : "border-app-text-muted hover:border-primary")}>
-                                                    {event.completed && <Check size={14} />}
-                                                </button>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                        <span className={clsx("text-xs px-2 py-0.5 rounded-full font-medium shrink-0", getEventColor(event.type, event.color).badge)}>{getEventColor(event.type, event.color).label}</span>
-                                                        <span className="text-xs text-app-text-muted shrink-0">{event.time}</span>
-                                                        <span className={clsx("text-[10px] px-1.5 py-0.5 rounded-full font-medium ml-auto hidden sm:inline-block shrink-0", PRIORITY_STYLES[event.priority || 'MEDIUM'].bg, PRIORITY_STYLES[event.priority || 'MEDIUM'].text)}>
-                                                            {PRIORITY_STYLES[event.priority || 'MEDIUM'].label}
-                                                        </span>
+                                        <div className="space-y-4 px-4">
+                                            {todaysEvents.map(event => (
+                                                <div 
+                                                    key={event.id} 
+                                                    className={clsx(
+                                                        "group flex items-start gap-6 p-6 rounded-[2.5rem] border transition-all duration-500", 
+                                                        event.completed ? "bg-app-stroke/10 border-app-stroke/50 opacity-60" : "bg-app-card border-app-stroke hover:shadow-2xl hover:scale-[1.01] hover:border-primary/30"
+                                                    )}
+                                                >
+                                                    <button onClick={() => { toggleEventCompleted(event); haptics.medium(); }} className="w-10 h-10 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-all mt-1 active:scale-90">
+                                                        <div className={clsx("w-full h-full rounded-2xl flex items-center justify-center transition-all", event.completed ? "bg-emerald-500 border-emerald-500 text-white shadow-lg" : "border-app-text-muted hover:border-primary")}>
+                                                            {event.completed && <Check size={20} strokeWidth={3} />}
+                                                        </div>
+                                                    </button>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                            <span className={clsx("text-[10px] px-3 py-1 rounded-xl font-black uppercase tracking-widest shrink-0", getEventColor(event.type, event.color).badge)}>{getEventColor(event.type, event.color).label}</span>
+                                                            <span className="text-xs font-black text-app-text-main shrink-0">{event.time}</span>
+                                                            <span className={clsx("text-[9px] px-2 py-1 rounded-lg font-black ml-auto uppercase tracking-tighter shrink-0", PRIORITY_STYLES[event.priority || 'MEDIUM'].bg, PRIORITY_STYLES[event.priority || 'MEDIUM'].text)}>
+                                                                {PRIORITY_STYLES[event.priority || 'MEDIUM'].label}
+                                                            </span>
+                                                        </div>
+                                                        <h4 className={clsx("text-xl font-black tracking-tight mb-2 truncate", event.completed ? "text-app-text-muted line-through" : "text-app-text-main")}>{event.title}</h4>
+                                                        {event.description && <p className="text-sm text-app-text-muted mt-2 max-w-2xl leading-relaxed line-clamp-3">{event.description}</p>}
+                                                        
+                                                        {event.location && (
+                                                            <div className="flex items-center gap-2 mt-4 text-[11px] font-bold text-app-text-muted">
+                                                                <MapPin size={14} className="text-primary" />
+                                                                {event.location}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <h4 className={clsx("font-medium truncate", event.completed ? "text-app-text-muted line-through" : "text-app-text-main")}>{event.title}</h4>
-                                                    {event.description && <p className="text-xs text-app-text-muted mt-1 max-w-2xl line-clamp-2">{event.description}</p>}
+                                                    <div className="flex flex-col gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all transform translate-x-4 group-hover:translate-x-0">
+                                                        <button onClick={(e) => { handleEditClick(event, e); haptics.light(); }} className="p-3 text-app-text-muted hover:text-primary hover:bg-primary/10 rounded-2xl transition-all shadow-sm"><Edit3 size={18} /></button>
+                                                        <button onClick={(e) => { handleDeleteEvent(event.id, e); haptics.medium(); }} className="p-3 text-app-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all shadow-sm"><Trash2 size={18} /></button>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
-                                                    <button onClick={(e) => handleEditClick(event, e)} className="p-2 text-app-text-muted hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Editar">
-                                                        <Edit3 size={16} />
-                                                    </button>
-                                                    <button onClick={(e) => handleDeleteEvent(event.id, e)} className="p-2 text-app-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors" title="Excluir">
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                             )}
 
                             {view === 'list' && (
-                                <div className="space-y-4">
-                                    {/* Astrea-style Full Continuous Pauta Layout */}
+                                <div className="space-y-8 max-w-5xl mx-auto w-full py-6 px-4">
                                     {listViewEvents.length === 0 ? (
-                                        <div className="text-center py-12 text-app-text-muted bg-app-card border border-app-stroke rounded-2xl">
-                                            <List size={48} className="mx-auto mb-3 opacity-20" />
-                                            <p className="font-semibold text-lg">Sua pauta está livre!</p>
-                                            <p className="text-sm">Nenhum compromisso marcado para este mês.</p>
+                                        <div className="text-center py-24 bg-app-card/30 border border-app-stroke/50 border-dashed rounded-[3rem]">
+                                            <div className="w-20 h-20 bg-app-stroke/20 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
+                                                <List size={32} className="text-app-text-muted opacity-30" />
+                                            </div>
+                                            <p className="text-2xl font-black text-app-text-main tracking-tighter uppercase">Pauta Livre</p>
+                                            <p className="text-sm text-app-text-muted mt-2 font-medium">Nenhum compromisso marcado para este mês.</p>
                                         </div>
                                     ) : (
                                         Object.entries(
@@ -1204,109 +1264,97 @@ export default function AgendaPage() {
                                                 return acc;
                                             }, {} as Record<string, Event[]>)
                                         ).map(([dateStr, dayEvents]) => (
-                                            <div key={dateStr} className="mb-6">
-                                                <h3 className="text-sm font-extrabold text-app-text-muted uppercase tracking-wider mb-3 px-1 border-b border-app-stroke pb-1 sticky top-0 bg-app-card/90 backdrop-blur z-10">{dateStr}</h3>
-                                                <div className="space-y-2">
+                                            <div key={dateStr} className="space-y-4">
+                                                <div className="flex items-center gap-4 sticky top-0 bg-app-bg/80 backdrop-blur-md z-10 py-3 px-2 rounded-2xl">
+                                                    <h3 className="text-[11px] font-black text-primary uppercase tracking-[0.3em] whitespace-nowrap">{dateStr}</h3>
+                                                    <div className="h-px bg-app-stroke/50 flex-1" />
+                                                </div>
+                                                <div className="grid grid-cols-1 gap-4">
                                                     {dayEvents.map(event => {
                                                         const isConflict = conflictIds.has(event.id);
-                                                        const isPast = new Date(event.start).getTime() < Date.now();
                                                         return (
                                                             <div
                                                                 key={event.id}
                                                                 className={clsx(
-                                                                    "group flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center p-3 sm:p-4 rounded-xl border-l-[6px] border border-app-stroke transition-all cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden",
-                                                                    event.completed ? "bg-app-stroke/20 opacity-60 grayscale border-l-slate-400" :
-                                                                        "bg-white dark:bg-slate-800",
-                                                                    !event.completed && event.color === 'red' ? "border-l-red-500 bg-red-50/50 dark:bg-red-500/10" :
-                                                                    !event.completed && event.color === 'blue' ? "border-l-blue-500 bg-blue-50/50 dark:bg-blue-500/10" :
-                                                                    !event.completed && event.color === 'green' ? "border-l-green-500 bg-green-50/50 dark:bg-green-500/10" :
-                                                                    !event.completed && event.color === 'amber' ? "border-l-amber-500 bg-amber-50/50 dark:bg-amber-500/10" :
-                                                                    !event.completed && event.color === 'purple' ? "border-l-purple-500 bg-purple-50/50 dark:bg-purple-500/10" :
-                                                                    !event.completed && event.type === 'hearing' ? "border-l-blue-500" :
-                                                                        !event.completed && event.type === 'deadline' ? "border-l-red-500" :
-                                                                            !event.completed && event.type === 'meeting' ? "border-l-emerald-500" : "border-l-purple-500",
-                                                                    isConflict && !event.completed && "ring-2 ring-red-500 animate-[pulse_2s_ease-in-out_infinite] bg-amber-50/50 dark:bg-amber-900/10",
-                                                                    isPast && !event.completed && "opacity-80",
-                                                                    ['deadline', 'hearing'].includes(event.type) && !event.completed && "pt-7 sm:pt-6"
+                                                                    "group flex flex-col lg:flex-row gap-6 p-6 rounded-[2.5rem] border transition-all duration-500 cursor-pointer relative overflow-hidden",
+                                                                    event.completed ? "bg-app-stroke/10 border-app-stroke/50 opacity-60 grayscale" : "bg-app-card border-app-stroke hover:shadow-2xl hover:scale-[1.01] hover:border-primary/30 shadow-sm",
+                                                                    isConflict && !event.completed && "ring-2 ring-amber-500 animate-pulse"
                                                                 )}
-                                                                onClick={(e) => handleViewClick(event, e)}
+                                                                onClick={(e) => { handleViewClick(event, e); haptics.light(); }}
                                                             >
-                                                                {/* Red Highlight Banner */}
-                                                                {['deadline', 'hearing'].includes(event.type) && !event.completed && (
-                                                                    <div className="absolute top-0 left-0 right-0 bg-red-600 text-white text-[9px] sm:text-[10px] font-bold uppercase text-center py-0.5 shadow-sm z-10 tracking-widest bg-gradient-to-r from-red-600 to-red-500">
-                                                                        Atenção: {event.type === 'deadline' ? 'Prazo Fatal' : 'Audiência'}
-                                                                    </div>
-                                                                )}
-                                                                <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
-                                                                    <button onClick={(e) => { e.stopPropagation(); toggleEventCompleted(event); }} className={clsx("w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors", event.completed ? "bg-green-500 border-green-500 text-white" : "border-app-text-muted hover:border-primary bg-app-bg")}>
-                                                                        {event.completed && <Check size={14} strokeWidth={3} />}
+                                                                {/* Colored accent indicator */}
+                                                                <div className={clsx("absolute top-0 left-0 bottom-0 w-2", 
+                                                                    event.completed ? "bg-slate-400" : 
+                                                                    event.type === 'deadline' ? "bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]" : 
+                                                                    event.type === 'hearing' ? "bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]" : 
+                                                                    event.type === 'meeting' ? "bg-emerald-500" : "bg-purple-500"
+                                                                )} />
+
+                                                                <div className="flex items-center gap-6 shrink-0 lg:border-r lg:border-app-stroke lg:pr-8">
+                                                                    <button onClick={(e) => { e.stopPropagation(); toggleEventCompleted(event); haptics.medium(); }} className="w-10 h-10 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-90 shrink-0">
+                                                                        <div className={clsx("w-full h-full rounded-2xl flex items-center justify-center transition-all", event.completed ? "bg-emerald-500 border-emerald-500 text-white shadow-lg" : "border-app-text-muted hover:border-primary")}>
+                                                                            {event.completed && <Check size={20} strokeWidth={3} />}
+                                                                        </div>
                                                                     </button>
                                                                     <div className="flex flex-col">
-                                                                        <span className="font-black text-lg text-app-text-main leading-none">{event.time}</span>
-                                                                        <span className={clsx(
-                                                                            "text-[10px] font-bold tracking-wider uppercase mt-1",
-                                                                            getEventColor(event.type, event.color).badge.split(' ')[1] // Get the text color class from badge
-                                                                        )}>
+                                                                        <span className="text-3xl font-black text-app-text-main leading-none tracking-tighter">{event.time}</span>
+                                                                        <span className={clsx("text-[9px] font-black uppercase tracking-widest mt-2", getEventColor(event.type, event.color).badge)}>
                                                                             {getEventColor(event.type, event.color).label}
                                                                         </span>
                                                                     </div>
-                                                                    {isConflict && !event.completed && (
-                                                                        <div title="Conflito de horários" className="ml-auto sm:ml-2 text-amber-500 bg-amber-500/10 p-1.5 rounded-lg">
-                                                                            <AlertTriangle size={16} />
-                                                                        </div>
-                                                                    )}
                                                                 </div>
 
-                                                                <div className="flex-1 min-w-0 flex flex-col sm:border-l sm:border-app-stroke sm:pl-4">
-                                                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                                        <h4 className={clsx("text-base font-bold truncate", event.completed ? "line-through text-app-text-muted" : "text-app-text-main")}>{event.title}</h4>
-                                                                        {event.priority === 'URGENT' && <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md animate-pulse">URGENTE</span>}
+                                                                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                                                    <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                                        <h4 className={clsx("text-lg font-black tracking-tight truncate", event.completed ? "text-app-text-muted line-through" : "text-app-text-main")}>{event.title}</h4>
+                                                                        {event.priority === 'URGENT' && !event.completed && <span className="bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded-lg animate-pulse uppercase tracking-widest shadow-lg shadow-red-500/20">Urgente</span>}
+                                                                        {isConflict && !event.completed && <AlertTriangle size={16} className="text-amber-500 animate-bounce" />}
                                                                     </div>
                                                                     
                                                                     {(event.clientName || event.processNumber) && (
-                                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
+                                                                        <div className="flex flex-wrap items-center gap-3 mt-1">
                                                                             {event.clientName && (
                                                                                 <button
-                                                                                    onClick={(e) => { e.stopPropagation(); setDrawerEntity({ type: 'client', clientId: event.clientId, title: `Cliente: ${event.clientName}` }); }}
-                                                                                    className="flex items-center gap-1.5 text-xs text-app-text-main font-medium bg-app-stroke/30 hover:bg-app-stroke/50 px-2 py-1 rounded-md transition-colors"
+                                                                                    onClick={(e) => { e.stopPropagation(); setDrawerEntity({ type: 'client', clientId: event.clientId, title: `Cliente: ${event.clientName}` }); haptics.light(); }}
+                                                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-app-text-muted bg-app-stroke/20 hover:bg-app-stroke/40 px-3 py-1.5 rounded-xl transition-all border border-app-stroke/50"
                                                                                 >
-                                                                                    <Users size={12} className="text-app-text-muted" /> {event.clientName}
+                                                                                    <Users size={12} className="text-primary" /> {event.clientName}
                                                                                 </button>
                                                                             )}
                                                                             {event.processNumber && (
                                                                                 <button
-                                                                                    onClick={(e) => { e.stopPropagation(); setDrawerEntity({ type: 'process', processId: event.processId, processNumber: event.processNumber, title: `Processo: ${event.processNumber}` }); }}
-                                                                                    className="flex items-center gap-1.5 text-xs text-primary font-bold bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded-md transition-colors"
+                                                                                    onClick={(e) => { e.stopPropagation(); setDrawerEntity({ type: 'process', processId: event.processId, processNumber: event.processNumber, title: `Processo: ${event.processNumber}` }); haptics.light(); }}
+                                                                                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-xl transition-all border border-primary/20"
                                                                                 >
                                                                                     <FileText size={12} /> {event.processNumber}
                                                                                 </button>
                                                                             )}
                                                                         </div>
                                                                     )}
-                                                                    {event.location && <p className="text-xs text-app-text-muted flex items-center gap-1 mt-1.5"><MapPin size={12} className="shrink-0" />{event.location}</p>}
+                                                                    {event.location && <p className="text-[11px] font-bold text-app-text-muted flex items-center gap-2 mt-3"><MapPin size={12} className="text-primary/50" />{event.location}</p>}
                                                                 </div>
                                                                 
-                                                                <div className="flex flex-row sm:flex-col gap-1 items-end ml-auto shrink-0 w-full sm:w-auto justify-end sm:justify-start">
+                                                                <div className="flex items-center justify-between lg:flex-col lg:items-end lg:justify-center lg:pl-8 lg:border-l lg:border-app-stroke shrink-0 gap-4">
                                                                     {event.assignees && event.assignees.length > 0 && (
-                                                                        <div className="flex -space-x-2 mr-3 sm:mr-0 sm:mb-2" title={event.assignees.map(a => a.userName).join(', ')}>
+                                                                        <div className="flex -space-x-3" title={event.assignees.map(a => a.userName).join(', ')}>
                                                                             {event.assignees.slice(0, 3).map((assignee, i) => (
                                                                                 <Avatar
                                                                                     key={i}
                                                                                     name={assignee.userName}
                                                                                     size="sm"
-                                                                                    className="w-6 h-6 border-2 border-white dark:border-slate-800"
+                                                                                    className="w-8 h-8 ring-4 ring-app-card rounded-2xl shadow-lg transition-transform hover:scale-110 hover:z-20 cursor-pointer"
                                                                                 />
                                                                             ))}
                                                                             {event.assignees.length > 3 && (
-                                                                                <div className="w-6 h-6 rounded-full bg-app-stroke border-2 border-white dark:border-slate-800 flex items-center justify-center text-[9px] font-bold text-app-text-main shrink-0">
+                                                                                <div className="w-8 h-8 rounded-2xl bg-app-stroke border-2 border-app-card flex items-center justify-center text-[10px] font-black text-app-text-main shrink-0 shadow-lg">
                                                                                     +{event.assignees.length - 3}
                                                                                 </div>
                                                                             )}
                                                                         </div>
                                                                     )}
-                                                                    <div className="flex opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                                                                        <button onClick={(e) => handleEditClick(event, e)} className="p-2 text-app-text-muted hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Editar"><Edit3 size={16} /></button>
-                                                                        <button onClick={(e) => handleDeleteEvent(event.id, e)} className="p-2 text-app-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors" title="Excluir"><Trash2 size={16} /></button>
+                                                                    <div className="flex items-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all transform lg:translate-x-4 lg:group-hover:translate-x-0">
+                                                                        <button onClick={(e) => { handleEditClick(event, e); haptics.light(); }} className="p-3 text-app-text-muted hover:text-primary rounded-2xl hover:bg-primary/10 transition-all"><Edit3 size={20} /></button>
+                                                                        <button onClick={(e) => { handleDeleteEvent(event.id, e); haptics.medium(); }} className="p-3 text-app-text-muted hover:text-red-500 rounded-2xl hover:bg-red-500/10 transition-all"><Trash2 size={20} /></button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1318,6 +1366,7 @@ export default function AgendaPage() {
                                     )}
                                 </div>
                             )}
+
                         </motion.div>
                     </AnimatePresence>
 
@@ -1325,161 +1374,189 @@ export default function AgendaPage() {
                 </div>
             </main>
 
-            {/* Sidebar Desktop e Mobile Actions */}
+            {/* Premium Sidebar */}
             <aside className={clsx(
-                "fixed inset-y-0 right-0 z-[60] w-[85vw] max-w-sm sm:relative sm:w-full md:w-72 bg-app-card border-l sm:border sm:rounded-2xl flex flex-col shrink-0 shadow-2xl sm:shadow-none transition-transform duration-300 ease-in-out border-app-stroke",
+                "fixed inset-y-0 right-0 z-[60] w-[85vw] max-w-sm sm:relative sm:w-full md:w-80 bg-app-card/50 backdrop-blur-2xl border-l sm:border sm:rounded-[2.5rem] flex flex-col shrink-0 shadow-2xl sm:shadow-sm transition-all duration-500 ease-in-out border-app-stroke/50 overflow-hidden",
                 isSidebarOpenMobile ? "translate-x-0" : "translate-x-full sm:translate-x-0"
             )}>
-                <div className="p-4 border-b border-app-stroke">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex space-x-1 bg-app-bg p-1 rounded-lg border border-app-stroke w-full">
+                <div className="p-6 border-b border-app-stroke/50">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex bg-app-stroke/30 p-1.5 rounded-2xl border border-app-stroke/50 w-full shadow-inner">
                             <button
-                                onClick={() => setSidebarTab('DIA')}
-                                className={clsx("flex-1 px-2 py-1.5 rounded text-[11px] font-semibold transition-colors truncate", sidebarTab === 'DIA' ? "bg-primary text-white shadow-sm" : "text-app-text-muted hover:text-app-text-main")}
+                                onClick={() => { setSidebarTab('DIA'); haptics.light(); }}
+                                className={clsx(
+                                    "flex-1 px-3 py-2.5 rounded-xl text-[10px] font-black transition-all duration-300 uppercase tracking-tighter truncate", 
+                                    sidebarTab === 'DIA' ? "bg-black dark:bg-white text-white dark:text-black shadow-lg" : "text-app-text-muted hover:text-app-text-main"
+                                )}
                             >
                                 Agenda do Dia
                             </button>
                             <button
-                                onClick={() => setSidebarTab('PRAZOS')}
-                                className={clsx("flex-1 px-2 py-1.5 rounded text-[11px] font-semibold transition-colors truncate", sidebarTab === 'PRAZOS' ? "bg-primary text-white shadow-sm" : "text-app-text-muted hover:text-app-text-main")}
+                                onClick={() => { setSidebarTab('PRAZOS'); haptics.light(); }}
+                                className={clsx(
+                                    "flex-1 px-3 py-2.5 rounded-xl text-[10px] font-black transition-all duration-300 uppercase tracking-tighter truncate", 
+                                    sidebarTab === 'PRAZOS' ? "bg-black dark:bg-white text-white dark:text-black shadow-lg" : "text-app-text-muted hover:text-app-text-main"
+                                )}
                             >
-                                Próximos Prazos
+                                Prazos
                             </button>
                         </div>
                         <button
-                            className="sm:hidden ml-2 p-1 bg-app-bg rounded-lg shrink-0"
+                            className="sm:hidden ml-4 p-2 bg-app-stroke/50 rounded-2xl shrink-0 text-app-text-muted hover:text-app-text-main transition-all"
                             onClick={() => setIsSidebarOpenMobile(false)}
                         >
-                            <X size={18} className="text-app-text-muted" />
+                            <X size={20} />
                         </button>
                     </div>
 
                     {sidebarTab === 'DIA' && (
-                        <div className="flex items-center gap-2 text-app-text-main">
-                            <CalendarIcon size={18} className="text-primary shrink-0" />
-                            <span className="font-bold text-sm truncate">{selectedDate} de {getMonthName(currentMonth)}</span>
+                        <div className="flex items-center gap-3 text-app-text-main group cursor-pointer">
+                            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 group-hover:scale-110 transition-transform">
+                                <CalendarIcon size={20} />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black text-app-text-muted uppercase tracking-widest leading-none mb-1">Visualizando</p>
+                                <p className="font-black text-sm text-app-text-main">{selectedDate} de {getMonthName(currentMonth)}</p>
+                            </div>
                         </div>
                     )}
                     {sidebarTab === 'PRAZOS' && (
-                        <div className="flex items-center justify-between gap-1 mt-1 bg-app-bg p-1 rounded-lg border border-app-stroke">
+                        <div className="flex items-center justify-between gap-1 mt-1 bg-app-stroke/30 p-1.5 rounded-2xl border border-app-stroke/50 shadow-inner">
                             {(['ATIVO', 'SUSPENSO', 'FINALIZADO'] as const).map(status => (
                                 <button
                                     key={status}
-                                    onClick={() => setAsideFilter(status)}
-                                    className={clsx("flex-1 px-1 py-1 rounded text-[10px] font-bold transition-colors", asideFilter === status ? "bg-white dark:bg-slate-700 text-primary shadow-sm" : "text-app-text-muted hover:text-app-text-main")}
+                                    onClick={() => { setAsideFilter(status); haptics.light(); }}
+                                    className={clsx(
+                                        "flex-1 px-2 py-2 rounded-xl text-[9px] font-black transition-all uppercase tracking-tighter", 
+                                        asideFilter === status ? "bg-black dark:bg-white text-white dark:text-black shadow-md" : "text-app-text-muted hover:text-app-text-main"
+                                    )}
                                 >
-                                    {status === 'ATIVO' ? 'Ativos' : status === 'SUSPENSO' ? 'Suspensos' : 'Finalizados'}
+                                    {status === 'ATIVO' ? 'Ativos' : status === 'SUSPENSO' ? 'Susp.' : 'Fin.'}
                                 </button>
                             ))}
                         </div>
                     )}
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar scroll-smooth">
                     {sidebarTab === 'DIA' ? (
-                        todaysEvents.length > 0 ? todaysEvents.map(event => (
-                        <div key={event.id} className={clsx("group rounded-xl p-3 transition-all", event.completed ? "bg-app-stroke/10 border border-app-stroke opacity-75" : "bg-app-bg border border-app-stroke hover:border-primary/30 hover:shadow-md")}>
-                            {/* Colored top accent */}
-                            <div className={clsx("h-0.5 -mx-3 -mt-3 mb-3 rounded-t-xl", event.type === 'PRAZO_FATAL' ? 'bg-red-500' : event.type === 'AUDIENCIA' ? 'bg-amber-500' : event.type === 'PRAZO' ? 'bg-orange-400' : 'bg-primary')} />
-                            <div className="flex items-center gap-2 mb-2">
-                                <button onClick={() => toggleEventCompleted(event)} className="shrink-0">
-                                    <div className={clsx("w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors hover:border-primary", event.completed ? "bg-green-500 border-green-500 text-white" : "border-app-text-muted")}>
-                                        {event.completed && <Check size={12} />}
-                                    </div>
-                                </button>
-                                <span className="text-xs text-app-text-muted truncate">{event.time}</span>
-                                <span className={clsx("text-[10px] px-1.5 py-0.5 rounded-full font-medium truncate ml-auto", getEventColor(event.type).badge)}>{getEventColor(event.type).label}</span>
-                            </div>
-                            <h4 className={clsx("text-sm font-medium mb-1 line-clamp-2", event.completed ? "text-app-text-muted line-through" : "text-app-text-main")}>{event.title}</h4>
-
-                            {event.description && <p className="text-xs text-app-text-muted line-clamp-2 mb-1.5">{event.description}</p>}
-                            {event.location && <p className="text-[10px] text-app-text-muted flex items-center gap-1 mb-1.5"><MapPin size={10} />{event.location}</p>}
-
-                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-app-stroke/50">
-                                <div className="flex items-center gap-2">
-                                    <span className={clsx("text-[9px] px-1.5 py-0.5 rounded-full font-medium", PRIORITY_STYLES[event.priority || 'MEDIUM'].bg, PRIORITY_STYLES[event.priority || 'MEDIUM'].text)}>
-                                        {PRIORITY_STYLES[event.priority || 'MEDIUM'].label}
-                                    </span>
-                                    {conflictIds.has(event.id) && (
-                                        <div title="Conflito de horário" className="text-amber-500 bg-amber-500/10 p-0.5 rounded">
-                                            <AlertTriangle size={12} />
+                        todaysEvents.length > 0 ? (
+                            <div className="space-y-4">
+                                {todaysEvents.map(event => (
+                                    <div key={event.id} className={clsx(
+                                        "group relative rounded-3xl p-5 border transition-all duration-300 overflow-hidden",
+                                        event.completed ? "bg-app-stroke/10 border-app-stroke/50 opacity-60" : "bg-app-card border-app-stroke shadow-sm hover:shadow-xl hover:scale-[1.02] hover:border-primary/30"
+                                    )}>
+                                        <div className={clsx("absolute top-0 left-0 bottom-0 w-1.5", 
+                                            event.type === 'deadline' ? 'bg-red-500' : event.type === 'hearing' ? 'bg-blue-500' : event.type === 'meeting' ? 'bg-emerald-500' : 'bg-purple-500'
+                                        )} />
+                                        
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <button onClick={() => { toggleEventCompleted(event); haptics.medium(); }} className="shrink-0 transition-transform active:scale-90">
+                                                    <div className={clsx("w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all", 
+                                                        event.completed ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "border-app-text-muted hover:border-primary")}>
+                                                        {event.completed && <Check size={14} strokeWidth={3} />}
+                                                    </div>
+                                                </button>
+                                                <span className="text-[11px] font-black text-app-text-main">{event.time}</span>
+                                            </div>
+                                            <span className={clsx("text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-widest", getEventColor(event.type).badge)}>
+                                                {getEventColor(event.type).label}
+                                            </span>
                                         </div>
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={(e) => handleViewClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Visualizar">
-                                        <Eye size={14} />
-                                    </button>
-                                    <button onClick={(e) => handleEditClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Editar">
-                                        <Edit3 size={14} />
-                                    </button>
-                                    <button onClick={(e) => handleDeleteEvent(event.id, e)} className="p-1 text-app-text-muted hover:text-red-500 rounded-md transition-colors" title="Excluir">
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )) : (
-                        <div className="text-center py-8 text-app-text-muted">
-                            <CalendarIcon size={32} className="mx-auto mb-2 opacity-20" />
-                            <p>Sem eventos para este dia.</p>
-                        </div>
-                    )) : (
-                        upcomingEventsSidebar.length > 0 ? upcomingEventsSidebar.map(event => {
-                            const eventDate = new Date(event.start);
-                            const now = new Date();
-                            const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                            const urgencyColor = diffDays <= 2 ? 'text-red-500 bg-red-500/10' : diffDays <= 5 ? 'text-amber-500 bg-amber-500/10' : 'text-emerald-500 bg-emerald-500/10';
-                            const urgencyBorder = diffDays <= 2 ? 'bg-red-500' : diffDays <= 5 ? 'bg-amber-500' : 'bg-emerald-500';
-                            return (
-                            <div key={'pz_'+event.id} className={clsx("group rounded-xl p-3 transition-all", event.completed ? "bg-app-stroke/10 border border-app-stroke opacity-75" : "bg-app-bg border border-app-stroke hover:border-primary/30 hover:shadow-md")}>
-                                {/* Urgency top accent */}
-                                <div className={clsx("h-0.5 -mx-3 -mt-3 mb-3 rounded-t-xl", urgencyBorder)} />
-                                <div className="flex items-center gap-2 mb-2">
-                                    <button onClick={() => toggleEventCompleted(event)} className="shrink-0">
-                                        <div className={clsx("w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors hover:border-primary", event.completed ? "bg-green-500 border-green-500 text-white" : "border-app-text-muted")}>
-                                            {event.completed && <Check size={12} />}
+
+                                        <h4 className={clsx("text-sm font-bold mb-2 leading-snug line-clamp-2", event.completed ? "text-app-text-muted line-through" : "text-app-text-main")}>{event.title}</h4>
+
+                                        <div className="flex flex-col gap-1.5 mt-4 pt-4 border-t border-app-stroke/30">
+                                            {event.location && (
+                                                <p className="text-[10px] text-app-text-muted flex items-center gap-2 font-medium">
+                                                    <MapPin size={12} className="text-primary/50" />
+                                                    <span className="truncate">{event.location}</span>
+                                                </p>
+                                            )}
+                                            <div className="flex items-center justify-between">
+                                                <span className={clsx("text-[9px] font-black px-2 py-1 rounded-lg", PRIORITY_STYLES[event.priority || 'MEDIUM'].bg, PRIORITY_STYLES[event.priority || 'MEDIUM'].text)}>
+                                                    {PRIORITY_STYLES[event.priority || 'MEDIUM'].label}
+                                                </span>
+                                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                                                    <button onClick={(e) => handleEditClick(event, e)} className="p-2 text-app-text-muted hover:text-primary transition-colors"><Edit3 size={16} /></button>
+                                                    <button onClick={(e) => handleDeleteEvent(event.id, e)} className="p-2 text-app-text-muted hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </button>
-                                    <span className="text-xs text-app-text-muted font-medium truncate">{new Date(event.start).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
-                                    {/* Time remaining badge */}
-                                    <span className={clsx("text-[9px] px-1.5 py-0.5 rounded-full font-bold ml-auto shrink-0", urgencyColor)}>
-                                        {diffDays <= 0 ? 'Hoje' : diffDays === 1 ? 'Amanhã' : `${diffDays}d restantes`}
-                                    </span>
-                                </div>
-                                <h4 className={clsx("text-sm font-medium mb-1 line-clamp-2", event.completed ? "text-app-text-muted line-through" : "text-app-text-main")}>{event.title}</h4>
-                                <div className="flex items-center gap-2">
-                                    <span className={clsx("text-[10px] px-1.5 py-0.5 rounded-full font-medium", getEventColor(event.type).badge)}>{getEventColor(event.type).label}</span>
-                                    {event.processNumber && <span className="text-[10px] font-mono text-primary bg-primary/10 rounded px-1.5 py-0.5">{event.processNumber}</span>}
-                                </div>
-                                <div className="flex items-center justify-between mt-2 pt-2 border-t border-app-stroke/50">
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-auto">
-                                        <button onClick={(e) => handleViewClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Visualizar">
-                                            <Eye size={14} />
-                                        </button>
-                                        <button onClick={(e) => handleEditClick(event, e)} className="p-1 text-app-text-muted hover:text-primary rounded-md transition-colors" title="Editar">
-                                            <Edit3 size={14} />
-                                        </button>
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                            );
-                        }) : (
-                            <div className="text-center py-8 text-app-text-muted">
-                                <AlertTriangle size={32} className="mx-auto mb-2 opacity-20" />
-                                <p>Sem prazos pendentes encontrados.</p>
+                        ) : (
+                            <div className="text-center py-20">
+                                <div className="w-16 h-16 bg-app-stroke/30 rounded-[2rem] flex items-center justify-center mx-auto mb-4 border border-app-stroke/50">
+                                    <CalendarIcon size={24} className="text-app-text-muted opacity-30" />
+                                </div>
+                                <p className="text-sm font-black text-app-text-muted uppercase tracking-widest">Pauta Livre</p>
+                                <p className="text-[10px] text-app-text-muted/60 mt-1 uppercase tracking-tighter">Nenhum evento marcado</p>
+                            </div>
+                        )
+                    ) : (
+                        upcomingEventsSidebar.length > 0 ? (
+                            <div className="space-y-4">
+                                {upcomingEventsSidebar.map(event => {
+                                    const eventDate = new Date(event.start);
+                                    const now = new Date();
+                                    const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                                    const urgencyStyles = diffDays <= 2 ? 'bg-red-500/10 text-red-500 border-red-500/20' : diffDays <= 5 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+                                    const urgencyBadge = diffDays <= 2 ? 'bg-red-500' : diffDays <= 5 ? 'bg-amber-500' : 'bg-emerald-500';
+                                    
+                                    return (
+                                        <div key={'pz_'+event.id} className="group relative rounded-3xl p-5 bg-app-card border border-app-stroke transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:border-primary/30 overflow-hidden">
+                                            <div className={clsx("absolute top-0 right-0 w-24 h-24 bg-gradient-to-br opacity-[0.03] -mr-8 -mt-8 rounded-full", urgencyBadge)} />
+                                            
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={clsx("w-2 h-2 rounded-full", urgencyBadge, "animate-pulse")} />
+                                                    <span className="text-[11px] font-black text-app-text-main">{eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span>
+                                                </div>
+                                                <span className={clsx("text-[9px] font-black px-2 py-1 rounded-lg border", urgencyStyles)}>
+                                                    {diffDays <= 0 ? 'Hoje' : diffDays === 1 ? 'Amanhã' : `${diffDays}d`}
+                                                </span>
+                                            </div>
+
+                                            <h4 className="text-sm font-bold text-app-text-main mb-3 leading-snug line-clamp-2">{event.title}</h4>
+                                            
+                                            <div className="flex items-center gap-2 pt-4 border-t border-app-stroke/30">
+                                                <span className={clsx("text-[9px] font-black px-2 py-1 rounded-lg uppercase tracking-widest", getEventColor(event.type).badge)}>
+                                                    {getEventColor(event.type).label}
+                                                </span>
+                                                {event.processNumber && (
+                                                    <span className="text-[9px] font-black px-2 py-1 rounded-lg bg-primary/5 text-primary border border-primary/10">
+                                                        {event.processNumber}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center py-20">
+                                <div className="w-16 h-16 bg-app-stroke/30 rounded-[2rem] flex items-center justify-center mx-auto mb-4 border border-app-stroke/50">
+                                    <AlertTriangle size={24} className="text-app-text-muted opacity-30" />
+                                </div>
+                                <p className="text-sm font-black text-app-text-muted uppercase tracking-widest">Sem Prazos</p>
+                                <p className="text-[10px] text-app-text-muted/60 mt-1 uppercase tracking-tighter">Tudo em dia por aqui</p>
                             </div>
                         )
                     )}
                 </div>
 
-                <div className="p-4 border-t border-app-stroke">
-                    <button onClick={() => setIsNewEventOpen(true)} className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-500 text-white rounded-xl py-2.5 text-sm font-semibold transition-all shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 active:scale-[0.98] flex items-center justify-center gap-2">
-                        <Plus size={16} />
+                <div className="p-6 border-t border-app-stroke/50 bg-app-card/30 backdrop-blur-md">
+                    <button onClick={() => { setIsNewEventOpen(true); haptics.medium(); }} className="w-full bg-black dark:bg-white text-white dark:text-black rounded-2xl py-4 text-[11px] font-black uppercase tracking-widest transition-all shadow-2xl hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3">
+                        <Plus size={18} strokeWidth={3} />
                         Adicionar Evento
                     </button>
                 </div>
             </aside>
+
 
             {/* Quick View Modal */}
             <EventDetailModal

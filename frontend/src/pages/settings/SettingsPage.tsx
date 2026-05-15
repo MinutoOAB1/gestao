@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download, FileText } from 'lucide-react';
+import { useState, useEffect, useCallback, memo } from 'react';
+import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download, FileText, ChevronRight, Settings2, Trash2, ExternalLink, RefreshCw, Smartphone as MobileIcon, Hash } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
 import { useSearchParams } from 'react-router-dom';
@@ -9,25 +10,22 @@ import TeamPermissionsModal from '../../components/settings/TeamPermissionsModal
 import Modal from '../../components/ui/Modal';
 import { useToast } from '../../context/ToastContext';
 import BillingPage from './BillingPage';
+import { haptics } from '../../utils/haptics';
 
 // Settings storage key
 const SETTINGS_KEY = 'app_settings';
 
 interface Settings {
-    // Identity
     officeName: string;
     cnpj: string;
     email: string;
     phone: string;
     website: string;
-    // Regional
     language: string;
     timezone: string;
     dateFormat: string;
-    // Security
     twoFactor: boolean;
     loginAlerts: boolean;
-    // Notifications
     emailNotifications: boolean;
     processUpdates: boolean;
     deadlineReminders: boolean;
@@ -50,20 +48,58 @@ const defaultSettings: Settings = {
     deadlineReminders: true,
 };
 
-const Toggle = ({ checked, onChange }: { checked: boolean, onChange: (e: React.MouseEvent) => void }) => (
+const PremiumToggle = memo(({ checked, onChange }: { checked: boolean, onChange: (e: React.MouseEvent) => void }) => (
     <button
-        onClick={onChange}
+        onClick={(e) => { haptics.light(); onChange(e); }}
         className={clsx(
-            "w-11 h-6 rounded-full transition-colors relative",
-            checked ? "bg-primary" : "bg-app-stroke"
+            "w-14 h-7 rounded-full transition-all duration-300 relative border",
+            checked ? "bg-primary border-primary/50 shadow-lg shadow-primary/20" : "bg-app-stroke border-white/5 shadow-inner"
         )}
     >
-        <div className={clsx(
-            "w-4 h-4 rounded-full bg-white absolute top-1 transition-transform",
-            checked ? "left-6" : "left-1"
-        )} />
+        <motion.div 
+            animate={{ x: checked ? 28 : 4 }}
+            className={clsx(
+                "w-5 h-5 rounded-full absolute top-1 transition-all duration-300",
+                checked ? "bg-white" : "bg-app-text-muted"
+            )} 
+        />
     </button>
-);
+));
+
+const SettingSection = memo(({ title, description, children, icon: Icon }: any) => (
+    <motion.section 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-6 mb-12"
+    >
+        <div className="flex items-center gap-4 px-2">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-sm">
+                {Icon && <Icon size={24} />}
+            </div>
+            <div>
+                <h2 className="text-xl font-black text-app-text-main tracking-tight uppercase">{title}</h2>
+                <p className="text-sm text-app-text-muted font-medium">{description}</p>
+            </div>
+        </div>
+        <div className="bg-app-card rounded-[2.5rem] border border-app-stroke p-8 shadow-xl shadow-black/5">
+            {children}
+        </div>
+    </motion.section>
+));
+
+const PremiumInput = memo(({ label, error, ...props }: any) => (
+    <div className="space-y-2">
+        <label className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] ml-1">{label}</label>
+        <input
+            {...props}
+            className={clsx(
+                "w-full bg-app-bg border rounded-[1.25rem] px-5 py-4 text-app-text-main text-sm font-bold focus:border-primary outline-none transition-all shadow-inner",
+                error ? "border-rose-500/50 focus:border-rose-500 ring-2 ring-rose-500/10" : "border-app-stroke focus:ring-4 focus:ring-primary/10"
+            )}
+        />
+        {error && <p className="text-[10px] text-rose-500 font-black uppercase tracking-widest ml-1">{error}</p>}
+    </div>
+));
 
 export default function SettingsPage() {
     const { addToast } = useToast();
@@ -82,12 +118,10 @@ export default function SettingsPage() {
     const [phoneError, setPhoneError] = useState('');
     const [googleConnected, setGoogleConnected] = useState(false);
     const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
-    const [showAutentiqueModal, setShowAutentiqueModal] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams();
     
-    // Fetch user profile and google status
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
             const response = await api.get('/auth/profile');
             setUser2FAEnabled(response.data.twoFactorEnabled || false);
@@ -95,11 +129,11 @@ export default function SettingsPage() {
         } catch (error) {
             console.error('Error fetching profile:', error);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchProfile();
-    }, []);
+    }, [fetchProfile]);
 
     useEffect(() => {
         if (searchParams.get('google') === 'success') {
@@ -108,7 +142,7 @@ export default function SettingsPage() {
             newParams.delete('google');
             setSearchParams(newParams);
         }
-    }, [searchParams]);
+    }, [searchParams, fetchProfile, setSearchParams]);
 
     const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -189,14 +223,14 @@ export default function SettingsPage() {
         }
 
         setIsSaving(true);
+        haptics.medium();
         try {
             await api.post('/settings', settings);
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-            setSaveMessage('Configurações salvas com sucesso!');
+            addToast('Configurações salvas!', 'success');
             setIsDirty(false);
-            setTimeout(() => setSaveMessage(''), 3000);
         } catch (error) {
-            setSaveMessage('Erro ao salvar configurações.');
+            addToast('Erro ao salvar.', 'error');
         } finally {
             setIsSaving(false);
         }
@@ -212,6 +246,7 @@ export default function SettingsPage() {
         setIsDirty(false);
         setCnpjError('');
         setPhoneError('');
+        haptics.light();
     };
 
     const updateSetting = <K extends keyof Settings>(key: K, value: Settings[K]) => {
@@ -228,24 +263,29 @@ export default function SettingsPage() {
     };
 
     const tabs = [
-        { id: 'general', label: 'Geral', icon: Globe },
-        { id: 'notifications', label: 'Notificações', icon: Bell },
-        { id: 'security', label: 'Segurança & Login', icon: Lock },
-        { id: 'integrations', label: 'Integrações', icon: LayoutGrid },
-        { id: 'billing', label: 'Faturamento', icon: LayoutGrid },
+        { id: 'general', label: 'Escritório', icon: Globe, desc: 'Identidade e localização' },
+        { id: 'notifications', label: 'Notificações', icon: Bell, desc: 'Alertas e mensagens' },
+        { id: 'security', label: 'Segurança', icon: Shield, desc: 'Login e proteção' },
+        { id: 'integrations', label: 'Integrações', icon: LayoutGrid, desc: 'Ferramentas externas' },
+        { id: 'billing', label: 'Assinatura', icon: FileText, desc: 'Planos e faturamento' },
     ];
 
     return (
-        <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 h-full lg:h-[calc(100vh-theme(spacing.20))]">
+        <div className="flex flex-col lg:flex-row gap-8 h-full pb-20 lg:pb-0">
 
-            <aside className="w-full lg:w-64 shrink-0">
-                <h2 className="hidden lg:block text-xs font-bold text-app-text-muted uppercase tracking-wider mb-4 px-2">Configurações Gerais</h2>
-                <div className="flex lg:flex-col gap-1 lg:gap-1 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 -mx-2 px-2 lg:mx-0 lg:px-0 scrollbar-hide touch-pan-x">
+            <aside className="w-full lg:w-80 shrink-0 space-y-10">
+                <div className="px-2">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-app-text-muted mb-1">Configurações</p>
+                    <h1 className="text-4xl font-black text-app-text-main tracking-tighter">Preferências</h1>
+                </div>
+
+                <nav className="space-y-2">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => {
-                                if (isDirty && activeTab !== tab.id && tab.id !== 'general' && activeTab === 'general') {
+                                haptics.light();
+                                if (isDirty && activeTab !== tab.id && activeTab === 'general') {
                                     setPendingTab(tab.id);
                                     setShowUnsavedModal(true);
                                 } else {
@@ -253,485 +293,422 @@ export default function SettingsPage() {
                                 }
                             }}
                             className={clsx(
-                                "flex items-center gap-2 lg:gap-3 px-3 lg:px-3 py-2 lg:py-2.5 rounded-lg text-xs lg:text-sm font-medium transition-fast whitespace-nowrap shrink-0 touch-manipulation",
+                                "w-full flex items-center gap-5 p-5 rounded-[1.5rem] transition-all duration-300 group",
                                 activeTab === tab.id
-                                    ? "bg-primary text-white shadow-md shadow-primary/20"
-                                    : "text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 active:bg-app-stroke/50"
+                                    ? "bg-primary text-white shadow-xl shadow-primary/20 scale-[1.02]"
+                                    : "text-app-text-muted hover:bg-app-card hover:text-app-text-main border border-transparent hover:border-app-stroke"
                             )}
                         >
-                            <tab.icon size={16} className="lg:w-[18px] lg:h-[18px]" />
-                            <span className="hidden sm:inline lg:inline">{tab.label}</span>
+                            <div className={clsx(
+                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                activeTab === tab.id ? "bg-white/20" : "bg-app-stroke/50 group-hover:bg-primary/10 group-hover:text-primary"
+                            )}>
+                                <tab.icon size={20} />
+                            </div>
+                            <div className="text-left">
+                                <p className="text-sm font-black uppercase tracking-widest leading-none mb-1">{tab.label}</p>
+                                <p className={clsx("text-[10px] font-medium opacity-60", activeTab === tab.id ? "text-white" : "text-app-text-muted")}>{tab.desc}</p>
+                            </div>
+                            {activeTab === tab.id && <ChevronRight size={16} className="ml-auto opacity-50" />}
                         </button>
                     ))}
-                </div>
+                </nav>
 
-                <div className="hidden lg:block mt-8 pt-8 border-t border-app-stroke space-y-1">
-                    <h2 className="text-xs font-bold text-app-text-muted uppercase tracking-wider mb-4 px-2">Administração</h2>
-                    <button
-                        onClick={() => setShowTeamModal(true)}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-fast touch-manipulation"
-                    >
-                        <User size={18} /> Equipe & Permissões
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('integrations')}
-                        className={clsx(
-                            "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-fast touch-manipulation",
-                            activeTab === 'integrations' ? "bg-primary text-white" : "text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30"
-                        )}
-                    >
-                        <LayoutGrid size={18} /> Integrações
-                    </button>
-                </div>
-
-                <div className="hidden lg:block mt-8 pt-8 border-t border-app-stroke">
-                    <h2 className="text-xs font-bold text-app-text-muted uppercase tracking-wider mb-4 px-2">Aparência</h2>
-                    <div className="bg-app-card border border-app-stroke rounded-xl p-4">
-                        <div className="flex items-center justify-between">
+                <div className="pt-8 border-t border-app-stroke space-y-6 px-2">
+                    <div className="space-y-1">
+                        <p className="text-[10px] font-black text-app-text-muted uppercase tracking-widest">Administração</p>
+                        <button
+                            onClick={() => { haptics.medium(); setShowTeamModal(true); }}
+                            className="w-full flex items-center justify-between p-4 rounded-2xl bg-app-card border border-app-stroke text-app-text-main font-bold text-sm hover:border-primary/30 transition-all group"
+                        >
                             <div className="flex items-center gap-3">
-                                {theme === 'dark' ? <Moon size={18} className="text-primary" /> : <Sun size={18} className="text-amber-500" />}
-                                <span className="text-sm font-medium text-app-text-main">
-                                    {theme === 'dark' ? 'Modo Escuro' : 'Modo Claro'}
+                                <User size={18} className="text-primary" />
+                                Equipe & Permissões
+                            </div>
+                            <ChevronRight size={16} className="text-app-text-muted group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </div>
+
+                    <div className="space-y-3">
+                        <p className="text-[10px] font-black text-app-text-muted uppercase tracking-widest">Aparência</p>
+                        <div className="bg-app-card border border-app-stroke rounded-2xl p-5 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-app-bg border border-app-stroke flex items-center justify-center">
+                                    {theme === 'dark' ? <Moon size={18} className="text-primary" /> : <Sun size={18} className="text-amber-500" />}
+                                </div>
+                                <span className="text-sm font-bold text-app-text-main">
+                                    {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
                                 </span>
                             </div>
-                            <Toggle checked={theme === 'light'} onChange={(e) => toggleTheme(e)} />
+                            <PremiumToggle checked={theme === 'light'} onChange={(e) => toggleTheme(e)} />
                         </div>
                     </div>
                 </div>
             </aside>
 
-            <main className="flex-1 bg-app-card border border-app-stroke rounded-2xl overflow-hidden flex flex-col lg:mr-6 mb-6 lg:mb-0">
-                <div className="p-6 border-b border-app-stroke flex justify-between items-center bg-app-card sticky top-0 z-10">
-                    <div>
-                        <div className="flex items-center gap-2 text-sm text-app-text-muted mb-1">
-                            <span>Home</span>
-                            <span>›</span>
-                            <span>Configurações</span>
-                        </div>
-                        <h1 className="text-2xl font-bold text-app-text-main">Configurações do Sistema</h1>
-                        <p className="text-sm text-app-text-muted">Gerencie as preferências da sua conta jurídica e personalize sua experiência.</p>
+            <main className="flex-1 flex flex-col min-w-0">
+                <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 px-2">
+                    <div className="space-y-1">
+                        <h2 className="text-3xl font-black text-app-text-main tracking-tighter leading-none">{tabs.find(t => t.id === activeTab)?.label}</h2>
+                        <p className="text-sm text-app-text-muted font-medium">{tabs.find(t => t.id === activeTab)?.desc}</p>
                     </div>
-                    <div className="flex gap-3 items-center">
-                        {saveMessage && (
-                            <span className={clsx(
-                                "text-sm font-medium px-3 py-1 rounded-lg",
-                                saveMessage.includes('sucesso') ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
-                            )}>
-                                {saveMessage}
-                            </span>
-                        )}
+                    <div className="flex items-center gap-4">
                         {isDirty && (
                             <button
                                 onClick={handleCancel}
-                                className="px-4 py-2 rounded-lg border border-app-stroke text-app-text-main text-sm font-medium hover:bg-app-stroke/30 transition-colors"
+                                className="px-6 py-3 rounded-2xl border border-app-stroke text-app-text-muted text-[10px] font-black uppercase tracking-widest hover:text-app-text-main hover:bg-app-card transition-all"
                             >
-                                Cancelar
+                                Descartar
                             </button>
                         )}
                         <button
                             onClick={handleSave}
                             disabled={isSaving}
-                            className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors flex items-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50"
+                            className="px-8 py-3 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-3 shadow-xl shadow-primary/20 disabled:opacity-50"
                         >
                             <Save size={16} />
-                            {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                            {isSaving ? 'Gravando...' : 'Salvar Alterações'}
                         </button>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-
-                    {activeTab === 'general' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main mb-4">Identidade do Escritório</h2>
-                                <div className="bg-app-bg border border-app-stroke rounded-xl p-6">
-                                    <div className="flex flex-col md:flex-row gap-6">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <label className="w-24 h-24 rounded-full bg-app-card border-2 border-dashed border-app-stroke flex items-center justify-center relative cursor-pointer hover:border-primary transition-colors group overflow-hidden">
-                                                {settings.logoUrl ? (
-                                                    <img src={settings.logoUrl} alt="Logo do escritório" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <Camera size={24} className="text-app-text-muted group-hover:text-app-text-main" />
-                                                )}
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handlePhotoUpload}
-                                                    className="hidden"
-                                                />
-                                                <div className="absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white border-2 border-app-bg">
-                                                    <Camera size={14} />
-                                                </div>
-                                            </label>
-                                            <span className="text-xs text-app-text-muted">Logo do Escritório</span>
-                                        </div>
-                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-app-text-muted">Nome do Escritório</label>
-                                                <input
-                                                    type="text"
-                                                    value={settings.officeName}
-                                                    onChange={(e) => updateSetting('officeName', e.target.value)}
-                                                    className="w-full bg-app-card border border-app-stroke rounded-lg px-4 py-2.5 text-app-text-main text-sm focus:border-primary outline-none transition-colors"
-                                                />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-app-text-muted">CNPJ / NIF</label>
-                                                <input
-                                                    type="text"
-                                                    value={settings.cnpj}
-                                                    onChange={(e) => updateSetting('cnpj', e.target.value)}
-                                                    className={clsx(
-                                                        "w-full bg-app-card border rounded-lg px-4 py-2.5 text-app-text-main text-sm outline-none transition-colors",
-                                                        cnpjError ? "border-red-500 focus:border-red-500" : "border-app-stroke focus:border-primary"
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    <AnimatePresence mode="wait">
+                        {activeTab === 'general' && (
+                            <motion.div key="general" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <SettingSection title="Identidade Visual" description="Como seu escritório é visto pelos clientes e no sistema" icon={Camera}>
+                                    <div className="flex flex-col lg:flex-row gap-12 items-start">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="relative group">
+                                                <label className="w-32 h-32 rounded-[2rem] bg-app-bg border-2 border-dashed border-app-stroke flex items-center justify-center cursor-pointer hover:border-primary transition-all overflow-hidden shadow-inner group">
+                                                    {settings.logoUrl ? (
+                                                        <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                    ) : (
+                                                        <Camera size={32} className="text-app-text-muted group-hover:text-primary transition-colors" />
                                                     )}
-                                                    placeholder="00.000.000/0001-00"
-                                                    maxLength={18}
-                                                />
-                                                {cnpjError && <p className="text-[10px] text-red-500">{cnpjError}</p>}
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-app-text-muted">Telefone</label>
-                                                <input
-                                                    type="text"
-                                                    value={settings.phone}
-                                                    onChange={(e) => updateSetting('phone', e.target.value)}
-                                                    className={clsx(
-                                                        "w-full bg-app-card border rounded-lg px-4 py-2.5 text-app-text-main text-sm outline-none transition-colors",
-                                                        phoneError ? "border-red-500 focus:border-red-500" : "border-app-stroke focus:border-primary"
-                                                    )}
-                                                    placeholder="(11) 90000-0000"
-                                                    maxLength={15}
-                                                />
-                                                {phoneError && <p className="text-[10px] text-red-500">{phoneError}</p>}
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-app-text-muted">Email de Contato Principal</label>
-                                                <input
-                                                    type="email"
-                                                    value={settings.email}
-                                                    onChange={(e) => updateSetting('email', e.target.value)}
-                                                    className="w-full bg-app-card border border-app-stroke rounded-lg px-4 py-2.5 text-app-text-main text-sm focus:border-primary outline-none transition-colors"
-                                                />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label className="text-xs font-bold text-app-text-muted">Website</label>
-                                                <div className="flex">
-                                                    <span className="bg-app-card border border-r-0 border-app-stroke rounded-l-lg px-3 py-2.5 text-app-text-muted text-sm flex items-center">https://</span>
-                                                    <input
-                                                        type="text"
-                                                        value={settings.website}
-                                                        onChange={(e) => updateSetting('website', e.target.value)}
-                                                        className="flex-1 bg-app-card border border-app-stroke rounded-r-lg px-4 py-2.5 text-app-text-main text-sm focus:border-primary outline-none transition-colors"
-                                                    />
+                                                    <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <RefreshCw size={24} className="text-white animate-spin-slow" />
+                                                    </div>
+                                                </label>
+                                                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary rounded-2xl flex items-center justify-center text-white border-4 border-app-card shadow-lg">
+                                                    <Camera size={16} />
                                                 </div>
                                             </div>
+                                            <p className="text-[10px] font-black text-app-text-muted uppercase tracking-widest">Logo (5MB máx)</p>
                                         </div>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main mb-4">Preferências Regionais</h2>
-                                <div className="bg-app-bg border border-app-stroke rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-app-text-muted">Idioma do Sistema</label>
-                                        <select
-                                            value={settings.language}
-                                            onChange={(e) => updateSetting('language', e.target.value)}
-                                            className="w-full bg-app-card border border-app-stroke rounded-lg px-4 py-2.5 text-app-text-main text-sm focus:border-primary outline-none appearance-none cursor-pointer"
-                                        >
-                                            <option value="pt-BR">Português (Brasil)</option>
-                                            <option value="en-US">English (US)</option>
-                                            <option value="es">Español</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-app-text-muted">Fuso Horário</label>
-                                        <select
-                                            value={settings.timezone}
-                                            onChange={(e) => updateSetting('timezone', e.target.value)}
-                                            className="w-full bg-app-card border border-app-stroke rounded-lg px-4 py-2.5 text-app-text-main text-sm focus:border-primary outline-none appearance-none cursor-pointer"
-                                        >
-                                            <option value="America/Sao_Paulo">(GMT-03:00) Brasília</option>
-                                            <option value="America/Fortaleza">(GMT-03:00) Fortaleza</option>
-                                            <option value="America/Manaus">(GMT-04:00) Manaus</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-app-text-muted">Formato de Data</label>
-                                        <select
-                                            value={settings.dateFormat}
-                                            onChange={(e) => updateSetting('dateFormat', e.target.value)}
-                                            className="w-full bg-app-card border border-app-stroke rounded-lg px-4 py-2.5 text-app-text-main text-sm focus:border-primary outline-none appearance-none cursor-pointer"
-                                        >
-                                            <option value="DD/MM/YYYY">DD/MM/AAAA (31/12/2023)</option>
-                                            <option value="MM/DD/YYYY">MM/DD/AAAA (12/31/2023)</option>
-                                            <option value="YYYY-MM-DD">AAAA-MM-DD (2023-12-31)</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section className="pb-8">
-                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
-                                    <Download size={20} className="text-primary" /> Exportação e Backup de Dados
-                                </h2>
-                                <div className="bg-app-bg border border-app-stroke rounded-xl p-6">
-                                    <p className="text-sm text-app-text-muted mb-4">
-                                        Baixe um arquivo contendo todos os clientes, processos, histórico financeiro e eventos do seu escritório jurídico. Para manter seus dados sempre seguros com você.
-                                    </p>
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        <button
-                                            onClick={async () => {
-                                                const btn = document.getElementById('btn-export-excel') as HTMLButtonElement;
-                                                const originalText = btn.innerText;
-                                                try {
-                                                    btn.innerText = 'Gerando...';
-                                                    btn.disabled = true;
-                                                    const response = await api.get('/backup/export/excel', { responseType: 'blob' });
-                                                    const url = window.URL.createObjectURL(new Blob([response.data]));
-                                                    const link = document.createElement('a');
-                                                    link.href = url;
-                                                    link.setAttribute('download', `backup_excel_${new Date().toISOString().split('T')[0]}.xlsx`);
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    link.parentNode?.removeChild(link);
-                                                    addToast('Backup em Excel gerado com sucesso!', 'success');
-                                                } catch (err) {
-                                                    addToast('Erro ao gerar backup em Excel', 'error');
-                                                } finally {
-                                                    btn.innerText = originalText;
-                                                    btn.disabled = false;
-                                                }
-                                            }}
-                                            id="btn-export-excel"
-                                            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
-                                        >
-                                            <Download size={16} /> Exportar Planilha XLSX
-                                        </button>
-
-                                        <button
-                                            onClick={async () => {
-                                                const btn = document.getElementById('btn-export-json') as HTMLButtonElement;
-                                                const originalText = btn.innerText;
-                                                try {
-                                                    btn.innerText = 'Gerando...';
-                                                    btn.disabled = true;
-                                                    const response = await api.get('/backup/export/json', { responseType: 'blob' });
-                                                    const url = window.URL.createObjectURL(new Blob([response.data]));
-                                                    const link = document.createElement('a');
-                                                    link.href = url;
-                                                    link.setAttribute('download', `backup_dados_${new Date().toISOString().split('T')[0]}.json`);
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    link.parentNode?.removeChild(link);
-                                                    addToast('Backup JSON gerado com sucesso!', 'success');
-                                                } catch (err) {
-                                                    addToast('Erro ao gerar backup JSON', 'error');
-                                                } finally {
-                                                    btn.innerText = originalText;
-                                                    btn.disabled = false;
-                                                }
-                                            }}
-                                            id="btn-export-json"
-                                            className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
-                                        >
-                                            <Download size={16} /> Exportar Arquivo Estruturado (JSON)
-                                        </button>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                    )}
-
-                    {activeTab === 'integrations' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
-                                    <LayoutGrid size={20} className="text-primary" /> Integrações Disponíveis
-                                </h2>
-                                <p className="text-sm text-app-text-muted mb-6">Conecte sua plataforma jurídica com as melhores ferramentas do mercado.</p>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col hover:border-primary/50 transition-all group">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                                <Globe size={24} className="text-primary" />
-                                            </div>
-                                            <span className={clsx(
-                                                "text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full",
-                                                googleConnected ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-app-stroke text-app-text-muted"
-                                            )}>
-                                                {googleConnected ? 'Ativo' : 'Inativo'}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-base font-bold text-app-text-main mb-1">Google Calendar</h3>
-                                        <p className="text-xs text-app-text-muted mb-6 leading-relaxed">
-                                            Sincronize automaticamente suas audiências e prazos com sua agenda pessoal do Google.
-                                        </p>
                                         
-                                        <div className="mt-auto">
-                                            {googleConnected ? (
-                                                <button 
-                                                    onClick={async () => {
-                                                        if(confirm('Deseja realmente desconectar sua agenda do Google?')) {
-                                                            try {
-                                                                await api.delete('/google-calendar/disconnect');
-                                                                setGoogleConnected(false);
-                                                                addToast('Google Calendar desconectado!', 'success');
-                                                            } catch (err) {
-                                                                addToast('Erro ao desconectar.', 'error');
-                                                            }
-                                                        }
-                                                    }}
-                                                    className="w-full py-2.5 rounded-xl border border-red-500/30 text-red-500 text-xs font-bold hover:bg-red-500/5 transition-colors"
-                                                >
-                                                    Desconectar Conta
-                                                </button>
-                                            ) : (
-                                                <button 
-                                                    disabled={isConnectingGoogle}
-                                                    onClick={async () => {
-                                                        setIsConnectingGoogle(true);
-                                                        try {
-                                                            const response = await api.get('/google-calendar/auth-url');
-                                                            window.location.href = response.data.url;
-                                                        } catch (err) {
-                                                            addToast('Erro ao iniciar conexão.', 'error');
-                                                            setIsConnectingGoogle(false);
-                                                        }
-                                                    }}
-                                                    className="w-full py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all"
-                                                >
-                                                    {isConnectingGoogle ? 'Iniciando...' : 'Conectar Agora'}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-app-bg border border-app-stroke rounded-2xl p-6 flex flex-col hover:border-primary/50 transition-all group">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="w-12 h-12 rounded-xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                                <FileText size={24} className="text-primary" />
-                                            </div>
-                                            <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                                Ativo (Plataforma)
-                                            </span>
-                                        </div>
-                                        <h3 className="text-base font-bold text-app-text-main mb-1">Autentique</h3>
-                                        <p className="text-xs text-app-text-muted mb-6 leading-relaxed">
-                                            Assinaturas digitais integradas. O escritório tem direito a até 10 documentos inclusos.
-                                        </p>
-                                        <div className="mt-auto">
-                                            <div className="w-full py-2.5 rounded-xl bg-app-stroke/30 text-app-text-muted text-center text-xs font-bold">
-                                                Configurado pela Advus
+                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <PremiumInput 
+                                                label="Nome Oficial" 
+                                                value={settings.officeName} 
+                                                onChange={(e: any) => updateSetting('officeName', e.target.value)} 
+                                            />
+                                            <PremiumInput 
+                                                label="CNPJ / Registro" 
+                                                value={settings.cnpj} 
+                                                error={cnpjError}
+                                                onChange={(e: any) => updateSetting('cnpj', e.target.value)} 
+                                                placeholder="00.000.000/0001-00"
+                                            />
+                                            <PremiumInput 
+                                                label="Telefone Comercial" 
+                                                value={settings.phone} 
+                                                error={phoneError}
+                                                onChange={(e: any) => updateSetting('phone', e.target.value)} 
+                                                placeholder="(11) 90000-0000"
+                                            />
+                                            <PremiumInput 
+                                                label="Email Principal" 
+                                                type="email"
+                                                value={settings.email} 
+                                                onChange={(e: any) => updateSetting('email', e.target.value)} 
+                                            />
+                                            <div className="md:col-span-2">
+                                                <PremiumInput 
+                                                    label="Website (Opcional)" 
+                                                    value={settings.website} 
+                                                    onChange={(e: any) => updateSetting('website', e.target.value)} 
+                                                    placeholder="www.escritorio.com.br"
+                                                />
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </section>
-                        </div>
-                    )}
+                                </SettingSection>
 
-                    {activeTab === 'notifications' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
-                                    <Bell size={20} className="text-primary" /> Notificações
-                                </h2>
-                                <div className="bg-app-bg border border-app-stroke rounded-xl p-6 space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-bold text-app-text-main">Notificações por Email</h3>
-                                            <p className="text-xs text-app-text-muted mt-1">Receba atualizações importantes por email.</p>
+                                <SettingSection title="Regional & Formatação" description="Ajuste como datas e horários são exibidos" icon={Globe}>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-app-text-muted uppercase tracking-widest ml-1">Idioma</label>
+                                            <select
+                                                value={settings.language}
+                                                onChange={(e) => updateSetting('language', e.target.value)}
+                                                className="w-full bg-app-bg border border-app-stroke rounded-[1.25rem] px-5 py-4 text-app-text-main text-sm font-bold focus:border-primary outline-none appearance-none cursor-pointer shadow-inner"
+                                            >
+                                                <option value="pt-BR">Português (Brasil)</option>
+                                                <option value="en-US">English (US)</option>
+                                                <option value="es">Español</option>
+                                            </select>
                                         </div>
-                                        <Toggle checked={settings.emailNotifications} onChange={() => updateSetting('emailNotifications', !settings.emailNotifications)} />
-                                    </div>
-                                    <div className="w-full h-px bg-app-stroke" />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-bold text-app-text-main">Atualizações de Processos</h3>
-                                            <p className="text-xs text-app-text-muted mt-1">Notificações quando houver movimentações processuais.</p>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-app-text-muted uppercase tracking-widest ml-1">Fuso Horário</label>
+                                            <select
+                                                value={settings.timezone}
+                                                onChange={(e) => updateSetting('timezone', e.target.value)}
+                                                className="w-full bg-app-bg border border-app-stroke rounded-[1.25rem] px-5 py-4 text-app-text-main text-sm font-bold focus:border-primary outline-none appearance-none cursor-pointer shadow-inner"
+                                            >
+                                                <option value="America/Sao_Paulo">Brasília (GMT-3)</option>
+                                                <option value="America/Manaus">Manaus (GMT-4)</option>
+                                            </select>
                                         </div>
-                                        <Toggle checked={settings.processUpdates} onChange={() => updateSetting('processUpdates', !settings.processUpdates)} />
-                                    </div>
-                                    <div className="w-full h-px bg-app-stroke" />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-bold text-app-text-main">Lembretes de Prazos</h3>
-                                            <p className="text-xs text-app-text-muted mt-1">Alertas para prazos processuais próximos.</p>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-app-text-muted uppercase tracking-widest ml-1">Formato de Data</label>
+                                            <select
+                                                value={settings.dateFormat}
+                                                onChange={(e) => updateSetting('dateFormat', e.target.value)}
+                                                className="w-full bg-app-bg border border-app-stroke rounded-[1.25rem] px-5 py-4 text-app-text-main text-sm font-bold focus:border-primary outline-none appearance-none cursor-pointer shadow-inner"
+                                            >
+                                                <option value="DD/MM/YYYY">31/12/2023</option>
+                                                <option value="MM/DD/YYYY">12/31/2023</option>
+                                                <option value="YYYY-MM-DD">2023-12-31</option>
+                                            </select>
                                         </div>
-                                        <Toggle checked={settings.deadlineReminders} onChange={() => updateSetting('deadlineReminders', !settings.deadlineReminders)} />
                                     </div>
-                                </div>
-                            </section>
-                        </div>
-                    )}
+                                </SettingSection>
 
-                    {activeTab === 'security' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <section>
-                                <h2 className="text-lg font-bold text-app-text-main flex items-center gap-2 mb-4">
-                                    <Shield size={20} className="text-primary" /> Segurança
-                                </h2>
-                                <div className="bg-app-bg border border-app-stroke rounded-xl p-6 space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-bold text-app-text-main">Autenticação em Dois Fatores (2FA)</h3>
-                                            <p className="text-xs text-app-text-muted mt-1">Adicione uma camada extra de segurança à sua conta exigindo um código do seu celular.</p>
+                                <SettingSection title="Exportação & Backup" description="Tenha controle total sobre seus dados" icon={Download}>
+                                    <div className="p-6 bg-primary/5 rounded-3xl border border-primary/10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                        <div className="space-y-2 text-center md:text-left">
+                                            <h4 className="text-lg font-black text-app-text-main tracking-tight uppercase">Base de Dados Completa</h4>
+                                            <p className="text-xs text-app-text-muted font-medium max-w-md">Baixe todos os clientes, processos e registros financeiros em um arquivo estruturado.</p>
                                         </div>
-                                        <button
-                                            onClick={() => setShow2FAModal(true)}
-                                            className={clsx(
-                                                "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                                                user2FAEnabled
-                                                    ? "bg-green-500/10 text-green-500 border border-green-500/30"
-                                                    : "bg-primary text-white hover:bg-primary-dark"
-                                            )}
-                                        >
-                                            {user2FAEnabled ? 'Gerenciar' : 'Configurar'}
-                                        </button>
-                                    </div>
-                                    <div className="w-full h-px bg-app-stroke" />
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-sm font-bold text-app-text-main">Notificar novos logins</h3>
-                                            <p className="text-xs text-app-text-muted mt-1">Receba um alerta por email sempre que sua conta for acessada de um novo dispositivo ou IP.</p>
+                                        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                                            <button
+                                                onClick={async () => {
+                                                    haptics.medium();
+                                                    try {
+                                                        const response = await api.get('/backup/export/excel', { responseType: 'blob' });
+                                                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                                                        const link = document.createElement('a');
+                                                        link.href = url;
+                                                        link.setAttribute('download', `backup_excel_${new Date().toISOString().split('T')[0]}.xlsx`);
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        link.parentNode?.removeChild(link);
+                                                        addToast('Planilha gerada!', 'success');
+                                                    } catch (err) {
+                                                        addToast('Erro ao exportar.', 'error');
+                                                    }
+                                                }}
+                                                className="px-6 py-4 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3 hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                                            >
+                                                <Download size={18} /> Excel (XLSX)
+                                            </button>
+                                            <button
+                                                onClick={async () => {
+                                                    haptics.medium();
+                                                    try {
+                                                        const response = await api.get('/backup/export/json', { responseType: 'blob' });
+                                                        const url = window.URL.createObjectURL(new Blob([response.data]));
+                                                        const link = document.createElement('a');
+                                                        link.href = url;
+                                                        link.setAttribute('download', `backup_dados_${new Date().toISOString().split('T')[0]}.json`);
+                                                        document.body.appendChild(link);
+                                                        link.click();
+                                                        link.parentNode?.removeChild(link);
+                                                        addToast('Arquivo JSON gerado!', 'success');
+                                                    } catch (err) {
+                                                        addToast('Erro ao exportar.', 'error');
+                                                    }
+                                                }}
+                                                className="px-6 py-4 bg-[#0F172A] text-white text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-all"
+                                            >
+                                                <Hash size={18} /> Dados (JSON)
+                                            </button>
                                         </div>
-                                        <Toggle checked={settings.loginAlerts} onChange={() => updateSetting('loginAlerts', !settings.loginAlerts)} />
                                     </div>
-                                </div>
-                            </section>
-                        </div>
-                    )}
+                                </SettingSection>
+                            </motion.div>
+                        )}
 
-                    {activeTab === 'billing' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <BillingPage />
-                        </div>
-                    )}
+                        {activeTab === 'notifications' && (
+                            <motion.div key="notifications" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <SettingSection title="Canais de Comunicação" description="Escolha onde e como quer ser avisado" icon={Bell}>
+                                    <div className="space-y-0 divide-y divide-app-stroke/50">
+                                        {[
+                                            { key: 'emailNotifications', label: 'Notificações por Email', desc: 'Relatórios diários e resumos semanais no seu inbox.' },
+                                            { key: 'processUpdates', label: 'Alertas de Processos', desc: 'Avisar imediatamente sobre movimentações no tribunal.' },
+                                            { key: 'deadlineReminders', label: 'Lembretes de Prazos', desc: 'Alertas críticos 24h antes de cada vencimento.' }
+                                        ].map((n) => (
+                                            <div key={n.key} className="py-8 flex items-center justify-between gap-10 first:pt-0 last:pb-0">
+                                                <div className="space-y-1">
+                                                    <h3 className="text-base font-black text-app-text-main uppercase tracking-tight">{n.label}</h3>
+                                                    <p className="text-sm text-app-text-muted font-medium">{n.desc}</p>
+                                                </div>
+                                                <PremiumToggle 
+                                                    checked={(settings as any)[n.key]} 
+                                                    onChange={() => updateSetting(n.key as any, !(settings as any)[n.key])} 
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </SettingSection>
+                            </motion.div>
+                        )}
+
+                        {activeTab === 'security' && (
+                            <motion.div key="security" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <SettingSection title="Proteção de Conta" description="Gerencie chaves de acesso e camadas extras" icon={Shield}>
+                                    <div className="space-y-10">
+                                        <div className="p-8 bg-primary/5 rounded-[2rem] border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-8">
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-16 h-16 rounded-[1.25rem] bg-white dark:bg-app-card flex items-center justify-center text-primary shadow-lg border border-app-stroke">
+                                                    <MobileIcon size={32} />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <h3 className="text-xl font-black text-app-text-main tracking-tight uppercase">Autenticação (2FA)</h3>
+                                                    <p className="text-sm text-app-text-muted font-medium">Use apps como Google Authenticator ou Authy.</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => { haptics.medium(); setShow2FAModal(true); }}
+                                                className={clsx(
+                                                    "px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg",
+                                                    user2FAEnabled
+                                                        ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30"
+                                                        : "bg-primary text-white hover:opacity-90 shadow-primary/20"
+                                                )}
+                                            >
+                                                {user2FAEnabled ? 'Proteção Ativa' : 'Ativar Agora'}
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between px-2">
+                                            <div className="space-y-1">
+                                                <h3 className="text-base font-black text-app-text-main uppercase tracking-tight">Alertas de Novo Login</h3>
+                                                <p className="text-sm text-app-text-muted font-medium">Avisar sempre que acessarem de um IP desconhecido.</p>
+                                            </div>
+                                            <PremiumToggle 
+                                                checked={settings.loginAlerts} 
+                                                onChange={() => updateSetting('loginAlerts', !settings.loginAlerts)} 
+                                            />
+                                        </div>
+                                    </div>
+                                </SettingSection>
+                            </motion.div>
+                        )}
+
+                        {activeTab === 'integrations' && (
+                            <motion.div key="integrations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <SettingSection title="Ecossistema Conectado" description="Sincronize com ferramentas de produtividade" icon={LayoutGrid}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="bg-app-bg border border-app-stroke rounded-[2rem] p-8 flex flex-col hover:border-primary/50 transition-all group relative overflow-hidden">
+                                            <div className="flex justify-between items-start mb-8 relative z-10">
+                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                                    <Globe size={32} className="text-[#4285F4]" />
+                                                </div>
+                                                <div className={clsx(
+                                                    "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                    googleConnected ? "bg-emerald-500/10 text-emerald-500" : "bg-app-stroke text-app-text-muted"
+                                                )}>
+                                                    {googleConnected ? 'Conectado' : 'Offline'}
+                                                </div>
+                                            </div>
+                                            <div className="relative z-10 flex-1 flex flex-col">
+                                                <h3 className="text-xl font-black text-app-text-main tracking-tight uppercase mb-2">Google Calendar</h3>
+                                                <p className="text-sm text-app-text-muted font-medium mb-10 leading-relaxed">
+                                                    Sincronize audiências e prazos automaticamente com sua agenda mobile e desktop.
+                                                </p>
+                                                
+                                                <div className="mt-auto">
+                                                    {googleConnected ? (
+                                                        <button 
+                                                            onClick={async () => {
+                                                                haptics.medium();
+                                                                if(confirm('Desconectar agenda do Google?')) {
+                                                                    try {
+                                                                        await api.delete('/google-calendar/disconnect');
+                                                                        setGoogleConnected(false);
+                                                                        addToast('Desconectado!', 'success');
+                                                                    } catch (err) {
+                                                                        addToast('Erro ao desconectar.', 'error');
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="w-full py-4 rounded-2xl border border-rose-500/30 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/5 transition-all"
+                                                        >
+                                                            Interromper Conexão
+                                                        </button>
+                                                    ) : (
+                                                        <button 
+                                                            disabled={isConnectingGoogle}
+                                                            onClick={async () => {
+                                                                haptics.medium();
+                                                                setIsConnectingGoogle(true);
+                                                                try {
+                                                                    const response = await api.get('/google-calendar/auth-url');
+                                                                    window.location.href = response.data.url;
+                                                                } catch (err) {
+                                                                    addToast('Erro ao iniciar.', 'error');
+                                                                    setIsConnectingGoogle(false);
+                                                                }
+                                                            }}
+                                                            className="w-full py-4 rounded-2xl bg-[#4285F4] text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-[#4285F4]/20 hover:opacity-90 transition-all"
+                                                        >
+                                                            {isConnectingGoogle ? 'Autenticando...' : 'Vincular Conta Google'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-app-bg border border-app-stroke rounded-[2rem] p-8 flex flex-col border-dashed opacity-80 group">
+                                            <div className="flex justify-between items-start mb-8">
+                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-xl grayscale group-hover:grayscale-0 transition-all duration-500">
+                                                    <FileText size={32} className="text-primary" />
+                                                </div>
+                                                <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-500">
+                                                    Sistema
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-black text-app-text-main tracking-tight uppercase mb-2">Autentique</h3>
+                                            <p className="text-sm text-app-text-muted font-medium mb-10 leading-relaxed">
+                                                Assinaturas digitais integradas nativamente. 10 documentos mensais cortesia da Advus.
+                                            </p>
+                                            <div className="mt-auto">
+                                                <div className="w-full py-4 rounded-2xl bg-app-stroke/30 text-app-text-muted text-center text-[10px] font-black uppercase tracking-widest">
+                                                    Pré-configurado
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </SettingSection>
+                            </motion.div>
+                        )}
+
+                        {activeTab === 'billing' && (
+                            <motion.div key="billing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <BillingPage />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </main>
 
             <Modal
                 isOpen={showUnsavedModal}
                 onClose={() => setShowUnsavedModal(false)}
-                title="Alterações Não Salvas"
+                title="Dados Pendentes"
                 size="sm"
             >
-                <div className="space-y-4">
-                    <p className="text-sm text-app-text-muted">
-                        Você tem alterações não salvas na aba atual. Deseja sair e perder essas alterações?
+                <div className="space-y-6 text-center p-4">
+                    <div className="w-20 h-20 bg-rose-500/10 rounded-[2rem] flex items-center justify-center mx-auto text-rose-500 mb-6">
+                        <Save size={32} />
+                    </div>
+                    <p className="text-base text-app-text-muted font-medium leading-relaxed">
+                        Você tem alterações não salvas. Deseja realmente descartar e mudar de aba?
                     </p>
-                    <div className="flex gap-3 pt-4 border-t border-app-stroke justify-end">
-                        <button
-                            onClick={() => setShowUnsavedModal(false)}
-                            className="px-4 py-2 rounded-lg border border-app-stroke text-app-text-main text-sm font-medium hover:bg-app-stroke/30 transition-colors"
-                        >
-                            Ficar
-                        </button>
+                    <div className="flex flex-col gap-3 pt-6">
                         <button
                             onClick={() => {
                                 handleCancel();
@@ -739,9 +716,15 @@ export default function SettingsPage() {
                                 if (pendingTab) setActiveTab(pendingTab);
                                 setPendingTab(null);
                             }}
-                            className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors"
+                            className="w-full py-4 rounded-2xl bg-rose-500 text-white text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-rose-500/20"
                         >
-                            Sair e Descartar
+                            Descartar & Sair
+                        </button>
+                        <button
+                            onClick={() => setShowUnsavedModal(false)}
+                            className="w-full py-4 rounded-2xl bg-app-stroke/30 text-app-text-main text-xs font-black uppercase tracking-widest hover:bg-app-stroke/50 transition-all"
+                        >
+                            Continuar Editando
                         </button>
                     </div>
                 </div>

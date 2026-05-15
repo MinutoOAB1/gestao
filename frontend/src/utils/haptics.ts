@@ -22,6 +22,15 @@ export const haptics = {
     },
 
     /**
+     * Heavy vibration for destructive actions
+     */
+    heavy: () => {
+        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(50);
+        }
+    },
+
+    /**
      * Double vibration for errors or warnings
      */
     error: () => {

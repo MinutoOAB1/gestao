@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Briefcase, Clock, TrendingUp, ChevronRight, Scale, FileText } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Briefcase, Clock, TrendingUp, ChevronRight, Scale, FileText, Calendar, Bell, ExternalLink, Sparkles, UserCircle } from 'lucide-react';
 import api from '../../services/api';
 import { Link } from 'react-router-dom';
 import { usePortalAuth } from '../../context/PortalAuthContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { haptics } from '../../utils/haptics';
+import { clsx } from 'clsx';
 
 const PortalDashboard = () => {
   const [data, setData] = useState<any>(null);
@@ -24,19 +26,6 @@ const PortalDashboard = () => {
     fetchDashboard();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const activeCount = data?.activeProcesses || 0;
-  const closedCount = data?.closedProcesses || 0;
-  const totalCount = data?.totalProcesses || 0;
-  const updates = data?.recentUpdates || [];
-
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Bom dia';
@@ -44,170 +33,237 @@ const PortalDashboard = () => {
     return 'Boa noite';
   };
 
-  const stats = [
-    {
-      label: 'Processos Ativos',
-      value: activeCount,
-      icon: Briefcase,
-      color: 'from-blue-500 to-blue-600',
-      bg: 'bg-blue-500/10',
-      text: 'text-blue-500',
-    },
-    {
-      label: 'Novas Movimentações',
-      value: updates.length,
-      icon: Clock,
-      color: 'from-amber-500 to-orange-600',
-      bg: 'bg-amber-500/10',
-      text: 'text-amber-500',
-    },
-    {
-      label: 'Total de Processos',
-      value: totalCount,
-      icon: TrendingUp,
-      color: 'from-emerald-500 to-emerald-600',
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-500',
-    },
-  ];
+  const stats = useMemo(() => {
+    const activeCount = data?.activeProcesses || 0;
+    const updatesCount = data?.recentUpdates?.length || 0;
+    const totalCount = data?.totalProcesses || 0;
+
+    return [
+      {
+        label: 'Processos Ativos',
+        value: activeCount,
+        icon: Briefcase,
+        color: 'text-primary',
+        bg: 'bg-primary/10',
+        border: 'border-primary/20'
+      },
+      {
+        label: 'Atualizações',
+        value: updatesCount,
+        icon: Bell,
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10',
+        border: 'border-amber-500/20'
+      },
+      {
+        label: 'Total Geral',
+        value: totalCount,
+        icon: TrendingUp,
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10',
+        border: 'border-emerald-500/20'
+      },
+    ];
+  }, [data]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-6">
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full" 
+          />
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-app-text-muted animate-pulse">Sincronizando painel...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const updates = data?.recentUpdates || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-12 pb-20">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-6"
       >
-        <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          {getGreeting()}, {user?.name?.split(' ')[0] || 'Cliente'} 👋
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">
-          Acompanhe aqui o andamento dos seus processos jurídicos.
-        </p>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full mb-2">
+            <Sparkles size={14} className="text-primary" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary">Portal do Cliente</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-app-text-main tracking-tighter leading-none">
+            {getGreeting()}, <span className="text-primary">{user?.name?.split(' ')[0] || 'Cliente'}</span> 👋
+          </h1>
+          <p className="text-sm text-app-text-muted font-medium max-w-lg">
+            Seja bem-vindo ao seu espaço de transparência. Aqui você acompanha cada passo da sua jornada jurídica em tempo real.
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-app-card border border-app-stroke p-4 rounded-[2rem] shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-app-bg border border-app-stroke flex items-center justify-center text-primary">
+            <Calendar size={20} />
+          </div>
+          <div className="pr-4">
+            <p className="text-[10px] font-black uppercase tracking-widest text-app-text-muted">Hoje é dia</p>
+            <p className="text-sm font-black text-app-text-main">
+              {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {stats.map((stat, idx) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.1 }}
-            className="bg-white dark:bg-white/[0.06] rounded-2xl p-5 border border-slate-200/80 dark:border-white/[0.08] hover:shadow-md dark:hover:bg-white/[0.08] transition-all group"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.1 }}
+            className="bg-app-card rounded-[2.5rem] p-8 border border-app-stroke shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className={`p-2.5 rounded-xl ${stat.bg}`}>
-                <stat.icon size={20} className={stat.text} />
-              </div>
+            <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+              <stat.icon size={80} />
             </div>
-            <p className="text-xs font-semibold text-slate-500 dark:text-white/40 uppercase tracking-wider">{stat.label}</p>
-            <p className="text-3xl font-black text-slate-900 dark:text-white mt-1">{stat.value}</p>
+            <div className={clsx("w-14 h-14 rounded-2xl flex items-center justify-center border mb-6 transition-transform group-hover:scale-110", stat.bg, stat.border, stat.color)}>
+              <stat.icon size={24} />
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-app-text-muted mb-1">{stat.label}</p>
+            <p className="text-4xl font-black text-app-text-main tracking-tight">{stat.value}</p>
           </motion.div>
         ))}
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left - Recent Updates */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Recent Updates */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="lg:col-span-2"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+          className="lg:col-span-2 space-y-6"
         >
-          <div className="bg-white dark:bg-white/[0.06] rounded-2xl border border-slate-200/80 dark:border-white/[0.08] overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-white/[0.06]">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Movimentações Recentes</h3>
-              <Link to="/portal/processos" className="text-xs font-semibold text-blue-500 hover:text-blue-600 transition-colors flex items-center gap-1">
-                Ver tudo <ChevronRight size={14} />
+          <div className="bg-app-card rounded-[3rem] border border-app-stroke shadow-2xl overflow-hidden">
+            <div className="px-10 py-8 border-b border-app-stroke/50 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <Clock size={20} />
+                </div>
+                <h3 className="text-lg font-black text-app-text-main uppercase tracking-tight">Movimentações Recentes</h3>
+              </div>
+              <Link 
+                to="/portal/processos" 
+                onClick={() => haptics.light()}
+                className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-2"
+              >
+                Ver Histórico <ChevronRight size={14} />
               </Link>
             </div>
-            <div className="divide-y divide-slate-100 dark:divide-white/[0.06]">
+            
+            <div className="divide-y divide-app-stroke/30">
               {updates.length === 0 ? (
-                <div className="p-8 text-center">
-                  <Scale className="w-10 h-10 text-slate-300 dark:text-white/20 mx-auto mb-3" />
-                  <p className="text-sm text-slate-400 dark:text-white/40">Nenhuma movimentação recente.</p>
+                <div className="px-10 py-20 text-center space-y-4">
+                  <div className="w-20 h-20 bg-app-bg border border-app-stroke rounded-[2rem] flex items-center justify-center mx-auto text-app-text-muted/30">
+                    <Scale size={40} />
+                  </div>
+                  <p className="text-sm font-bold text-app-text-muted italic">Nenhuma nova movimentação no momento.</p>
                 </div>
               ) : (
-                updates.slice(0, 5).map((update: any, idx: number) => (
-                  <div key={idx} className="px-5 py-4 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-1">
-                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 ring-4 ring-blue-500/20" />
+                updates.slice(0, 6).map((update: any, idx: number) => (
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className="px-10 py-6 hover:bg-primary/5 transition-colors group cursor-default"
+                  >
+                    <div className="flex items-start gap-6">
+                      <div className="mt-1 relative">
+                        <div className="w-3 h-3 rounded-full bg-primary shadow-[0_0_15px_rgba(0,112,255,0.5)] group-hover:scale-125 transition-transform" />
+                        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-px h-16 bg-app-stroke/50" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{update.description}</p>
-                        <p className="text-xs text-slate-400 dark:text-white/40 mt-0.5">
-                          Processo nº {update.processNumber} • {update.processTitle}
-                        </p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-xs font-semibold text-slate-500 dark:text-white/50">
-                          {new Date(update.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
-                        </p>
-                        <p className="text-[10px] text-slate-400 dark:text-white/30">
-                          {new Date(update.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-black text-app-text-main leading-tight group-hover:text-primary transition-colors">{update.description}</p>
+                          <span className="text-[10px] font-black text-app-text-muted uppercase tracking-widest whitespace-nowrap ml-4">
+                            {new Date(update.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} • {new Date(update.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-app-text-muted flex items-center gap-2">
+                          <Briefcase size={12} />
+                          Processo: <span className="text-app-text-main/60">{update.processTitle}</span>
+                          <span className="opacity-40">•</span>
+                          <span className="font-mono text-[9px]">{update.processNumber}</span>
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               )}
             </div>
           </div>
         </motion.div>
 
-        {/* Right - Quick Actions */}
+        {/* Sidebar Actions */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-          className="space-y-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-8"
         >
-          {/* View Processes CTA */}
-          <Link to="/portal/processos" className="block">
-            <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-2xl p-5 text-white relative overflow-hidden group hover:shadow-lg transition-all">
-              <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-1/4 translate-y-1/4">
-                <Briefcase className="w-32 h-32" />
+          {/* Main CTA */}
+          <Link to="/portal/processos" onClick={() => haptics.medium()}>
+            <div className="bg-primary rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl shadow-primary/40 hover:-translate-y-1 transition-all">
+              <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+                <Briefcase size={180} />
               </div>
-              <div className="relative z-10">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 mb-3">Acessar</p>
-                <h4 className="text-lg font-black mb-1">Meus Processos</h4>
-                <p className="text-xs text-white/50 mb-4">Veja detalhes, movimentações e documentos.</p>
-                <div className="flex items-center gap-2 text-xs font-bold text-white/80 group-hover:text-white transition-colors">
-                  Ver todos <ChevronRight size={14} />
+              <div className="relative z-10 space-y-6">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                  <FileText size={24} />
+                </div>
+                <div>
+                  <h4 className="text-2xl font-black tracking-tight leading-none mb-2">Meus Processos</h4>
+                  <p className="text-xs text-white/70 font-medium leading-relaxed">
+                    Acesse a lista completa, documentos anexados e o histórico detalhado de cada ação.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] bg-white/20 w-fit px-4 py-2 rounded-full backdrop-blur-md group-hover:bg-white group-hover:text-primary transition-all">
+                  Explorar Agora <ExternalLink size={14} />
                 </div>
               </div>
             </div>
           </Link>
 
-          {/* Encerrados */}
-          <div className="bg-white dark:bg-white/[0.06] rounded-2xl p-5 border border-slate-200/80 dark:border-white/[0.08]">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/10">
-                <FileText size={18} className="text-slate-500 dark:text-white/50" />
+          {/* Help Card */}
+          <div className="bg-app-card rounded-[2.5rem] p-8 border border-app-stroke shadow-xl space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
+                <UserCircle size={24} />
               </div>
-              <div>
-                <p className="text-xs font-semibold text-slate-400 dark:text-white/40 uppercase tracking-wider">Encerrados</p>
-                <p className="text-xl font-black text-slate-900 dark:text-white">{closedCount}</p>
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-black uppercase tracking-widest text-app-text-muted">Atendimento</p>
+                <p className="text-sm font-black text-app-text-main">Precisa de Ajuda?</p>
               </div>
             </div>
-            <p className="text-xs text-slate-400 dark:text-white/40 leading-relaxed">
-              Processos finalizados e arquivados estão disponíveis para consulta.
+            <p className="text-xs text-app-text-muted font-medium leading-relaxed">
+              Dúvidas sobre o andamento do seu processo? Entre em contato diretamente com seu advogado.
             </p>
+            <button 
+              onClick={() => haptics.light()}
+              className="w-full bg-app-bg border border-app-stroke text-app-text-main font-black uppercase text-[10px] tracking-[0.2em] py-4 rounded-2xl hover:bg-app-stroke/30 transition-all active:scale-95"
+            >
+              Falar com Escritório
+            </button>
           </div>
 
-          {/* Contact */}
-          <div className="bg-gradient-to-br from-blue-500/10 to-violet-500/10 dark:from-blue-500/20 dark:to-violet-500/20 rounded-2xl p-5 border border-blue-200/50 dark:border-blue-500/20">
-            <p className="font-bold text-sm text-slate-900 dark:text-white mb-1">Precisa de ajuda?</p>
-            <p className="text-xs text-slate-500 dark:text-white/50 mb-4 leading-relaxed">
-              Entre em contato com seu advogado responsável.
-            </p>
-            <button className="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl text-xs transition-colors">
-              Contatar Escritório
-            </button>
+          {/* System Status */}
+          <div className="flex items-center justify-center gap-3 opacity-40">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-app-text-muted">Sistema Online & Sincronizado</span>
           </div>
         </motion.div>
       </div>

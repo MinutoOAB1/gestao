@@ -1,26 +1,28 @@
 import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Users, Layout, X, Clock, FileText, ExternalLink, Calendar, AlertTriangle } from 'lucide-react';
+import { Plus, Search, Users, Layout, X, Clock, FileText, ExternalLink, Calendar, AlertTriangle, Filter, ChevronRight, Hash, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
 import { clsx } from 'clsx';
 import { ListSkeleton } from '../../components/ui/Skeleton';
+import { haptics } from '../../utils/haptics';
 
 // Optimized animation variants
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
-        transition: { staggerChildren: 0.02, delayChildren: 0.01 }
+        transition: { staggerChildren: 0.05, delayChildren: 0.1 }
     }
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, y: 12 },
+    hidden: { opacity: 0, y: 20, scale: 0.98 },
     visible: {
         opacity: 1,
         y: 0,
-        transition: { type: "spring" as const, stiffness: 300, damping: 25 }
+        scale: 1,
+        transition: { type: "spring" as const, stiffness: 260, damping: 20 }
     }
 };
 
@@ -43,6 +45,7 @@ export default function ProcessListPage() {
     const [processes, setProcesses] = useState<Process[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState('Todos');
+    const [searchQuery, setSearchQuery] = useState('');
     const navigate = useNavigate();
 
     const [selectedProcessId, setSelectedProcessId] = useState<string | null>(null);
@@ -62,16 +65,21 @@ export default function ProcessListPage() {
         fetchProcesses();
     }, [fetchProcesses]);
 
-    // Filter processes based on active filter
+    // Filter processes based on active filter and search query
     const filteredProcesses = useMemo(() => {
         return processes.filter(proc => {
+            const matchesSearch = proc.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                proc.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                proc.client?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+            
+            if (!matchesSearch) return false;
+
             if (activeFilter === 'Todos') return true;
             if (activeFilter === 'Em Andamento') {
                 return proc.status === 'EM_ANDAMENTO' || proc.status === 'ATIVO' ||
                     (proc.kanbanColumn !== 'concluido' && proc.kanbanColumn !== 'arquivado');
             }
             if (activeFilter === 'Urgentes') {
-                // Check if deadline is within 3 days or overdue
                 if (!proc.deadline) return false;
                 const deadline = new Date(proc.deadline);
                 const today = new Date();
@@ -83,80 +91,109 @@ export default function ProcessListPage() {
             }
             return true;
         });
-    }, [processes, activeFilter]);
+    }, [processes, activeFilter, searchQuery]);
 
-    // Adapting styles for Dark Mode Pixel Perfect
     return (
-        <div className="flex h-full gap-6 pb-20 md:pb-0 overflow-hidden">
-            <div className="flex-1 flex flex-col space-y-6 overflow-y-auto custom-scrollbar">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-app-text-main">Processos</h1>
-                        <p className="text-app-text-muted text-sm">{filteredProcesses.length} casos {activeFilter !== 'Todos' ? `(${activeFilter})` : 'ativos'}</p>
-                    </div>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => navigate('/app/processos/kanban')}
-                            className="hidden md:flex bg-app-card border border-app-stroke text-app-text-main px-4 py-2 rounded-lg items-center gap-2 hover:bg-app-stroke/50 transition-colors"
-                        >
-                            <Layout size={20} />
-                            Quadro
-                        </button>
-                        <button
-                            onClick={() => navigate('/app/processos/novo')}
-                            className="hidden md:flex bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg items-center gap-2 font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-black/20"
-                        >
-                            <Plus size={20} />
-                            Novo
-                        </button>
-                    </div>
-                </div>
-
-                {/* Mobile Filter Chips */}
-                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide touch-pan-x -mx-2 px-2">
-                    {['Todos', 'Em Andamento', 'Urgentes', 'Arquivados'].map((filter) => (
-                        <button
-                            key={filter}
-                            onClick={() => setActiveFilter(filter)}
-                            className={clsx(
-                                "px-3 sm:px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border touch-manipulation shrink-0 flex items-center gap-1.5",
-                                activeFilter === filter
-                                    ? "bg-black text-white dark:bg-white dark:text-black border-black/10 dark:border-white/10 shadow-lg"
-                                    : "bg-transparent text-app-text-muted border-app-stroke hover:border-black/30 dark:hover:border-white/30"
-                            )}
-                        >
-                            {filter}
-                            {filter === 'Urgentes' && (
-                                <span className={clsx("w-2 h-2 rounded-full", activeFilter === filter ? "bg-white dark:bg-black" : "bg-black dark:bg-white animate-pulse")}></span>
-                            )}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Main List Area */}
-                <div className="flex-1">
-                    {loading ? (
-                        <ListSkeleton count={5} />
-                    ) : filteredProcesses.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-app-card rounded-2xl border border-dashed border-app-stroke/60">
-                            <div className="relative mb-6">
-                                <div className="absolute inset-0 bg-black/5 dark:bg-white/5 blur-3xl rounded-full"></div>
-                                <Search size={64} className="relative text-app-text-muted opacity-40 animate-pulse" />
+        <div className="flex h-full gap-8 pb-20 md:pb-0 overflow-hidden bg-app-bg/50">
+            <div className="flex-1 flex flex-col space-y-8 overflow-y-auto custom-scrollbar px-1 pt-2">
+                {/* Header Section */}
+                <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-3 mb-1">
+                            <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                <FileText className="text-primary" size={20} />
                             </div>
-                            <h3 className="text-lg font-black text-app-text-main mb-2 uppercase tracking-widest">Nenhum processo encontrado</h3>
-                            <p className="text-app-text-muted text-sm max-w-xs mx-auto mb-8">
-                                Não encontramos nenhum caso para o filtro <span className="text-black dark:text-white font-black">{activeFilter}</span>.
+                            <h1 className="text-4xl font-black text-app-text-main tracking-tighter">Processos</h1>
+                        </div>
+                        <p className="text-app-text-muted text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
+                            {filteredProcesses.length} casos {activeFilter !== 'Todos' ? `em ${activeFilter}` : 'localizados'}
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative group min-w-[300px]">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted group-focus-within:text-primary transition-colors" size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar processo, número ou cliente..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-12 pr-4 py-3.5 bg-app-card border border-app-stroke rounded-2xl text-sm font-bold text-app-text-main focus:ring-4 focus:ring-primary/10 focus:border-primary/30 transition-all shadow-sm group-hover:border-app-stroke/80"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => { navigate('/app/processos/kanban'); haptics.light(); }}
+                                className="flex-1 sm:flex-none bg-app-card border border-app-stroke text-app-text-main px-6 py-3.5 rounded-2xl items-center gap-2 hover:bg-app-stroke/30 transition-all font-black text-[10px] uppercase tracking-widest active:scale-95 shadow-sm"
+                            >
+                                <Layout size={18} />
+                                Quadro
+                            </button>
+                            <button
+                                onClick={() => { navigate('/app/processos/novo'); haptics.medium(); }}
+                                className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-6 py-3.5 rounded-2xl items-center gap-2 font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-black/20 active:scale-95"
+                            >
+                                <Plus size={18} />
+                                Novo
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                {/* Filter Toolbar */}
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar -mx-1 px-1">
+                    <div className="p-1 bg-app-card border border-app-stroke rounded-2xl flex gap-1 shadow-sm">
+                        {['Todos', 'Em Andamento', 'Urgentes', 'Arquivados'].map((filter) => (
+                            <button
+                                key={filter}
+                                onClick={() => { setActiveFilter(filter); haptics.light(); }}
+                                className={clsx(
+                                    "px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap",
+                                    activeFilter === filter
+                                        ? "bg-black text-white dark:bg-white dark:text-black shadow-lg"
+                                        : "text-app-text-muted hover:bg-app-stroke/50 hover:text-app-text-main"
+                                )}
+                            >
+                                {filter === 'Urgentes' && <AlertTriangle size={14} className={activeFilter === filter ? "" : "text-amber-500"} />}
+                                {filter}
+                                {filter === 'Urgentes' && (
+                                    <span className={clsx("w-2 h-2 rounded-full", activeFilter === filter ? "bg-white dark:bg-black" : "bg-red-500 animate-pulse")}></span>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="h-8 w-px bg-app-stroke/50 hidden sm:block mx-2"></div>
+                    <button className="p-3 bg-app-card border border-app-stroke rounded-2xl text-app-text-muted hover:text-primary transition-all shadow-sm active:scale-90">
+                        <Filter size={18} />
+                    </button>
+                </div>
+
+                {/* Main Content */}
+                <main className="flex-1">
+                    {loading ? (
+                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <ListSkeleton count={6} />
+                        </div>
+                    ) : filteredProcesses.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-32 px-6 text-center bg-app-card/30 rounded-[3rem] border border-dashed border-app-stroke/60 backdrop-blur-sm">
+                            <div className="w-24 h-24 bg-app-stroke/20 rounded-[2.5rem] flex items-center justify-center mb-8">
+                                <Search size={40} className="text-app-text-muted opacity-40 animate-pulse" />
+                            </div>
+                            <h3 className="text-2xl font-black text-app-text-main mb-3 uppercase tracking-tighter">Nada por aqui...</h3>
+                            <p className="text-app-text-muted text-sm max-w-sm mx-auto mb-10 font-medium leading-relaxed">
+                                Não encontramos nenhum caso que corresponda aos seus critérios de busca atual.
                             </p>
                             <button
-                                onClick={() => setActiveFilter('Todos')}
-                                className="px-6 py-2 bg-app-bg border border-app-stroke text-app-text-main rounded-xl text-sm font-semibold hover:bg-app-stroke/30 transition-all active:scale-95"
+                                onClick={() => { setActiveFilter('Todos'); setSearchQuery(''); haptics.light(); }}
+                                className="px-8 py-4 bg-app-card border border-app-stroke text-app-text-main rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-app-stroke/50 transition-all shadow-sm active:scale-95"
                             >
-                                Ver todos os casos
+                                Limpar filtros e ver todos
                             </button>
                         </div>
                     ) : (
                         <motion.div
-                            className="space-y-3 sm:space-y-4"
+                            className="grid grid-cols-1 xl:grid-cols-2 gap-6"
                             variants={containerVariants}
                             initial="hidden"
                             animate="visible"
@@ -166,13 +203,13 @@ export default function ProcessListPage() {
                                     key={proc.id} 
                                     proc={proc} 
                                     isSelected={selectedProcessId === proc.id}
-                                    onSelect={() => setSelectedProcessId(selectedProcessId === proc.id ? null : proc.id)}
-                                    onNavigate={() => navigate(`/app/processos/${proc.id}`)} 
+                                    onSelect={() => { setSelectedProcessId(selectedProcessId === proc.id ? null : proc.id); haptics.light(); }}
+                                    onNavigate={() => { navigate(`/app/processos/${proc.id}`); haptics.medium(); }} 
                                 />
                             ))}
                         </motion.div>
                     )}
-                </div>
+                </main>
             </div>
 
             {/* Side Panel Preview */}
@@ -181,7 +218,7 @@ export default function ProcessListPage() {
                     <SelectedProcessSidebar 
                         processId={selectedProcessId} 
                         onClose={() => setSelectedProcessId(null)} 
-                        onNavigate={(id) => navigate(`/app/processos/${id}`)}
+                        onNavigate={(id) => { navigate(`/app/processos/${id}`); haptics.medium(); }}
                     />
                 )}
             </AnimatePresence>
@@ -214,78 +251,100 @@ function SelectedProcessSidebar({
         fetchDetail();
     }, [processId]);
 
-    const UPDATE_TYPE_ICONS: Record<string, { icon: any; color: string }> = {
-        'MOVIMENTO': { icon: FileText, color: 'text-neutral-500' },
-        'DECISAO': { icon: FileText, color: 'text-black dark:text-white' },
-        'SENTENCA': { icon: FileText, color: 'text-black dark:text-white' },
-        'DESPACHO': { icon: FileText, color: 'text-neutral-600' },
-        'AUDIENCIA': { icon: Calendar, color: 'text-neutral-800 dark:text-neutral-200' },
-        'PRAZO': { icon: AlertTriangle, color: 'text-black dark:text-white' },
-        'OUTRO': { icon: Clock, color: 'text-neutral-400' },
+    const UPDATE_TYPE_ICONS: Record<string, { icon: any; color: string; bg: string }> = {
+        'MOVIMENTO': { icon: FileText, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        'DECISAO': { icon: FileText, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        'SENTENCA': { icon: FileText, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        'DESPACHO': { icon: FileText, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+        'AUDIENCIA': { icon: Calendar, color: 'text-primary', bg: 'bg-primary/10' },
+        'PRAZO': { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-500/10' },
+        'OUTRO': { icon: Clock, color: 'text-app-text-muted', bg: 'bg-app-stroke/30' },
     };
 
     return (
         <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed md:relative top-0 right-0 h-full w-full md:w-[400px] bg-white dark:bg-slate-900 border-l border-gray-100 dark:border-slate-800 shadow-2xl z-[60] md:z-0 flex flex-col"
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed lg:relative top-0 right-0 h-full w-full lg:w-[450px] bg-app-card/80 backdrop-blur-2xl border-l border-app-stroke shadow-2xl z-[60] lg:z-0 flex flex-col"
         >
-            <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
-                <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-widest text-xs">Prévia do Caso</h3>
-                <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl text-gray-400 transition-all">
+            <div className="p-8 border-b border-app-stroke flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <div className="w-2 h-8 bg-primary rounded-full"></div>
+                    <h3 className="font-black text-app-text-main uppercase tracking-[0.2em] text-[11px]">Resumo do Processo</h3>
+                </div>
+                <button onClick={() => { onClose(); haptics.light(); }} className="p-3 bg-app-stroke/20 hover:bg-app-stroke/40 rounded-2xl text-app-text-muted transition-all active:scale-90">
                     <X size={20} />
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
                 {loading || !process ? (
-                    <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                        <div className="w-8 h-8 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Carregando...</p>
+                    <div className="flex flex-col items-center justify-center h-full space-y-6">
+                        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-[10px] text-app-text-muted font-black uppercase tracking-[0.3em] animate-pulse">Sincronizando dados...</p>
                     </div>
                 ) : (
                     <>
-                        {/* Basic Info */}
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-black text-gray-900 dark:text-white leading-tight">{process.title}</h2>
-                            <div className="flex flex-wrap gap-2">
-                                <span className="px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded text-[10px] font-black text-neutral-500">{process.number}</span>
-                                <span className="px-2 py-1 bg-black dark:bg-white text-white dark:text-black rounded text-[10px] font-black uppercase tracking-widest">{process.area}</span>
+                        {/* Case Header */}
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-lg border border-primary/20">{process.area}</span>
+                                <h2 className="text-3xl font-black text-app-text-main leading-none tracking-tighter">{process.title}</h2>
                             </div>
+                            
+                            <div className="p-4 bg-app-bg/50 rounded-3xl border border-app-stroke flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Hash size={16} className="text-app-text-muted" />
+                                    <span className="text-xs font-black font-mono text-app-text-main">{process.number}</span>
+                                </div>
+                                <button className="p-2 text-primary hover:bg-primary/10 rounded-xl transition-all"><ExternalLink size={16} /></button>
+                            </div>
+
                             <button 
                                 onClick={() => onNavigate(process.id)}
-                                className="w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-black/20 flex items-center justify-center gap-2 hover:opacity-90"
+                                className="w-full py-5 bg-black dark:bg-white text-white dark:text-black rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest transition-all shadow-2xl shadow-black/20 flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95"
                             >
-                                <ExternalLink size={14} /> ABRIR DETALHES
+                                <Eye size={18} /> Detalhes Completos
                             </button>
                         </div>
 
-                        {/* History Timeline */}
-                        <div className="space-y-6">
-                            <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                <Clock size={14} /> LINHA DO TEMPO
-                            </h4>
-                            <div className="relative pl-6 space-y-6 before:content-[''] before:absolute before:left-[3px] before:top-2 before:bottom-2 before:w-[2px] before:bg-gray-100 dark:before:bg-slate-800">
-                                {process.updates?.map((upd: any) => {
+                        {/* Recent Activity */}
+                        <div className="space-y-8">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-[11px] font-black text-app-text-muted uppercase tracking-[0.2em] flex items-center gap-2">
+                                    <Clock size={16} className="text-primary" /> Histórico Recente
+                                </h4>
+                                <span className="text-[9px] font-black text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-md">{process.updates?.length || 0} andamentos</span>
+                            </div>
+                            
+                            <div className="relative pl-6 space-y-8 before:content-[''] before:absolute before:left-[4px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-primary before:via-app-stroke before:to-transparent">
+                                {process.updates?.slice(0, 5).map((upd: any) => {
                                     const typeInfo = UPDATE_TYPE_ICONS[upd.type] || UPDATE_TYPE_ICONS['OUTRO'];
                                     const Icon = typeInfo.icon;
                                     return (
                                         <div key={upd.id} className="relative group">
-                                            <div className={`absolute -left-[27px] top-0 w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 flex items-center justify-center shrink-0 ${typeInfo.color} shadow-sm z-10 transition-transform group-hover:scale-110`}>
+                                            <div className={clsx(
+                                                "absolute -left-[28px] top-0 w-8 h-8 rounded-xl border-2 border-app-card flex items-center justify-center shrink-0 shadow-lg z-10 transition-transform group-hover:scale-110",
+                                                typeInfo.bg, typeInfo.color
+                                            )}>
                                                 <Icon size={14} />
                                             </div>
-                                            <div className="flex justify-between items-start mb-1">
-                                                <p className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-tighter">{upd.type}</p>
-                                                <span className="text-[9px] font-bold text-gray-400">{new Date(upd.date).toLocaleDateString('pt-BR')}</span>
+                                            <div className="bg-app-bg/40 p-5 rounded-[2rem] border border-app-stroke/50 group-hover:border-primary/30 transition-all group-hover:shadow-xl group-hover:shadow-primary/5">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <p className="text-[10px] font-black text-app-text-main uppercase tracking-widest">{upd.type}</p>
+                                                    <span className="text-[10px] font-bold text-app-text-muted">{new Date(upd.date).toLocaleDateString('pt-BR')}</span>
+                                                </div>
+                                                <p className="text-xs text-app-text-muted leading-relaxed font-medium">{upd.description}</p>
                                             </div>
-                                            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight p-2 bg-gray-50/30 dark:bg-slate-800/20 rounded-xl border border-gray-100 dark:border-slate-800/50">{upd.description}</p>
                                         </div>
                                     );
                                 })}
                                 {(!process.updates || process.updates.length === 0) && (
-                                    <p className="text-xs text-gray-400 italic">Nenhum andamento registrado ainda.</p>
+                                    <div className="py-12 text-center bg-app-bg/20 rounded-[2rem] border border-dashed border-app-stroke">
+                                        <p className="text-xs text-app-text-muted font-bold uppercase tracking-widest italic">Nenhum andamento</p>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -299,16 +358,18 @@ function SelectedProcessSidebar({
 // Memoized Process Card to prevent unnecessary re-renders when filtering
 const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Process, isSelected?: boolean, onSelect?: () => void, onNavigate: () => void }) => {
 
-    // Determine Area Color
-    const getAreaColor = (areaStr: string) => {
+    // Determine Area Color - Using more vibrant and refined colors
+    const getAreaStyles = (areaStr: string) => {
         const area = areaStr || 'Cível';
-        if (area.toLowerCase().includes('cível')) return 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/30';
-        if (area.toLowerCase().includes('trabalho') || area.toLowerCase().includes('trabalh')) return 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-100 dark:border-blue-800/30';
-        if (area.toLowerCase().includes('família')) return 'bg-pink-50 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400 border-pink-100 dark:border-pink-800/30';
-        if (area.toLowerCase().includes('criminal') || area.toLowerCase().includes('penal')) return 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 border-orange-100 dark:border-orange-800/30';
-        if (area.toLowerCase().includes('tribut')) return 'bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400 border-cyan-100 dark:border-cyan-800/30';
-        return 'bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border-gray-100 dark:border-gray-700';
+        if (area.toLowerCase().includes('cível')) return { badge: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20', accent: 'bg-emerald-500' };
+        if (area.toLowerCase().includes('trabalho') || area.toLowerCase().includes('trabalh')) return { badge: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20', accent: 'bg-blue-500' };
+        if (area.toLowerCase().includes('família')) return { badge: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20', accent: 'bg-pink-500' };
+        if (area.toLowerCase().includes('criminal') || area.toLowerCase().includes('penal')) return { badge: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20', accent: 'bg-orange-500' };
+        if (area.toLowerCase().includes('tribut')) return { badge: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20', accent: 'bg-cyan-500' };
+        return { badge: 'bg-app-stroke/30 text-app-text-muted border-app-stroke/50', accent: 'bg-primary' };
     };
+
+    const areaStyles = getAreaStyles(proc.area);
 
     // Determine Urgency
     const isUrgent = proc.deadline && Math.ceil((new Date(proc.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) <= 3;
@@ -324,72 +385,87 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
     return (
         <motion.div
             variants={itemVariants}
+            layout
             className={clsx(
-                "bg-app-card rounded-xl border p-4 sm:p-5 transition-all cursor-pointer shadow-sm relative overflow-hidden group touch-manipulation will-animate",
-                isSelected ? "border-black dark:border-white ring-4 ring-black/5 dark:ring-white/5" : "border-app-stroke hover:border-black/20 dark:hover:border-white/20"
+                "bg-app-card rounded-[2.5rem] border p-8 transition-all cursor-pointer shadow-sm relative overflow-hidden group touch-manipulation",
+                isSelected ? "border-primary shadow-2xl shadow-primary/10 ring-4 ring-primary/5" : "border-app-stroke hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5"
             )}
-            whileHover={{ scale: isSelected ? 1 : 1.01 }}
-            whileTap={{ scale: 0.99 }}
             onClick={onSelect}
         >
-            {/* Priority Indicator */}
-            <div className={clsx("absolute left-0 top-0 bottom-0 w-1 transition-all", isUrgent ? "bg-black dark:bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)]" : "bg-neutral-200 dark:bg-neutral-800 group-hover:bg-neutral-400 dark:group-hover:bg-neutral-600")}></div>
+            {/* Priority Pulse Background */}
+            {isUrgent && (
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-red-500/5 blur-[50px] animate-pulse"></div>
+            )}
 
-            <div className="flex justify-between items-start mb-2 pl-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2 py-0.5 rounded bg-app-bg border border-app-stroke text-[10px] text-app-text-muted uppercase tracking-wider font-mono">
-                        #{proc.number.slice(-4)}
+            <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <span className="px-3 py-1 rounded-xl bg-app-bg border border-app-stroke text-[10px] font-black text-app-text-muted uppercase tracking-widest font-mono">
+                        #{proc.number.split('.').slice(0, 1)}
                     </span>
-                    <span className={clsx("px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border", getAreaColor(proc.area))}>
+                    <span className={clsx("px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border", areaStyles.badge)}>
                         {proc.area || 'Cível'}
                     </span>
                     {isUrgent && (
-                        <span className="px-2 py-0.5 rounded border bg-black dark:bg-white text-white dark:text-black border-black/10 dark:border-white/10 text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-white dark:bg-black animate-pulse"></span>
+                        <span className="px-3 py-1 rounded-xl bg-red-500 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-red-500/20">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                             Urgente
                         </span>
                     )}
                 </div>
-                <button className="text-app-text-muted hover:text-black dark:hover:text-white transition-colors p-1" onClick={(e) => e.stopPropagation()}>
-                    <div className="w-1 h-1 rounded-full bg-current mb-0.5"></div>
-                    <div className="w-1 h-1 rounded-full bg-current mb-0.5"></div>
-                    <div className="w-1 h-1 rounded-full bg-current"></div>
-                </button>
+                <div className="w-2 h-8 bg-app-stroke/50 rounded-full group-hover:bg-primary/20 transition-all"></div>
             </div>
 
-            <h3 className="text-sm sm:text-base font-bold text-app-text-main mb-1 pl-2 line-clamp-2">{proc.title}</h3>
-
-            <div className="flex items-center gap-2 pl-2 mb-3 sm:mb-4">
-                <Users size={14} className="text-app-text-muted shrink-0" />
-                <span className="text-xs sm:text-sm text-app-text-muted truncate">Cliente: <span className="text-app-text-main font-semibold">{proc.client?.name || 'Não atribuído'}</span></span>
-            </div>
-
-            {/* Visual Progress Bar */}
-            <div className="pl-2 mb-4 w-full">
-                <div className="flex justify-between text-[10px] text-app-text-muted mb-1 font-medium px-0.5">
-                    <span>Progresso</span>
-                    <span>{progress}%</span>
-                </div>
-                <div className="h-1.5 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-black to-neutral-500 dark:from-white dark:to-neutral-400 transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
-                </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-app-stroke pt-3 pl-2">
-                <div className="flex items-center gap-2 text-xs text-app-text-muted">
-                    <div className="w-4 h-4 rounded bg-app-bg flex items-center justify-center border border-app-stroke">
-                        <div className={clsx("w-2 h-2 rounded-full", progress === 100 ? "bg-black dark:bg-white" : isUrgent ? "bg-black dark:bg-white animate-pulse" : "bg-neutral-400")}></div>
+            <div className="mb-6 space-y-2">
+                <h3 className="text-2xl font-black text-app-text-main tracking-tighter line-clamp-2 leading-tight group-hover:text-primary transition-colors">{proc.title}</h3>
+                <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-app-stroke/20 rounded-lg flex items-center justify-center shrink-0">
+                        <Users size={12} className="text-app-text-muted" />
                     </div>
-                    <span className="hidden sm:inline capitalize">{proc.kanbanColumn?.replace('_', ' ') || 'Processo Ativo'}</span>
-                    <span className="sm:hidden capitalize truncate max-w-[100px]">{proc.kanbanColumn?.replace('_', ' ') || 'Ativo'}</span>
+                    <span className="text-sm text-app-text-muted font-bold tracking-tight">
+                        Cliente: <span className="text-app-text-main">{proc.client?.name || 'Não atribuído'}</span>
+                    </span>
                 </div>
-                <div 
+            </div>
+
+            {/* Progress Visualization */}
+            <div className="space-y-3 mb-8">
+                <div className="flex justify-between items-end">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black text-app-text-main uppercase tracking-widest">{proc.kanbanColumn?.replace('_', ' ') || 'Processo Ativo'}</span>
+                    </div>
+                    <span className="text-lg font-black text-app-text-main tracking-tighter">{progress}%</span>
+                </div>
+                <div className="h-3 w-full bg-app-stroke/20 rounded-full overflow-hidden p-0.5 border border-app-stroke/30">
+                    <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 1.5, ease: "circOut" }}
+                        className={clsx("h-full rounded-full transition-all shadow-[0_0_10px_rgba(0,0,0,0.1)]", 
+                            progress === 100 ? "bg-emerald-500" : areaStyles.accent
+                        )}
+                    />
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-6 border-t border-app-stroke/50">
+                <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                        {[1, 2].map((i) => (
+                            <div key={i} className="w-8 h-8 rounded-xl bg-app-stroke/50 border-2 border-app-card flex items-center justify-center text-[10px] font-black">
+                                {i === 1 ? 'VA' : 'MB'}
+                            </div>
+                        ))}
+                    </div>
+                    <span className="text-[10px] font-black text-app-text-muted uppercase tracking-widest">+2 equipe</span>
+                </div>
+                <button 
                     onClick={(e) => { e.stopPropagation(); onNavigate(); }}
-                    className="text-[10px] font-black uppercase tracking-widest text-white dark:text-black bg-black dark:bg-white px-3 py-1.5 rounded-lg border border-black/10 dark:border-white/10 hover:opacity-80 transition-all shadow-lg"
+                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-app-text-main bg-app-stroke/20 hover:bg-primary hover:text-white px-5 py-2.5 rounded-2xl transition-all active:scale-95 border border-app-stroke/50 hover:border-primary shadow-sm"
                 >
-                    Detalhes
-                </div>
+                    Acessar <ChevronRight size={14} />
+                </button>
             </div>
         </motion.div>
     );
 });
+
