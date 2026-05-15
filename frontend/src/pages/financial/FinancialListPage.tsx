@@ -1272,107 +1272,106 @@ export default function FinancialListPage() {
                     <InvoiceManagementTab />
                 ) : activeTab === 'inadimplencia' ? (
                     <InadimplenciaTab records={records} />
-                ) : (
-                    <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden mt-4">
-
-                    <div className="p-5 border-b border-app-stroke flex justify-between items-center">
-                        <div>
-                            <h3 className="text-lg font-bold text-app-text-main">Repasses de Honorários</h3>
-                            <p className="text-sm text-app-text-muted">Lista dos valores devidos a parceiros do escritório.</p>
+                ) : activeTab === 'repasses' ? (
+                    <div className="bg-app-card border border-app-stroke rounded-2xl overflow-hidden mt-4 shadow-sm">
+                        <div className="p-5 border-b border-app-stroke flex justify-between items-center">
+                            <div>
+                                <h3 className="text-lg font-bold text-app-text-main">Repasses de Honorários</h3>
+                                <p className="text-sm text-app-text-muted">Lista dos valores devidos a parceiros do escritório.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead>
-                                <tr className="border-b border-app-stroke/50 bg-app-bg/50 text-xs font-semibold text-app-text-muted">
-                                    <th className="px-6 py-4 rounded-tl-xl whitespace-nowrap">DATA</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">PARCEIRO</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">ORIGEM</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">VALOR DO REPASSE</th>
-                                    <th className="px-6 py-4 whitespace-nowrap">STATUS</th>
-                                    <th className="px-6 py-4 rounded-tr-xl text-right whitespace-nowrap">AÇÕES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {repasses?.length > 0 ? (
-                                    repasses.map((rep: any) => (
-                                        <tr key={rep.id} className="border-b border-app-stroke/50 hover:bg-app-bg/30 transition-colors group">
-                                            <td className="px-6 py-4 align-middle whitespace-nowrap">
-                                                <div className="flex items-center gap-2 text-sm text-app-text-main">
-                                                    <Calendar size={14} className="text-app-text-muted" />
-                                                    {rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('pt-BR') : 'Sem data'}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 align-middle">
-                                                <div className="flex items-center gap-2">
-                                                    <div style={{ backgroundColor: rep.partner?.color }} className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs">
-                                                        {rep.partner?.initials}
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse min-w-[800px]">
+                                <thead>
+                                    <tr className="border-b border-app-stroke/50 bg-app-bg/50 text-xs font-semibold text-app-text-muted">
+                                        <th className="px-6 py-4 rounded-tl-xl whitespace-nowrap">DATA</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">PARCEIRO</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">ORIGEM</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">VALOR DO REPASSE</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">STATUS</th>
+                                        <th className="px-6 py-4 rounded-tr-xl text-right whitespace-nowrap">AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {repasses?.length > 0 ? (
+                                        repasses.map((rep: any) => (
+                                            <tr key={rep.id} className="border-b border-app-stroke/50 hover:bg-app-bg/30 transition-colors group">
+                                                <td className="px-6 py-4 align-middle whitespace-nowrap">
+                                                    <div className="flex items-center gap-2 text-sm text-app-text-main">
+                                                        <Calendar size={14} className="text-app-text-muted" />
+                                                        {rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('pt-BR') : 'Sem data'}
                                                     </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-app-text-main whitespace-nowrap">
-                                                            {rep.partner?.name}
-                                                        </p>
-                                                        <p className="text-[10px] text-app-text-muted">
-                                                            {rep.partner?.type}
-                                                        </p>
+                                                </td>
+                                                <td className="px-6 py-4 align-middle">
+                                                    <div className="flex items-center gap-2">
+                                                        <div style={{ backgroundColor: rep.partner?.color }} className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                                                            {rep.partner?.initials}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-medium text-app-text-main whitespace-nowrap">
+                                                                {rep.partner?.name}
+                                                            </p>
+                                                            <p className="text-[10px] text-app-text-muted">
+                                                                {rep.partner?.type}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 align-middle max-w-[200px]">
-                                                <p className="text-sm text-app-text-main truncate" title={rep.description}>
-                                                    {rep.description}
-                                                </p>
-                                            </td>
-                                            <td className="px-6 py-4 align-middle whitespace-nowrap">
-                                                <span className="text-sm font-bold text-app-text-main">
-                                                    {formatBRL(rep.amount)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 align-middle whitespace-nowrap">
-                                                <span className={clsx(
-                                                    "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit",
-                                                    rep.status === 'PAID'
-                                                        ? "bg-black/10 text-black"
-                                                        : "bg-amber-400/10 text-amber-600"
-                                                )}>
-                                                    <div className={clsx(
-                                                        "w-1.5 h-1.5 rounded-full",
-                                                        rep.status === 'PAID' ? "bg-black" : "bg-amber-400"
-                                                    )} />
-                                                    {rep.status === 'PAID' ? 'Pago' : 'Pendente'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 align-middle text-right whitespace-nowrap">
-                                                {rep.status === 'PENDING' && (
-                                                    <button
-                                                        onClick={() => handlePayRepasse(rep.id)}
-                                                        className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:opacity-90 transition-colors shadow-lg shadow-black/20"
-                                                    >
-                                                        Marcar Pago
-                                                    </button>
-                                                )}
-                                                {rep.status === 'PAID' && (
-                                                    <span className="text-xs text-app-text-muted italic">Repassado</span>
-                                                )}
+                                                </td>
+                                                <td className="px-6 py-4 align-middle max-w-[200px]">
+                                                    <p className="text-sm text-app-text-main truncate" title={rep.description}>
+                                                        {rep.description}
+                                                    </p>
+                                                </td>
+                                                <td className="px-6 py-4 align-middle whitespace-nowrap">
+                                                    <span className="text-sm font-bold text-app-text-main">
+                                                        {formatBRL(rep.amount)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 align-middle whitespace-nowrap">
+                                                    <span className={clsx(
+                                                        "px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 w-fit shadow-sm",
+                                                        rep.status === 'PAID'
+                                                            ? "bg-black/10 text-black border border-black/10"
+                                                            : "bg-amber-400/10 text-amber-600 border border-amber-400/20"
+                                                    )}>
+                                                        <div className={clsx(
+                                                            "w-1.5 h-1.5 rounded-full",
+                                                            rep.status === 'PAID' ? "bg-black" : "bg-amber-400"
+                                                        )} />
+                                                        {rep.status === 'PAID' ? 'Pago' : 'Pendente'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 align-middle text-right whitespace-nowrap">
+                                                    {rep.status === 'PENDING' && (
+                                                        <button
+                                                            onClick={() => handlePayRepasse(rep.id)}
+                                                            className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:opacity-90 transition-colors shadow-lg shadow-black/20"
+                                                        >
+                                                            Marcar Pago
+                                                        </button>
+                                                    )}
+                                                    {rep.status === 'PAID' && (
+                                                        <span className="text-xs text-app-text-muted font-medium italic">Repassado</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={6} className="px-6 py-12 text-center text-app-text-muted font-medium">
+                                                Nenhum repasse registrado na planilha de honorários.
                                             </td>
                                         </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-app-text-muted">
-                                            Nenhum repasse registrado na planilha de honorários.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            ) : activeTab === 'dre' ? (
-                <DREReportTab />
-            ) : activeTab === 'audit' ? (
-                <FinancialAuditTab />
-            ) : null}
+                ) : activeTab === 'dre' ? (
+                    <DREReportTab />
+                ) : activeTab === 'audit' ? (
+                    <FinancialAuditTab />
+                ) : null}
 
             {/* Transaction Modal */}
             <TransactionModal
