@@ -96,7 +96,7 @@ const PortalDashboard = () => {
             <Sparkles size={14} className="text-primary" />
             <span className="text-[10px] font-black uppercase tracking-widest text-primary">Portal do Cliente</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-app-text-main tracking-tighter leading-none">
+          <h1 className="text-3xl md:text-5xl font-black text-app-text-main tracking-tighter leading-tight md:leading-none">
             {getGreeting()}, <span className="text-primary">{user?.name?.split(' ')[0] || 'Cliente'}</span> 👋
           </h1>
           <p className="text-sm text-app-text-muted font-medium max-w-lg">
@@ -104,7 +104,7 @@ const PortalDashboard = () => {
           </p>
         </div>
         
-        <div className="flex items-center gap-3 bg-app-card border border-app-stroke p-4 rounded-[2rem] shadow-xl">
+        <div className="flex items-center gap-3 bg-app-card border border-app-stroke p-4 md:p-4 rounded-2xl md:rounded-[2rem] shadow-xl w-full md:w-auto">
           <div className="w-12 h-12 rounded-2xl bg-app-bg border border-app-stroke flex items-center justify-center text-primary">
             <Calendar size={20} />
           </div>
@@ -125,7 +125,7 @@ const PortalDashboard = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: idx * 0.1 }}
-            className="bg-app-card rounded-[2.5rem] p-8 border border-app-stroke shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all"
+            className="bg-app-card rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-app-stroke shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all"
           >
             <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
               <stat.icon size={80} />
@@ -148,8 +148,8 @@ const PortalDashboard = () => {
           transition={{ delay: 0.3 }}
           className="lg:col-span-2 space-y-6"
         >
-          <div className="bg-app-card rounded-[3rem] border border-app-stroke shadow-2xl overflow-hidden">
-            <div className="px-10 py-8 border-b border-app-stroke/50 flex items-center justify-between">
+          <div className="bg-app-card rounded-[2rem] md:rounded-[3rem] border border-app-stroke shadow-2xl overflow-hidden">
+            <div className="px-6 md:px-10 py-6 md:py-8 border-b border-app-stroke/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                   <Clock size={20} />
@@ -179,7 +179,7 @@ const PortalDashboard = () => {
                     key={idx}
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    className="px-10 py-6 hover:bg-primary/5 transition-colors group cursor-default"
+                    className="px-6 md:px-10 py-5 md:py-6 hover:bg-primary/5 transition-colors group cursor-default"
                   >
                     <div className="flex items-start gap-6">
                       <div className="mt-1 relative">
@@ -187,9 +187,9 @@ const PortalDashboard = () => {
                         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-px h-16 bg-app-stroke/50" />
                       </div>
                       <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
                           <p className="text-sm font-black text-app-text-main leading-tight group-hover:text-primary transition-colors">{update.description}</p>
-                          <span className="text-[10px] font-black text-app-text-muted uppercase tracking-widest whitespace-nowrap ml-4">
+                          <span className="text-[10px] font-black text-app-text-muted uppercase tracking-widest whitespace-nowrap">
                             {new Date(update.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} • {new Date(update.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
@@ -217,7 +217,7 @@ const PortalDashboard = () => {
         >
           {/* Main CTA */}
           <Link to="/portal/processos" onClick={() => haptics.medium()}>
-            <div className="bg-primary rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl shadow-primary/40 hover:-translate-y-1 transition-all">
+            <div className="bg-primary rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 text-white relative overflow-hidden group shadow-2xl shadow-primary/40 hover:-translate-y-1 transition-all">
               <div className="absolute -right-10 -bottom-10 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">
                 <Briefcase size={180} />
               </div>
@@ -239,7 +239,7 @@ const PortalDashboard = () => {
           </Link>
 
           {/* Help Card */}
-          <div className="bg-app-card rounded-[2.5rem] p-8 border border-app-stroke shadow-xl space-y-6">
+          <div className="bg-app-card rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-app-stroke shadow-xl space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
                 <UserCircle size={24} />

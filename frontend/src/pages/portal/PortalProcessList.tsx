@@ -79,7 +79,7 @@ const PortalProcessList = () => {
         className="flex flex-col md:flex-row md:items-end justify-between gap-6"
       >
         <div className="space-y-2">
-          <h1 className="text-4xl md:text-5xl font-black text-app-text-main tracking-tighter leading-none uppercase">Meus Processos</h1>
+          <h1 className="text-3xl md:text-5xl font-black text-app-text-main tracking-tighter leading-tight md:leading-none uppercase">Meus Processos</h1>
           <p className="text-sm text-app-text-muted font-medium max-w-lg">
             {processes.length} registros encontrados • <span className="text-primary">{activeProcesses} ativos agora</span>
           </p>
@@ -114,8 +114,8 @@ const PortalProcessList = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="PESQUISAR POR NÚMERO OU TÍTULO DO PROCESSO..."
-          className="w-full pl-16 pr-8 py-6 bg-app-card border border-app-stroke rounded-[2rem] text-sm font-black text-app-text-main placeholder:text-app-text-muted/30 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-xl"
+          placeholder="BUSCAR PROCESSO..."
+          className="w-full pl-16 pr-8 py-5 md:py-6 bg-app-card border border-app-stroke rounded-[1.5rem] md:rounded-[2rem] text-sm font-black text-app-text-main placeholder:text-app-text-muted/30 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-xl"
         />
       </motion.div>
 
@@ -127,8 +127,8 @@ const PortalProcessList = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-app-card rounded-[3rem] p-20 border border-app-stroke shadow-2xl text-center space-y-6"
           >
-            <div className="w-24 h-24 bg-app-bg border border-app-stroke rounded-[2.5rem] flex items-center justify-center mx-auto text-app-text-muted/30">
-              <Scale size={48} />
+            <div className="w-20 h-20 bg-app-bg border border-app-stroke rounded-[2rem] flex items-center justify-center mx-auto text-app-text-muted/30">
+              <Scale size={40} />
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-black text-app-text-main uppercase tracking-tight">Nenhum processo encontrado</h3>
@@ -145,19 +145,19 @@ const PortalProcessList = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
               >
-                <Link
-                  to={`/portal/processos/${process.id}`}
-                  onClick={() => haptics.medium()}
-                  className="block bg-app-card rounded-[2.5rem] p-8 border border-app-stroke hover:border-primary/50 shadow-lg hover:shadow-2xl transition-all group relative overflow-hidden"
-                >
+                  <Link
+                    to={`/portal/processos/${process.id}`}
+                    onClick={() => haptics.medium()}
+                    className="block bg-app-card rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-app-stroke hover:border-primary/50 shadow-lg hover:shadow-2xl transition-all group relative overflow-hidden"
+                  >
                   <div className="absolute right-0 top-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] group-hover:scale-110 transition-all">
                     <Briefcase size={120} />
                   </div>
 
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
                     <div className="flex items-start gap-6 flex-1 min-w-0">
-                      <div className="w-16 h-16 rounded-[1.5rem] bg-app-bg border border-app-stroke flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/5 transition-all">
-                        <Briefcase size={28} />
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-[1.5rem] bg-app-bg border border-app-stroke flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/5 transition-all shrink-0">
+                        <Briefcase size={24} className="md:size-[28px]" />
                       </div>
                       <div className="flex-1 min-w-0 space-y-3">
                         <div className="flex items-center gap-4 flex-wrap">

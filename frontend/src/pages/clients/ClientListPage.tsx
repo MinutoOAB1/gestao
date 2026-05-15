@@ -340,7 +340,7 @@ export default function ClientListPage() {
             </AnimatePresence>
 
             {/* Premium Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-1">
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-xl shadow-black/20 dark:shadow-white/10">
@@ -379,7 +379,7 @@ export default function ClientListPage() {
                         Novo Cliente
                     </button>
                 </div>
-            </div>
+            </header>
 
             {/* Glassmorphic Search & Filters */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -485,7 +485,7 @@ export default function ClientListPage() {
                                     key={client.id}
                                     variants={itemVariants}
                                     onClick={() => navigate(`/app/clientes/${client.id}`)}
-                                    className="group relative bg-app-card/40 hover:bg-app-card/80 border border-app-stroke/40 hover:border-primary/30 rounded-[1.25rem] p-4 transition-all cursor-pointer shadow-sm hover:shadow-xl hover:shadow-black/5"
+                                    className="bg-app-card rounded-[1.5rem] p-5 sm:p-6 border border-app-stroke hover:border-primary/50 transition-all cursor-pointer shadow-sm relative group overflow-hidden touch-manipulation"
                                 >
                                     <div className="flex flex-col lg:flex-row lg:items-center gap-6">
                                         {/* Profile Info */}

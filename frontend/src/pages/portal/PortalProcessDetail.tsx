@@ -57,8 +57,8 @@ const PortalProcessDetail = () => {
 
   if (!process) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center p-8">
-        <div className="bg-app-card rounded-[3rem] p-16 border border-app-stroke shadow-2xl text-center space-y-8 max-w-lg">
+      <div className="min-h-[60vh] flex items-center justify-center p-4 sm:p-8">
+        <div className="bg-app-card rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 border border-app-stroke shadow-2xl text-center space-y-8 max-w-lg">
           <div className="w-24 h-24 bg-app-bg border border-app-stroke rounded-[2.5rem] flex items-center justify-center mx-auto text-app-text-muted/20">
             <Scale size={48} />
           </div>
@@ -107,8 +107,8 @@ const PortalProcessDetail = () => {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div className="space-y-3">
-            <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-4xl md:text-5xl font-black text-app-text-main tracking-tighter leading-none uppercase">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-wrap">
+              <h1 className="text-3xl md:text-5xl font-black text-app-text-main tracking-tighter leading-tight md:leading-none uppercase">
                 PROCESSO {process.number || 'S/N'}
               </h1>
               <div className={clsx("flex items-center gap-2 px-4 py-1.5 rounded-full border", status.bg, status.border, status.color)}>
@@ -136,7 +136,7 @@ const PortalProcessDetail = () => {
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="bg-app-card rounded-[3rem] p-10 border border-app-stroke shadow-2xl relative overflow-hidden group"
+            className="bg-app-card rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 border border-app-stroke shadow-2xl relative overflow-hidden group"
           >
             <div className="absolute top-0 right-0 p-10 opacity-[0.02] group-hover:opacity-[0.05] transition-all">
               <Info size={120} />
@@ -145,7 +145,7 @@ const PortalProcessDetail = () => {
               <Info size={16} className="text-primary" />
               Detalhamento Técnico
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-10">
               {infoItems.map((item, idx) => (
                 <div key={idx} className="flex items-start gap-5">
                   <div className="w-12 h-12 rounded-2xl bg-app-bg border border-app-stroke flex items-center justify-center text-primary/60 group-hover:scale-110 transition-transform">
@@ -166,7 +166,7 @@ const PortalProcessDetail = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-app-card rounded-[3rem] p-10 border border-app-stroke shadow-xl"
+              className="bg-app-card rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 border border-app-stroke shadow-xl"
             >
               <h3 className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.3em] mb-6">Síntese do Caso</h3>
               <p className="text-sm text-app-text-main/70 font-medium leading-relaxed whitespace-pre-wrap">{process.description}</p>
@@ -178,16 +178,16 @@ const PortalProcessDetail = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-app-card rounded-[3rem] border border-app-stroke shadow-2xl overflow-hidden"
+            className="bg-app-card rounded-[2rem] md:rounded-[3rem] border border-app-stroke shadow-2xl overflow-hidden"
           >
-            <div className="px-10 py-8 border-b border-app-stroke/50 flex items-center gap-4">
+            <div className="px-6 md:px-10 py-6 md:py-8 border-b border-app-stroke/50 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                 <Clock size={20} />
               </div>
               <h3 className="text-lg font-black text-app-text-main uppercase tracking-tight">Caminho Processual</h3>
             </div>
 
-            <div className="p-10">
+            <div className="p-6 md:p-10">
               {process.updates && process.updates.length > 0 ? (
                 <div className="space-y-0 relative">
                   <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-app-stroke to-transparent" />
@@ -249,7 +249,7 @@ const PortalProcessDetail = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-primary rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-primary/40 group"
+            className="bg-primary rounded-[2rem] md:rounded-[3rem] p-8 md:p-10 text-white relative overflow-hidden shadow-2xl shadow-primary/40 group"
           >
             <div className="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform duration-1000">
               <ShieldCheck size={200} />
@@ -282,7 +282,7 @@ const PortalProcessDetail = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-app-card rounded-[3rem] p-10 border border-app-stroke shadow-xl space-y-10"
+            className="bg-app-card rounded-[2rem] md:rounded-[3rem] p-8 md:p-10 border border-app-stroke shadow-xl space-y-10"
           >
             <h3 className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.3em] flex items-center gap-3">
               <ShieldCheck size={16} className="text-primary" />

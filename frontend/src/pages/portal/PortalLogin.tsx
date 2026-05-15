@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePortalAuth } from '../../context/PortalAuthContext';
 import { useToast } from '../../context/ToastContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { haptics } from '../../utils/haptics';
 
@@ -39,190 +39,170 @@ const PortalLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#050A18] relative overflow-hidden font-sans selection:bg-primary/30 selection:text-white">
-      {/* Dynamic Background Elements */}
-      <div className="absolute inset-0 z-0">
-        <motion.div 
-          animate={{ 
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.1, 0.2, 0.1]
+    <div className="min-h-screen flex bg-[#0B1121]">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden">
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A]" />
+        <div className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)'
           }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-primary/30 to-transparent blur-[120px]" 
         />
-        <motion.div 
-          animate={{ 
-            scale: [1.2, 1, 1.2],
-            rotate: [90, 0, 90],
-            opacity: [0.1, 0.15, 0.1]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-tr from-indigo-500/20 to-transparent blur-[120px]" 
-        />
-      </div>
 
-      <div className="container max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-12 relative z-10 items-center">
-        {/* Brand Section */}
-        <div className="hidden lg:block space-y-12 pr-12 border-r border-white/5">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-5"
-          >
-            <div className="w-16 h-16 bg-white rounded-[1.25rem] shadow-2xl flex items-center justify-center p-3">
-              <img src="/Logo-pwa2.png" alt="Advus" className="w-full h-full object-contain" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-4xl font-black text-white tracking-tighter leading-none">ADVUS</span>
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-1">Portal do Cliente</span>
-            </div>
-          </motion.div>
-
-          <div className="space-y-8">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-6xl font-black text-white leading-[1.05] tracking-tighter"
-            >
-              Transparência na palma da <span className="text-primary italic">sua mão.</span>
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-lg text-white/50 leading-relaxed max-w-md font-medium"
-            >
-              Acompanhe cada etapa do seu processo com segurança, clareza e agilidade. O portal definitivo para a sua jornada jurídica.
-            </motion.p>
-          </div>
-
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center gap-10"
-          >
-            {[
-              { label: 'Seguro', icon: Shield },
-              { label: 'Realtime', icon: Sparkles },
-              { label: 'Completo', icon: Mail }
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <item.icon size={20} className="text-primary/60" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/30">{item.label}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-
-        {/* Login Card */}
+        {/* Logo */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 sm:p-14 shadow-2xl relative overflow-hidden group"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative z-10"
         >
-          {/* Internal Glow */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-[60px] pointer-events-none group-hover:bg-primary/20 transition-colors duration-700" />
-          
-          <div className="relative z-10 space-y-10">
-            <div className="space-y-3 text-center sm:text-left">
-              <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-4 py-1.5 rounded-full mb-2">
-                <Shield size={14} className="text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Acesso Restrito</span>
-              </div>
-              <h1 className="text-4xl font-black text-white tracking-tighter">Bem-vindo ao Portal</h1>
-              <p className="text-white/40 text-sm font-medium">Insira suas credenciais para acessar seus processos.</p>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-8">
-              <div className="space-y-6">
-                {/* Email Field */}
-                <div className="space-y-2 group">
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1 group-focus-within:text-primary transition-colors">E-mail de Acesso</label>
-                  <div className="relative">
-                    <Mail size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="exemplo@email.com"
-                      required
-                      className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] py-5 pl-16 pr-6 text-white text-sm font-bold focus:border-primary outline-none transition-all focus:ring-4 focus:ring-primary/10"
-                    />
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div className="space-y-2 group">
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] ml-1 group-focus-within:text-primary transition-colors">Sua Senha</label>
-                  <div className="relative">
-                    <Lock size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-white/[0.03] border border-white/5 rounded-[1.5rem] py-5 pl-16 pr-16 text-white text-sm font-bold focus:border-primary outline-none transition-all focus:ring-4 focus:ring-primary/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => { haptics.light(); setShowPassword(!showPassword); }}
-                      className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors"
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <AnimatePresence>
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 text-[10px] font-black uppercase tracking-widest text-center"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary-dark text-white font-black uppercase text-xs tracking-[0.3em] py-6 rounded-[1.75rem] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-4 shadow-2xl shadow-primary/30"
-              >
-                {isLoading ? (
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full" 
-                  />
-                ) : (
-                  <>
-                    Acessar meu Painel
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </button>
-            </form>
-
-            <div className="pt-8 border-t border-white/5 text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
-                Escritório de Advocacia parceiro <span className="text-white/40">Advus</span>
-              </p>
+          <div className="flex items-center gap-3">
+            <img src="/Logo-pwa2.png" alt="Advus" className="h-10 w-auto rounded-xl shadow-lg" />
+            <div className="flex items-baseline tracking-[-0.05em] font-black text-3xl">
+              <span className="text-white">ADV</span>
+              <span className="text-white/60">US</span>
             </div>
           </div>
         </motion.div>
+
+        {/* Center Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="relative z-10 max-w-md"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Shield className="w-5 h-5 text-blue-400" />
+            <span className="text-xs font-bold text-blue-400 uppercase tracking-[0.2em]">Portal do Cliente</span>
+          </div>
+          <h2 className="text-4xl font-black text-white leading-tight mb-4 tracking-tight">
+            Acompanhe seus processos com <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">transparência total</span>
+          </h2>
+          <p className="text-white/50 text-base leading-relaxed">
+            Acesse movimentações, documentos e informações do seu processo jurídico de forma segura e em tempo real.
+          </p>
+        </motion.div>
+
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="relative z-10"
+        >
+          <p className="text-white/30 text-xs font-medium">
+            © 2026 Advus. Todos os direitos reservados.
+          </p>
+        </motion.div>
       </div>
 
-      {/* Footer Label */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] font-black text-white/20 uppercase tracking-[0.5em] hidden sm:block">
-        © 2026 Advus Technology
+      {/* Right Side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-[#0B1121] relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.02),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)] pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md relative z-10"
+        >
+          {/* Mobile Logo */}
+          <div className="flex items-center gap-3 mb-8 lg:hidden">
+            <img src="/Logo-pwa2.png" alt="Advus" className="h-8 w-auto rounded-xl shadow-sm" />
+            <div className="flex items-baseline tracking-[-0.05em] font-black text-2xl">
+              <span className="text-slate-900 dark:text-white">ADV</span>
+              <span className="text-slate-400 dark:text-white/60">US</span>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+              Portal do Cliente
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400">
+              Entre com as credenciais fornecidas pelo seu escritório.
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                E-mail
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  required
+                  className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
+                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40" size={20} />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-white/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => { haptics.light(); setShowPassword(!showPassword); }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-600 dark:text-red-400 text-sm text-center"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#0F172A] hover:bg-[#1E293B] dark:bg-white dark:hover:bg-slate-200 text-white dark:text-[#0F172A] font-bold py-3.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-black/10 dark:shadow-white/10"
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 dark:border-slate-400/30 border-t-white dark:border-t-slate-900 rounded-full animate-spin" />
+              ) : (
+                <>
+                  Acessar Portal
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-slate-400 dark:text-slate-500 text-sm">
+              Acesso exclusivo para clientes cadastrados pelo escritório.
+            </p>
+          </div>
+
+          <p className="text-center text-slate-400 dark:text-slate-600 text-xs mt-12">
+            © 2026 Advus. Todos os direitos reservados.
+          </p>
+        </motion.div>
       </div>
     </div>
   );

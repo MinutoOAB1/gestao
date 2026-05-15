@@ -97,7 +97,7 @@ export default function ProcessListPage() {
         <div className="flex h-full gap-8 pb-20 md:pb-0 overflow-hidden bg-app-bg/50">
             <div className="flex-1 flex flex-col space-y-8 overflow-y-auto custom-scrollbar px-1 pt-2">
                 {/* Header Section */}
-                <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-1">
                     <div className="space-y-1">
                         <div className="flex items-center gap-3 mb-1">
                             <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -111,8 +111,8 @@ export default function ProcessListPage() {
                         </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative group min-w-[300px]">
+                    <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <div className="relative group w-full sm:min-w-[300px]">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-app-text-muted group-focus-within:text-primary transition-colors" size={18} />
                             <input 
                                 type="text" 
@@ -397,7 +397,7 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-red-500/5 blur-[50px] animate-pulse"></div>
             )}
 
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-4 sm:mb-6">
                 <div className="flex items-center gap-3 flex-wrap">
                     <span className="px-3 py-1 rounded-xl bg-app-bg border border-app-stroke text-[10px] font-black text-app-text-muted uppercase tracking-widest font-mono">
                         #{proc.number.split('.').slice(0, 1)}
@@ -415,7 +415,7 @@ const ProcessCard = memo(({ proc, isSelected, onSelect, onNavigate }: { proc: Pr
                 <div className="w-2 h-8 bg-app-stroke/50 rounded-full group-hover:bg-primary/20 transition-all"></div>
             </div>
 
-            <div className="mb-6 space-y-2">
+            <div className="mb-4 sm:mb-6 space-y-2">
                 <h3 className="text-xl font-black text-app-text-main tracking-tighter line-clamp-2 leading-tight group-hover:text-primary transition-colors">{proc.title}</h3>
                 <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-app-stroke/20 rounded-lg flex items-center justify-center shrink-0">
