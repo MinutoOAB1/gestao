@@ -51,7 +51,7 @@ export default function FinancialListPage() {
     const [dateFilterStart, setDateFilterStart] = useState('');
     const [dateFilterEnd, setDateFilterEnd] = useState('');
     const [chartPeriod, setChartPeriod] = useState<'7D' | '1M' | '1A'>('1M');
-    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices' | 'inadimplencia'>('transactions');
+    const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices' | 'inadimplencia' | 'dre' | 'audit'>('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
