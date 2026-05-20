@@ -124,16 +124,23 @@ export class AiService {
 
   async analyzeContract(contractText: string, tenantId?: string, userId?: string, contractName?: string, expertMode: string = 'Geral') {
     const prompt = `
-      Você é um Advogado de Elite especializado em Due Diligence e Auditoria Contratual no sistema jurídico brasileiro.
-      Sua missão é realizar uma análise profunda e "impiedosa" do contrato abaixo, atuando como um especialista em ${expertMode}.
-      Se o modo for "Geral", use uma visão ampla. Se for específico (ex: Trabalhista, Cível), foque bstante nas leis e riscos específicos dessa área.
+      Você é um Advogado de Elite especializado em Due Diligence e Auditoria Contratual no sistema jurídico brasileiro, com profundo conhecimento da legislação federal vigente (Código Civil, CDC, LGPD, CLT e leis especiais brasileiras).
+      Sua missão é realizar uma análise profunda, técnica e "impiedosa" do contrato abaixo, atuando como um especialista de altíssimo nível em ${expertMode}.
+      Se o modo for "Geral", use uma visão ampla. Se for específico (ex: Trabalhista, Cível), foque de forma aprofundada nas leis, doutrinas e riscos específicos dessa área.
+
+      DIRETRIZES LEGAIS ESTRITAS PARA PRECISÃO DA ANÁLISE (LEGISLAÇÃO VIGENTE):
+      1. Código Civil (CC - Lei 10.406/2002): Avalie a validade dos negócios jurídicos (Art. 104), a proporcionalidade de cláusulas penais e multas (Arts. 408 a 416 - garantindo que a penalidade não exceda a obrigação principal), as regras de resolução por onerosidade excessiva (Arts. 478 a 480) e a exclusão/inclusão de caso fortuito e força maior (Art. 393).
+      2. Código de Defesa do Consumidor (CDC - Lei 8.078/1990): Em relações consumeristas ou de adesão, identifique e denuncie cláusulas abusivas que violem o Art. 51 do CDC (como limitação de indenização, perda total de parcelas pagas ou alteração unilateral).
+      3. Lei Geral de Proteção de Dados (LGPD - Lei 13.709/2018): Exija cláusulas sólidas de tratamento de dados pessoais (Arts. 7º e 11), delimitação clara de responsabilidade entre Controlador e Operador (Art. 42), confidencialidade de dados e planos de mitigação de incidentes de segurança.
+      4. Legislação Trabalhista (CLT): Em contratos de prestação de serviços civis ou de representação comercial, certifique-se de mitigar o risco de caracterização de vínculo empregatício oculto (Arts. 2º e 3º da CLT - pessoalidade, subordinação jurídica, onerosidade e habitualidade).
+      5. Leis Especiais (Ex: Lei do Inquilinato - Lei 8.245/91): Adeque contratos imobiliários às regras de garantias de locação e renovação.
 
       OBJETIVOS DA ANÁLISE:
-      1. Auditoria Dinâmica: Identifique riscos reais, cláusulas predatórias e omissões críticas.
-      2. Compliance Jurídico: Verifique aderência à LGPD, ESG e normas setoriais.
-      3. Poder de Negociação: Calcule quem detém o maior poder baseado nos termos.
-      4. Redação Jurídica: Sugira uma redação "blindada" e melhorada para cada ponto de risco encontrado.
-      
+      1. Auditoria Dinâmica: Identifique riscos reais, cláusulas predatórias e omissões críticas, sempre indicando a base legal brasileira exata aplicável.
+      2. Compliance Jurídico: Verifique a aderência detalhada à LGPD, regras gerais de direito de contratos, CDC e normas setoriais vigentes.
+      3. Poder de Negociação: Calcule quem detém o maior poder prático baseado nas obrigações pactuadas.
+      4. Redação Jurídica Otimizada: Sugira uma nova redação "blindada", robusta e perfeitamente ajustada à jurisprudência e à legislação para cada risco apontado.
+
       CONTRATO PARA ANÁLISE:
       ---
       ${contractText}

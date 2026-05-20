@@ -340,8 +340,83 @@ export default function IAAnalisePage() {
         };
         setAnalysisHistory(prev => [...prev, versionEntry]);
 
-        // Logic to replace text in the contract
-        const newText = contractText.replace(clause.originalText, clause.suggestedRedaction);
+        // Extremely robust replacement logic
+        let newText = contractText;
+        
+        // 1. Try exact replacement first
+        if (contractText.includes(clause.originalText)) {
+            newText = contractText.replace(clause.originalText, clause.suggestedRedaction);
+        } else {
+            // 2. Try replacement by normalizing whitespace
+            const normalize = (str: string) => str.replace(/\s+/g, ' ').trim();
+            const normalizedContract = normalize(contractText);
+            const normalizedOriginal = normalize(clause.originalText);
+            
+            const matchIndex = normalizedContract.indexOf(normalizedOriginal);
+            if (matchIndex !== -1) {
+                // We found a match in normalized space!
+                const searchPatterns = [
+                    `Cláusula ${clause.clauseReference}`,
+                    `cláusula ${clause.clauseReference}`,
+                    `Parágrafo ${clause.clauseReference}`,
+                    clause.clauseReference
+                ];
+                
+                let foundIndex = -1;
+                for (const pattern of searchPatterns) {
+                    const idx = contractText.toLowerCase().indexOf(pattern.toLowerCase());
+                    if (idx !== -1) {
+                        foundIndex = idx;
+                        break;
+                    }
+                }
+                
+                if (foundIndex !== -1) {
+                    let endIdx = contractText.indexOf('\n\n', foundIndex);
+                    if (endIdx === -1 || endIdx - foundIndex > 500) {
+                        endIdx = Math.min(foundIndex + 300, contractText.length);
+                    }
+                    newText = contractText.slice(0, foundIndex) + clause.suggestedRedaction + contractText.slice(endIdx);
+                } else {
+                    // Fallback: split original text into words and match bounds
+                    const words = clause.originalText.split(/\s+/).filter((w: string) => w.length > 3);
+                    if (words.length > 0) {
+                        const firstWordIdx = contractText.indexOf(words[0]);
+                        const lastWord = words[words.length - 1];
+                        const lastWordIdx = contractText.indexOf(lastWord, firstWordIdx);
+                        if (firstWordIdx !== -1 && lastWordIdx !== -1 && lastWordIdx > firstWordIdx) {
+                            newText = contractText.slice(0, firstWordIdx) + clause.suggestedRedaction + contractText.slice(lastWordIdx + lastWord.length);
+                        }
+                    }
+                }
+            } else {
+                // 3. Locate via search patterns (same as UI highlighting)
+                const searchPatterns = [
+                    `Cláusula ${clause.clauseReference}`,
+                    `cláusula ${clause.clauseReference}`,
+                    `Parágrafo ${clause.clauseReference}`,
+                    clause.clauseReference
+                ];
+                
+                let foundIndex = -1;
+                for (const pattern of searchPatterns) {
+                    const idx = contractText.toLowerCase().indexOf(pattern.toLowerCase());
+                    if (idx !== -1) {
+                        foundIndex = idx;
+                        break;
+                    }
+                }
+                
+                if (foundIndex !== -1) {
+                    let endIdx = contractText.indexOf('\n\n', foundIndex);
+                    if (endIdx === -1 || endIdx - foundIndex > 500) {
+                        endIdx = Math.min(foundIndex + 300, contractText.length);
+                    }
+                    newText = contractText.slice(0, foundIndex) + clause.suggestedRedaction + contractText.slice(endIdx);
+                }
+            }
+        }
+
         setContractText(newText);
 
         // Update clause status locally
@@ -422,13 +497,25 @@ export default function IAAnalisePage() {
         if (!analysis) return;
 
         try {
-            // Load logo
+            // Load logo safely
+            let logoLoaded = false;
             const logoImg = new Image();
             logoImg.src = '/Logo-advus.png';
-            await new Promise((resolve, reject) => {
-                logoImg.onload = resolve;
-                logoImg.onerror = reject;
-            });
+            try {
+                await new Promise((resolve) => {
+                    logoImg.onload = () => {
+                        logoLoaded = true;
+                        resolve(true);
+                    };
+                    logoImg.onerror = () => {
+                        logoLoaded = false;
+                        resolve(false);
+                    };
+                    setTimeout(() => resolve(false), 1000);
+                });
+            } catch (e) {
+                logoLoaded = false;
+            }
 
             // Target the paper element for better capture
             const elementToCapture = documentRef.current?.firstChild as HTMLElement;
@@ -444,22 +531,32 @@ export default function IAAnalisePage() {
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
 
+            if (logoLoaded) {
+                // Add Logo Header
+                const logoH = 15;
+                const logoRatio = logoImg.width / logoImg.height;
+                const logoW = logoH * logoRatio;
 
-            // Add Logo Header
-            const logoH = 15;
-            const logoRatio = logoImg.width / logoImg.height;
-            const logoW = logoH * logoRatio;
+                pdf.addImage(logoImg, 'PNG', 10, 10, logoW, logoH);
 
-            pdf.addImage(logoImg, 'PNG', 10, 10, logoW, logoH);
+                // Add Title
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Relatório de Análise Jurídica', 10 + logoW + 5, 20);
 
-            // Add Title
-            pdf.setFontSize(16);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('Relatório de Análise Jurídica', 10 + logoW + 5, 20);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 10 + logoW + 5, 25);
+            } else {
+                // Add Title without Logo
+                pdf.setFontSize(16);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Relatório de Análise Jurídica', 10, 20);
 
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'normal');
-            pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 10 + logoW + 5, 25);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 10, 25);
+            }
 
             // Add Analysis Content
             // Calculate height to fit width

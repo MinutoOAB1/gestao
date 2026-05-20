@@ -231,7 +231,7 @@ export default function DashboardLayout() {
     const isKanban = location.pathname.includes('/kanban');
     const isAgenda = location.pathname.includes('/agenda');
     const isDocumentos = location.pathname.includes('/documentos');
-    const isDocumentEditor = location.pathname.includes('/modelos/');
+    const isDocumentEditor = location.pathname.includes('/modelos');
     // Make Client Detail full screen, but not the client list (/clientes)
     const isClientDetail = location.pathname.startsWith('/clientes/') && location.pathname.split('/').length > 2 && location.pathname.split('/')[2] !== 'novo';
     const isFullScreenPage = isKanban || isAgenda || isDocumentos || isDocumentEditor || isClientDetail || location.pathname.includes('/analise-ia');

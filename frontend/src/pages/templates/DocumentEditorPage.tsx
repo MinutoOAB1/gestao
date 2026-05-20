@@ -367,12 +367,27 @@ export default function DocumentEditorPage() {
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
 
-            // Load logo
+            // Load logo safely
+            let logoLoaded = false;
+            const logoImg = new Image();
+            logoImg.src = '/Logo-advus.png';
             try {
-                const logoImg = new Image();
-                logoImg.src = '/Logo-advus.png';
-                await new Promise((resolve) => logoImg.onload = resolve);
+                await new Promise((resolve) => {
+                    logoImg.onload = () => {
+                        logoLoaded = true;
+                        resolve(true);
+                    };
+                    logoImg.onerror = () => {
+                        logoLoaded = false;
+                        resolve(false);
+                    };
+                    setTimeout(() => resolve(false), 1000);
+                });
+            } catch (e) {
+                logoLoaded = false;
+            }
 
+            if (logoLoaded) {
                 const logoH = 15;
                 const logoRatio = logoImg.width / logoImg.height;
                 const logoW = logoH * logoRatio;
@@ -385,14 +400,6 @@ export default function DocumentEditorPage() {
                 pdf.setFont('helvetica', 'bold');
                 pdf.text(template.title, 10 + logoW + 5, 18);
 
-                // Shift content down? 
-                // Currently content captures the WHOLE document page. 
-                // If we want to overlay logo ON TOP of the document content?
-                // Or push content down?
-                // DocumentEditor usually WYSIWYG. The logo should probably be IN the document if user wants it.
-                // But USER REQUEST: "em todo relatório ... use a imagem".
-                // So I will force add it to header.
-
                 // Add content image shifted down
                 const startY = 30;
 
@@ -401,10 +408,8 @@ export default function DocumentEditorPage() {
                 const ratio = Math.min((pdfWidth - 20) / imgWidth, (pdfHeight - startY - 10) / imgHeight);
 
                 pdf.addImage(imgData, 'PNG', 10, startY, imgWidth * ratio, imgHeight * ratio);
-
-            } catch (e) {
+            } else {
                 // Fallback if logo fails or just standard print
-                console.warn('Logo load failed, printing standard', e);
                 const imgWidth = canvas.width;
                 const imgHeight = canvas.height;
                 const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
