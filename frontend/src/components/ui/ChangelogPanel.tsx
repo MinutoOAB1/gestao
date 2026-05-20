@@ -11,29 +11,50 @@ export interface ChangelogItem {
     date: string;
 }
 
-// Platform changelog entries — bundled with the frontend for instant, zero-latency rendering.
-// Add new entries at the TOP of this array when deploying new features.
+// Changelog real da plataforma Advus — embutido no frontend para renderização instantânea.
+// Adicione novas entradas no TOPO deste array ao publicar novas funcionalidades.
 const CHANGELOG_DATA: ChangelogItem[] = [
     {
-        id: 'cl-v1.38.0',
-        title: 'Grupo de trabalho para plano corporativo, pasta da equipe e revisão',
-        description: 'Planos corporativos agora contam com Grupo de Trabalho integrado ao gerenciamento do time. Ao ativar o recurso, o proprietário do plano assume automaticamente como líder do grupo.\n- Disponível para proprietários e administradores de planos corporativos em Gerenciar time\nAo ativar o Grupo de Trabalho, o sistema cria automaticamente a pasta do time na biblioteca e inclui todos os membros do time no grupo. Somente proprietários e administradores podem editar os itens da pasta.\n- Disponível na aba Biblioteca\nCom o Grupo de Trabalho ativo, bibliotecários podem ser fixados para o time por líderes e administradores, facilitando a padronização dos materiais utilizados pela equipe.\n- Disponível na aba Bibliotecários\nFluxo de revisão habilitado no corporativo com seleção de revisores ao ativar o Grupo de Trabalho. Membros do time podem enviar minutas para os revisores definidos na gestão do time.\n- Disponível no editor de minutas através do botão "Enviar para revisão"',
-        version: 'v1.38.0',
-        date: '2026-05-15T12:00:00.000Z',
+        id: 'cl-v2.5.0',
+        title: 'Changelog do Sistema e Melhorias Visuais',
+        description: 'Novo botão de Changelog com ícone de foguete no cabeçalho, separando as atualizações da plataforma das notificações do escritório. O painel exibe todas as melhorias recentes com versões, datas e descrições detalhadas.\n- Disponível no cabeçalho, ao lado do ícone de notificações\nIndicador verde pulsante aparece automaticamente quando há atualizações que o usuário ainda não visualizou.\n- Disponível para todos os perfis de usuário',
+        version: 'v2.5.0',
+        date: '2026-05-20T04:00:00.000Z',
     },
     {
-        id: 'cl-v1.37.0',
-        title: 'Legislações: inserir manualmente, carregar arquivos e salvar na biblioteca',
-        description: 'Agora é possível carregar legislações como contexto a serem utilizadas nas minutas geradas pelo botão "Inserir manualmente" e pelo botão "Arquivos" — no topo da aba Legislação.\n- Disponível na aba Legislação\nLegislações inseridas manualmente ou carregadas via arquivo podem ser salvas na biblioteca para serem reutilizadas em minutas futuras. Ficam identificadas com a etiqueta "Manual" para fácil distinção.\n- Disponível na aba Legislação e na Biblioteca',
-        version: 'v1.37.0',
-        date: '2026-05-06T12:00:00.000Z',
+        id: 'cl-v2.4.0',
+        title: 'Notificações Financeiras em Tempo Real',
+        description: 'Faturas vencidas ou próximas do vencimento agora disparam alertas visuais instantâneos via WebSockets, sem necessidade de recarregar a página. O sistema verifica parcelas com atraso e notifica o responsável na hora.\n- Disponível automaticamente no painel de notificações\nIntegração direta com o módulo financeiro para monitorar status de pagamentos de clientes em tempo real.\n- Disponível na aba Financeiro e no Dashboard',
+        version: 'v2.4.0',
+        date: '2026-05-20T03:30:00.000Z',
     },
     {
-        id: 'cl-v1.36.0',
-        title: 'Visual Law: a peça em texto vira PDF diagramado',
-        description: 'O documento em texto vira PDF diagramado com sumário executivo, linhas de tempo, quadros de contraposição, cards de jurisprudência e gráficos. Suporte templates institucionais com brasão e rodapés customizados.\n- Disponível no editor de documentos e na exportação',
-        version: 'v1.36.0',
-        date: '2026-05-05T12:00:00.000Z',
+        id: 'cl-v2.3.0',
+        title: 'Controle de Acesso por Perfil e Matriz de Permissões',
+        description: 'Implementação completa de restrição de rotas e visibilidade de menus com base nos perfis de Administrador, Advogado, Estagiário e Parceiro. Cada perfil possui acesso limitado conforme a matriz de permissões definida.\n- Configurável em Configurações > Usuários\nProteção reforçada nos endpoints do backend para bloquear acessos indevidos a módulos restritos como Financeiro, IA Jurídica, Modelos e Configurações.\n- Aplicado automaticamente em todas as rotas protegidas',
+        version: 'v2.3.0',
+        date: '2026-05-20T03:00:00.000Z',
+    },
+    {
+        id: 'cl-v2.2.0',
+        title: 'Correções na Página de Modelos: Layout, Editor e Exportação PDF',
+        description: 'A listagem de modelos agora ocupa toda a largura da tela, sem margens de centralização. O editor de documentos exibe o conteúdo completo sem cortes, e a exportação para PDF gera o arquivo íntegro.\n- Disponível na aba Modelos\nA coluna de variáveis foi redesenhada com campos mais claros e intuitivos, facilitando a edição e orientação do usuário ao preencher os dados do modelo.\n- Disponível ao abrir qualquer modelo para edição',
+        version: 'v2.2.0',
+        date: '2026-05-20T02:45:00.000Z',
+    },
+    {
+        id: 'cl-v2.1.0',
+        title: 'IA Análise: Comparador de Versões com Zoom Independente',
+        description: 'O painel de IA Análise agora conta com controle individualizado de zoom para o documento original e a sugestão de revisão da IA, permitindo comparação lado a lado com escala ajustável.\n- Disponível na aba IA Análise > Analisar Contrato\nNovo botão de tela cheia (Fullscreen) para maximizar a área de trabalho da análise, removendo margens e menus laterais.\n- Disponível no cabeçalho do comparador\nBusca em tempo real com destaque (highlight) nas cláusulas do contrato e drawer lateral retrátil com resumo executivo.\n- Disponível na barra de ferramentas do comparador',
+        version: 'v2.1.0',
+        date: '2026-05-19T23:00:00.000Z',
+    },
+    {
+        id: 'cl-v2.0.0',
+        title: 'Módulo Financeiro Avançado com DRE e Plano de Contas',
+        description: 'O módulo financeiro foi completamente remodelado com plano de contas hierárquico, gestão tributária integrada, relatório DRE (Demonstração do Resultado do Exercício) e automação de lançamentos recorrentes.\n- Disponível na aba Financeiro\nAuditoria de conformidade fiscal com alertas automáticos para inconsistências e exportação de relatórios em PDF.\n- Disponível em Financeiro > Relatórios',
+        version: 'v2.0.0',
+        date: '2026-05-18T12:00:00.000Z',
     },
 ];
 
