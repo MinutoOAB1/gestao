@@ -204,7 +204,7 @@ export default function TemplatesPage() {
     };
 
     return (
-        <div className="h-full overflow-y-auto pb-10">
+        <div className="h-full overflow-y-auto p-6 lg:p-8 pb-16">
             {/* Header */}
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-app-text-main mb-1">Modelos de Documentos</h1>

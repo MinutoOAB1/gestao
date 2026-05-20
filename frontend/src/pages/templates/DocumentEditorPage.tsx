@@ -666,22 +666,13 @@ export default function DocumentEditorPage() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: zoom / 100 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            transition={{ duration: 0.3, ease: "easeOut" }}
                             ref={editorRef}
-                            className={clsx(
-                                "bg-white rounded-sm outline-none transition-shadow",
-                                isEditing && "shadow-[0_0_0_2px_rgba(59,130,246,0.5)] cursor-text"
-                            )}
+                            className="outline-none w-full flex flex-col items-center"
                             contentEditable={isEditing}
                             suppressContentEditableWarning={true}
                             style={{ 
-                                width: '210mm', 
-                                minHeight: '297mm',
                                 transformOrigin: 'top center',
-                                boxShadow: isEditing 
-                                    ? '0 20px 60px -15px rgba(0,0,0,0.15), 0 0 0 2px rgba(59,130,246,0.5)' 
-                                    : '0 20px 60px -15px rgba(0,0,0,0.15), 0 0 1px 1px rgba(0,0,0,0.05)',
-                                overflow: 'hidden'
                             }}
                         />
                     </div>
@@ -747,7 +738,12 @@ export default function DocumentEditorPage() {
                                                         <div className="p-1 rounded bg-black/5 dark:bg-white/10 text-gray-500 dark:text-gray-400">{group.icon}</div>
                                                         {group.name}
                                                     </h4>
-                                                    <ChevronDown size={14} className={clsx("text-gray-400 transition-transform duration-300", expandedGroups[group.name] ? "rotate-180" : "rotate-0")} />
+                                                    <div className="flex items-center gap-2 ml-auto">
+                                                        <span className="text-[9px] font-bold bg-gray-200/50 dark:bg-gray-850 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full mr-1">
+                                                            {group.fields.length} {group.fields.length === 1 ? 'campo' : 'campos'}
+                                                        </span>
+                                                        <ChevronDown size={14} className={clsx("text-gray-400 transition-transform duration-300", expandedGroups[group.name] ? "rotate-180" : "rotate-0")} />
+                                                    </div>
                                                 </button>
                                                 
                                                 <AnimatePresence>
@@ -758,29 +754,28 @@ export default function DocumentEditorPage() {
                                                             exit={{ height: 0, opacity: 0 }}
                                                             className="overflow-hidden"
                                                         >
-                                                            <div className="flex flex-col gap-3 p-3 max-h-[500px] overflow-y-auto custom-scrollbar pb-8">
+                                                            <div className="flex flex-col gap-3.5 p-3.5 max-h-[500px] overflow-y-auto custom-scrollbar pb-8">
                                                                 {group.fields.map((field) => (
-                                                                    <div key={field.name} className="relative group/input pt-5 pb-1">
-                                                                        <label className={clsx(
-                                                                            "absolute left-3 text-[10px] uppercase font-bold tracking-wide transition-all duration-200 pointer-events-none z-10 bg-white dark:bg-app-card px-1",
-                                                                            variableValues[field.name] 
-                                                                                ? "-top-1 text-primary" 
-                                                                                : "top-5 text-gray-400 group-focus-within:-top-1 group-focus-within:text-primary"
-                                                                        )}>
-                                                                            {field.label}
-                                                                        </label>
+                                                                    <div key={field.name} className="flex flex-col gap-2 bg-gray-50/40 dark:bg-black/10 p-3.5 rounded-2xl border border-gray-100/50 dark:border-gray-800/50 focus-within:border-primary/30 transition-all">
+                                                                        <div className="flex justify-between items-center">
+                                                                            <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                                                                                {field.label}
+                                                                            </label>
+                                                                            <span className="text-[8px] font-mono font-bold text-primary/70 bg-primary/5 px-1.5 py-0.5 rounded-md">
+                                                                                {`{${field.name}}`}
+                                                                            </span>
+                                                                        </div>
                                                                         <textarea
                                                                             rows={1}
                                                                             value={variableValues[field.name] || ''}
                                                                             onChange={(e) => handleVariableChange(field.name, e.target.value)}
+                                                                            placeholder={field.originalValue || "Preencher..."}
+                                                                            className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-3 py-2 text-xs font-bold text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none min-h-[38px] custom-scrollbar shadow-sm"
                                                                             onInput={(e) => {
                                                                                 const target = e.target as HTMLTextAreaElement;
                                                                                 target.style.height = 'auto';
                                                                                 target.style.height = `${target.scrollHeight}px`;
                                                                             }}
-                                                                            placeholder={variableValues[field.name] ? "" : field.originalValue || ""}
-                                                                            className="w-full bg-transparent border-2 border-gray-100 dark:border-gray-800 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 dark:text-gray-200 focus:outline-none focus:border-primary/40 hover:border-gray-200 dark:hover:border-gray-700 transition-all shadow-sm resize-none overflow-hidden min-h-[46px] variable-textarea"
-                                                                            style={{ height: 'auto' }}
                                                                         />
                                                                     </div>
                                                                 ))}

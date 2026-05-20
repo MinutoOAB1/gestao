@@ -933,3 +933,54 @@ html {
 @media (max-width: 768px) { 
   #crisp-chatbox, .crisp-client { display: none !important; } 
 }
+
+/* ==========================================
+   DOCX PREVIEW & HIGH-FIDELITY EDITOR PAGE STYLING
+   ========================================== */
+
+/* Remove interfering docx-wrapper background and padding */
+.docx-preview-container .docx-wrapper {
+  background: transparent !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 2rem !important;
+  width: 100% !important;
+}
+
+/* Style individual docx page sections as floating premium paper sheets */
+.docx-preview-container .docx-wrapper > section.docx {
+  background: white !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
+  padding: 2.5cm 2.5cm !important;
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* Focus and active editing outline overrides */
+.docx-preview-container .docx-wrapper > section.docx[contenteditable="true"]:focus {
+  outline: none !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 2px var(--primary, #4F73F5) !important;
+  border-color: transparent !important;
+}
+
+/* Print layout overrides for docx pages */
+@media print {
+  .docx-preview-container .docx-wrapper {
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .docx-preview-container .docx-wrapper > section.docx {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
