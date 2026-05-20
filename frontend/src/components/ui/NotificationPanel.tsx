@@ -42,9 +42,28 @@ const getTimeAgo = (date: Date) => {
 
 export default function NotificationPanel() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
+
+    // Detect mobile viewport
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Prevent body scroll when open on mobile
+    useEffect(() => {
+        if (isMobile && isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [isMobile, isOpen]);
 
     // Close panel when clicking outside
     useEffect(() => {
@@ -113,6 +132,18 @@ export default function NotificationPanel() {
 
     return (
         <div className="relative" ref={panelRef}>
+            {/* Mobile backdrop */}
+            <AnimatePresence>
+                {isMobile && isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[55]"
+                        onClick={() => setIsOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
             {/* Bell Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
@@ -130,8 +161,20 @@ export default function NotificationPanel() {
             </button>
 
             {/* Dropdown Panel */}
-            {isOpen && (
-                <div className="absolute right-0 top-12 w-80 md:w-96 bg-app-card border border-app-stroke rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={isMobile ? { opacity: 0, y: 40 } : { opacity: 0, y: 6 }}
+                        animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+                        exit={isMobile ? { opacity: 0, y: 40 } : { opacity: 0, y: 6 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className={clsx(
+                            "bg-app-card border border-app-stroke shadow-2xl overflow-hidden",
+                            isMobile
+                                ? "fixed inset-x-2 bottom-[72px] rounded-2xl z-[60] max-h-[75vh] flex flex-col"
+                                : "absolute right-0 top-12 w-80 md:w-96 rounded-xl z-50"
+                        )}
+                    >
                     {/* Header */}
                     <div className="p-4 border-b border-app-stroke flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -165,7 +208,7 @@ export default function NotificationPanel() {
                     </div>
 
                     {/* Notifications List */}
-                    <div className="max-h-[400px] overflow-y-auto custom-scrollbar bg-app-bg/30">
+                    <div className={clsx("overflow-y-auto custom-scrollbar bg-app-bg/30", isMobile ? "flex-1" : "max-h-[400px]")}>
                         {notifications.length === 0 ? (
                             <div className="p-8 text-center">
                                 <Bell size={32} className="mx-auto mb-2 text-app-text-muted opacity-30" />
@@ -278,8 +321,9 @@ export default function NotificationPanel() {
                             </button>
                         </div>
                     )}
-                </div>
-            )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

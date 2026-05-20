@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Rocket, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -76,9 +76,18 @@ const formatChangelogDate = (dateStr: string) => {
 export default function ChangelogPanel() {
     const [isOpen, setIsOpen] = useState(false);
     const [hasNewUpdates, setHasNewUpdates] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
     const LAST_SEEN_KEY = 'app_changelog_last_seen';
+
+    // Detect mobile viewport
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Check for new updates based on localStorage
     useEffect(() => {
@@ -90,6 +99,16 @@ export default function ChangelogPanel() {
             }
         }
     }, []);
+
+    // Prevent body scroll when open on mobile
+    useEffect(() => {
+        if (isMobile && isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [isMobile, isOpen]);
 
     // Close panel when clicking outside
     useEffect(() => {
@@ -147,6 +166,18 @@ export default function ChangelogPanel() {
 
     return (
         <div className="relative" ref={panelRef}>
+            {/* Mobile backdrop */}
+            <AnimatePresence>
+                {isMobile && isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[55]"
+                        onClick={() => setIsOpen(false)}
+                    />
+                )}
+            </AnimatePresence>
             {/* Rocket Icon Button */}
             <button
                 onClick={handleToggleOpen}
@@ -171,11 +202,24 @@ export default function ChangelogPanel() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-12 w-[340px] sm:w-[480px] md:w-[560px] bg-white dark:bg-[#0B1121] border border-slate-100 dark:border-white/5 rounded-2xl shadow-2xl z-50 overflow-hidden"
+                        initial={isMobile
+                            ? { opacity: 0, y: 40 }
+                            : { opacity: 0, y: 10, scale: 0.96 }}
+                        animate={isMobile
+                            ? { opacity: 1, y: 0 }
+                            : { opacity: 1, y: 0, scale: 1 }}
+                        exit={isMobile
+                            ? { opacity: 0, y: 40 }
+                            : { opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className={clsx(
+                            "bg-white dark:bg-[#0B1121] border border-slate-100 dark:border-white/5 shadow-2xl overflow-hidden",
+                            isMobile
+                                // Mobile: fixed sheet sliding up from bottom, above bottom nav
+                                ? "fixed inset-x-2 bottom-[72px] rounded-2xl z-[60] max-h-[75vh] flex flex-col"
+                                // Desktop: absolute dropdown below button
+                                : "absolute right-0 top-12 w-[480px] lg:w-[560px] rounded-2xl z-50"
+                        )}
                     >
                         {/* Header */}
                         <div className="p-6 pb-4 flex items-start justify-between">
@@ -206,7 +250,7 @@ export default function ChangelogPanel() {
                         </div>
 
                         {/* List */}
-                        <div className="max-h-[460px] overflow-y-auto custom-scrollbar px-6 pb-6">
+                        <div className={clsx("overflow-y-auto custom-scrollbar px-6 pb-6", isMobile ? "flex-1" : "max-h-[460px]")}>
                             <div className="flex flex-col gap-6">
                                 {CHANGELOG_DATA.map((item, idx) => {
                                     const dateLabel = formatChangelogDate(item.date);
