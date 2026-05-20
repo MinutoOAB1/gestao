@@ -188,7 +188,7 @@ export default function ClientFormPage() {
     const sectionClass = "bg-app-card border border-app-stroke rounded-xl p-6 space-y-5";
 
     return (
-        <div className="max-w-5xl mx-auto pb-8">
+        <div className="max-w-5xl mx-auto pb-24 md:pb-8 px-1">
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
                 <button
@@ -658,7 +658,7 @@ export default function ClientFormPage() {
                 )}
 
                 {/* Navigation and Submit */}
-                <div className="flex items-center justify-between gap-4 pt-4 border-t border-app-stroke">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-app-stroke">
                     <div className="flex gap-2">
                         <button
                             type="button"
@@ -682,14 +682,14 @@ export default function ClientFormPage() {
                         <button
                             type="button"
                             onClick={() => navigate('/app/clientes')}
-                            className="px-6 py-2.5 border border-app-stroke rounded-lg text-app-text-muted font-medium hover:bg-app-stroke/30 transition-colors"
+                            className="flex-1 sm:flex-none px-6 py-2.5 border border-app-stroke rounded-lg text-app-text-muted font-medium hover:bg-app-stroke/30 transition-colors"
                             disabled={loading}
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-black/20"
+                            className="flex-1 sm:flex-none px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-xl shadow-black/20"
                             disabled={loading}
                         >
                             <Save size={18} />

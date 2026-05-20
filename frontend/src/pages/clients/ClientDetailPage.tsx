@@ -430,7 +430,7 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
         <div className="flex-1 overflow-y-auto w-full h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 relative">
             {/* Header Sticky */}
             <div className="sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 p-4 lg:px-8">
-                <div className="max-w-[1600px] mx-auto w-full flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="max-w-[1600px] mx-auto w-full flex flex-col md:flex-row md:items-start justify-between gap-3">
                     <div className="flex items-center gap-4">
                         {!isDrawer && (
                             <button
@@ -526,10 +526,10 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                         <button 
                             onClick={() => navigate(`/app/processos/kanban?newProcess=true&clientId=${client.id}`)}
-                            className="flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border border-black/10 dark:border-white/10 rounded-xl text-sm font-bold transition-all hover:shadow-md"
+                            className="flex items-center gap-2 px-3 py-2 bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border border-black/10 dark:border-white/10 rounded-xl text-sm font-bold transition-all hover:shadow-md"
                         >
                             <Briefcase size={16} />
                             <span className="hidden sm:inline">Criar Processo</span>
@@ -554,21 +554,21 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
 
             {/* Quick Contact Bar */}
             <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-8 pt-6">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     <button 
                         onClick={handleWhatsAppClick}
                         className={clsx(
-                            "flex items-center gap-3 p-3 rounded-xl border transition-all", 
+                            "flex items-center gap-2 p-3 rounded-xl border transition-all", 
                             client.phone ? "bg-black dark:bg-white text-white dark:text-black hover:opacity-90 border-black/10 dark:border-white/10 shadow-lg shadow-black/10" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed"
                         )}
                     >
-                        <MessageCircle size={18} /><span className="text-sm font-bold">WhatsApp</span>
+                        <MessageCircle size={18} className="shrink-0" /><span className="text-sm font-bold">WhatsApp</span>
                     </button>
-                    <a href={client.phone ? `tel:${client.phone}` : '#'} onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.phone ? "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black hover:opacity-90 border-neutral-700" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
-                        <Phone size={18} /><span className="text-sm font-bold">Ligar</span>
+                    <a href={client.phone ? `tel:${client.phone}` : '#'} onClick={(e) => !client.phone && e.preventDefault()} className={clsx("flex items-center gap-2 p-3 rounded-xl border transition-all", client.phone ? "bg-neutral-800 text-white dark:bg-neutral-200 dark:text-black hover:opacity-90 border-neutral-700" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
+                        <Phone size={18} className="shrink-0" /><span className="text-sm font-bold">Ligar</span>
                     </a>
-                    <a href={client.email ? `mailto:${client.email}` : '#'} onClick={(e) => !client.email && e.preventDefault()} className={clsx("flex items-center gap-3 p-3 rounded-xl border transition-all", client.email ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
-                        <Mail size={18} /><span className="text-sm font-medium truncate">{client.email || 'Email não informado'}</span>
+                    <a href={client.email ? `mailto:${client.email}` : '#'} onClick={(e) => !client.email && e.preventDefault()} className={clsx("flex items-center gap-2 p-3 rounded-xl border transition-all overflow-hidden", client.email ? "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300" : "bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800/50 dark:border-slate-700 cursor-not-allowed")}>
+                        <Mail size={18} className="shrink-0" /><span className="text-sm font-medium truncate">{client.email || 'Email'}</span>
                     </a>
                     <div className="flex items-center gap-3 p-3 rounded-xl border bg-gradient-to-r from-neutral-50 to-white dark:from-neutral-900 dark:to-black border-slate-200 dark:border-slate-700">
                         <DollarSign size={18} className="text-black dark:text-white" />
@@ -581,12 +581,12 @@ export function ClientDetailPageContent({ clientIdProp, isDrawer = false }: { cl
                 </div>
             </div>
             {/* Tab Navigation */}
-            <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-8 pt-6">
-                <div className="flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-slate-800 pb-px">
+            <div className="max-w-[1600px] mx-auto w-full px-4 lg:px-8 pt-4 sm:pt-6">
+                <div className="flex gap-1 overflow-x-auto no-scrollbar border-b border-slate-200 dark:border-slate-800 pb-px">
                     {tabs.map(tab => {
                         const Icon = tab.icon;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={clsx("flex items-center gap-2 px-4 py-2.5 text-sm font-black rounded-t-lg border-b-2 transition-all whitespace-nowrap uppercase tracking-widest", activeTab === tab.id ? "border-black text-black dark:text-white dark:border-white bg-black/5 dark:bg-white/10" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50")}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={clsx("flex items-center gap-1.5 px-3 py-2.5 text-xs sm:text-sm font-black rounded-t-lg border-b-2 transition-all whitespace-nowrap uppercase tracking-widest shrink-0", activeTab === tab.id ? "border-black text-black dark:text-white dark:border-white bg-black/5 dark:bg-white/10" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50")}>
                                 <Icon size={16} />{tab.label}
                             </button>
                         );
