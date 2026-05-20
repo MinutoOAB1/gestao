@@ -1120,8 +1120,8 @@ export default function FinancialListPage() {
             </div>
 
             {/* Tabs Row */}
-            <div className="flex border-b border-app-stroke mb-8">
-                <div className="flex flex-wrap items-center gap-2">
+            <div className="flex border-b border-app-stroke mb-8 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                <div className="flex items-center gap-2 pb-2 whitespace-nowrap">
                     <button
                         onClick={() => setActiveTab('transactions')}
                         className={clsx(

@@ -393,7 +393,7 @@ export default function DocumentsPage() {
                 {/* Header - Mobile Responsive */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shrink-0 mb-4 md:mb-6">
                     {/* Search and Predictive Filters */}
-                <div className="flex-1 max-w-2xl px-4 hidden md:flex flex-col gap-2">
+                <div className="w-full md:flex-1 md:max-w-2xl flex flex-col gap-2">
                     <div className="relative">
                         <input 
                             type="text" 
@@ -404,7 +404,7 @@ export default function DocumentsPage() {
                         />
                         <Filter size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-app-text-muted" />
                     </div>
-                    <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
                         <span className="text-[10px] font-bold text-app-text-muted uppercase tracking-wider shrink-0">Filtros Rápidos:</span>
                         {QUICK_FILTERS.map(filter => (
                             <button
@@ -447,11 +447,11 @@ export default function DocumentsPage() {
 
             <div className="flex-1 bg-app-bg/50 border border-app-stroke/50 rounded-2xl overflow-hidden flex flex-col p-4 md:p-6 gap-4 relative">
                 <div className="flex justify-between items-center gap-4 shrink-0">
-                    <div className="flex items-center gap-2 text-sm text-app-text-main font-bold">
+                    <div className="flex items-center gap-2 text-sm text-app-text-main font-bold overflow-x-auto no-scrollbar whitespace-nowrap -mx-2 px-2 sm:mx-0 sm:px-0">
                         {breadcrumbs.map((crumb, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                                {idx > 0 && <ChevronRight size={14} />}
-                                <button onClick={() => handleBreadcrumbClick(idx)} className="hover:text-primary font-medium">{crumb.name}</button>
+                            <div key={idx} className="flex items-center gap-2 shrink-0">
+                                {idx > 0 && <ChevronRight size={14} className="shrink-0" />}
+                                <button onClick={() => handleBreadcrumbClick(idx)} className="hover:text-primary font-medium whitespace-nowrap">{crumb.name}</button>
                             </div>
                         ))}
                     </div>
@@ -495,7 +495,7 @@ export default function DocumentsPage() {
                                     ))}
                                 </div>
                             ) : viewMode === 'grid' ? (
-                                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 animate-pulse">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 animate-pulse">
                                     {[...Array(12)].map((_, i) => (
                                         <div key={i} className="bg-app-card border border-app-stroke rounded-xl overflow-hidden h-48 flex flex-col">
                                             <div className="flex-1 bg-app-stroke/20" />
@@ -552,7 +552,7 @@ export default function DocumentsPage() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -15 }}
                                     transition={{ duration: 0.12 }}
-                                    className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
+                                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4"
                                 >
                                     {filteredFiles.map(file => (
                                         <div key={file.id}

@@ -200,7 +200,7 @@ export default function TimesheetPage() {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="max-w-[1400px] mx-auto space-y-10 pb-20"
+            className="max-w-[1400px] mx-auto px-4 md:px-0 space-y-10 pb-24 md:pb-20"
         >
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
                 <div className="space-y-1">
@@ -296,8 +296,8 @@ export default function TimesheetPage() {
                 <div className="flex flex-col lg:flex-row items-center gap-10">
                     <div className="relative shrink-0">
                         <div className={clsx(
-                            "text-7xl font-mono font-black tracking-tight transition-all duration-500",
-                            timer.isRunning ? "text-primary scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-app-text-main"
+                            "text-5xl sm:text-7xl font-mono font-black tracking-tight transition-all duration-500",
+                            timer.isRunning ? "text-primary scale-105 sm:scale-110 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" : "text-app-text-main"
                         )}>
                             {formatTime(timer.seconds)}
                         </div>

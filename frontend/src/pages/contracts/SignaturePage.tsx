@@ -56,7 +56,7 @@ export default function SignaturePage() {
     };
 
     return (
-        <div className="min-h-screen pb-20 animate-in fade-in duration-500">
+        <div className="min-h-screen px-4 md:px-0 pb-24 md:pb-20 animate-in fade-in duration-500">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                 <div className="space-y-1">
@@ -210,11 +210,11 @@ export default function SignaturePage() {
                         </div>
 
                         {/* 3. Actions */}
-                        <div className="flex items-center gap-4 pt-4">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
                             <button 
                                 type="button"
                                 onClick={() => navigate('/app/contratos')}
-                                className="px-8 py-4 rounded-2xl text-sm font-black text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-all uppercase tracking-widest"
+                                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-black text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 transition-all uppercase tracking-widest"
                                 disabled={uploading}
                             >
                                 Cancelar
@@ -222,7 +222,7 @@ export default function SignaturePage() {
                             <button 
                                 type="submit"
                                 disabled={uploading || !signatureFile}
-                                className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-sm font-black transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-[0.2em] group relative overflow-hidden"
+                                className="w-full sm:flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-sm font-black transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-[0.2em] group relative overflow-hidden"
                             >
                                 {uploading ? (
                                     <>

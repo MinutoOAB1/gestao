@@ -289,7 +289,7 @@ export default function UserFilesPage() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100dvh-8rem)] md:h-[calc(100dvh-theme(spacing.20))] overflow-hidden bg-app-bg text-app-text-main gap-4 md:gap-6 p-1">
+        <div className="flex flex-col min-h-screen px-4 md:px-0 pb-24 md:pb-20 bg-app-bg text-app-text-main gap-4 md:gap-6">
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 shrink-0">
                 <div>

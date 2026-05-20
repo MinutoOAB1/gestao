@@ -114,7 +114,7 @@ export default function ProcessFormPage() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto px-4 md:px-0 pb-24 md:pb-8">
             <div className="flex items-center gap-4 mb-6">
                 <button
                     onClick={() => navigate('/app/processos')}
@@ -132,7 +132,7 @@ export default function ProcessFormPage() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-app-card rounded-2xl border border-app-stroke p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="bg-app-card rounded-2xl border border-app-stroke p-4 sm:p-8 space-y-6">
 
                 {/* Seção 1: Informações Básicas */}
                 <div>
@@ -283,18 +283,18 @@ export default function ProcessFormPage() {
                     />
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                     <button
                         type="button"
                         onClick={() => navigate('/app/processos')}
-                        className="px-6 py-2.5 border border-app-stroke rounded-lg text-white font-medium hover:bg-white/5 transition-colors"
+                        className="w-full sm:w-auto px-6 py-2.5 border border-app-stroke rounded-lg text-white font-medium hover:bg-white/5 transition-colors"
                         disabled={loading}
                     >
                         Cancelar
                     </button>
                     <button
                         type="submit"
-                        className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-black/20"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-xl shadow-black/20"
                         disabled={loading}
                     >
                         <Save size={18} />
