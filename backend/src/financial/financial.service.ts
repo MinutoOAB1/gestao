@@ -522,6 +522,15 @@ export class FinancialService {
             );
         }
 
+        this.eventEmitter.emit('financial.updated', {
+            id: updatedRecord.id,
+            type: updatedRecord.type,
+            amount: updatedRecord.amount,
+            description: updatedRecord.description,
+            tenantId,
+            userId
+        });
+
         return updatedRecord;
     }
 
