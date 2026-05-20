@@ -7,57 +7,70 @@ export interface ChangelogItem {
     id: string;
     title: string;
     description: string;
-    version?: string;
+    version: string;
     date: string;
 }
 
+// Platform changelog entries — bundled with the frontend for instant, zero-latency rendering.
+// Add new entries at the TOP of this array when deploying new features.
+const CHANGELOG_DATA: ChangelogItem[] = [
+    {
+        id: 'cl-v1.38.0',
+        title: 'Grupo de trabalho para plano corporativo, pasta da equipe e revisão',
+        description: 'Planos corporativos agora contam com Grupo de Trabalho integrado ao gerenciamento do time. Ao ativar o recurso, o proprietário do plano assume automaticamente como líder do grupo.\n- Disponível para proprietários e administradores de planos corporativos em Gerenciar time\nAo ativar o Grupo de Trabalho, o sistema cria automaticamente a pasta do time na biblioteca e inclui todos os membros do time no grupo. Somente proprietários e administradores podem editar os itens da pasta.\n- Disponível na aba Biblioteca\nCom o Grupo de Trabalho ativo, bibliotecários podem ser fixados para o time por líderes e administradores, facilitando a padronização dos materiais utilizados pela equipe.\n- Disponível na aba Bibliotecários\nFluxo de revisão habilitado no corporativo com seleção de revisores ao ativar o Grupo de Trabalho. Membros do time podem enviar minutas para os revisores definidos na gestão do time.\n- Disponível no editor de minutas através do botão "Enviar para revisão"',
+        version: 'v1.38.0',
+        date: '2026-05-15T12:00:00.000Z',
+    },
+    {
+        id: 'cl-v1.37.0',
+        title: 'Legislações: inserir manualmente, carregar arquivos e salvar na biblioteca',
+        description: 'Agora é possível carregar legislações como contexto a serem utilizadas nas minutas geradas pelo botão "Inserir manualmente" e pelo botão "Arquivos" — no topo da aba Legislação.\n- Disponível na aba Legislação\nLegislações inseridas manualmente ou carregadas via arquivo podem ser salvas na biblioteca para serem reutilizadas em minutas futuras. Ficam identificadas com a etiqueta "Manual" para fácil distinção.\n- Disponível na aba Legislação e na Biblioteca',
+        version: 'v1.37.0',
+        date: '2026-05-06T12:00:00.000Z',
+    },
+    {
+        id: 'cl-v1.36.0',
+        title: 'Visual Law: a peça em texto vira PDF diagramado',
+        description: 'O documento em texto vira PDF diagramado com sumário executivo, linhas de tempo, quadros de contraposição, cards de jurisprudência e gráficos. Suporte templates institucionais com brasão e rodapés customizados.\n- Disponível no editor de documentos e na exportação',
+        version: 'v1.36.0',
+        date: '2026-05-05T12:00:00.000Z',
+    },
+];
+
 const formatChangelogDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    
+
     const months = [
         'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
         'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
     ];
-    
+
     const day = date.getDate();
     const month = months[date.getMonth()];
     const year = date.getFullYear();
-    
+
     return `${day} de ${month} de ${year}`;
 };
 
 export default function ChangelogPanel() {
     const [isOpen, setIsOpen] = useState(false);
-    const [changelogs, setChangelogs] = useState<ChangelogItem[]>([]);
     const [hasNewUpdates, setHasNewUpdates] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
     const LAST_SEEN_KEY = 'app_changelog_last_seen';
 
+    // Check for new updates based on localStorage
     useEffect(() => {
-        const fetchChangelogs = async () => {
-            try {
-                const api = (await import('../../services/api')).default;
-                const response = await api.get('/changelog');
-                const data = response.data || [];
-                setChangelogs(data);
-
-                // Check for new updates since last seen
-                const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
-                if (data.length > 0) {
-                    const latestDate = new Date(data[0].date).getTime();
-                    if (!lastSeen || latestDate > parseInt(lastSeen, 10)) {
-                        setHasNewUpdates(true);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to fetch changelogs:', error);
+        const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
+        if (CHANGELOG_DATA.length > 0) {
+            const latestDate = new Date(CHANGELOG_DATA[0].date).getTime();
+            if (!lastSeen || latestDate > parseInt(lastSeen, 10)) {
+                setHasNewUpdates(true);
             }
-        };
-
-        fetchChangelogs();
+        }
     }, []);
 
+    // Close panel when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
@@ -77,27 +90,22 @@ export default function ChangelogPanel() {
     const handleToggleOpen = () => {
         const nextState = !isOpen;
         setIsOpen(nextState);
-        
+
         if (nextState) {
             setHasNewUpdates(false);
             localStorage.setItem(LAST_SEEN_KEY, Date.now().toString());
         }
     };
 
-    // Render exact styling for description paragraphs and bullet points
+    // Render description with paragraphs and curved-arrow bullet points
     const renderDescription = (text: string) => {
         const lines = text.split('\n');
         return lines.map((line, idx) => {
             const trimmed = line.trim();
             if (!trimmed) return null;
 
-            // Check if the line is a bullet point or availability notice
             const isBullet = trimmed.startsWith('- ') || trimmed.startsWith('↳ ');
-            const content = trimmed.startsWith('- ') 
-                ? trimmed.substring(2) 
-                : trimmed.startsWith('↳ ') 
-                    ? trimmed.substring(2) 
-                    : trimmed;
+            const content = isBullet ? trimmed.substring(2) : trimmed;
 
             if (isBullet) {
                 return (
@@ -117,13 +125,13 @@ export default function ChangelogPanel() {
     };
 
     return (
-        <div className="relative animate-fade-in" ref={panelRef}>
-            {/* Rocket Icon Box styled exactly like the button in the image */}
+        <div className="relative" ref={panelRef}>
+            {/* Rocket Icon Button */}
             <button
                 onClick={handleToggleOpen}
                 className={clsx(
                     "relative p-2 rounded-xl transition-all duration-300 border flex items-center justify-center",
-                    isOpen 
+                    isOpen
                         ? "bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
                         : "bg-slate-50/50 hover:bg-slate-100 dark:bg-[#0B1121]/50 dark:hover:bg-slate-800/40 border-slate-100 dark:border-white/5 text-slate-400 hover:text-slate-700 dark:hover:text-white"
                 )}
@@ -138,7 +146,7 @@ export default function ChangelogPanel() {
                 )}
             </button>
 
-            {/* Dropdown Panel - Highly refined matching MinutaAI style */}
+            {/* Dropdown Panel */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -178,50 +186,39 @@ export default function ChangelogPanel() {
 
                         {/* List */}
                         <div className="max-h-[460px] overflow-y-auto custom-scrollbar px-6 pb-6">
-                            {changelogs.length === 0 ? (
-                                <div className="py-12 text-center">
-                                    <Rocket size={32} className="mx-auto mb-2 text-slate-300 dark:text-slate-700 animate-pulse" />
-                                    <p className="text-slate-400 dark:text-slate-500 text-xs">Nenhuma melhoria cadastrada</p>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-6">
-                                    {changelogs.map((item, idx) => {
-                                        const dateLabel = formatChangelogDate(item.date);
-                                        return (
-                                            <div key={item.id} className="first:mt-2">
-                                                {/* Top Row with version pill and date */}
-                                                <div className="flex items-center justify-between gap-2 mb-2.5">
-                                                    {item.version ? (
-                                                        <span className="px-2.5 py-0.5 text-[11px] font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-full font-mono">
-                                                            {item.version}
-                                                        </span>
-                                                    ) : (
-                                                        <span />
-                                                    )}
-                                                    <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
-                                                        {dateLabel}
-                                                    </span>
-                                                </div>
-                                                
-                                                {/* Title */}
-                                                <h4 className="text-[14px] font-bold text-slate-900 dark:text-white mb-2 leading-snug">
-                                                    {item.title}
-                                                </h4>
-                                                
-                                                {/* Styled Description Lines */}
-                                                <div className="space-y-1">
-                                                    {renderDescription(item.description)}
-                                                </div>
-
-                                                {/* Separator line between items */}
-                                                {idx < changelogs.length - 1 && (
-                                                    <hr className="border-slate-100 dark:border-white/5 mt-6 mb-2" />
-                                                )}
+                            <div className="flex flex-col gap-6">
+                                {CHANGELOG_DATA.map((item, idx) => {
+                                    const dateLabel = formatChangelogDate(item.date);
+                                    return (
+                                        <div key={item.id} className="first:mt-2">
+                                            {/* Version pill and date */}
+                                            <div className="flex items-center justify-between gap-2 mb-2.5">
+                                                <span className="px-2.5 py-0.5 text-[11px] font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 rounded-full font-mono">
+                                                    {item.version}
+                                                </span>
+                                                <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500">
+                                                    {dateLabel}
+                                                </span>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
+
+                                            {/* Title */}
+                                            <h4 className="text-[14px] font-bold text-slate-900 dark:text-white mb-2 leading-snug">
+                                                {item.title}
+                                            </h4>
+
+                                            {/* Description */}
+                                            <div className="space-y-1">
+                                                {renderDescription(item.description)}
+                                            </div>
+
+                                            {/* Separator */}
+                                            {idx < CHANGELOG_DATA.length - 1 && (
+                                                <hr className="border-slate-100 dark:border-white/5 mt-6 mb-2" />
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </motion.div>
                 )}
