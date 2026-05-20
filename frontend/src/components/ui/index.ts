@@ -24,5 +24,6 @@ export { default as Modal } from './Modal';
 export { Skeleton, SkeletonCard, ListSkeleton } from './Skeleton';
 export { default as LazyImage } from './LazyImage';
 export { default as NotificationPanel } from './NotificationPanel';
+export { default as ChangelogPanel } from './ChangelogPanel';
 export { default as PomodoroTimer } from './PomodoroTimer';
 export { default as PrefetchLink } from './PrefetchLink';

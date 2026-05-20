@@ -11,6 +11,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, memo } from 'react';
 import NotificationPanel from '../ui/NotificationPanel';
+import ChangelogPanel from '../ui/ChangelogPanel';
 import GlobalSearch from '../shared/GlobalSearch';
 import { useTimer } from '../../context/TimerContext';
 import api from '../../services/api';
@@ -536,6 +537,7 @@ export default function DashboardLayout() {
                                         <Clock size={20} />
                                     </button>
                                 )}
+                                <ChangelogPanel />
                                 <NotificationPanel />
                             </div>
 
@@ -561,6 +563,7 @@ export default function DashboardLayout() {
                             >
                                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                             </button>
+                            <ChangelogPanel />
                             <NotificationPanel />
                         </div>
                     </header>

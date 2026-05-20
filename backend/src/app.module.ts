@@ -37,6 +37,7 @@ import { SecurityModule } from './common/security/security.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { PortalModule } from './portal/portal.module';
 import { DatajudModule } from './integrations/datajud/datajud.module';
+import { ChangelogModule } from './changelog/changelog.module';
 
 
 @Module({
@@ -77,6 +78,7 @@ import { DatajudModule } from './integrations/datajud/datajud.module';
     GoogleCalendarModule,
     SubscriptionsModule,
     PortalModule,
+    ChangelogModule,
   ],
   controllers: [AppController, HealthController],
   providers: [
