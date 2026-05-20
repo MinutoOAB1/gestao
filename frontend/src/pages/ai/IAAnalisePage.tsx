@@ -152,7 +152,12 @@ export default function IAAnalisePage() {
     const [selectedClause, setSelectedClause] = useState<any | null>(null);
     const [uploadOpen, setUploadOpen] = useState(false);
     const [fileToUpload, setFileToUpload] = useState<File | null>(null);
-    const [zoomLevel, setZoomLevel] = useState(100);
+    const [zoomLevelOriginal, setZoomLevelOriginal] = useState(100);
+    const [zoomLevelDraft, setZoomLevelDraft] = useState(100);
+    const [summaryOpen, setSummaryOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeTab, setActiveTab] = useState<'riscos' | 'compliance' | 'sugestoes'>('riscos');
     const [hoveredClause, setHoveredClause] = useState<string | null>(null);
     
@@ -212,9 +217,10 @@ export default function IAAnalisePage() {
     // Auto-adjust zoom for Split View
     useEffect(() => {
         if (isSplitView) {
-            setZoomLevel(70); 
+            setZoomLevelOriginal(70); 
+            setZoomLevelDraft(70); 
         } else {
-            setZoomLevel(100);
+            setZoomLevelOriginal(100);
         }
     }, [isSplitView]);
 
@@ -356,8 +362,53 @@ export default function IAAnalisePage() {
     };
 
     // Zoom controls
-    const handleZoomIn = () => setZoomLevel(prev => Math.min(200, prev + 25));
-    const handleZoomOut = () => setZoomLevel(prev => Math.max(50, prev - 25));
+    const handleZoomIn = () => setZoomLevelOriginal(prev => Math.min(200, prev + 25));
+    const handleZoomOut = () => setZoomLevelOriginal(prev => Math.max(50, prev - 25));
+
+    // Fullscreen native control
+    const handleToggleFullscreen = () => {
+        const docViewer = document.querySelector('.flex-1.flex.gap-6.min-h-0.relative.items-stretch');
+        if (!docViewer) return;
+        
+        if (!document.fullscreenElement) {
+            docViewer.requestFullscreen().then(() => {
+                setIsFullscreen(true);
+            }).catch(err => {
+                console.error('Erro ao ativar tela cheia:', err);
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                setIsFullscreen(false);
+            }).catch(err => {
+                console.error('Erro ao sair de tela cheia:', err);
+            });
+        }
+    };
+
+    // Sincroniza estado de tela cheia ao sair usando Esc
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    }, []);
+
+    // Text search live highlighting helper
+    const highlightSearchText = (text: string, query: string) => {
+        if (!query) return text;
+        try {
+            const escapedQuery = query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
+            return parts.map((part, i) => 
+                part.toLowerCase() === query.toLowerCase() 
+                    ? <mark key={i} className="bg-yellow-300 dark:bg-yellow-500/40 text-black dark:text-white px-0.5 rounded font-semibold">{part}</mark>
+                    : part
+            );
+        } catch (e) {
+            return text;
+        }
+    };
 
     // Scroll to clause in document
     const scrollToClause = (clauseRef: string) => {
@@ -464,7 +515,7 @@ export default function IAAnalisePage() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-8rem)] w-full max-w-full overflow-hidden">
+        <div className="flex flex-col h-full w-full max-w-full overflow-hidden p-6 lg:p-8">
             {/* Header Section (Matching Image 0) */}
             <header className="flex-none mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="space-y-1">
@@ -746,21 +797,107 @@ export default function IAAnalisePage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex-1 flex gap-6 min-h-0 relative items-stretch"
                     >
+                        {/* Left Column: Sumário Sidebar */}
+                        <AnimatePresence>
+                            {summaryOpen && (
+                                <motion.div
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: 320, opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    className="w-80 flex flex-col bg-white dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-lg h-full flex-none z-10"
+                                >
+                                    <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 flex-none">
+                                        <div className="space-y-1">
+                                            <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Sumário de Elite</h3>
+                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Navegação e Resumo Rápido</p>
+                                        </div>
+                                        <button onClick={() => setSummaryOpen(false)} className="text-slate-400 hover:text-slate-950 dark:hover:text-white"><X size={16} /></button>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                                        {/* Resumo Executivo */}
+                                        <div className="space-y-3">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1053ff]">Resumo Executivo</h4>
+                                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-[#0c0e17] p-4 rounded-xl border border-slate-200 dark:border-slate-800/50 italic whitespace-pre-wrap">
+                                                {analysis.executiveSummary}
+                                            </p>
+                                        </div>
+                                        
+                                        {/* Score de Negociação */}
+                                        {analysis.negotiationPower && (
+                                            <div className="space-y-3">
+                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Poder de Negociação</h4>
+                                                <div className="bg-slate-50 dark:bg-[#0c0e17] p-4 rounded-xl border border-slate-200 dark:border-slate-800/50 space-y-2">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Score de Força</span>
+                                                        <span className="text-sm font-black text-emerald-500">{analysis.negotiationPower.score}/100</span>
+                                                    </div>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                        {analysis.negotiationPower.analysis}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Índice de Cláusulas */}
+                                        <div className="space-y-3">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-amber-500">Cláusulas Mapeadas</h4>
+                                            <div className="space-y-2">
+                                                {analysis.analysisGroups.auditoria.map((clause, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        onClick={() => {
+                                                            setSelectedClause(clause);
+                                                            scrollToClause(clause.clauseReference);
+                                                        }}
+                                                        className="w-full text-left p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#0c0e17]/50 hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-[#0c0e17] transition-all flex items-center justify-between group"
+                                                    >
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-xs font-bold text-slate-800 dark:text-white truncate group-hover:text-primary transition-colors">
+                                                                {clause.clauseReference}. {clause.title}
+                                                            </p>
+                                                            <p className="text-[9px] text-slate-400 truncate mt-0.5">
+                                                                {clause.description}
+                                                            </p>
+                                                        </div>
+                                                        <span className={clsx(
+                                                            "ml-3 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider flex-none",
+                                                            clause.risk === 'Alto' ? "bg-red-500/10 text-red-500" : "bg-amber-500/10 text-amber-500"
+                                                        )}>
+                                                            {clause.risk}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         {/* Middle Column: Premium Document Viewer (PDF Style) */}
                         <div className="flex-1 flex flex-col bg-slate-100 dark:bg-[#161b2c] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative h-full">
                             {/* PDF Toolbar */}
                             <div className="h-14 bg-white dark:bg-[#1c2237] border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 flex-none text-slate-600 dark:text-slate-400">
                                 <div className="flex items-center gap-6">
-                                    <button className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><Menu size={16} /></button>
+                                    <button 
+                                        onClick={() => setSummaryOpen(!summaryOpen)}
+                                        className={clsx(
+                                            "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-md transition-colors",
+                                            summaryOpen && "bg-slate-100 dark:bg-slate-800 text-primary dark:text-primary-light"
+                                        )}
+                                        title="Sumário de Cláusulas"
+                                    >
+                                        <Menu size={16} />
+                                    </button>
                                     <div className="h-4 w-px bg-slate-300 dark:bg-slate-800" />
                                     <div className="flex items-center gap-4 text-[10px] font-bold text-slate-500 dark:text-slate-400">
-                                        Página 1 de 12
+                                        Página 1 de 1
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center bg-slate-100 dark:bg-[#0c0e17] rounded-lg border border-slate-300 dark:border-slate-800 px-2 py-1 gap-3">
                                         <button onClick={handleZoomOut} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><Minimize2 size={12} /></button>
-                                        <span className="text-[10px] font-bold text-slate-700 dark:text-white min-w-[40px] text-center">{zoomLevel}%</span>
+                                        <span className="text-[10px] font-bold text-slate-700 dark:text-white min-w-[40px] text-center">{zoomLevelOriginal}%</span>
                                         <button onClick={handleZoomIn} className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><Plus size={12} /></button>
                                     </div>
                                     <div className="h-4 w-px bg-slate-300 dark:bg-slate-800" />
@@ -775,8 +912,43 @@ export default function IAAnalisePage() {
                                         {isSplitView ? "Fechar Comparação" : "Comparar Versões"}
                                     </button>
                                     <div className="h-4 w-px bg-slate-300 dark:bg-slate-800" />
-                                    <button className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><Search size={16} /></button>
-                                    <button className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><Maximize2 size={16} /></button>
+                                    <div className="flex items-center gap-2 relative">
+                                        <AnimatePresence>
+                                            {searchOpen && (
+                                                <motion.input
+                                                    initial={{ width: 0, opacity: 0 }}
+                                                    animate={{ width: 140, opacity: 1 }}
+                                                    exit={{ width: 0, opacity: 0 }}
+                                                    type="text"
+                                                    placeholder="Buscar no texto..."
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    className="bg-slate-100 dark:bg-slate-900 border border-slate-350 dark:border-slate-700 rounded-lg px-2.5 py-0.5 text-[11px] text-slate-800 dark:text-white outline-none focus:ring-1 focus:ring-primary/50 font-medium"
+                                                    autoFocus
+                                                />
+                                            )}
+                                        </AnimatePresence>
+                                        <button 
+                                            onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setSearchQuery(''); }}
+                                            className={clsx(
+                                                "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-md transition-colors",
+                                                searchOpen && "bg-slate-100 dark:bg-slate-800 text-primary dark:text-primary-light"
+                                            )}
+                                            title="Buscar Termo"
+                                        >
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                    <button 
+                                        onClick={handleToggleFullscreen}
+                                        className={clsx(
+                                            "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 rounded-md transition-colors",
+                                            isFullscreen && "text-primary bg-slate-100 dark:bg-slate-800"
+                                        )}
+                                        title={isFullscreen ? "Sair de Tela Cheia" : "Abrir em Tela Cheia"}
+                                    >
+                                        <Maximize2 size={16} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -792,9 +964,18 @@ export default function IAAnalisePage() {
                                             "bg-white text-slate-800 p-6 md:p-12 lg:p-16 shadow-xl font-serif text-[15px] leading-[2] relative transition-all duration-500 border border-slate-200 dark:border-transparent",
                                             isSplitView ? "w-[794px] flex-shrink-0" : "w-full"
                                         )}
-                                        style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: isSplitView ? 'top left' : 'top center' }}
+                                        style={{ transform: `scale(${zoomLevelOriginal / 100})`, transformOrigin: isSplitView ? 'top left' : 'top center' }}
                                     >
-                                        <h4 className="text-[10px] font-black uppercase text-slate-400 mb-8 border-b pb-2">Contrato Original</h4>
+                                        <div className="flex justify-between items-center mb-8 border-b pb-2 select-none">
+                                            <h4 className="text-[10px] font-black uppercase text-slate-400">Contrato Original</h4>
+                                            {isSplitView && (
+                                                <div className="flex items-center bg-slate-100 dark:bg-[#0c0e17] rounded-lg border border-slate-200 dark:border-slate-800 px-2 py-0.5 gap-2">
+                                                    <button onClick={(e) => { e.stopPropagation(); setZoomLevelOriginal(prev => Math.max(50, prev - 25)) }} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" title="Zoom Out"><Minimize2 size={10} /></button>
+                                                    <span className="text-[9px] font-bold text-slate-700 dark:text-white min-w-[30px] text-center">{zoomLevelOriginal}%</span>
+                                                    <button onClick={(e) => { e.stopPropagation(); setZoomLevelOriginal(prev => Math.min(200, prev + 25)) }} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" title="Zoom In"><Plus size={10} /></button>
+                                                </div>
+                                            )}
+                                        </div>
                                         <div className="whitespace-pre-wrap">
                                             {(() => {
                                                 // Render the full contract text with clause highlighting
@@ -837,7 +1018,7 @@ export default function IAAnalisePage() {
                                                 highlights.forEach((h, idx) => {
                                                     if (h.start > lastEnd) {
                                                         elements.push(
-                                                            <span key={`text-${idx}`}>{fullText.slice(lastEnd, h.start)}</span>
+                                                            <span key={`text-${idx}`}>{highlightSearchText(fullText.slice(lastEnd, h.start), searchQuery)}</span>
                                                         );
                                                     }
 
@@ -858,7 +1039,7 @@ export default function IAAnalisePage() {
                                                                 hoveredClause === h.clause.clauseReference && "ring-2 ring-blue-500 bg-blue-100"
                                                             )}
                                                         >
-                                                            {highlightText}
+                                                            {highlightSearchText(highlightText, searchQuery)}
                                                         </span>
                                                     );
 
@@ -866,10 +1047,10 @@ export default function IAAnalisePage() {
                                                 });
 
                                                 if (lastEnd < fullText.length) {
-                                                    elements.push(<span key="text-end">{fullText.slice(lastEnd)}</span>);
+                                                    elements.push(<span key="text-end">{highlightSearchText(fullText.slice(lastEnd), searchQuery)}</span>);
                                                 }
 
-                                                return elements.length > 0 ? elements : fullText;
+                                                return elements.length > 0 ? elements : highlightSearchText(fullText, searchQuery);
                                             })()}
                                         </div>
 
@@ -885,14 +1066,21 @@ export default function IAAnalisePage() {
                                             initial={{ opacity: 0, x: 20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             className="w-[794px] flex-shrink-0 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 p-6 md:p-12 lg:p-16 shadow-2xl font-serif text-[15px] leading-[2] relative border-2 border-primary/30"
-                                            style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top left' }}
+                                            style={{ transform: `scale(${zoomLevelDraft / 100})`, transformOrigin: 'top left' }}
                                         >
                                             <div className="absolute top-0 right-0 p-4">
                                                 <button onClick={() => setIsSplitView(false)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={20}/></button>
                                             </div>
-                                            <h4 className="text-[10px] font-black uppercase text-primary mb-8 border-b border-primary/20 pb-2 flex items-center gap-2">
-                                                <Zap size={12} fill="currentColor"/> Sugestão de Revisão Elite
-                                            </h4>
+                                            <div className="flex justify-between items-center mb-8 border-b border-primary/20 pb-2 pr-8 select-none">
+                                                <h4 className="text-[10px] font-black uppercase text-primary flex items-center gap-2">
+                                                    <Zap size={12} fill="currentColor"/> Sugestão de Revisão Elite
+                                                </h4>
+                                                <div className="flex items-center bg-slate-100 dark:bg-[#0c0e17] rounded-lg border border-slate-200 dark:border-slate-800 px-2 py-0.5 gap-2">
+                                                    <button onClick={(e) => { e.stopPropagation(); setZoomLevelDraft(prev => Math.max(50, prev - 25)) }} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" title="Zoom Out"><Minimize2 size={10} /></button>
+                                                    <span className="text-[9px] font-bold text-slate-700 dark:text-white min-w-[30px] text-center">{zoomLevelDraft}%</span>
+                                                    <button onClick={(e) => { e.stopPropagation(); setZoomLevelDraft(prev => Math.min(200, prev + 25)) }} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" title="Zoom In"><Plus size={10} /></button>
+                                                </div>
+                                            </div>
                                             
                                             <div className="whitespace-pre-wrap italic text-slate-600 dark:text-slate-400">
                                                 {(() => {
