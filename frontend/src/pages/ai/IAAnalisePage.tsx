@@ -79,6 +79,72 @@ interface ChatMessage {
     content: string;
 }
 
+const extractTextFromPdf = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        if ((window as any).pdfjsLib) {
+            runExtraction((window as any).pdfjsLib, file, resolve, reject);
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        script.async = true;
+        script.onload = () => {
+            const pdfjsLib = (window as any).pdfjsLib;
+            if (pdfjsLib) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                runExtraction(pdfjsLib, file, resolve, reject);
+            } else {
+                reject(new Error('Biblioteca PDF.js não pôde ser inicializada.'));
+            }
+        };
+        script.onerror = () => {
+            reject(new Error('Erro ao carregar script do leitor de PDF do servidor remoto.'));
+        };
+        document.head.appendChild(script);
+    });
+};
+
+const runExtraction = async (pdfjsLib: any, file: File, resolve: (val: string) => void, reject: (err: Error) => void) => {
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        let fullText = '';
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            
+            let lastY = -1;
+            let pageText = '';
+            
+            for (const item of textContent.items) {
+                if (item.str !== undefined) {
+                    const currentY = item.transform[5];
+                    if (lastY !== -1 && Math.abs(currentY - lastY) > 5) {
+                        pageText += '\n';
+                    }
+                    pageText += item.str + ' ';
+                    lastY = currentY;
+                }
+            }
+            
+            if (pageText.trim()) {
+                fullText += `--- PÁGINA ${i} ---\n${pageText.trim()}\n\n`;
+            }
+        }
+
+        if (!fullText.trim()) {
+            reject(new Error('Nenhum texto pôde ser extraído. O PDF pode conter apenas imagens escaneadas.'));
+        } else {
+            resolve(fullText.trim());
+        }
+    } catch (err: any) {
+        reject(new Error(err.message || 'Erro ao decodificar arquivo PDF.'));
+    }
+};
+
 export default function IAAnalisePage() {
     const [contractText, setContractText] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -95,6 +161,7 @@ export default function IAAnalisePage() {
     const [analysisStep, setAnalysisStep] = useState<'idle' | 'scanning' | 'auditing' | 'redacting' | 'done'>('idle');
     const [isSplitView, setIsSplitView] = useState(false);
     const [draftText, setDraftText] = useState('');
+    const [isParsingPdf, setIsParsingPdf] = useState(false);
 
     // History/Version Control State
     const [analysisHistory, setAnalysisHistory] = useState<Array<{
@@ -490,16 +557,16 @@ export default function IAAnalisePage() {
                     >
                         <Star size={16} />
                     </button>
-                    <label className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-800 transition-all cursor-pointer">
+                     <label className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-800 transition-all cursor-pointer">
                         <input
                             type="file"
                             accept=".txt,.pdf"
                             className="hidden"
-                            onChange={(e) => {
+                            onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                    setFileToUpload(file);
                                     if (file.type === 'text/plain') {
+                                        setFileToUpload(file);
                                         const reader = new FileReader();
                                         reader.onload = (e) => {
                                             setContractText(e.target?.result as string);
@@ -507,8 +574,20 @@ export default function IAAnalisePage() {
                                         };
                                         reader.readAsText(file);
                                     } else if (file.type === 'application/pdf') {
-                                        setContractText(`[Arquivo PDF selecionado: ${file.name}]\nO conteúdo será extraído durante a análise.`);
                                         setUploadOpen(true);
+                                        setIsParsingPdf(true);
+                                        setContractText('');
+                                        try {
+                                            const extractedText = await extractTextFromPdf(file);
+                                            setContractText(extractedText);
+                                            setFileToUpload(null); // No need to upload heavy binary anymore
+                                        } catch (error: any) {
+                                            console.warn('Browser parsing failed, using backend fallback:', error);
+                                            setFileToUpload(file);
+                                            setContractText(`[Arquivo PDF selecionado: ${file.name}]\nO conteúdo será extraído durante a análise.`);
+                                        } finally {
+                                            setIsParsingPdf(false);
+                                        }
                                     }
                                 }
                             }}
@@ -602,12 +681,28 @@ export default function IAAnalisePage() {
                                 <button onClick={() => setUploadOpen(false)} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"><X /></button>
                             </div>
                         </div>
-                        <textarea
-                            className="flex-1 p-6 bg-slate-50 dark:bg-[#0c0e17] border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 outline-none resize-none font-mono text-sm leading-relaxed"
-                            placeholder="Cole o texto do contrato aqui ou faça upload de um arquivo .txt..."
-                            value={contractText}
-                            onChange={(e) => setContractText(e.target.value)}
-                        />
+                        {isParsingPdf ? (
+                            <div className="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-[#0c0e17] border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center relative overflow-hidden group shadow-inner">
+                                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[60px] pointer-events-none opacity-50" />
+                                <div className="relative z-10 space-y-4">
+                                    <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary mx-auto animate-pulse">
+                                        <RefreshCw className="animate-spin" size={32} />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">Lendo e Processando PDF...</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 text-xs max-w-sm mx-auto leading-relaxed">
+                                        Extraindo o texto do contrato localmente no seu navegador para evitar limites de tamanho e acelerar a análise.
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <textarea
+                                className="flex-1 p-6 bg-slate-50 dark:bg-[#0c0e17] border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 outline-none resize-none font-mono text-sm leading-relaxed"
+                                placeholder="Cole o texto do contrato aqui ou faça upload de um arquivo .txt..."
+                                value={contractText}
+                                onChange={(e) => setContractText(e.target.value)}
+                            />
+                        )}
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={() => setUploadOpen(false)}
@@ -617,7 +712,7 @@ export default function IAAnalisePage() {
                             </button>
                             <button
                                 onClick={handleAnalyze}
-                                disabled={!contractText || isAnalyzing}
+                                disabled={!contractText || isAnalyzing || isParsingPdf}
                                 className={clsx(
                                     "flex items-center gap-3 px-8 py-2 rounded-xl text-white font-bold transition-all disabled:opacity-50 min-w-[240px] justify-center",
                                     isAnalyzing ? "bg-amber-600" : "bg-primary"
