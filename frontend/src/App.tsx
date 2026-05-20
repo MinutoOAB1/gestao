@@ -10,6 +10,8 @@ import { PrivateRoute } from './components/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import OfflineIndicator from './components/ui/OfflineIndicator';
 import { CookieBanner } from './components/ui/CookieBanner';
+import { Protect } from './components/auth/Protect';
+import { AccessDenied } from './components/auth/AccessDenied';
 
 // Auto-retry dynamic imports on chunk load failure (stale cache after deploy)
 function lazyWithRetry(factory: () => Promise<any>) {
@@ -123,24 +125,30 @@ function App() {
                             <Route index element={<DashboardHome />} />
                             <Route path="processos" element={<ProcessListPage />} />
                             <Route path="processos/kanban" element={<KanbanPage />} />
-                            <Route path="processos/novo" element={<ProcessFormPage />} />
+                            <Route path="processos/novo" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><ProcessFormPage /></Protect>} />
                             <Route path="processos/:id" element={<ProcessDetailPage />} />
-                            <Route path="processos/:id/editar" element={<ProcessFormPage />} />
-                            <Route path="clientes" element={<ClientListPage />} />
-                            <Route path="clientes/novo" element={<ClientFormPage />} />
-                            <Route path="clientes/:id" element={<ClientDetailPage />} />
-                            <Route path="clientes/:id/editar" element={<ClientFormPage />} />
-                            <Route path="financeiro" element={<FinancialListPage />} />
-                            <Route path="financeiro/novo" element={<FinancialFormPage />} />
-                            <Route path="financeiro/:id/editar" element={<FinancialFormPage />} />
-                            <Route path="contratos" element={<ContractsPage />} />
-                            <Route path="contratos/assinatura" element={<SignaturePage />} />
-                            <Route path="analise-ia" element={<IAAnalisePage />} />
-                            <Route path="documentos" element={<DocumentsPage />} />
+                            <Route path="processos/:id/editar" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><ProcessFormPage /></Protect>} />
+                            
+                            <Route path="clientes" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><ClientListPage /></Protect>} />
+                            <Route path="clientes/novo" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><ClientFormPage /></Protect>} />
+                            <Route path="clientes/:id" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><ClientDetailPage /></Protect>} />
+                            <Route path="clientes/:id/editar" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><ClientFormPage /></Protect>} />
+                            
+                            <Route path="financeiro" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><FinancialListPage /></Protect>} />
+                            <Route path="financeiro/novo" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><FinancialFormPage /></Protect>} />
+                            <Route path="financeiro/:id/editar" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><FinancialFormPage /></Protect>} />
+                            
+                            <Route path="contratos" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><ContractsPage /></Protect>} />
+                            <Route path="contratos/assinatura" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><SignaturePage /></Protect>} />
+                            
+                            <Route path="analise-ia" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><IAAnalisePage /></Protect>} />
+                            <Route path="documentos" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><DocumentsPage /></Protect>} />
                             <Route path="agenda" element={<AgendaPage />} />
-                            <Route path="modelos" element={<TemplatesPage />} />
-                            <Route path="modelos/:id" element={<DocumentEditorPage />} />
-                            <Route path="usuarios" element={<UsersPage />} />
+                            
+                            <Route path="modelos" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><TemplatesPage /></Protect>} />
+                            <Route path="modelos/:id" element={<Protect roles={['ADMIN', 'LAWYER', 'INTERN']} fallback={<AccessDenied />}><DocumentEditorPage /></Protect>} />
+                            
+                            <Route path="usuarios" element={<Protect roles={['ADMIN']} fallback={<AccessDenied />}><UsersPage /></Protect>} />
                             <Route path="timesheet" element={<TimesheetPage />} />
                             <Route path="perfil" element={<ProfilePage />} />
                             <Route path="configuracoes" element={<SettingsPage />} />

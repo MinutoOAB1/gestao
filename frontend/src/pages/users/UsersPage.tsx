@@ -188,7 +188,7 @@ export default function UsersPage() {
                         Gerencie usuários e defina níveis de permissão
                     </p>
                 </div>
-                <Protect roles={['ADMIN', 'LAWYER']}>
+                <Protect roles={['ADMIN']}>
                     <button
                         onClick={() => { resetForm(); setShowAddModal(true); }}
                         className="px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl flex items-center gap-2 text-sm font-medium transition-colors"
@@ -322,7 +322,7 @@ export default function UsersPage() {
                                             </td>
                                             <td className="px-4 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-1">
-                                                    <Protect roles={['ADMIN', 'LAWYER']}>
+                                                    <Protect roles={['ADMIN']}>
                                                         <button
                                                             onClick={() => openEditModal(user)}
                                                             className="p-2 hover:bg-app-stroke/50 rounded-lg text-app-text-muted hover:text-app-text-main transition-colors"

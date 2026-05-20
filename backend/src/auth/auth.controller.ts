@@ -92,7 +92,7 @@ export class AuthController {
 
   @Post('users')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN, Role.LAWYER)
+  @Roles(Role.ADMIN)
   async createUser(@Request() req, @Body() body: { name: string; email: string; password: string; role: string }) {
     // Get the name of the user who is creating the new member
     const inviter = await this.authService.getProfile(req.user.sub);
@@ -102,7 +102,7 @@ export class AuthController {
 
   @Patch('users/:id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.ADMIN, Role.LAWYER)
+  @Roles(Role.ADMIN)
   async updateUser(@Request() req, @Param('id') id: string, @Body() body: {
     name?: string;
     role?: string;

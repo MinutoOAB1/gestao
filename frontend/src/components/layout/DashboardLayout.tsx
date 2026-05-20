@@ -373,21 +373,28 @@ export default function DashboardLayout() {
                             )}
                         </AnimatePresence>
                     </div>
-                    <SidebarItem icon={Users} label="Clientes" path="/app/clientes" collapsed={collapsed} />
+                    {user && ['ADMIN', 'LAWYER', 'INTERN'].includes(user.role) && (
+                        <SidebarItem icon={Users} label="Clientes" path="/app/clientes" collapsed={collapsed} />
+                    )}
 
                     <div className="my-2 border-t border-white/[0.06] mx-4"></div>
 
                     {/* Jurídico & Gestão */}
-                    <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Jurídico</p>
-                    <SidebarItem icon={ClipboardList} label="Contratos" path="/app/contratos" collapsed={collapsed} />
-                    <SidebarItem icon={Folder} label="Meus Arquivos" path="/app/documentos" collapsed={collapsed} />
-                    <SidebarItem icon={FileText} label="Modelos" path="/app/modelos" collapsed={collapsed} />
-
-                    <div className="my-2 border-t border-white/[0.06] mx-4"></div>
+                    {user && ['ADMIN', 'LAWYER', 'INTERN'].includes(user.role) && (
+                        <>
+                            <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Jurídico</p>
+                            <SidebarItem icon={ClipboardList} label="Contratos" path="/app/contratos" collapsed={collapsed} />
+                            <SidebarItem icon={Folder} label="Meus Arquivos" path="/app/documentos" collapsed={collapsed} />
+                            <SidebarItem icon={FileText} label="Modelos" path="/app/modelos" collapsed={collapsed} />
+                            <div className="my-2 border-t border-white/[0.06] mx-4"></div>
+                        </>
+                    )}
 
                     {/* Operacional */}
                     <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Operacional</p>
-                    <SidebarItem icon={DollarSign} label="Financeiro" path="/app/financeiro" collapsed={collapsed} />
+                    {user && ['ADMIN', 'LAWYER'].includes(user.role) && (
+                        <SidebarItem icon={DollarSign} label="Financeiro" path="/app/financeiro" collapsed={collapsed} />
+                    )}
                     <SidebarItem icon={Calendar} label="Agenda" path="/app/agenda" collapsed={collapsed} />
                     <SidebarItem icon={Clock} label="Timesheet" path="/app/timesheet" collapsed={collapsed} />
 
@@ -395,14 +402,18 @@ export default function DashboardLayout() {
 
                     {/* IA & Configurações */}
                     <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>IA & Config</p>
-                    <SidebarItemWithHistory collapsed={collapsed} />
-                    <SidebarItem icon={Users} label="Usuários" path="/app/usuarios" collapsed={collapsed} />
+                    {user && ['ADMIN', 'LAWYER'].includes(user.role) && (
+                        <SidebarItemWithHistory collapsed={collapsed} />
+                    )}
+                    {user && user.role === 'ADMIN' && (
+                        <SidebarItem icon={Users} label="Usuários" path="/app/usuarios" collapsed={collapsed} />
+                    )}
                     <SidebarItem icon={User} label="Meu Perfil" path="/app/perfil" collapsed={collapsed} />
                     <SidebarItem icon={Settings} label="Ajustes" path="/app/configuracoes" collapsed={collapsed} />
                 </div>
 
                 {/* IA Jurídica Card - only show when not collapsed */}
-                {!collapsed && (
+                {!collapsed && user && ['ADMIN', 'LAWYER'].includes(user.role) && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
                             <div className="relative bg-white/[0.06] rounded-2xl p-4 overflow-hidden group cursor-pointer hover:bg-white/[0.09] transition-all border border-white/[0.08]">
@@ -593,7 +604,9 @@ export default function DashboardLayout() {
             <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#0B1121] border-t border-gray-100 dark:border-white/5 flex items-center justify-between px-2 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)] dark:shadow-none">
                 <BottomNavItem icon={Home} label="Início" path="/app" />
                 <BottomNavItem icon={FileText} label="Processos" path="/app/processos" />
-                <BottomNavItem icon={Users} label="Clientes" path="/app/clientes" />
+                {user && ['ADMIN', 'LAWYER', 'INTERN'].includes(user.role) && (
+                    <BottomNavItem icon={Users} label="Clientes" path="/app/clientes" />
+                )}
                 <BottomNavItem icon={ClipboardList} label="Atividades" path="/app/agenda" />
                 <BottomNavItem icon={MoreHorizontal} label="Mais" path="#" onClick={() => setIsMobileDrawerOpen(true)} />
             </div>
@@ -623,7 +636,14 @@ export default function DashboardLayout() {
                                 </button>
                             </div>
                             <div className="grid grid-cols-4 gap-2 p-4">
-                                {DRAWER_MENU_ITEMS.map((item) => (
+                                {DRAWER_MENU_ITEMS.filter(item => {
+                                    if (item.path === '/app/clientes') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
+                                    if (item.path === '/app/contratos') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
+                                    if (item.path === '/app/documentos') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
+                                    if (item.path === '/app/modelos') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
+                                    if (item.path === '/app/usuarios') return user?.role === 'ADMIN';
+                                    return true;
+                                }).map((item) => (
                                     <Link
                                         key={item.path}
                                         to={item.path}
@@ -637,16 +657,18 @@ export default function DashboardLayout() {
                                     </Link>
                                 ))}
                                 {/* IA Análise in drawer */}
-                                <Link
-                                    to="/app/analise-ia"
-                                    onClick={() => setIsMobileDrawerOpen(false)}
-                                    className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary/5 dark:hover:bg-white/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
-                                >
-                                    <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-white/10 flex items-center justify-center">
-                                        <Shield size={20} className="text-primary dark:text-white" />
-                                    </div>
-                                    <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">IA Análise</span>
-                                </Link>
+                                {user && ['ADMIN', 'LAWYER'].includes(user.role) && (
+                                    <Link
+                                        to="/app/analise-ia"
+                                        onClick={() => setIsMobileDrawerOpen(false)}
+                                        className="flex flex-col items-center gap-1.5 p-2 rounded-xl hover:bg-primary/5 dark:hover:bg-white/10 transition-colors touch-manipulation no-tap-highlight active:scale-95"
+                                    >
+                                        <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-white/10 flex items-center justify-center">
+                                            <Shield size={20} className="text-primary dark:text-white" />
+                                        </div>
+                                        <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">IA Análise</span>
+                                    </Link>
+                                )}
                                 {/* Settings in drawer too */}
                                 <Link
                                     to="/app/configuracoes"
