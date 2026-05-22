@@ -215,7 +215,7 @@ const DRAWER_MENU_ITEMS = [
     { icon: Calendar, label: 'Agenda', path: '/app/agenda' },
     { icon: Folder, label: 'Meus Arquivos', path: '/app/documentos' },
     { icon: FileText, label: 'Modelos', path: '/app/modelos' },
-    { icon: Network, label: 'Cadeia de Valor', path: '/app/gestao/cadeia-valor' },
+    { icon: Network, label: 'Briefing de Processos', path: '/app/gestao/cadeia-valor' },
     { icon: Users, label: 'Usuários', path: '/app/usuarios' },
     { icon: User, label: 'Meu Perfil', path: '/app/perfil' },
     { icon: Clock, label: 'Timesheet', path: '/app/timesheet' },
@@ -396,7 +396,7 @@ export default function DashboardLayout() {
                     {user && ['ADMIN', 'LAWYER', 'INTERN'].includes(user.role) && (
                         <>
                             <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Gestão</p>
-                            <SidebarItem icon={Network} label="Cadeia de Valor" path="/app/gestao/cadeia-valor" collapsed={collapsed} />
+                            <SidebarItem icon={Network} label="Briefing de Processos" path="/app/gestao/cadeia-valor" collapsed={collapsed} />
                             <div className="my-2 border-t border-white/[0.06] mx-4"></div>
                         </>
                     )}

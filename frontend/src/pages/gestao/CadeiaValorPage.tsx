@@ -1139,7 +1139,7 @@ export default function CadeiaValorPage() {
             <Network size={20} className="text-[#4F73F5]" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-sm md:text-base font-bold tracking-tight text-slate-800 dark:text-white truncate max-w-[200px] sm:max-w-none">Cadeia de Valor & CRM de Entrada</h1>
+            <h1 className="text-sm md:text-base font-bold tracking-tight text-slate-800 dark:text-white truncate max-w-[200px] sm:max-w-none">Briefing de Processos & CRM de Entrada</h1>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden md:block">Gestão integrada de processos estratégicos e funil de atendimento ao cliente</p>
           </div>
         </div>
