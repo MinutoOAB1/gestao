@@ -53,8 +53,15 @@ interface DetailState {
   docsGenerated: string;
 }
 
+// Interface for the process template
+interface BpmnTemplate {
+  nodes: BpmnNode[];
+  connections: BpmnConnection[];
+  details: DetailState;
+}
+
 // Function to serve contextual BPMN process templates based on Mindmap ID
-const getDefaultBPMNData = (processId: string) => {
+const getDefaultBPMNData = (processId: string): BpmnTemplate => {
   switch (processId) {
     case 'triagem':
       return {
