@@ -43,6 +43,9 @@ model Tenant {
   timeEntries          TimeEntry[]
   users                User[]
   financialCategories  FinancialCategory[]
+  chatChannels         ChatChannel[]
+  directMessages       DirectMessage[]
+  valueChains          ValueChain[]
 }
 
 model User {
@@ -727,6 +730,10 @@ model FinancialCategory {
   tenantId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  defaultIss      Float?    @default(0)
+  defaultIrrf     Float?    @default(0)
+  defaultPis      Float?    @default(0)
+  defaultCofins   Float?    @default(0)
   
   parent    FinancialCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children  FinancialCategory[] @relation("CategoryHierarchy")
@@ -736,3 +743,80 @@ model FinancialCategory {
   @@unique([name, type, tenantId, parentId])
   @@index([tenantId])
 }
+
+model ChatChannel {
+  id        String        @id @default(uuid())
+  name      String
+  type      String        @default("GENERAL")
+  processId String?
+  tenantId  String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+  tenant    Tenant        @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([processId])
+}
+
+model ChatMessage {
+  id           String      @id @default(uuid())
+  content      String
+  channelId    String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  fileName     String?
+  fileUrl      String?
+  fileSize     String?
+  fileType     String?
+  replyToId    String?
+  reactions    String?
+  isPinned     Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  channel      ChatChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([channelId])
+}
+
+model DirectMessage {
+  id           String   @id @default(uuid())
+  content      String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  recipientId  String
+  isRead       Boolean  @default(false)
+  tenantId     String
+  createdAt    DateTime @default(now())
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([senderId, recipientId])
+}
+
+model Changelog {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.Text
+  version     String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ValueChain {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @default("")
+  nodes       Json     // Store nodes JSON
+  connections Json     // Store connections JSON
+  tenantId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
