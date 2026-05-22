@@ -1,78 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import {
     FileText, Users, DollarSign, Calendar, Shield,
     Check, ArrowRight, Menu, X, Sparkles,
-    Globe, Clock, MessageSquare, Folder, ChevronDown, Star
+    Globe, Clock, MessageSquare, Folder, ChevronDown
 } from 'lucide-react';
-import { motion, AnimatePresence, useInView, useScroll, useTransform } from 'framer-motion';
-
-// Hook for scroll-triggered reveal animations
-function useScrollReveal(threshold = 0.15) {
-    const ref = useRef<HTMLDivElement>(null);
-    const isInView = useInView(ref, { once: true, amount: threshold });
-    return { ref, isInView };
-}
-
-// Animated Hero Background with floating orbs
-function AnimatedHeroBackground() {
-    return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Animated gradient orbs */}
-            <motion.div
-                className="absolute w-[600px] h-[600px] rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(79,115,245,0.15) 0%, transparent 70%)', top: '-10%', right: '-5%' }}
-                animate={{ x: [0, 30, -20, 0], y: [0, -40, 20, 0], scale: [1, 1.1, 0.95, 1] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-                className="absolute w-[500px] h-[500px] rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)', bottom: '5%', left: '-8%' }}
-                animate={{ x: [0, -25, 35, 0], y: [0, 30, -25, 0], scale: [1, 0.9, 1.15, 1] }}
-                transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-                className="absolute w-[350px] h-[350px] rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(79,115,245,0.1) 0%, transparent 70%)', top: '40%', left: '30%' }}
-                animate={{ x: [0, 40, -30, 0], y: [0, -20, 40, 0], scale: [1, 1.2, 0.85, 1] }}
-                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            {/* Grid pattern overlay */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-                backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                backgroundSize: '60px 60px'
-            }} />
-            {/* Floating particles */}
-            {[...Array(6)].map((_, i) => (
-                <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 bg-accent/30 rounded-full"
-                    style={{ top: `${15 + i * 14}%`, left: `${10 + i * 15}%` }}
-                    animate={{ y: [0, -30, 0], opacity: [0.2, 0.7, 0.2] }}
-                    transition={{ duration: 4 + i, repeat: Infinity, delay: i * 0.5 }}
-                />
-            ))}
-        </div>
-    );
-}
-
-// Scroll-reveal wrapper component
-function ScrollReveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-    const { ref, isInView } = useScrollReveal();
-    return (
-        <motion.div
-            ref={ref}
-            initial={{ opacity: 0, y: 40 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-            transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-}
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Navbar Component
 function Navbar() {
@@ -214,8 +149,9 @@ function HeroSection() {
 
     return (
         <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 overflow-hidden bg-primary-dark">
-            {/* Animated Background */}
-            <AnimatedHeroBackground />
+            {/* Background Decorative Elements */}
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/20 blur-[160px] rounded-full -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent/5 blur-[140px] rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none" />
             
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center max-w-5xl mx-auto">
@@ -373,7 +309,7 @@ function FeaturesSection() {
             
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <ScrollReveal className="text-center max-w-3xl mx-auto mb-32">
+                <div className="text-center max-w-3xl mx-auto mb-32">
                     <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
                         Recursos <br />
                         <span className="text-white/30">de Gestão</span>
@@ -381,26 +317,25 @@ function FeaturesSection() {
                     <p className="text-xl text-white/40 leading-relaxed font-medium">
                         Desenvolvido especificamente para as necessidades da advocacia de alta performance.
                     </p>
-                </ScrollReveal>
+                </div>
 
                 {/* Features Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {features.map((feature, idx) => (
-                        <ScrollReveal key={idx} delay={idx * 0.1}>
-                            <div
-                                className="group p-10 bg-white/[0.02] hover:bg-white/[0.04] rounded-[2.5rem] border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-2 h-full"
-                            >
-                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.01] text-accent flex items-center justify-center mb-10 border border-white/10 group-hover:scale-110 transition-transform duration-500">
-                                    <feature.icon size={28} />
-                                </div>
-                                <h3 className="text-2xl font-black text-white mb-4 font-display uppercase tracking-tight">
-                                    {feature.title}
-                                </h3>
-                                <p className="text-white/40 leading-relaxed font-medium">
-                                    {feature.description}
-                                </p>
+                        <div
+                            key={idx}
+                            className="group p-10 bg-white/[0.02] hover:bg-white/[0.04] rounded-[2.5rem] border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-2"
+                        >
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.01] text-accent flex items-center justify-center mb-10 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                                <feature.icon size={28} />
                             </div>
-                        </ScrollReveal>
+                            <h3 className="text-2xl font-black text-white mb-4 font-display uppercase tracking-tight">
+                                {feature.title}
+                            </h3>
+                            <p className="text-white/40 leading-relaxed font-medium">
+                                {feature.description}
+                            </p>
+                        </div>
                     ))}
                 </div>
             </div>
@@ -422,16 +357,14 @@ function StatsSection() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
                     {stats.map((stat, idx) => (
-                        <ScrollReveal key={idx} delay={idx * 0.15}>
-                            <div className="text-center">
-                                <div className="text-4xl md:text-6xl font-black text-white mb-4 font-display">
-                                    {stat.value}
-                                </div>
-                                <div className="text-accent text-[10px] font-black uppercase tracking-[0.3em]">
-                                    {stat.label}
-                                </div>
+                        <div key={idx} className="text-center">
+                            <div className="text-4xl md:text-6xl font-black text-white mb-4 font-display">
+                                {stat.value}
                             </div>
-                        </ScrollReveal>
+                            <div className="text-accent text-[10px] font-black uppercase tracking-[0.3em]">
+                                {stat.label}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
@@ -456,12 +389,12 @@ function EngagementSection() {
     return (
         <section className="py-32 md:py-48 bg-primary-dark/50 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <ScrollReveal className="text-center mb-24">
+                <div className="text-center mb-24">
                     <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
                         Ferramentas <br />
                         <span className="text-white/30">de Engajamento</span>
                     </h2>
-                </ScrollReveal>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {/* ROI Calculator */}
@@ -567,7 +500,7 @@ function PricingSection() {
         <section id="pricing" className="py-32 md:py-48 bg-black relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <ScrollReveal className="text-center max-w-3xl mx-auto mb-24">
+                <div className="text-center max-w-3xl mx-auto mb-24">
                     <h2 id="pricing-title" className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
                         Assinatura <br />
                         <span className="text-white/30">Planos Premium</span>
@@ -575,7 +508,7 @@ function PricingSection() {
                     <p className="text-xl text-white/40 leading-relaxed font-medium">
                         Acesso ilimitado ao ecossistema mais sofisticado do Brasil.
                     </p>
-                </ScrollReveal>
+                </div>
 
                 {/* Pricing Card */}
                 <div className="max-w-xl mx-auto">
@@ -630,7 +563,7 @@ function PricingSection() {
     );
 }
 
-// Testimonials Section — Infinite horizontal marquee, pauses on hover
+// Testimonials Section
 function TestimonialsSection() {
     const testimonials = [
         {
@@ -638,119 +571,63 @@ function TestimonialsSection() {
             role: 'ADVOGADO SÊNIOR',
             company: 'SILVA & ASSOC.',
             content: 'O Advus redefiniu nossa cultura de produtividade. Não é apenas software, é vantagem competitiva.',
-            avatar: 'CS',
-            stars: 5
+            avatar: 'CS'
         },
         {
             name: 'Marina Costa',
             role: 'LEGAL DESIGNER',
             company: 'COSTA HUB',
             content: 'A experiência de usuário é impecável. Reflete exatamente o posicionamento premium que temos.',
-            avatar: 'MC',
-            stars: 5
+            avatar: 'MC'
         },
         {
             name: 'Roberto Mendes',
             role: 'CEO',
             company: 'MENDES GROUP',
             content: 'A IA Jurídica do Advus é o nosso filtro mais confiável em auditorias complexas. Indispensável.',
-            avatar: 'RM',
-            stars: 5
-        },
-        {
-            name: 'Ana Beatriz Lopes',
-            role: 'SÓCIA FUNDADORA',
-            company: 'LOPES ADVOCACIA',
-            content: 'Desde que adotamos o Advus, reduzimos em 60% o tempo gasto com tarefas administrativas repetitivas.',
-            avatar: 'AL',
-            stars: 5
-        },
-        {
-            name: 'Fernando Dias',
-            role: 'ADVOGADO TRIBUTARISTA',
-            company: 'DIAS & LIMA',
-            content: 'O controle financeiro integrado aos processos é genial. Finalmente tenho visibilidade real dos honorários.',
-            avatar: 'FD',
-            stars: 5
-        },
-        {
-            name: 'Juliana Martins',
-            role: 'GESTORA JURÍDICA',
-            company: 'JM LEGAL',
-            content: 'A assinatura digital integrada eliminou uma dor operacional enorme. Tudo em um único lugar.',
-            avatar: 'JM',
-            stars: 5
-        },
+            avatar: 'RM'
+        }
     ];
 
-    // Duplicate for seamless loop
-    const marqueeItems = [...testimonials, ...testimonials];
-
     return (
-        <section id="testimonials" className="py-32 md:py-48 bg-primary-dark overflow-hidden">
-            <ScrollReveal className="text-center mb-24 px-4">
-                <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
-                    Depoimentos <br />
-                    <span className="text-white/30">de Quem Decide</span>
-                </h2>
-            </ScrollReveal>
+        <section id="testimonials" className="py-32 md:py-48 bg-primary-dark">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-24">
+                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
+                        Depoimentos <br />
+                        <span className="text-white/30">de Quem Decide</span>
+                    </h2>
+                </div>
 
-            {/* Marquee container with edge shadows */}
-            <div className="relative">
-                {/* Left shadow fade */}
-                <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-primary-dark to-transparent z-10 pointer-events-none" />
-                {/* Right shadow fade */}
-                <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-primary-dark to-transparent z-10 pointer-events-none" />
-
-                {/* Infinite marquee — pauses on hover via CSS */}
-                <div
-                    className="flex gap-8 hover:[animation-play-state:paused]"
-                    style={{
-                        animation: 'marquee-scroll 40s linear infinite',
-                        width: 'max-content',
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
-                >
-                    {marqueeItems.map((testimonial, idx) => (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    {testimonials.map((testimonial, idx) => (
                         <div
                             key={idx}
-                            className="flex-shrink-0 w-[380px] p-8 bg-white/[0.03] rounded-[2rem] border border-white/5 hover:border-accent/20 transition-all duration-300 hover:bg-white/[0.06]"
+                            className="p-10 bg-white/[0.03] rounded-[2.5rem] border border-white/5 relative"
                         >
-                            {/* Stars */}
-                            <div className="flex gap-1 mb-6">
-                                {[...Array(testimonial.stars)].map((_, i) => (
-                                    <Star key={i} size={14} className="text-accent fill-accent" />
-                                ))}
-                            </div>
-                            <p className="text-white/60 leading-relaxed font-medium italic mb-8 text-sm min-h-[72px]">
-                                "{testimonial.content}"
-                            </p>
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent font-black border border-accent/20 text-lg">
+                            <div className="flex items-center gap-5 mb-8">
+                                <div className="w-14 h-14 rounded-2xl bg-accent/20 flex items-center justify-center text-accent font-black border border-accent/20 text-xl">
                                     {testimonial.avatar}
                                 </div>
                                 <div>
-                                    <h4 className="font-black text-white uppercase tracking-tight text-sm">
+                                    <h4 className="font-black text-white uppercase tracking-tight">
                                         {testimonial.name}
                                     </h4>
                                     <p className="text-[10px] text-accent font-black uppercase tracking-widest">
-                                        {testimonial.role} • {testimonial.company}
+                                        {testimonial.role}
                                     </p>
                                 </div>
                             </div>
+                            <p className="text-white/60 leading-relaxed font-medium italic mb-6">
+                                "{testimonial.content}"
+                            </p>
+                            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">
+                                {testimonial.company}
+                            </p>
                         </div>
                     ))}
                 </div>
             </div>
-
-            {/* Inject marquee keyframes */}
-            <style>{`
-                @keyframes marquee-scroll {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-            `}</style>
         </section>
     );
 }
