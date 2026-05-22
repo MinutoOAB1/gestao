@@ -5,7 +5,18 @@ import { TenantContextService } from './tenant-context.service';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly tenantContext: TenantContextService) {
-    super();
+    let dbUrl = process.env.DATABASE_URL || '';
+    if (dbUrl && dbUrl.includes(':6543') && !dbUrl.includes('pgbouncer=')) {
+      const separator = dbUrl.includes('?') ? '&' : '?';
+      dbUrl = `${dbUrl}${separator}pgbouncer=true`;
+    }
+    super({
+      datasources: {
+        db: {
+          url: dbUrl,
+        },
+      },
+    });
   }
 
   async onModuleInit() {
