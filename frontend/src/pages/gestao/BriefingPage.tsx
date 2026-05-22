@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import { 
   Workflow, 
   Play, 
@@ -405,43 +406,56 @@ export default function BriefingPage() {
     saveState(updated, connections);
   };
 
-  // Trigger AI layout refactoring simulator
+  // Trigger Llama 3.1 70B AI process optimization
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const handleOptimizeWithAi = () => {
+  const handleOptimizeWithAi = async () => {
     setIsAiLoading(true);
-    setTimeout(() => {
-      // Create a premium optimized flow with gateways and automated tasks
-      const optimizedNodes: BpmnNode[] = [
-        { id: 'start_opt', type: 'start', label: 'Início: Novo Lead Previdenciário', x: 80, y: 120 },
-        { id: 'task_opt1', type: 'task', label: 'Validação de CPF por API do Governo', x: 230, y: 100, taskType: 'service' },
-        { id: 'task_opt2', type: 'task', label: 'Análise de Vínculos Trabalhistas', x: 450, y: 100, taskType: 'user' },
-        { id: 'gate_opt', type: 'gateway', label: 'Requisitos Cumpridos?', x: 670, y: 100 },
-        { id: 'task_opt3', type: 'task', label: 'Minuta Gerada Automaticamente', x: 800, y: 100, taskType: 'service' },
-        { id: 'task_opt4', type: 'task', label: 'Enviar Relatório de Inelegibilidade', x: 800, y: 250, taskType: 'send' },
-        { id: 'end_opt1', type: 'end', label: 'Sucesso: Caso Distribuído', x: 1050, y: 120 },
-        { id: 'end_opt2', type: 'end', label: 'Fim: Recusado por Falta de Requisitos', x: 1050, y: 270 }
-      ];
+    try {
+      const response = await api.post('/ai/gestao/briefing/otimizar', {
+        processId: id,
+        nodes: nodes,
+        connections: connections,
+        details: details
+      });
 
-      const optimizedConns: BpmnConnection[] = [
-        { id: 'c_opt1', from: 'start_opt', to: 'task_opt1' },
-        { id: 'c_opt2', from: 'task_opt1', to: 'task_opt2' },
-        { id: 'c_opt3', from: 'task_opt2', to: 'gate_opt' },
-        { id: 'c_opt4', from: 'gate_opt', to: 'task_opt3', label: 'Sim' },
-        { id: 'c_opt5', from: 'gate_opt', to: 'task_opt4', label: 'Não' },
-        { id: 'c_opt6', from: 'task_opt3', to: 'end_opt1' },
-        { id: 'c_opt7', from: 'task_opt4', to: 'end_opt2' }
-      ];
+      const { nodes: optimizedNodes, connections: optimizedConns, details: optimizedDetails } = response.data;
 
-      const newDetails = {
-        ...details,
-        objective: 'Faturamento de honorários advocatícios de forma 100% automatizada com score inteligente.',
-        rules: 'Tempo máximo de resposta de 2 horas. Gateways validados por IA sênior no Asaas/Desk.'
+      // Type-safe mapping of shapes to preserve exact BpmnNode types
+      const mappedNodes: BpmnNode[] = (optimizedNodes || []).map((n: any) => ({
+        id: n.id || `node_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        type: (['start', 'task', 'gateway', 'data', 'end'].includes(n.type) ? n.type : 'task') as 'start' | 'task' | 'gateway' | 'data' | 'end',
+        label: n.label || 'Tarefa',
+        x: Number(n.x) || 150,
+        y: Number(n.y) || 150,
+        taskType: n.taskType ? (['user', 'service', 'send', 'receive'].includes(n.taskType) ? n.taskType : undefined) : undefined
+      }));
+
+      const mappedConns: BpmnConnection[] = (optimizedConns || []).map((c: any) => ({
+        id: c.id || `conn_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        from: c.from,
+        to: c.to,
+        label: c.label || undefined
+      }));
+
+      const mappedDetails = {
+        objective: optimizedDetails?.objective || details.objective,
+        owner: optimizedDetails?.owner || details.owner,
+        actors: optimizedDetails?.actors || details.actors,
+        rules: optimizedDetails?.rules || details.rules,
+        dataCollected: optimizedDetails?.dataCollected || details.dataCollected,
+        systemsUsed: optimizedDetails?.systemsUsed || details.systemsUsed,
+        docsGenerated: optimizedDetails?.docsGenerated || details.docsGenerated
       };
 
-      saveState(optimizedNodes, optimizedConns, newDetails);
-      logRevision('Refatorou o diagrama BPMN usando Inteligência Artificial de Processos');
+      saveState(mappedNodes, mappedConns, mappedDetails);
+      logRevision('Refatorou o fluxo de processo e preencheu governança com Llama 3.1 70B');
+      alert('Seu fluxo operacional foi otimizado com IA de ponta com sucesso!');
+    } catch (error: any) {
+      console.error('[AI Optimization Error]', error);
+      alert('Falha ao otimizar fluxo com IA: ' + (error.response?.data?.message || error.message));
+    } finally {
       setIsAiLoading(false);
-    }, 2800);
+    }
   };
 
   // Exporter Simulators

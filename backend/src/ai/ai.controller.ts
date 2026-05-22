@@ -97,5 +97,27 @@ export class AiController {
             throw new BadRequestException(`Erro na análise de IA: ${error.message}`);
         }
     }
+
+    @Post('gestao/cadeia-valor/gerar')
+    async gerarCadeiaValor(@Body() body: { officeArea: string, prompt?: string }) {
+        console.log('[AI Controller] Gerando cadeia de valor. Área:', body.officeArea);
+        try {
+            return await this.aiService.generateValueChain(body.officeArea, body.prompt);
+        } catch (error: any) {
+            console.error('[AI Controller] Erro ao gerar cadeia de valor:', error.message);
+            throw new BadRequestException(`Erro ao gerar cadeia de valor: ${error.message}`);
+        }
+    }
+
+    @Post('gestao/briefing/otimizar')
+    async otimizarBriefing(@Body() body: { processId: string, nodes: any[], connections: any[], details: any }) {
+        console.log('[AI Controller] Otimizando briefing. ID:', body.processId);
+        try {
+            return await this.aiService.optimizeBPMNProcess(body.processId, body.nodes, body.connections, body.details);
+        } catch (error: any) {
+            console.error('[AI Controller] Erro ao otimizar briefing:', error.message);
+            throw new BadRequestException(`Erro ao otimizar briefing: ${error.message}`);
+        }
+    }
 }
 

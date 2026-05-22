@@ -30,7 +30,7 @@ export class AiService {
 
   // ... (rest of private methods)
 
-  private async callOpenRouter(messages: any[], jsonMode: boolean = false) {
+  private async callOpenRouter(messages: any[], jsonMode: boolean = false, model: string = 'google/gemini-2.0-flash-001') {
     if (!this.openRouterKey) {
       throw new Error('AI Service not initialized. Check API Key.');
     }
@@ -45,7 +45,7 @@ export class AiService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.0-flash-001',
+          model: model,
           messages: messages,
         })
       });
@@ -434,6 +434,112 @@ export class AiService {
     } catch (e) {
       this.logger.error('Failed to parse suggested tasks from AI', cleanResult);
       return [];
+    }
+  }
+
+  // NEW: Generate customized Mindmap Value Chain using Llama 3.1 70B
+  async generateValueChain(officeArea: string, prompt?: string) {
+    const userPrompt = prompt ? `\nContexto adicional fornecido pelo usuário: "${prompt}"` : '';
+    const systemPrompt = `
+      Você é um Consultor de Engenharia de Processos e IA de Elite, especializado em estruturar fluxos de valor de escritórios de advocacia no Brasil.
+      Sua missão é gerar um mapeamento estratégico de Cadeia de Valor completo para a área de atuação: "${officeArea}".${userPrompt}
+
+      Você deve planejar os blocos (nodes) divididos em duas categorias:
+      1. "primary" (Atividades-fim do escritório, ex: Atendimento, Triagem, Elaboração de Petições, Distribuição Judicial, Audiências, Execução de Sentenças)
+      2. "support" (Atividades de apoio, ex: Faturamento, Controladoria, Marketing Jurídico, Pós-venda, TI)
+
+      Posicione os blocos no espaço bidimensional (x, y) de forma organizada:
+      - Atividades-fim ("primary") devem fluir sequencialmente na horizontal do início ao fim do processo principal (ex: y entre 80 e 150, x de 80 a 1100).
+      - Atividades de apoio ("support") devem ser posicionadas logo abaixo (ex: y entre 250 e 320, x distribuído cobrindo as áreas de apoio correspondentes).
+
+      RETORNE APENAS um JSON válido com a seguinte estrutura (sem blocos de código markdown \`\`\`):
+      {
+        "nodes": [
+          { "id": "process_id_unico", "label": "Nome curto legível do setor", "category": "primary" | "support", "x": 120, "y": 100 }
+        ],
+        "connections": [
+          { "id": "conn_id_unico", "from": "node_origem", "to": "node_destino", "label": "Ex: Direciona lead" }
+        ]
+      }
+
+      REGRAS:
+      - IDs de processos primários devem ser descritivos como "atendimento", "triagem", "elaboracao", "distribuicao", "audiencia", "financeiro", "pos_venda", etc.
+      - Crie entre 5 e 8 blocos no total para garantir um mapa rico porém limpo.
+      - As conexões devem representar o fluxo real de trabalho e as transferências de tarefas.
+      - Responda apenas com o JSON puro, sem textos adicionais.
+    `;
+
+    const result = await this.callOpenRouter(
+      [{ role: 'user', content: systemPrompt }], 
+      true, 
+      'meta-llama/llama-3.1-70b-instruct'
+    );
+    let cleanResult = result.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    try {
+      return JSON.parse(cleanResult);
+    } catch (e) {
+      this.logger.error('Failed to parse generateValueChain JSON from AI', cleanResult);
+      throw new Error('A IA não retornou um formato de Cadeia de Valor válido. Tente novamente.');
+    }
+  }
+
+  // NEW: Optimize BPMN Process Whiteboard using Llama 3.1 70B
+  async optimizeBPMNProcess(processId: string, currentNodes: any[], currentConnections: any[], details: any) {
+    const systemPrompt = `
+      Você é um Engenheiro de Processos Jurídicos Sênior e Especialista em Automação (BPMN).
+      Sua missão é receber um fluxo atual de trabalho de um setor de advocacia, analisá-lo e retornar uma versão OTIMIZADA.
+      Você deve propor melhorias práticas inserindo automações por IA, robôs ou integrações automáticas, ajustando regras de negócio e governança.
+
+      PROCESSO ATUAL (ID: ${processId}):
+      - Etapas (Nodes): ${JSON.stringify(currentNodes)}
+      - Conectores (Connections): ${JSON.stringify(currentConnections)}
+      - Detalhes (Details): ${JSON.stringify(details)}
+
+      Você deve otimizar o fluxo e as raias de responsabilidades:
+      - Adicione novas etapas se faltar validações críticas (ex: LGPD, integridade cadastral).
+      - Transforme etapas manuais repetitivas em tarefas automáticas ("service") executadas por robôs.
+      - Insira gateways de decisão se houver bifurcações de sucesso/erro.
+      - Mantenha o posicionamento x e y limpo, cobrindo raias (de cima para baixo: Secretaria/Triagem, Advogado, Parceiros/Sistemas, etc. - y variando de 80 a 300).
+      
+      RETORNE APENAS um JSON válido com esta estrutura exata (sem markdown \`\`\`):
+      {
+        "nodes": [
+          { "id": "string", "type": "start|task|gateway|data|end", "label": "Nome curto", "x": 120, "y": 100, "taskType": "user|service|send|receive" }
+        ],
+        "connections": [
+          { "id": "string", "from": "string", "to": "string", "label": "Rótulo opcional" }
+        ],
+        "details": {
+          "objective": "Objetivo refinado",
+          "owner": "Dono do processo",
+          "actors": "Atores mapeados",
+          "rules": "Regras de negócio e SLAs de tempos de respostas refinados",
+          "dataCollected": "Dados coletados (exigidos)",
+          "systemsUsed": "Sistemas e APIs sugeridos para automação",
+          "docsGenerated": "Documentos e relatórios gerados"
+        }
+      }
+
+      REGRAS:
+      - Todos os nós devem ter coordenadas x e y válidas e do tipo number.
+      - O campo type dos nós só aceita: "start", "task", "gateway", "data", "end".
+      - O campo taskType (apenas para type: "task") só aceita: "user", "service", "send", "receive".
+      - Responda apenas com o JSON puro, sem textos adicionais.
+    `;
+
+    const result = await this.callOpenRouter(
+      [{ role: 'user', content: systemPrompt }], 
+      true, 
+      'meta-llama/llama-3.1-70b-instruct'
+    );
+    let cleanResult = result.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    try {
+      return JSON.parse(cleanResult);
+    } catch (e) {
+      this.logger.error('Failed to parse optimizeBPMNProcess JSON from AI', cleanResult);
+      throw new Error('A IA não retornou um formato de Processo BPMN otimizado válido. Tente novamente.');
     }
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import { 
   Network, 
   Plus, 
@@ -73,6 +74,11 @@ export default function CadeiaValorPage() {
   const [connFrom, setConnFrom] = useState('');
   const [connTo, setConnTo] = useState('');
   const [connLabel, setConnLabel] = useState('');
+
+  // AI Prompt Modal States
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiOfficeArea, setAiOfficeArea] = useState('Direito de Família');
+  const [aiPrompt, setAiPrompt] = useState('');
 
   // UI States
   const [zoom, setZoom] = useState(1);
@@ -280,45 +286,43 @@ export default function CadeiaValorPage() {
     }
   };
 
-  // AI Agent Mappings Simulation
-  const handleGenerateWithAgent = () => {
+  // AI Agent Mappings using real Llama 3.1 70B Endpoint
+  const handleGenerateWithAgent = async () => {
     setIsAiLoading(true);
-    setAiStatusMsg('Agente analisando a estrutura de processos jurídicos do seu escritório...');
+    setAiStatusMsg('O Llama 3.1 70B está analisando a área selecionada e modelando os processos do escritório...');
     
-    setTimeout(() => {
-      setAiStatusMsg('Estruturando a cadeia de valor otimizada (Cível, Trabalhista e Previdenciário)...');
-    }, 1200);
+    try {
+      const response = await api.post('/ai/gestao/cadeia-valor/gerar', {
+        officeArea: aiOfficeArea || 'Direito de Família',
+        prompt: aiPrompt
+      });
 
-    setTimeout(() => {
-      setAiStatusMsg('Criando fluxos de dados e alinhando canais de leads...');
-    }, 2400);
+      const { nodes: aiNodes, connections: aiConns } = response.data;
 
-    setTimeout(() => {
-      // Premium target mindmap layout
-      const aiNodes: ProcessNode[] = [
-        { id: 'triagem', label: 'Triagem e Qualificação', category: 'principal', description: 'Análise de viabilidade jurídica e qualificação preliminar dos leads de entrada.', x: 120, y: 150 },
-        { id: 'trabalhista', label: 'Assessoria Trabalhista', category: 'principal', description: 'Análise preventiva trabalhista e representação judicial em dissídios e defesas.', x: 120, y: 280 },
-        { id: 'previdenciario', label: 'Assessoria Previdenciária', category: 'principal', description: 'Cálculo de tempo de contribuição, planejamento e requerimento de benefícios.', x: 120, y: 410 },
-        { id: 'atendimento', label: 'Atendimento ao Cliente', category: 'principal', description: 'Realizar o primeiro contato com potenciais clientes, entendendo suas demandas e cadastrando no CRM.', x: 480, y: 280 },
-        { id: 'fechamento', label: 'Fechamento de Contratos', category: 'principal', description: 'Geração e negociação de propostas comerciais, honorários e coleta de assinaturas digitais.', x: 840, y: 280 },
-        { id: 'gestao_casos', label: 'Gestão de Casos Jurídicos', category: 'principal', description: 'Acompanhamento de prazos, andamento de processos judiciais e notificações processuais.', x: 1200, y: 280 },
-        { id: 'financeiro', label: 'Financeiro e Custos', category: 'apoio', description: 'Faturamento de honorários, controle de fluxo de caixa, pagamentos e planejamento.', x: 480, y: 520 },
-        { id: 'compliance', label: 'Compliance & LGPD', category: 'apoio', description: 'Controle de políticas de dados, auditorias internas e parametrizações operacionais.', x: 840, y: 520 }
-      ];
+      const mappedNodes: ProcessNode[] = (aiNodes || []).map((n: any) => ({
+        id: n.id || `node_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        label: n.label || 'Setor Sem Nome',
+        category: n.category === 'support' ? 'apoio' : 'principal',
+        description: n.description || `Mapeamento operacional da etapa de ${n.label || 'processo'}.`,
+        x: Number(n.x) || 200,
+        y: Number(n.y) || 200
+      }));
 
-      const aiConns: Connection[] = [
-        { id: 'c1', from: 'triagem', to: 'atendimento', label: 'Gera leads' },
-        { id: 'c2', from: 'trabalhista', to: 'atendimento', label: 'Aciona demandas trabalhistas' },
-        { id: 'c3', from: 'previdenciario', to: 'atendimento', label: 'Filtra clientes previdenciários' },
-        { id: 'c4', from: 'atendimento', to: 'fechamento', label: 'Gera propostas de honorários' },
-        { id: 'c5', from: 'fechamento', to: 'gestao_casos', label: 'Distribui ação em juízo' },
-        { id: 'c6', from: 'fechamento', to: 'financeiro', label: 'Fatura guias e parcelas' },
-        { id: 'c7', from: 'gestao_casos', to: 'compliance', label: 'Valida logs de segurança do processo' }
-      ];
+      const mappedConns: Connection[] = (aiConns || []).map((c: any) => ({
+        id: c.id || `conn_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        from: c.from,
+        to: c.to,
+        label: c.label || 'Direcionamento de fluxo'
+      }));
 
-      saveState(aiNodes, aiConns);
+      saveState(mappedNodes, mappedConns);
+      setShowAiModal(false);
+    } catch (error: any) {
+      console.error('[AI Chain Generation Error]', error);
+      alert('Falha ao gerar mapeamento estratégico com a IA: ' + (error.response?.data?.message || error.message));
+    } finally {
       setIsAiLoading(false);
-    }, 3600);
+    }
   };
 
   // Undo/Redo handlers
@@ -389,7 +393,7 @@ export default function CadeiaValorPage() {
         <div className="flex items-center gap-3">
           {/* AI trigger */}
           <button 
-            onClick={handleGenerateWithAgent}
+            onClick={() => setShowAiModal(true)}
             disabled={isAiLoading}
             className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#4F73F5] to-[#7C3AED] hover:from-[#4062E0] hover:to-[#6D28D9] text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/10 disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
@@ -756,7 +760,7 @@ export default function CadeiaValorPage() {
                     Arrastar processos do menu lateral para o quadro para desenhar o mapa do seu escritório.
                   </p>
                   <button 
-                    onClick={handleGenerateWithAgent}
+                    onClick={() => setShowAiModal(true)}
                     className="flex items-center gap-1.5 px-4 py-2 bg-[#4F73F5]/20 hover:bg-[#4F73F5]/30 text-[#4F73F5] dark:text-[#6D8CFF] border border-[#4F73F5]/20 rounded-xl text-xs font-bold"
                   >
                     <Sparkles size={13} />
@@ -789,6 +793,64 @@ export default function CadeiaValorPage() {
             <h3 className="text-base font-bold text-white mb-2 tracking-tight">Agente IA de Processos</h3>
             <p className="text-xs text-slate-300 dark:text-slate-400 font-medium max-w-xs leading-relaxed animate-pulse">{aiStatusMsg}</p>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: CONFIGURAÇÃO DE IA LLAMA 3.1 */}
+      <AnimatePresence>
+        {showAiModal && (
+          <div className="fixed inset-0 bg-black/60 z-[120] flex items-center justify-center p-4 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={16} className="text-purple-500 animate-pulse" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white">Gerar com Agente Llama 3.1 70B</h3>
+                </div>
+                <button 
+                  onClick={() => setShowAiModal(false)}
+                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white"
+                >
+                  Fechar
+                </button>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Área Jurídica do Escritório</label>
+                  <input
+                    type="text"
+                    value={aiOfficeArea}
+                    onChange={(e) => setAiOfficeArea(e.target.value)}
+                    placeholder="Ex: Direito Trabalhista, Direito Tributário, Cível..."
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Contexto Adicional (Opcional)</label>
+                  <textarea
+                    rows={3}
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    placeholder="Ex: Foque na automação de petições iniciais, triagem rápida e compliance com a LGPD no pós-venda..."
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 resize-none focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleGenerateWithAgent}
+                className="w-full py-3 bg-gradient-to-r from-[#4F73F5] to-[#7C3AED] hover:from-[#4062E0] hover:to-[#6D28D9] text-white rounded-xl text-xs font-bold transition-all shadow-lg"
+              >
+                Gerar Cadeia Estratégica Completa
+              </button>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
