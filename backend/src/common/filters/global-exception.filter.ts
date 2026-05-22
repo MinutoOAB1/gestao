@@ -81,10 +81,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             error,
         };
 
-        // ALWAYS include stack trace and detailed error for quick production diagnostics
-        if (exception instanceof Error) {
+        // Include stack trace in development
+        if (process.env.NODE_ENV !== 'production' && exception instanceof Error) {
             errorResponse.stack = exception.stack;
-            errorResponse.message = exception.message;
         }
 
         // Log all errors
