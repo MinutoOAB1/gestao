@@ -2,39 +2,38 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Workflow, 
-  ArrowLeft, 
-  Save, 
-  Sparkles, 
-  Download, 
-  Share2, 
-  Plus, 
-  Trash2, 
-  Settings, 
-  Database, 
+  Play, 
+  CheckSquare, 
   HelpCircle, 
-  AlertCircle,
-  Clock,
-  User,
-  Users,
-  Compass,
+  Database, 
+  Square,
+  Sparkles,
+  Download,
   FileCode,
-  Layout,
-  Maximize2,
-  Minimize2,
-  FileText
+  Image as ImageIcon,
+  FileText,
+  RotateCcw,
+  Save,
+  Plus,
+  Trash2,
+  Settings,
+  ListTodo,
+  ShieldAlert,
+  ArrowLeft,
+  Calendar,
+  Clock,
+  History as HistoryIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// BPMN Node Types
-type BpmnNodeType = 'start' | 'task' | 'gateway' | 'datastore' | 'end';
+import { useTheme } from '../../context/ThemeContext';
 
 interface BpmnNode {
   id: string;
-  type: BpmnNodeType;
+  type: 'start' | 'task' | 'gateway' | 'data' | 'end';
   label: string;
   x: number;
   y: number;
-  taskType?: 'user' | 'service' | 'script';
+  taskType?: 'user' | 'service' | 'send' | 'receive';
 }
 
 interface BpmnConnection {
@@ -44,7 +43,7 @@ interface BpmnConnection {
   label?: string;
 }
 
-interface ProcessDetails {
+interface DetailState {
   objective: string;
   owner: string;
   actors: string;
@@ -54,618 +53,760 @@ interface ProcessDetails {
   docsGenerated: string;
 }
 
+// Function to serve contextual BPMN process templates based on Mindmap ID
+const getDefaultBPMNData = (processId: string) => {
+  switch (processId) {
+    case 'triagem':
+      return {
+        nodes: [
+          { id: 't_start', type: 'start', label: 'Lead Recebido', x: 80, y: 120 },
+          { id: 't_task1', type: 'task', label: 'Verificar Score Cadastral via API', x: 230, y: 100, taskType: 'service' },
+          { id: 't_task2', type: 'task', label: 'Validar Conflito de Interesses', x: 450, y: 100, taskType: 'user' },
+          { id: 't_gateway', type: 'gateway', label: 'Score Aprovado?', x: 670, y: 100 },
+          { id: 't_task3', type: 'task', label: 'Agendar Entrevista com Advogado', x: 800, y: 100, taskType: 'user' },
+          { id: 't_task4', type: 'task', label: 'Recusar Lead via WhatsApp', x: 800, y: 250, taskType: 'service' },
+          { id: 't_end1', type: 'end', label: 'Fim: Lead Triado', x: 1050, y: 120 },
+          { id: 't_end2', type: 'end', label: 'Fim: Lead Negado', x: 1050, y: 270 }
+        ],
+        connections: [
+          { id: 'tc1', from: 't_start', to: 't_task1' },
+          { id: 'tc2', from: 't_task1', to: 't_task2' },
+          { id: 'tc3', from: 't_task2', to: 't_gateway' },
+          { id: 'tc4', from: 't_gateway', to: 't_task3', label: 'Sim' },
+          { id: 'tc5', from: 't_gateway', to: 't_task4', label: 'Não' },
+          { id: 'tc6', from: 't_task3', to: 't_end1' },
+          { id: 'tc7', from: 't_task4', to: 't_end2' }
+        ],
+        details: {
+          objective: 'Realizar a primeira triagem técnica, comercial e de compliance dos leads que entram no escritório.',
+          owner: 'Setor de Admissões (Intake)',
+          actors: 'Secretária de Triagem, Dr. Renato Lemos, Robô de Score cadastral',
+          rules: 'Todos os leads novos devem passar pela consulta de score em menos de 15 minutos úteis. Demandas fora da área do escritório devem ser sumariamente recusadas.',
+          dataCollected: 'Nome do interessado, CPF/CNPJ, E-mail, Resumo do caso, Score cadastral.',
+          systemsUsed: 'CRM Interno, WhatsApp Business Sandbox, API Receita Federal.',
+          docsGenerated: 'Relatório Preliminar de Triagem de Caso, Termo de Declínio.'
+        }
+      };
+    case 'previdenciario':
+      return {
+        nodes: [
+          { id: 'p_start', type: 'start', label: 'Requerente Previdenciário Recebido', x: 80, y: 120 },
+          { id: 'p_task1', type: 'task', label: 'Importar CNIS do Portal Meu INSS', x: 230, y: 100, taskType: 'service' },
+          { id: 'p_task2', type: 'task', label: 'Calcular Tempo de Contribuição', x: 450, y: 100, taskType: 'user' },
+          { id: 'p_gateway', type: 'gateway', label: 'Atingiu Direito Adquirido?', x: 670, y: 100 },
+          { id: 'p_task3', type: 'task', label: 'Elaborar Requerimento INSS', x: 800, y: 100, taskType: 'user' },
+          { id: 'p_task4', type: 'task', label: 'Simular Regras de Transição', x: 800, y: 250, taskType: 'user' },
+          { id: 'p_end1', type: 'end', label: 'Protocolo de Benefício Efetuado', x: 1050, y: 120 },
+          { id: 'p_end2', type: 'end', label: 'Parecer Planejamento Concluído', x: 1050, y: 270 }
+        ],
+        connections: [
+          { id: 'pc1', from: 'p_start', to: 'p_task1' },
+          { id: 'pc2', from: 'p_task1', to: 'p_task2' },
+          { id: 'pc3', from: 'p_task2', to: 'p_gateway' },
+          { id: 'pc4', from: 'p_gateway', to: 'p_task3', label: 'Sim' },
+          { id: 'pc5', from: 'p_gateway', to: 'p_task4', label: 'Não' },
+          { id: 'pc6', from: 'p_task3', to: 'p_end1' },
+          { id: 'pc7', from: 'p_task4', to: 'p_end2' }
+        ],
+        details: {
+          objective: 'Estruturar o requerimento administrativo de aposentadoria ou benefício no INSS de forma 100% qualificada.',
+          owner: 'Setor de Direito Previdenciário',
+          actors: 'Advogado Previdenciário Sênior, Assistente de Cálculos, Portal Meu INSS',
+          rules: 'Nenhum requerimento de aposentadoria por tempo de contribuição deve ser feito sem a planilha de cálculo de transição anexada ao prontuário.',
+          dataCollected: 'CPF do segurado, Senha GOV.br, Períodos especiais de trabalho (PPP), CNIS completo.',
+          systemsUsed: 'Portal Meu INSS, Calculadora de Tempo Previdenciário, Plataforma Integrada.',
+          docsGenerated: 'Petição Administrativa de Aposentadoria, Parecer de Planejamento Previdenciário.'
+        }
+      };
+    case 'financeiro':
+      return {
+        nodes: [
+          { id: 'f_start', type: 'start', label: 'Contrato Assinado com Cliente', x: 80, y: 120 },
+          { id: 'f_task1', type: 'task', label: 'Gerar Fatura Recorrente no Asaas', x: 230, y: 100, taskType: 'service' },
+          { id: 'f_task2', type: 'task', label: 'Conciliar Entrada com Fluxo de Caixa', x: 450, y: 100, taskType: 'user' },
+          { id: 'f_gateway', type: 'gateway', label: 'Fatura Liquidada?', x: 670, y: 100 },
+          { id: 'f_task3', type: 'task', label: 'Emitir Recibo de Quitação Aut.', x: 800, y: 100, taskType: 'service' },
+          { id: 'f_task4', type: 'task', label: 'Acionar Régua de Cobrança (CRM)', x: 800, y: 250, taskType: 'service' },
+          { id: 'f_end1', type: 'end', label: 'Honorários Liquidados', x: 1050, y: 120 },
+          { id: 'f_end2', type: 'end', label: 'Fluxo em Atraso Gerenciado', x: 1050, y: 270 }
+        ],
+        connections: [
+          { id: 'fc1', from: 'f_start', to: 'f_task1' },
+          { id: 'fc2', from: 'f_task1', to: 'f_task2' },
+          { id: 'fc3', from: 'f_task2', to: 'f_gateway' },
+          { id: 'fc4', from: 'f_gateway', to: 'f_task3', label: 'Sim' },
+          { id: 'fc5', from: 'f_gateway', to: 'f_task4', label: 'Não' },
+          { id: 'fc6', from: 'f_task3', to: 'f_end1' },
+          { id: 'fc7', from: 'f_task4', to: 'f_end2' }
+        ],
+        details: {
+          objective: 'Processar pagamentos de honorários advocatícios contratados, faturando-os pelo Asaas e quitando as pendências.',
+          owner: 'Controladoria e Financeiro',
+          actors: 'Analista Financeiro, API de Cobranças Asaas, Gerente de Conta',
+          rules: 'O faturamento deve ser gerado no mesmo dia da assinatura. Guias judiciais levantadas devem ter repasse em até 48 horas úteis.',
+          dataCollected: 'Dados de cobrança do cliente, valor do contrato, conta bancária de destino, datas de vencimento.',
+          systemsUsed: 'Asaas Pagamentos, Software de Gestão Desk, Planilha de Custos do Processo.',
+          docsGenerated: 'Fatura Bancária, Recibo de Quitação de Honorários, Extrato de Repasse de Valores.'
+        }
+      };
+    default:
+      // Default fallback template: Atendimento ao Cliente
+      return {
+        nodes: [
+          { id: 'start_1', type: 'start', label: 'Início: Novo Cliente', x: 80, y: 120 },
+          { id: 'task_1', type: 'task', label: 'Coleta de Fatos e Documentos', x: 230, y: 100, taskType: 'user' },
+          { id: 'task_2', type: 'task', label: 'Elaboração do Parecer Técnico', x: 450, y: 100, taskType: 'user' },
+          { id: 'gateway_1', type: 'gateway', label: 'Viabilidade Favorável?', x: 670, y: 100 },
+          { id: 'task_3', type: 'task', label: 'Minuta de Ação Judicial', x: 800, y: 100, taskType: 'user' },
+          { id: 'task_4', type: 'task', label: 'Comunicação de Parecer Contrário', x: 800, y: 250, taskType: 'send' },
+          { id: 'end_1', type: 'end', label: 'Fim: Caso Distribuído', x: 1050, y: 120 },
+          { id: 'end_2', type: 'end', label: 'Fim: Processo Encerrado', x: 1050, y: 270 }
+        ],
+        connections: [
+          { id: 'conn_1', from: 'start_1', to: 'task_1' },
+          { id: 'conn_2', from: 'task_1', to: 'task_2' },
+          { id: 'conn_3', from: 'task_2', to: 'gateway_1' },
+          { id: 'conn_4', from: 'gateway_1', to: 'task_3', label: 'Sim' },
+          { id: 'conn_5', from: 'gateway_1', to: 'task_4', label: 'Não' },
+          { id: 'conn_6', from: 'task_3', to: 'end_1' },
+          { id: 'conn_7', from: 'task_4', to: 'end_2' }
+        ],
+        details: {
+          objective: 'Coletar relatos de potenciais clientes cíveis/trabalhistas para estruturar o parecer de admissibilidade técnico.',
+          owner: 'Departamento Cível e Operações',
+          actors: 'Advogado Geral, Estagiário Técnico, Consultor Associado',
+          rules: 'Todos os pareceres de viabilidade devem ser validados por um advogado sênior antes da resposta comercial final.',
+          dataCollected: 'RG/CPF, comprovante de residência, documentos comprobatórios, relato escrito dos fatos.',
+          systemsUsed: 'Plataforma Geral, Pasta no Workspace do Cliente, Editor de Minutas.',
+          docsGenerated: 'Parecer Jurídico de Admissibilidade, Ficha Cadastral do Cliente.'
+        }
+      };
+  }
+};
+
 export default function BriefingPage() {
   const { id = 'atendimento' } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
-  // Tab State
-  const [activeTab, setActiveTab] = useState<'bpmn' | 'details' | 'lifecycle' | 'history'>('bpmn');
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  // BPMN Canvas State
+  // Whiteboard Canvas State
   const [nodes, setNodes] = useState<BpmnNode[]>([]);
   const [connections, setConnections] = useState<BpmnConnection[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [activeDragNodeId, setActiveDragNodeId] = useState<string | null>(null);
+  const [connectingNodeId, setConnectingNodeId] = useState<string | null>(null);
   
-  // Swimlanes
-  const [swimlanes, setSwimlanes] = useState<string[]>([
-    'Coordenador de Atendimento ao Cliente',
-    'Advogado Responsável'
-  ]);
-  
-  // Form State
-  const [details, setDetails] = useState<ProcessDetails>({
-    objective: 'Realizar o primeiro contato com potenciais clientes, entendendo suas demandas iniciais e cadastrando no CRM.',
-    owner: 'Coordenador de Atendimento / Flatin Sociedade de Advocacia',
-    actors: 'Secretária(o), Advogado(a) Plantonista, Inteligência Artificial',
-    rules: 'Retornar o contato em no máximo 15 minutos. Caso o lead seja qualificado para cível/trabalhista, agendar reunião.',
-    dataCollected: 'Nome Completo, WhatsApp, E-mail, Relato dos Fatos, Documento de Identidade, Comprovante de Residência.',
-    systemsUsed: 'CRM LegalDesk, WhatsApp Business API, Google Drive.',
-    docsGenerated: 'Ficha de Pré-Cadastro, Ficha de Qualificação do Caso.'
+  // Custom swimlanes
+  const [swimlanes, setSwimlanes] = useState<string[]>(['Secretaria / Triagem', 'Advogado Associado', 'Parceiros / Sistemas']);
+
+  // Tabs & Forms
+  const [activeTab, setActiveTab] = useState<'bpmn' | 'details' | 'lifecycle' | 'history'>('bpmn');
+  const [details, setDetails] = useState<DetailState>({
+    objective: '',
+    owner: '',
+    actors: '',
+    rules: '',
+    dataCollected: '',
+    systemsUsed: '',
+    docsGenerated: ''
   });
 
   // History timeline log
-  const [historyLogs, setHistoryLogs] = useState<Array<{ id: string; date: string; action: string; author: string }>>([
-    { id: 'h1', date: '21/05/2026 19:30', action: 'Fluxo BPMN otimizado com triagem de IA', author: 'Dr. Flatin' },
-    { id: 'h2', date: '18/05/2026 14:15', action: 'Atualização de campos de triagem e regras', author: 'Dra. Victória' },
-    { id: 'h3', date: '15/05/2026 09:00', action: 'Criação do briefing e mapeamento inicial do setor', author: 'Admin' }
-  ]);
+  const [historyLogs, setHistoryLogs] = useState<Array<{ time: string; author: string; action: string }>>([]);
 
-  // UI States
+  // Zoom / Offset
   const [zoom, setZoom] = useState(1);
-  const [activeDragId, setActiveDragId] = useState<string | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [isConnectingMode, setIsConnectingMode] = useState(false);
-  const [connectFromId, setConnectFromId] = useState<string | null>(null);
-  
-  // AI Loader
-  const [isAiProcessing, setIsAiProcessing] = useState(false);
-  const [aiStatusText, setAiStatusText] = useState('');
-  
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
 
-  // Get localized label for titles
-  const getProcessLabel = () => {
-    switch (id) {
-      case 'triagem': return 'Triagem e Qualificação';
-      case 'previdenciario': return 'Assessoria Previdenciária';
-      case 'trabalhista': return 'Assessoria Trabalhista';
-      case 'fechamento': return 'Fechamento de Contratos';
-      case 'financeiro': return 'Financeiro e Custos';
-      case 'atendimento': return 'Atendimento ao Cliente';
-      default: 
-        return id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-  };
-
-  // Load state from localStorage on mount
+  // Load state on mount or id changes
   useEffect(() => {
     const savedNodes = localStorage.getItem(`bpmn-nodes-${id}`);
     const savedConns = localStorage.getItem(`bpmn-connections-${id}`);
     const savedDetails = localStorage.getItem(`bpmn-details-${id}`);
+    const savedHistory = localStorage.getItem(`bpmn-history-${id}`);
+    const savedLanes = localStorage.getItem(`bpmn-lanes-${id}`);
     
+    // Load dynamic contextual templates if no localStorage data exists yet
     if (savedNodes && savedConns) {
       try {
         setNodes(JSON.parse(savedNodes));
         setConnections(JSON.parse(savedConns));
       } catch (e) {}
     } else {
-      // Set a perfect default BPMN diagram based on the image
-      const initialNodes: BpmnNode[] = [
-        { id: 'b_start', type: 'start', label: 'Solicitação de Atendimento Recebida', x: 80, y: 120 },
-        { id: 'b_task1', type: 'task', label: 'Registrar Solicitação no CRM', x: 260, y: 100, taskType: 'service' },
-        { id: 'b_task2', type: 'task', label: 'Realizar Triagem Inicial e Entrevista', x: 500, y: 100, taskType: 'user' },
-        { id: 'b_gateway', type: 'gateway', label: 'Necessidade Identificada?', x: 740, y: 100 },
-        { id: 'b_task3', type: 'task', label: 'Elaborar Proposta e Agendar Consulta', x: 880, y: 220, taskType: 'user' },
-        { id: 'b_end', type: 'end', label: 'Atendimento Finalizado', x: 1120, y: 240 }
-      ];
-
-      const initialConns: BpmnConnection[] = [
-        { id: 'bc1', from: 'b_start', to: 'b_task1' },
-        { id: 'bc2', from: 'b_task1', to: 'b_task2' },
-        { id: 'bc3', from: 'b_task2', to: 'b_gateway' },
-        { id: 'bc4', from: 'b_gateway', to: 'b_task3', label: 'Sim' },
-        { id: 'bc5', from: 'b_task3', to: 'b_end' }
-      ];
-
-      setNodes(initialNodes);
-      setConnections(initialConns);
+      const template = getDefaultBPMNData(id);
+      setNodes(template.nodes);
+      setConnections(template.connections);
+      setDetails(template.details);
     }
-
+    
     if (savedDetails) {
       try {
         setDetails(JSON.parse(savedDetails));
       } catch (e) {}
+    } else if (savedNodes && savedConns) {
+      // Just fallback details if custom data but details missing
+      const template = getDefaultBPMNData(id);
+      setDetails(template.details);
+    }
+
+    if (savedLanes) {
+      try {
+        setSwimlanes(JSON.parse(savedLanes));
+      } catch (e) {}
+    } else {
+      setSwimlanes(['Secretaria / Triagem', 'Advogado Associado', 'Parceiros / Sistemas']);
+    }
+
+    if (savedHistory) {
+      try {
+        setHistoryLogs(JSON.parse(savedHistory));
+      } catch (e) {}
+    } else {
+      setHistoryLogs([
+        { time: 'Há 1 dia', author: 'Dr. Renato Lemos', action: 'Mapeou o fluxo estratégico inicial da cadeia' },
+        { time: 'Há 5 horas', author: 'Sistema (MinutaAI)', action: 'Mapeamento automatizado via prompt do advogado' }
+      ]);
     }
   }, [id]);
 
-  // Save current values to localStorage
-  const handleSave = () => {
-    localStorage.setItem(`bpmn-nodes-${id}`, JSON.stringify(nodes));
-    localStorage.setItem(`bpmn-connections-${id}`, JSON.stringify(connections));
-    localStorage.setItem(`bpmn-details-${id}`, JSON.stringify(details));
+  // Save current state
+  const saveState = (updatedNodes: BpmnNode[], updatedConns: BpmnConnection[], updatedDetails?: DetailState) => {
+    setNodes(updatedNodes);
+    setConnections(updatedConns);
+    localStorage.setItem(`bpmn-nodes-${id}`, JSON.stringify(updatedNodes));
+    localStorage.setItem(`bpmn-connections-${id}`, JSON.stringify(updatedConns));
     
-    // Add history entry
+    if (updatedDetails) {
+      setDetails(updatedDetails);
+      localStorage.setItem(`bpmn-details-${id}`, JSON.stringify(updatedDetails));
+    }
+  };
+
+  const logRevision = (action: string) => {
     const newLog = {
-      id: `h_${Date.now()}`,
-      date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
-      action: 'Alterações salvas manualmente pelo advogado',
-      author: 'Usuário Conectado'
+      time: 'Agora mesmo',
+      author: 'Você (Advogado)',
+      action
     };
     const updatedLogs = [newLog, ...historyLogs];
     setHistoryLogs(updatedLogs);
-    
-    alert('Processo e fluxograma BPMN salvos com sucesso!');
+    localStorage.setItem(`bpmn-history-${id}`, JSON.stringify(updatedLogs));
   };
 
-  // Add shapes from Toolbox
-  const handleSpawnShape = (type: BpmnNodeType) => {
-    const uniqueId = `${type}_${Date.now()}`;
-    
-    let defaultLabel = 'Nova Forma';
-    let taskType: BpmnNode['taskType'] = undefined;
-    
-    switch (type) {
-      case 'start': defaultLabel = 'Início do Fluxo'; break;
-      case 'task': 
-        defaultLabel = 'Nova Atividade'; 
-        taskType = 'user';
-        break;
-      case 'gateway': defaultLabel = 'Decisão?'; break;
-      case 'datastore': defaultLabel = 'Armazenar Dados'; break;
-      case 'end': defaultLabel = 'Fim do Fluxo'; break;
-    }
-
-    const newNode: BpmnNode = {
-      id: uniqueId,
-      type,
-      label: defaultLabel,
-      x: 300,
-      y: 150,
-      taskType
-    };
-
-    setNodes([...nodes, newNode]);
-    setSelectedNodeId(uniqueId);
-  };
-
-  // Pointer drag event handlers for shapes (React 19 compatible)
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
-    e.stopPropagation();
-    setSelectedNodeId(node.id);
-    
-    if (isConnectingMode) {
-      if (!connectFromId) {
-        setConnectFromId(node.id);
-      } else if (connectFromId !== node.id) {
-        // Connect nodes
+  // Node Dragging inside Canvas (React 19 PointerEvents)
+  const handleNodePointerDown = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
+    if (connectingNodeId) {
+      e.stopPropagation();
+      // Handle click-to-connect instead of dragging
+      if (connectingNodeId !== node.id) {
+        const uniqueId = `bpmn_conn_${Date.now()}`;
         const newConn: BpmnConnection = {
-          id: `bc_${Date.now()}`,
-          from: connectFromId,
-          to: node.id,
-          label: ''
+          id: uniqueId,
+          from: connectingNodeId,
+          to: node.id
         };
-        setConnections([...connections, newConn]);
-        setConnectFromId(null);
-        setIsConnectingMode(false);
+        const updated = [...connections, newConn];
+        saveState(nodes, updated);
+        logRevision(`Conectou o bloco "${nodes.find(n => n.id === connectingNodeId)?.label}" ao bloco "${node.label}"`);
       }
+      setConnectingNodeId(null);
       return;
     }
 
-    setActiveDragId(node.id);
+    e.stopPropagation();
+    setSelectedNodeId(node.id);
+    setActiveDragNodeId(node.id);
+    
     const rect = e.currentTarget.getBoundingClientRect();
     dragOffset.current = {
       x: (e.clientX - rect.left) / zoom,
       y: (e.clientY - rect.top) / zoom
     };
+    
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
-    if (activeDragId !== node.id || !canvasRef.current) return;
+  const handleNodePointerMove = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
+    if (activeDragNodeId !== node.id || !canvasRef.current) return;
     e.stopPropagation();
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
     const x = Math.round((e.clientX - canvasRect.left) / zoom - dragOffset.current.x);
     const y = Math.round((e.clientY - canvasRect.top) / zoom - dragOffset.current.y);
 
-    const updatedNodes = nodes.map(n => 
+    const updated = nodes.map(n => 
       n.id === node.id ? { ...n, x: Math.max(20, x), y: Math.max(20, y) } : n
     );
-    setNodes(updatedNodes);
+    setNodes(updated);
   };
 
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
-    if (activeDragId === node.id) {
+  const handleNodePointerUp = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
+    if (activeDragNodeId === node.id) {
       e.stopPropagation();
-      setActiveDragId(null);
+      setActiveDragNodeId(null);
       e.currentTarget.releasePointerCapture(e.pointerId);
+      saveState(nodes, connections);
     }
   };
 
-  // Edit Node Label on Double Click
-  const handleDoubleClickNode = (node: BpmnNode) => {
-    const newLabel = prompt('Edite a descrição/título da etapa:', node.label);
-    if (newLabel !== null) {
-      setNodes(nodes.map(n => n.id === node.id ? { ...n, label: newLabel } : n));
-    }
+  // Add new shape to Canvas (from toolbox click)
+  const handleAddBpmnShape = (type: 'start' | 'task' | 'gateway' | 'data' | 'end') => {
+    const idStr = `bpmn_${type}_${Date.now()}`;
+    let label = 'Nova Etapa';
+    if (type === 'start') label = 'Início: Novo Caso';
+    if (type === 'gateway') label = 'Decisão?';
+    if (type === 'data') label = 'Base de Dados';
+    if (type === 'end') label = 'Fim do Fluxo';
+
+    const newNode: BpmnNode = {
+      id: idStr,
+      type,
+      label,
+      x: 150,
+      y: 180,
+      taskType: type === 'task' ? 'user' : undefined
+    };
+
+    const updated = [...nodes, newNode];
+    saveState(updated, connections);
+    setSelectedNodeId(idStr);
+    logRevision(`Adicionou a forma BPMN do tipo "${type.toUpperCase()}" ao quadro`);
   };
 
-  // Delete selected node
+  // Delete node from Canvas
   const handleDeleteNode = (nodeId: string) => {
-    setNodes(nodes.filter(n => n.id !== nodeId));
-    setConnections(connections.filter(c => c.from !== nodeId && c.to !== nodeId));
-    if (selectedNodeId === nodeId) setSelectedNodeId(null);
+    if (confirm('Deseja remover esta etapa do diagrama BPMN?')) {
+      const filteredNodes = nodes.filter(n => n.id !== nodeId);
+      const filteredConns = connections.filter(c => c.from !== nodeId && c.to !== nodeId);
+      saveState(filteredNodes, filteredConns);
+      if (selectedNodeId === nodeId) setSelectedNodeId(null);
+      logRevision('Excluiu um elemento e suas conexões associadas do quadro');
+    }
   };
 
-  // Toggle connection mode
-  const handleStartConnection = () => {
-    setIsConnectingMode(true);
-    setConnectFromId(null);
+  // Edit node label
+  const handleEditLabel = (nodeId: string, newLabel: string) => {
+    const updated = nodes.map(n => n.id === nodeId ? { ...n, label: newLabel } : n);
+    saveState(updated, connections);
   };
 
-  // "Atualizar com IA" Simulation
-  const handleAiUpdate = () => {
-    setIsAiProcessing(true);
-    setAiStatusText('Agente de Processos IA revisando seu diagrama de fluxo...');
-    
-    setTimeout(() => {
-      setAiStatusText('Identificando gargalos de triagem jurídica...');
-    }, 1000);
+  // Toggle task type
+  const handleToggleTaskType = (nodeId: string, type: 'user' | 'service' | 'send' | 'receive') => {
+    const updated = nodes.map(n => n.id === nodeId ? { ...n, taskType: type } : n);
+    saveState(updated, connections);
+  };
 
+  // Trigger AI layout refactoring simulator
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const handleOptimizeWithAi = () => {
+    setIsAiLoading(true);
     setTimeout(() => {
-      setAiStatusText('Implementando Gateway de qualificação técnica por IA e base de dados...');
-    }, 2000);
-
-    setTimeout(() => {
-      // Enhanced BPMN flowchart generated by AI
-      const aiNodes: BpmnNode[] = [
-        { id: 'b_start', type: 'start', label: 'Solicitação de Atendimento Recebida', x: 80, y: 120 },
-        { id: 'b_task1', type: 'task', label: 'Registrar Solicitação no CRM', x: 260, y: 100, taskType: 'service' },
-        { id: 'b_task2', type: 'task', label: 'Triagem Técnica com IA Generativa', x: 500, y: 100, taskType: 'service' },
-        { id: 'b_gateway', type: 'gateway', label: 'Cliente possui viabilidade jurídica?', x: 760, y: 100 },
-        { id: 'b_task3', type: 'task', label: 'Agendar Consulta com Especialista', x: 920, y: 100, taskType: 'user' },
-        { id: 'b_task4', type: 'task', label: 'Enviar Informativo e Arquivar Lead', x: 920, y: 260, taskType: 'service' },
-        { id: 'b_datastore', type: 'datastore', label: 'Banco de Dados Jurídicos', x: 740, y: 380 },
-        { id: 'b_end1', type: 'end', label: 'Lead Encaminhado p/ Fechamento', x: 1160, y: 120 },
-        { id: 'b_end2', type: 'end', label: 'Lead Arquivado', x: 1160, y: 280 }
+      // Create a premium optimized flow with gateways and automated tasks
+      const optimizedNodes: BpmnNode[] = [
+        { id: 'start_opt', type: 'start', label: 'Início: Novo Lead Previdenciário', x: 80, y: 120 },
+        { id: 'task_opt1', type: 'task', label: 'Validação de CPF por API do Governo', x: 230, y: 100, taskType: 'service' },
+        { id: 'task_opt2', type: 'task', label: 'Análise de Vínculos Trabalhistas', x: 450, y: 100, taskType: 'user' },
+        { id: 'gate_opt', type: 'gateway', label: 'Requisitos Cumpridos?', x: 670, y: 100 },
+        { id: 'task_opt3', type: 'task', label: 'Minuta Gerada Automaticamente', x: 800, y: 100, taskType: 'service' },
+        { id: 'task_opt4', type: 'task', label: 'Enviar Relatório de Inelegibilidade', x: 800, y: 250, taskType: 'send' },
+        { id: 'end_opt1', type: 'end', label: 'Sucesso: Caso Distribuído', x: 1050, y: 120 },
+        { id: 'end_opt2', type: 'end', label: 'Fim: Recusado por Falta de Requisitos', x: 1050, y: 270 }
       ];
 
-      const aiConns: BpmnConnection[] = [
-        { id: 'bc1', from: 'b_start', to: 'b_task1' },
-        { id: 'bc2', from: 'b_task1', to: 'b_task2' },
-        { id: 'bc3', from: 'b_task2', to: 'b_gateway' },
-        { id: 'bc4', from: 'b_gateway', to: 'b_task3', label: 'Sim' },
-        { id: 'bc5', from: 'b_gateway', to: 'b_task4', label: 'Não' },
-        { id: 'bc6', from: 'b_task3', to: 'b_end1' },
-        { id: 'bc7', from: 'b_task4', to: 'b_end2' },
-        { id: 'bc8', from: 'b_task2', to: 'b_datastore', label: 'Salva logs' }
+      const optimizedConns: BpmnConnection[] = [
+        { id: 'c_opt1', from: 'start_opt', to: 'task_opt1' },
+        { id: 'c_opt2', from: 'task_opt1', to: 'task_opt2' },
+        { id: 'c_opt3', from: 'task_opt2', to: 'gate_opt' },
+        { id: 'c_opt4', from: 'gate_opt', to: 'task_opt3', label: 'Sim' },
+        { id: 'c_opt5', from: 'gate_opt', to: 'task_opt4', label: 'Não' },
+        { id: 'c_opt6', from: 'task_opt3', to: 'end_opt1' },
+        { id: 'c_opt7', from: 'task_opt4', to: 'end_opt2' }
       ];
 
-      setNodes(aiNodes);
-      setConnections(aiConns);
-      
-      // Update form rules with intelligent recommendations
-      setDetails({
+      const newDetails = {
         ...details,
-        objective: 'Triagem e qualificação instantânea com IA generativa para otimizar os tempos de resposta e focar a atuação jurídica.',
-        rules: 'Todos os leads de entrada passam pela triagem de IA inicial. Caso a nota de viabilidade técnica seja superior a 7.5/10, o agendamento de consulta de honorários é disparado no calendário do advogado de forma automatizada.',
-        systemsUsed: 'CRM LegalDesk, API Gemini Advanced, WhatsApp Bot Automation.'
-      });
-
-      // Add to timeline
-      const newLog = {
-        id: `h_${Date.now()}`,
-        date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
-        action: 'Fluxograma BPMN otimizado e reestruturado pelo Agente IA',
-        author: 'Antigravity AI Agent'
+        objective: 'Faturamento de honorários advocatícios de forma 100% automatizada com score inteligente.',
+        rules: 'Tempo máximo de resposta de 2 horas. Gateways validados por IA sênior no Asaas/Desk.'
       };
-      setHistoryLogs([newLog, ...historyLogs]);
 
-      setIsAiProcessing(false);
-    }, 3200);
+      saveState(optimizedNodes, optimizedConns, newDetails);
+      logRevision('Refatorou o diagrama BPMN usando Inteligência Artificial de Processos');
+      setIsAiLoading(false);
+    }, 2800);
   };
 
-  // Export mock flow
-  const handleExport = (format: 'xml' | 'png' | 'pdf') => {
-    alert(`Exportando fluxograma de "${getProcessLabel()}" no formato ${format.toUpperCase()}.\nMock gerado com sucesso!`);
+  // Exporter Simulators
+  const [exporterMsg, setExporterMsg] = useState<string | null>(null);
+  const triggerExport = (format: 'XML' | 'PNG' | 'PDF') => {
+    setExporterMsg(`Exportando diagrama como arquivo ${format}...`);
+    setTimeout(() => {
+      setExporterMsg(`Sucesso! O download do seu arquivo ${format} foi iniciado no sandbox.`);
+      setTimeout(() => setExporterMsg(null), 3000);
+    }, 1200);
   };
 
-  // Calculate connection arrows
-  const drawNodeConnector = (conn: BpmnConnection) => {
+  // Draw dynamic path between circular/diamond BPMN shapes
+  const drawBpmnConnection = (conn: BpmnConnection) => {
     const fromNode = nodes.find(n => n.id === conn.from);
     const toNode = nodes.find(n => n.id === conn.to);
     
     if (!fromNode || !toNode) return { path: '', textX: 0, textY: 0 };
 
-    // Set connection offsets depending on shape dimensions
-    const fromWidth = fromNode.type === 'task' ? 180 : fromNode.type === 'gateway' ? 60 : 40;
-    const fromHeight = fromNode.type === 'task' ? 64 : fromNode.type === 'gateway' ? 60 : 40;
-    
-    const toWidth = toNode.type === 'task' ? 180 : toNode.type === 'gateway' ? 60 : 40;
-    const toHeight = toNode.type === 'task' ? 64 : toNode.type === 'gateway' ? 60 : 40;
+    // Standard widths: circular (54px), rectangular (170px), diamond (60px)
+    const getAnchorX = (node: BpmnNode, isSource: boolean) => {
+      if (node.type === 'task') return isSource ? node.x + 170 : node.x;
+      if (node.type === 'gateway') return isSource ? node.x + 60 : node.x;
+      return isSource ? node.x + 54 : node.x;
+    };
 
-    const fromX = fromNode.x + fromWidth;
-    const fromY = fromNode.y + fromHeight / 2;
-    
-    const toX = toNode.x;
-    const toY = toNode.y + toHeight / 2;
+    const getAnchorY = (node: BpmnNode) => {
+      if (node.type === 'task') return node.y + 35;
+      if (node.type === 'gateway') return node.y + 30;
+      return node.y + 27;
+    };
 
+    const fromX = getAnchorX(fromNode, true);
+    const fromY = getAnchorY(fromNode);
+    
+    const toX = getAnchorX(toNode, false);
+    const toY = getAnchorY(toNode);
+
+    // Dynamic S-curve/ortho lines
     const controlOffset = Math.abs(toX - fromX) / 2;
     const path = `M ${fromX} ${fromY} C ${fromX + controlOffset} ${fromY}, ${toX - controlOffset} ${toY}, ${toX} ${toY}`;
 
     const textX = (fromX + toX) / 2;
-    const textY = (fromY + toY) / 2 - 10;
+    const textY = (fromY + toY) / 2 - 8;
 
     return { path, textX, textY };
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#090E17] text-slate-100 select-none overflow-hidden relative">
-      
-      {/* HEADER BAR */}
-      <div className="flex h-16 items-center justify-between px-6 border-b border-white/5 bg-[#0F172A]/70 backdrop-blur-md z-30">
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#090E17] text-slate-800 dark:text-slate-100 select-none overflow-hidden relative">
+      {/* Top Header Panel */}
+      <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0F172A]/70 backdrop-blur-md z-30">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate('/app/gestao/cadeia-valor')}
-            className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-            title="Voltar para Cadeia de Valor"
+            className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
+            title="Voltar ao Mapa da Cadeia de Valor"
           >
             <ArrowLeft size={16} />
           </button>
           
-          <div className="w-[1px] h-6 bg-white/10" />
-
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#4F73F5]/10 rounded-xl">
-              <Workflow size={18} className="text-[#4F73F5]" />
+          <div className="p-2 bg-emerald-500/10 rounded-xl">
+            <Workflow size={20} className="text-emerald-500" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm font-bold tracking-tight text-slate-800 dark:text-white capitalize">Briefing de Processo: {id.replace('_', ' ')}</h1>
+              <span className="text-[8px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded uppercase">BPMN Whiteboard</span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold tracking-tight text-white">{getProcessLabel()}</h1>
-                <span className="text-[8px] font-bold bg-[#4F73F5]/10 text-[#6D8CFF] px-1.5 py-0.5 rounded-md uppercase">Briefing de Processo</span>
-              </div>
-              <p className="text-[10px] text-slate-400">Flatin Sociedade de Advocacia • Mapeamento estratégico BPMN</p>
-            </div>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Modelagem operacional do fluxo de raias, SLAs e ciclo de vida documental</p>
           </div>
         </div>
 
-        {/* Action triggers */}
-        <div className="flex items-center gap-2.5">
+        {/* Tab Controls */}
+        <div className="flex items-center bg-slate-100 dark:bg-[#131B2B] p-1 rounded-xl">
           <button 
-            onClick={handleAiUpdate}
-            disabled={isAiProcessing}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#7C3AED]/10 hover:bg-[#7C3AED]/20 border border-[#7C3AED]/20 text-[#C084FC] rounded-xl text-[11px] font-bold transition-all"
+            onClick={() => setActiveTab('bpmn')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'bpmn' 
+                ? 'bg-white dark:bg-[#1C263A] text-[#4F73F5] dark:text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-800 dark:hover:text-white'
+            }`}
           >
-            <Sparkles size={12} className={isAiProcessing ? 'animate-spin' : ''} />
-            Atualizar com IA
-          </button>
-
-          <div className="w-[1px] h-6 bg-white/10" />
-
-          {/* Exporters */}
-          <button 
-            onClick={() => handleExport('xml')}
-            className="px-2.5 py-1.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/5 text-[10px] font-bold text-slate-300 rounded-lg transition-all"
-          >
-            XML
+            Diagrama BPMN
           </button>
           <button 
-            onClick={() => handleExport('png')}
-            className="px-2.5 py-1.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/5 text-[10px] font-bold text-slate-300 rounded-lg transition-all"
+            onClick={() => setActiveTab('details')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'details' 
+                ? 'bg-white dark:bg-[#1C263A] text-[#4F73F5] dark:text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-800 dark:hover:text-white'
+            }`}
           >
-            PNG
+            Detalhamento do Setor
           </button>
           <button 
-            onClick={() => handleExport('pdf')}
-            className="px-2.5 py-1.5 bg-white/[0.04] hover:bg-white/[0.07] border border-white/5 text-[10px] font-bold text-slate-300 rounded-lg transition-all"
+            onClick={() => setActiveTab('lifecycle')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'lifecycle' 
+                ? 'bg-white dark:bg-[#1C263A] text-[#4F73F5] dark:text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-800 dark:hover:text-white'
+            }`}
           >
-            PDF
+            Ciclo de Vida
           </button>
+          <button 
+            onClick={() => setActiveTab('history')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              activeTab === 'history' 
+                ? 'bg-white dark:bg-[#1C263A] text-[#4F73F5] dark:text-white shadow-sm' 
+                : 'text-slate-400 hover:text-slate-800 dark:hover:text-white'
+            }`}
+          >
+            Histórico
+          </button>
+        </div>
 
-          <div className="w-[1px] h-6 bg-white/10" />
+        {/* Global Toolbar */}
+        <div className="flex items-center gap-2">
+          {activeTab === 'bpmn' && (
+            <button 
+              onClick={handleOptimizeWithAi}
+              disabled={isAiLoading}
+              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-500/10 disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Sparkles size={13} className={isAiLoading ? 'animate-spin' : ''} />
+              Otimizar com IA
+            </button>
+          )}
 
           <button 
-            onClick={handleSave}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#4F73F5] hover:bg-[#4062E0] text-white rounded-xl text-xs font-bold transition-all shadow-md"
+            onClick={() => {
+              localStorage.setItem(`bpmn-nodes-${id}`, JSON.stringify(nodes));
+              localStorage.setItem(`bpmn-connections-${id}`, JSON.stringify(connections));
+              localStorage.setItem(`bpmn-details-${id}`, JSON.stringify(details));
+              logRevision('Salvou as alterações manualmente');
+              alert('Fluxo e formulários salvos com sucesso!');
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#4F73F5] hover:bg-[#4062E0] text-white rounded-xl text-xs font-bold transition-all shadow-md"
           >
-            <Save size={14} />
-            Salvar Briefing
+            <Save size={13} />
+            Salvar
           </button>
         </div>
       </div>
 
-      {/* TABS SELECTOR BAR */}
-      <div className="flex h-11 border-b border-white/5 bg-[#0B1121] px-6 gap-6 z-25">
-        <button 
-          onClick={() => setActiveTab('bpmn')}
-          className={`h-full text-xs font-bold relative transition-all ${
-            activeTab === 'bpmn' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Diagrama BPMN
-          {activeTab === 'bpmn' && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#4F73F5] rounded-t-full" />}
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('details')}
-          className={`h-full text-xs font-bold relative transition-all ${
-            activeTab === 'details' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Detalhamento do Processo
-          {activeTab === 'details' && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#4F73F5] rounded-t-full" />}
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('lifecycle')}
-          className={`h-full text-xs font-bold relative transition-all ${
-            activeTab === 'lifecycle' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Ciclo de Vida da Inf.
-          {activeTab === 'lifecycle' && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#4F73F5] rounded-t-full" />}
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('history')}
-          className={`h-full text-xs font-bold relative transition-all ${
-            activeTab === 'history' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Histórico
-          {activeTab === 'history' && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#4F73F5] rounded-t-full" />}
-        </button>
-      </div>
-
-      {/* TAB CONTENT PANEL */}
+      {/* Main split work space */}
       <div className="flex-1 flex overflow-hidden">
-        
-        {/* ==========================================
-            TAB: DIAGRAMA BPMN (WHITEBOARD CANVAS)
-            ========================================== */}
-        {activeTab === 'bpmn' && (
-          <div className="flex-1 flex overflow-hidden">
-            
-            {/* Left toolbox for shapes */}
-            <div className="w-56 border-r border-white/5 bg-[#0B1121] flex flex-col p-4 space-y-4 flex-shrink-0">
-              <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Elementos BPMN</h3>
-              
-              <div className="space-y-2">
-                {/* Start Shape */}
+        <AnimatePresence mode="wait">
+          
+          {/* TAB 1: BPMN WHITEBOARD */}
+          {activeTab === 'bpmn' && (
+            <motion.div 
+              key="bpmn"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-grow flex overflow-hidden"
+            >
+              {/* Whiteboard toolbox left sidebar */}
+              <div className="w-64 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1121] flex flex-col p-5 space-y-4 flex-shrink-0">
+                <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Formas BPMN</p>
+                
                 <button 
-                  onClick={() => handleSpawnShape('start')}
-                  className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 hover:border-emerald-500/20 hover:bg-white/[0.04] rounded-xl text-left transition-all"
+                  onClick={() => handleAddBpmnShape('start')}
+                  className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-slate-200 dark:border-white/5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all hover:border-emerald-500/20"
                 >
-                  <div className="w-6 h-6 rounded-full border-2 border-emerald-500 bg-emerald-500/10 flex-shrink-0" />
-                  <span className="text-xs font-semibold text-slate-300">Evento de Início</span>
+                  <div className="w-6 h-6 rounded-full border-2 border-emerald-500 flex items-center justify-center bg-emerald-500/10">
+                    <Play size={10} className="text-emerald-500 translate-x-[0.5px]" />
+                  </div>
+                  Início (Start Event)
                 </button>
 
-                {/* Task Shape */}
                 <button 
-                  onClick={() => handleSpawnShape('task')}
-                  className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 hover:border-[#4F73F5]/20 hover:bg-white/[0.04] rounded-xl text-left transition-all"
+                  onClick={() => handleAddBpmnShape('task')}
+                  className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-slate-200 dark:border-white/5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all hover:border-[#4F73F5]/20"
                 >
-                  <div className="w-9 h-6 rounded-md border-2 border-[#4F73F5] bg-[#4F73F5]/10 flex-shrink-0" />
-                  <span className="text-xs font-semibold text-slate-300">Tarefa / Atividade</span>
+                  <div className="w-8 h-6 rounded border border-slate-400 dark:border-[#4F73F5] flex items-center justify-center bg-white dark:bg-[#131B2B] text-[8px] font-bold text-slate-500 dark:text-[#4F73F5]">
+                    Task
+                  </div>
+                  Tarefa (User/Service)
                 </button>
 
-                {/* Gateway Decision Shape */}
                 <button 
-                  onClick={() => handleSpawnShape('gateway')}
-                  className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 hover:border-yellow-500/20 hover:bg-white/[0.04] rounded-xl text-left transition-all"
+                  onClick={() => handleAddBpmnShape('gateway')}
+                  className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-slate-200 dark:border-white/5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all hover:border-yellow-500/20"
                 >
-                  <div className="w-6 h-6 rotate-45 border-2 border-yellow-500 bg-yellow-500/10 flex-shrink-0" />
-                  <span className="text-xs font-semibold text-slate-300">Gateway (Decisão)</span>
+                  <div className="w-6 h-6 border-2 border-yellow-500 rotate-45 flex items-center justify-center bg-yellow-500/10">
+                    <span className="text-[10px] text-yellow-500 -rotate-45 font-black">?</span>
+                  </div>
+                  Decisão (Gateway)
                 </button>
 
-                {/* Database Shape */}
                 <button 
-                  onClick={() => handleSpawnShape('datastore')}
-                  className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 hover:border-slate-500/20 hover:bg-white/[0.04] rounded-xl text-left transition-all"
+                  onClick={() => handleAddBpmnShape('data')}
+                  className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-slate-200 dark:border-white/5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all hover:border-blue-500/20"
                 >
-                  <Database size={20} className="text-slate-400 flex-shrink-0" />
-                  <span className="text-xs font-semibold text-slate-300">Banco de Dados</span>
+                  <Database size={15} className="text-blue-500" />
+                  Base de Dados
                 </button>
 
-                {/* End Shape */}
                 <button 
-                  onClick={() => handleSpawnShape('end')}
-                  className="w-full flex items-center gap-3 p-3 bg-white/[0.02] border border-white/5 hover:border-red-500/20 hover:bg-white/[0.04] rounded-xl text-left transition-all"
+                  onClick={() => handleAddBpmnShape('end')}
+                  className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-slate-200 dark:border-white/5 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-all hover:border-red-500/20"
                 >
-                  <div className="w-6 h-6 rounded-full border-[3px] double border-red-500 bg-red-500/10 flex-shrink-0" />
-                  <span className="text-xs font-semibold text-slate-300">Evento de Fim</span>
+                  <div className="w-6 h-6 rounded-full border-4 border-red-500 flex items-center justify-center bg-red-500/10">
+                    <Square size={8} className="text-red-500" />
+                  </div>
+                  Fim (End Event)
                 </button>
-              </div>
 
-              <div className="h-[1px] bg-white/5 my-2" />
+                <div className="border-t border-slate-200 dark:border-white/5 my-2 pt-4 space-y-3">
+                  <p className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Exportar Diagrama</p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button 
+                      onClick={() => triggerExport('XML')}
+                      className="flex flex-col items-center gap-1 p-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors"
+                    >
+                      <FileCode size={14} className="text-amber-500" />
+                      <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400">XML</span>
+                    </button>
+                    
+                    <button 
+                      onClick={() => triggerExport('PNG')}
+                      className="flex flex-col items-center gap-1 p-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors"
+                    >
+                      <ImageIcon size={14} className="text-[#4F73F5]" />
+                      <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400">PNG</span>
+                    </button>
 
-              <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Ações do Quadro</h3>
-              
-              <button 
-                onClick={handleStartConnection}
-                className={`w-full flex items-center justify-center gap-1.5 py-2.5 border rounded-xl text-xs font-bold transition-all ${
-                  isConnectingMode 
-                    ? 'bg-yellow-500/15 border-yellow-500/30 text-yellow-400' 
-                    : 'bg-[#4F73F5]/10 border-[#4F73F5]/20 text-[#6D8CFF] hover:bg-[#4F73F5]/20'
-                }`}
-              >
-                <Workflow size={13} />
-                {isConnectingMode ? 'Clique em 2 formas' : 'Criar Link Seta'}
-              </button>
+                    <button 
+                      onClick={() => triggerExport('PDF')}
+                      className="flex flex-col items-center gap-1 p-2 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-colors"
+                    >
+                      <FileText size={14} className="text-rose-500" />
+                      <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400">PDF</span>
+                    </button>
+                  </div>
+                </div>
 
-              {selectedNodeId && (
-                <button 
-                  onClick={() => handleDeleteNode(selectedNodeId)}
-                  className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-xl text-xs font-bold transition-all"
-                >
-                  <Trash2 size={13} />
-                  Excluir Selecionado
-                </button>
-              )}
-            </div>
+                {selectedNodeId && (
+                  <div className="border-t border-slate-200 dark:border-white/5 my-2 pt-4 space-y-3 bg-slate-50 dark:bg-[#131B2B]/40 p-3 rounded-2xl border">
+                    {(() => {
+                      const selectedNode = nodes.find(n => n.id === selectedNodeId);
+                      if (!selectedNode) return null;
+                      return (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-black text-[#4F73F5] uppercase tracking-wider">Ajustar Etapa</span>
+                            <button 
+                              onClick={() => handleDeleteNode(selectedNode.id)}
+                              className="text-red-400 hover:text-red-500 transition-colors"
+                              title="Remover"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Rótulo / Nome</label>
+                            <input
+                              type="text"
+                              value={selectedNode.label}
+                              onChange={(e) => handleEditLabel(selectedNode.id, e.target.value)}
+                              className="w-full bg-white dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-[11px] text-slate-800 dark:text-white rounded-lg p-2 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                            />
+                          </div>
 
-            {/* WHITEBOARD BPMN CANVAS AREA */}
-            <div className="flex-1 flex flex-col relative overflow-hidden bg-[#090E17]">
-              
-              {/* Floating guidance banner */}
-              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 p-2.5 rounded-xl bg-[#0F172A]/90 border border-white/5 shadow-2xl backdrop-blur-md max-w-sm">
-                <HelpCircle size={15} className="text-[#4F73F5] flex-shrink-0" />
-                <p className="text-[9px] text-slate-400 leading-normal">
-                  <span className="text-white font-bold">Duplo clique</span> nas formas para renomear. Clique em "Criar Link Seta" para traçar setas direcionais conectando as etapas de fluxo.
-                </p>
-              </div>
+                          {selectedNode.type === 'task' && (
+                            <div className="space-y-1">
+                              <label className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Tipo de Execução</label>
+                              <select
+                                value={selectedNode.taskType || 'user'}
+                                onChange={(e) => handleToggleTaskType(selectedNode.id, e.target.value as any)}
+                                className="w-full bg-white dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-[11px] text-slate-800 dark:text-white rounded-lg p-2 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                              >
+                                <option value="user">Manual / Advogado</option>
+                                <option value="service">Automática / Robô de IA</option>
+                                <option value="send">Enviar Comunicação</option>
+                                <option value="receive">Receber Comunicação</option>
+                              </select>
+                            </div>
+                          )}
 
-              {/* Zoom adjustments */}
-              <div className="absolute bottom-6 left-6 z-20 flex items-center gap-1 p-1 bg-[#0F172A]/90 border border-white/5 rounded-2xl shadow-xl backdrop-blur-md">
-                <button onClick={() => setZoom(z => Math.max(0.5, z - 0.1))} className="p-1.5 text-slate-400 hover:text-white rounded-lg"><Minimize2 size={12} /></button>
-                <span className="text-[9px] font-bold px-2 text-white/50">{Math.round(zoom * 100)}%</span>
-                <button onClick={() => setZoom(z => Math.min(1.5, z + 0.1))} className="p-1.5 text-slate-400 hover:text-white rounded-lg"><Maximize2 size={12} /></button>
-              </div>
-
-              {/* Interactive whiteboard grid layout */}
-              <div 
-                ref={canvasRef}
-                className="flex-1 w-full h-full relative cursor-grab bg-dot-pattern text-slate-700 overflow-hidden"
-                style={{ 
-                  backgroundColor: '#090E17',
-                  color: 'rgba(255, 255, 255, 0.04)'
-                }}
-              >
-                {/* Scaled layer container */}
-                <div 
-                  className="absolute inset-0 origin-top-left p-12 transition-transform duration-100 ease-out"
-                  style={{ transform: `scale(${zoom})` }}
-                >
-                  
-                  {/* SWIMLANES (Raias de atores) */}
-                  <div className="absolute top-0 left-0 w-[2000px] pointer-events-none select-none z-0">
-                    {swimlanes.map((lane, idx) => (
-                      <div 
-                        key={idx} 
-                        className="h-72 border-b border-white/[0.04] flex items-center relative"
-                        style={{ borderTop: idx === 0 ? '1px solid rgba(255, 255, 255, 0.04)' : undefined }}
-                      >
-                        {/* Swimlane Label Banner */}
-                        <div className="absolute left-0 top-0 bottom-0 w-8 bg-[#0F172A] border-r border-white/5 flex items-center justify-center p-2 text-center">
-                          <span className="text-[8px] font-black uppercase tracking-wider text-slate-500 transform -rotate-90 origin-center whitespace-nowrap">
-                            {lane}
-                          </span>
+                          <button 
+                            onClick={() => {
+                              setConnectingNodeId(selectedNode.id);
+                              alert('Clique em outra forma no quadro para criar um conector.');
+                            }}
+                            className="w-full py-1.5 bg-[#4F73F5]/10 hover:bg-[#4F73F5]/20 text-[#4F73F5] dark:text-[#6D8CFF] border border-[#4F73F5]/20 rounded-xl text-[10px] font-bold transition-all"
+                          >
+                            Ligar a outro bloco
+                          </button>
                         </div>
-                      </div>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Whiteboard BPMN Canvas Grid */}
+              <div className="flex-grow relative overflow-hidden bg-[#F8FAFC] dark:bg-[#090E17]">
+                
+                {/* Swimlane lane descriptors (Raias de atores) */}
+                <div className="absolute left-0 top-0 bottom-0 w-[40px] flex flex-col z-10 pointer-events-none">
+                  {swimlanes.map((lane, index) => (
+                    <div 
+                      key={index}
+                      className="flex-1 flex items-center justify-center border-b border-slate-200 dark:border-white/[0.04] bg-slate-100 dark:bg-[#0F172A] border-r border-slate-200 dark:border-white/5"
+                    >
+                      <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest -rotate-90 whitespace-nowrap">
+                        {lane}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Exporter Sandbox notifications */}
+                {exporterMsg && (
+                  <div className="absolute top-4 left-6 z-20 p-3 bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg animate-bounce">
+                    {exporterMsg}
+                  </div>
+                )}
+
+                <div 
+                  ref={canvasRef}
+                  className="w-full h-full relative cursor-grab bg-dot-pattern overflow-hidden pl-[40px]"
+                  style={{ 
+                    backgroundColor: isDark ? '#090E17' : '#F8FAFC',
+                    color: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'
+                  }}
+                >
+                  {/* Outer container of lanes inside canvas */}
+                  <div className="absolute inset-0 flex flex-col z-0 pointer-events-none origin-top-left pl-[40px]">
+                    {swimlanes.map((_, index) => (
+                      <div key={index} className="flex-1 border-b border-slate-200 dark:border-white/[0.04]" />
                     ))}
                   </div>
 
-                  {/* SVG CONNECTING FLOWS */}
-                  <svg className="absolute inset-0 w-[3000px] h-[3000px] pointer-events-none overflow-visible z-5">
+                  {/* SVG CONNECTORS */}
+                  <svg className="absolute inset-0 w-[4000px] h-[4000px] pointer-events-none overflow-visible z-0 pl-[40px]">
                     <defs>
                       <marker
-                        id="bpmn-arrow"
+                        id="bpmn_arrow"
                         viewBox="0 0 10 10"
-                        refX="8"
+                        refX="6"
                         refY="5"
                         markerWidth="6"
                         markerHeight="6"
                         orient="auto-start-reverse"
                       >
-                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4F73F5" />
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill={isDark ? '#4F73F5' : '#3B82F6'} />
                       </marker>
                     </defs>
 
                     {connections.map(conn => {
-                      const { path, textX, textY } = drawNodeConnector(conn);
+                      const { path, textX, textY } = drawBpmnConnection(conn);
                       if (!path) return null;
                       return (
                         <g key={conn.id} className="group pointer-events-auto cursor-pointer">
                           <path
                             d={path}
                             fill="none"
-                            stroke="#4F73F5"
+                            stroke={isDark ? '#4F73F5' : '#3B82F6'}
                             strokeWidth={2}
-                            markerEnd="url(#bpmn-arrow)"
-                            className="transition-all hover:stroke-[#E2B755] hover:stroke-[3px]"
+                            markerEnd="url(#bpmn_arrow)"
+                            className="transition-all hover:stroke-red-500"
                             onClick={() => {
-                              if (confirm('Deseja deletar esta conexão do fluxo?')) {
-                                setConnections(connections.filter(c => c.id !== conn.id));
+                              if (confirm('Deseja deletar esta conexão BPMN?')) {
+                                const filtered = connections.filter(c => c.id !== conn.id);
+                                saveState(nodes, filtered);
+                                logRevision('Removeu um conector de fluxo');
                               }
                             }}
                           />
@@ -674,20 +815,22 @@ export default function BriefingPage() {
                             <>
                               <rect
                                 x={textX - (conn.label.length * 3) - 4}
-                                y={textY - 8}
+                                y={textY - 7}
                                 width={(conn.label.length * 6) + 8}
                                 height={14}
                                 rx={3}
-                                fill="#090E17"
-                                stroke="rgba(79, 115, 245, 0.15)"
+                                fill={isDark ? '#090E17' : '#FFFFFF'}
+                                stroke={isDark ? 'rgba(79, 115, 245, 0.15)' : 'rgba(59, 130, 246, 0.15)'}
+                                strokeWidth={1}
                               />
                               <text
                                 x={textX}
-                                y={textY + 2}
-                                fill="#94A3B8"
+                                y={textY + 3}
+                                fill={isDark ? '#94A3B8' : '#475569'}
                                 fontSize={7}
                                 fontWeight="bold"
                                 textAnchor="middle"
+                                className="font-sans select-none"
                               >
                                 {conn.label}
                               </text>
@@ -698,285 +841,268 @@ export default function BriefingPage() {
                     })}
                   </svg>
 
-                  {/* RENDER DYNAMIC BPMN SHAPES */}
+                  {/* BPMN NODES RENDERING */}
                   {nodes.map(node => {
                     const isSelected = selectedNodeId === node.id;
-                    const isConnectionTarget = isConnectingMode && connectFromId === node.id;
-
                     return (
                       <div
                         key={node.id}
-                        onPointerDown={(e) => handlePointerDown(e, node)}
-                        onPointerMove={(e) => handlePointerMove(e, node)}
-                        onPointerUp={(e) => handlePointerUp(e, node)}
-                        onDoubleClick={() => handleDoubleClickNode(node)}
-                        className={`absolute flex flex-col items-center justify-center cursor-move text-center select-none z-10 touch-none group ${
-                          isSelected 
-                            ? 'ring-2 ring-[#4F73F5] shadow-lg shadow-blue-500/10' 
-                            : isConnectionTarget 
-                            ? 'ring-2 ring-yellow-500 animate-pulse'
-                            : ''
+                        onPointerDown={(e) => handleNodePointerDown(e, node)}
+                        onPointerMove={(e) => handleNodePointerMove(e, node)}
+                        onPointerUp={(e) => handleNodePointerUp(e, node)}
+                        style={{ left: node.x, top: node.y, touchAction: 'none' }}
+                        className={`absolute z-10 select-none cursor-move ${
+                          isSelected ? 'ring-2 ring-[#4F73F5] ring-offset-2 dark:ring-offset-[#090E17] rounded-xl' : ''
                         }`}
-                        style={{ 
-                          left: node.x, 
-                          top: node.y,
-                        }}
                       >
-                        {/* Event Start (Circle) */}
+                        {/* 1. START SHAPE */}
                         {node.type === 'start' && (
-                          <div className="w-10 h-10 rounded-full border-2 border-emerald-500 bg-[#0F172A]/90 flex items-center justify-center">
-                            <div className="w-3 h-3 rounded-full bg-emerald-500/40" />
-                          </div>
-                        )}
-
-                        {/* Task / Process (Rounded Rectangle) */}
-                        {node.type === 'task' && (
-                          <div className="w-[180px] h-16 rounded-xl border border-[#4F73F5]/80 bg-[#131B2B]/95 p-3 flex flex-col justify-between items-start shadow-xl">
-                            <span className="text-[7px] font-black uppercase text-slate-500 flex items-center gap-1">
-                              {node.taskType === 'service' ? 'Engrenagem (Automático)' : 'Usuário (Manual)'}
+                          <div className="flex flex-col items-center w-14">
+                            <div className="w-10 h-10 rounded-full border-2 border-emerald-500 bg-white dark:bg-[#0F172A] flex items-center justify-center shadow-lg shadow-emerald-500/10">
+                              <Play size={12} className="text-emerald-500 translate-x-[0.5px]" />
+                            </div>
+                            <span className="text-[8px] font-bold text-center text-slate-600 dark:text-slate-300 mt-1.5 w-24 line-clamp-2">
+                              {node.label}
                             </span>
-                            <p className="text-[10px] font-bold text-white leading-snug text-left truncate w-full">{node.label}</p>
                           </div>
                         )}
 
-                        {/* Gateway Decision (Diamond) */}
+                        {/* 2. TASK EVENT SHAPE */}
+                        {node.type === 'task' && (
+                          <div className="w-[170px] bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-[#4F73F5] rounded-xl p-3 shadow-md relative group hover:shadow-lg transition-shadow">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[7px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">
+                                {node.taskType === 'service' ? 'Serviço / IA' : 'Usuário / Manual'}
+                              </span>
+                              <div className="w-1.5 h-1.5 rounded-full bg-[#4F73F5]" />
+                            </div>
+                            <p className="text-[10px] font-bold text-slate-800 dark:text-white leading-normal pr-2 select-text">{node.label}</p>
+                          </div>
+                        )}
+
+                        {/* 3. GATEWAY DECISION SHAPE */}
                         {node.type === 'gateway' && (
-                          <div className="w-14 h-14 rotate-45 border border-yellow-500/80 bg-[#131B2B]/90 flex items-center justify-center shadow-xl">
-                            <div className="-rotate-45 font-black text-xs text-yellow-500">+</div>
+                          <div className="flex flex-col items-center w-16">
+                            <div className="w-10 h-10 border-2 border-yellow-500 rotate-45 bg-white dark:bg-[#131B2B] flex items-center justify-center shadow-lg">
+                              <span className="text-xs font-black text-yellow-500 -rotate-45">?</span>
+                            </div>
+                            <span className="text-[8px] font-bold text-center text-slate-600 dark:text-slate-300 mt-2.5 w-24 line-clamp-2">
+                              {node.label}
+                            </span>
                           </div>
                         )}
 
-                        {/* Data Store (Cylinder) */}
-                        {node.type === 'datastore' && (
-                          <div className="w-12 h-12 flex flex-col items-center justify-center">
-                            <Database size={24} className="text-slate-400 mb-1" />
+                        {/* 4. DATA STORE SHAPE */}
+                        {node.type === 'data' && (
+                          <div className="flex flex-col items-center w-16">
+                            <div className="w-10 h-10 rounded border border-slate-300 dark:border-blue-500/30 bg-white dark:bg-[#131B2B] flex items-center justify-center shadow-md">
+                              <Database size={16} className="text-blue-500" />
+                            </div>
+                            <span className="text-[8px] font-bold text-center text-slate-600 dark:text-slate-300 mt-1.5 w-24 line-clamp-2">
+                              {node.label}
+                            </span>
                           </div>
                         )}
 
-                        {/* End Event (Double Circle) */}
+                        {/* 5. END SHAPE */}
                         {node.type === 'end' && (
-                          <div className="w-10 h-10 rounded-full border-[3px] border-red-500 bg-[#0F172A]/90 flex items-center justify-center">
-                            <div className="w-4 h-4 rounded-full bg-red-500" />
+                          <div className="flex flex-col items-center w-14">
+                            <div className="w-10 h-10 rounded-full border-4 border-red-500 bg-white dark:bg-[#0F172A] flex items-center justify-center shadow-lg">
+                              <Square size={8} className="text-red-500 fill-red-500" />
+                            </div>
+                            <span className="text-[8px] font-bold text-center text-slate-600 dark:text-slate-300 mt-1.5 w-24 line-clamp-2">
+                              {node.label}
+                            </span>
                           </div>
                         )}
-
-                        {/* Node Name/Label below circle/diamond/database nodes */}
-                        {node.type !== 'task' && (
-                          <span className="absolute -bottom-6 w-36 text-[9px] font-semibold text-slate-300 truncate font-sans">
-                            {node.label}
-                          </span>
-                        )}
-                        
                       </div>
                     );
                   })}
-
                 </div>
               </div>
+            </motion.div>
+          )}
 
-            </div>
-          </div>
-        )}
-
-        {/* ==========================================
-            TAB: DETALHAMENTO DO PROCESSO
-            ========================================== */}
-        {activeTab === 'details' && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8 max-w-4xl mx-auto w-full space-y-6">
-            <div className="bg-[#131B2B] border border-white/5 rounded-2xl p-6 shadow-2xl space-y-4">
-              <h3 className="text-sm font-bold text-white pb-3 border-b border-white/5 flex items-center gap-2">
-                <FileText size={16} className="text-[#4F73F5]" />
-                Objetivos e Atores Principais
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Objetivo do Processo</label>
-                  <textarea
-                    rows={4}
-                    value={details.objective}
-                    onChange={(e) => setDetails({ ...details, objective: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3 resize-none"
-                  />
+          {/* TAB 2: DETAILED STRATEGY FORM */}
+          {activeTab === 'details' && (
+            <motion.div 
+              key="details"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-white dark:bg-[#0B1121]"
+            >
+              <div className="max-w-3xl mx-auto bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/[0.04] pb-4">
+                  <ListTodo size={18} className="text-[#4F73F5]" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white">Detalhamento Operacional e Regras de SLA</h3>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Regras de Negócio e SLAs</label>
-                  <textarea
-                    rows={4}
-                    value={details.rules}
-                    onChange={(e) => setDetails({ ...details, rules: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3 resize-none"
-                  />
-                </div>
+                <div className="grid grid-cols-2 gap-6 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">Objetivo Geral do Processo</label>
+                    <textarea
+                      rows={3}
+                      value={details.objective}
+                      onChange={(e) => setDetails({ ...details, objective: e.target.value })}
+                      placeholder="Qual o valor e o resultado esperado deste setor estratégico?"
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 resize-none focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    />
+                  </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Dono / Responsável pelo Setor</label>
-                  <input
-                    type="text"
-                    value={details.owner}
-                    onChange={(e) => setDetails({ ...details, owner: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Atores Operacionais Envolvidos</label>
-                  <input
-                    type="text"
-                    value={details.actors}
-                    onChange={(e) => setDetails({ ...details, actors: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#131B2B] border border-white/5 rounded-2xl p-6 shadow-2xl space-y-4">
-              <h3 className="text-sm font-bold text-white pb-3 border-b border-white/5 flex items-center gap-2">
-                <Settings size={16} className="text-[#4F73F5]" />
-                Raias de Organização (Swimlanes)
-              </h3>
-
-              <div className="space-y-3 text-xs">
-                {swimlanes.map((lane, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">Líder e Dono do Processo (Owner)</label>
                     <input
                       type="text"
-                      value={lane}
-                      onChange={(e) => {
-                        const newLanes = [...swimlanes];
-                        newLanes[idx] = e.target.value;
-                        setSwimlanes(newLanes);
-                      }}
-                      className="flex-1 bg-[#1C263A] border-white/5 text-white rounded-xl p-3"
+                      value={details.owner}
+                      onChange={(e) => setDetails({ ...details, owner: e.target.value })}
+                      placeholder="Ex: Dra. Flávia Albuquerque (Sênior)"
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 focus:ring-1 focus:ring-[#4F73F5] outline-none"
                     />
-                    <button 
-                      onClick={() => setSwimlanes(swimlanes.filter((_, i) => i !== idx))}
-                      className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl transition-all"
-                      title="Deletar raia"
-                    >
-                      <Trash2 size={14} />
-                    </button>
                   </div>
-                ))}
-                
-                <button 
-                  onClick={() => setSwimlanes([...swimlanes, 'Novo Ator de Processo'])}
-                  className="flex items-center gap-1 text-[11px] font-bold text-[#6D8CFF] hover:text-white transition-colors"
-                >
-                  <Plus size={12} />
-                  Adicionar Raia de Ator
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ==========================================
-            TAB: CICLO DE VIDA DA INFORMAÇÃO
-            ========================================== */}
-        {activeTab === 'lifecycle' && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8 max-w-4xl mx-auto w-full space-y-6">
-            <div className="bg-[#131B2B] border border-white/5 rounded-2xl p-6 shadow-2xl space-y-4">
-              <h3 className="text-sm font-bold text-white pb-3 border-b border-white/5 flex items-center gap-2">
-                <Database size={16} className="text-[#4F73F5]" />
-                Variáveis e Integrações do Ciclo de Informações
-              </h3>
-
-              <div className="space-y-4 text-xs">
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Dados e Variáveis Coletadas na Entrada</label>
-                  <textarea
-                    rows={3}
-                    value={details.dataCollected}
-                    onChange={(e) => setDetails({ ...details, dataCollected: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3 resize-none"
-                    placeholder="Quais dados são preenchidos nesta etapa?"
-                  />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Sistemas e APIs Integrados</label>
-                  <textarea
-                    rows={3}
-                    value={details.systemsUsed}
-                    onChange={(e) => setDetails({ ...details, systemsUsed: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3 resize-none"
-                    placeholder="Quais softwares ou integrações são acionados?"
-                  />
-                </div>
+                <div className="grid grid-cols-2 gap-6 text-xs pt-2">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">Atores Intermediários (Cargos)</label>
+                    <input
+                      type="text"
+                      value={details.actors}
+                      onChange={(e) => setDetails({ ...details, actors: e.target.value })}
+                      placeholder="Ex: Secretária, Estagiário de Intake, Calculista"
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    />
+                  </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-slate-400 font-semibold">Documentos e Procurações Geradas na Etapa</label>
-                  <textarea
-                    rows={3}
-                    value={details.docsGenerated}
-                    onChange={(e) => setDetails({ ...details, docsGenerated: e.target.value })}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-3 resize-none"
-                    placeholder="Quais minutas de contratos ou procurações são geradas automáticas?"
-                  />
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">Regras de Negócio e SLAs (Prazos)</label>
+                    <textarea
+                      rows={3}
+                      value={details.rules}
+                      onChange={(e) => setDetails({ ...details, rules: e.target.value })}
+                      placeholder="Ex: Prazos máximos, travas de validação técnica, fluxos de contingência."
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 resize-none focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
 
-        {/* ==========================================
-            TAB: HISTÓRICO DE REVISÕES
-            ========================================== */}
-        {activeTab === 'history' && (
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-8 max-w-4xl mx-auto w-full">
-            <div className="bg-[#131B2B] border border-white/5 rounded-2xl p-6 shadow-2xl space-y-6">
-              <h3 className="text-sm font-bold text-white pb-3 border-b border-white/5 flex items-center gap-2">
-                <Clock size={16} className="text-[#4F73F5]" />
-                Linha do Tempo de Revisões do Setor
-              </h3>
+          {/* TAB 3: INFORMATION LIFECYCLE (DATA GOVERNANCE) */}
+          {activeTab === 'lifecycle' && (
+            <motion.div 
+              key="lifecycle"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-white dark:bg-[#0B1121]"
+            >
+              <div className="max-w-3xl mx-auto bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/[0.04] pb-4">
+                  <ShieldAlert size={18} className="text-[#4F73F5]" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white">Governança e Ciclo de Vida da Informação (LGPD)</h3>
+                </div>
 
-              <div className="relative border-l border-white/10 pl-6 ml-2 space-y-6">
-                {historyLogs.map(log => (
-                  <div key={log.id} className="relative text-xs">
-                    {/* Circle Bullet */}
-                    <div className="absolute -left-[30px] top-1 w-2.5 h-2.5 rounded-full bg-[#4F73F5] border-2 border-[#131B2B]" />
-                    
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-white font-bold tracking-wide">{log.action}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Editado por: <strong className="text-slate-300 font-medium">{log.author}</strong></p>
+                <div className="space-y-4 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">1. Variáveis e Dados Coletados na Etapa</label>
+                    <input
+                      type="text"
+                      value={details.dataCollected}
+                      onChange={(e) => setDetails({ ...details, dataCollected: e.target.value })}
+                      placeholder="Ex: CPF, NIT do INSS, Comprovantes de Vínculo, Histórico de Fatos"
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">2. Sistemas Integrados e APIs Acionadas</label>
+                    <input
+                      type="text"
+                      value={details.systemsUsed}
+                      onChange={(e) => setDetails({ ...details, systemsUsed: e.target.value })}
+                      placeholder="Ex: Portal Meu INSS (API), Asaas Faturamento, Drive de Armazenamento"
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-slate-500 dark:text-slate-400 font-bold uppercase">3. Documentos Finais e Minutas Geradas</label>
+                    <input
+                      type="text"
+                      value={details.docsGenerated}
+                      onChange={(e) => setDetails({ ...details, docsGenerated: e.target.value })}
+                      placeholder="Ex: Contrato de Honorários, Petição de Requerimento Administrativo"
+                      className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-3 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 4: REVISION HISTORY TIMELINE */}
+          {activeTab === 'history' && (
+            <motion.div 
+              key="history"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-white dark:bg-[#0B1121]"
+            >
+              <div className="max-w-xl mx-auto bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/[0.04] pb-4">
+                  <HistoryIcon size={18} className="text-[#4F73F5]" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white">Linha do Tempo de Revisões do Fluxo</h3>
+                </div>
+
+                <div className="relative border-l border-slate-200 dark:border-white/10 pl-6 space-y-6 text-xs">
+                  {historyLogs.map((log, index) => (
+                    <div key={index} className="relative">
+                      {/* Timeline dot */}
+                      <span className="absolute -left-[30px] top-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-slate-100 dark:bg-[#131B2B] border-2 border-[#4F73F5]" />
+                      
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-black text-slate-800 dark:text-white">{log.action}</p>
+                          <span className="text-[8px] text-slate-400 dark:text-slate-500 font-bold">{log.time}</span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Efetuado por: <span className="font-semibold text-slate-700 dark:text-slate-300">{log.author}</span></p>
                       </div>
-                      <span className="text-[9px] font-bold text-slate-500">{log.date}</span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
 
+        </AnimatePresence>
       </div>
 
-      {/* AI PROCESSING OVERLAY LAYER */}
+      {/* AI PROCESSING OVERLAY SCREEN */}
       <AnimatePresence>
-        {isAiProcessing && (
+        {isAiLoading && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-[#090E17]/90 z-[100] flex flex-col items-center justify-center p-6 text-center"
+            className="absolute inset-0 bg-slate-900/90 dark:bg-[#090E17]/90 z-[100] flex flex-col items-center justify-center p-6 text-center"
           >
             <div className="relative mb-6">
-              <div className="w-14 h-14 border-4 border-purple-500 border-t-transparent flex items-center justify-center rounded-full animate-spin">
-                <div className="w-7 h-7 bg-gradient-to-tr from-[#4F73F5] to-[#7C3AED] rounded-full animate-pulse" />
+              <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent flex items-center justify-center rounded-full animate-spin">
+                <div className="w-8 h-8 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full animate-pulse" />
               </div>
-              <Sparkles size={16} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white animate-bounce" />
+              <Sparkles size={20} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white animate-bounce" />
             </div>
 
-            <h3 className="text-sm font-bold text-white mb-1.5 tracking-tight">Otimizador BPMN IA</h3>
-            <p className="text-[11px] text-slate-400 font-medium max-w-xs leading-relaxed animate-pulse">{aiStatusText}</p>
+            <h3 className="text-base font-bold text-white mb-2 tracking-tight">Otimizando com Inteligência de Processos</h3>
+            <p className="text-xs text-slate-300 dark:text-slate-400 font-medium max-w-xs leading-relaxed animate-pulse">
+              O agente está conectando gateways de decisão, inserindo chamadas automáticas de APIs e estruturando SLAs do setor...
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }

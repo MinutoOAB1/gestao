@@ -237,7 +237,7 @@ export default function DashboardLayout() {
     const isDocumentEditor = location.pathname.includes('/modelos');
     // Make Client Detail full screen, but not the client list (/clientes)
     const isClientDetail = location.pathname.startsWith('/clientes/') && location.pathname.split('/').length > 2 && location.pathname.split('/')[2] !== 'novo';
-    const isFullScreenPage = isKanban || isAgenda || isDocumentos || isDocumentEditor || isClientDetail || location.pathname.includes('/analise-ia');
+    const isFullScreenPage = isKanban || isAgenda || isDocumentos || isDocumentEditor || isClientDetail || location.pathname.includes('/analise-ia') || location.pathname.includes('/gestao');
     const [collapsed, setCollapsed] = useState(false);
 
     const [teamMembers, setTeamMembers] = useState<Array<{ id: string, name: string, avatar: string | null, role: string }>>([]);

@@ -12,13 +12,10 @@ import {
   Trash2, 
   ArrowRight,
   ChevronRight,
-  FileText,
-  AlertCircle,
-  HelpCircle,
-  Undo2,
   BookOpen
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 interface ProcessNode {
   id: string;
@@ -55,6 +52,8 @@ const DEFAULT_AVAILABLE_NODES: Omit<ProcessNode, 'x' | 'y'>[] = [
 
 export default function CadeiaValorPage() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   
   // Canvas State
   const [nodes, setNodes] = useState<ProcessNode[]>([]);
@@ -374,16 +373,16 @@ export default function CadeiaValorPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#090E17] text-slate-100 select-none overflow-hidden relative">
+    <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#090E17] text-slate-800 dark:text-slate-100 select-none overflow-hidden relative">
       {/* Upper header */}
-      <div className="flex h-16 items-center justify-between px-6 border-b border-white/5 bg-[#0F172A]/70 backdrop-blur-md z-30">
+      <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0F172A]/70 backdrop-blur-md z-30">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-[#4F73F5]/10 rounded-xl">
             <Network size={20} className="text-[#4F73F5]" />
           </div>
           <div>
-            <h1 className="text-base font-bold tracking-tight text-white">Mapa de Cadeia de Valor</h1>
-            <p className="text-[11px] text-slate-400 font-medium">Configure e visualize toda a cadeia de processos estratégicos do escritório</p>
+            <h1 className="text-base font-bold tracking-tight text-slate-800 dark:text-white">Mapa de Cadeia de Valor</h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Configure e visualize toda a cadeia de processos estratégicos do escritório</p>
           </div>
         </div>
 
@@ -398,13 +397,13 @@ export default function CadeiaValorPage() {
             {isAiLoading ? 'Mapeando com Agente...' : 'Gerar com Agente'}
           </button>
           
-          <div className="w-[1px] h-6 bg-white/10" />
+          <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10" />
 
           {/* Undo / Redo */}
           <button 
             onClick={handleUndo} 
             disabled={historyIndex <= 0}
-            className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
+            className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
             title="Desfazer"
           >
             <RotateCcw size={15} />
@@ -412,7 +411,7 @@ export default function CadeiaValorPage() {
           <button 
             onClick={handleRedo} 
             disabled={historyIndex >= history.length - 1}
-            className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
+            className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
             title="Refazer"
           >
             <RotateCw size={15} />
@@ -423,12 +422,12 @@ export default function CadeiaValorPage() {
       {/* Main split dashboard area */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT COLUMN: Sidebar items */}
-        <div className="w-80 border-r border-white/5 bg-[#0B1121] flex flex-col overflow-y-auto custom-scrollbar p-5 space-y-6 flex-shrink-0">
+        <div className="w-80 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-[#0B1121] flex flex-col overflow-y-auto custom-scrollbar p-5 space-y-6 flex-shrink-0">
           
           {/* Create custom process model button */}
           <button 
             onClick={() => setShowNewNodeModal(true)}
-            className="w-full flex items-center justify-center gap-2 p-3 bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 rounded-2xl text-xs font-bold text-white transition-all group"
+            className="w-full flex items-center justify-center gap-2 p-3 bg-slate-100 hover:bg-slate-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.07] border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-bold text-slate-700 dark:text-white transition-all group"
           >
             <Plus size={15} className="text-[#4F73F5] group-hover:scale-125 transition-transform" />
             Criar Novo Modelo
@@ -437,7 +436,7 @@ export default function CadeiaValorPage() {
           {/* Link connections button */}
           <button 
             onClick={() => setShowNewConnModal(true)}
-            className="w-full flex items-center justify-center gap-2 p-3 bg-[#4F73F5]/10 hover:bg-[#4F73F5]/20 border border-[#4F73F5]/20 rounded-2xl text-xs font-bold text-[#6D8CFF] transition-all"
+            className="w-full flex items-center justify-center gap-2 p-3 bg-[#4F73F5]/10 hover:bg-[#4F73F5]/20 border border-[#4F73F5]/20 rounded-2xl text-xs font-bold text-[#4F73F5] dark:text-[#6D8CFF] transition-all"
           >
             <Network size={14} />
             Conectar Processos
@@ -445,7 +444,7 @@ export default function CadeiaValorPage() {
 
           {/* Principais Section */}
           <div className="space-y-3">
-            <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E2B755]" />
               Modelos Principais
             </h3>
@@ -457,20 +456,20 @@ export default function CadeiaValorPage() {
                     key={item.id}
                     draggable={!onCanvas}
                     onDragStart={(e) => handleDragStart(e, item)}
-                    className={`p-3 bg-[#131B2B] border rounded-xl relative overflow-hidden transition-all group ${
+                    className={`p-3 bg-slate-50 dark:bg-[#131B2B] border rounded-xl relative overflow-hidden transition-all group ${
                       onCanvas 
-                        ? 'opacity-40 border-white/5 cursor-not-allowed' 
-                        : 'border-white/5 hover:border-[#E2B755]/30 cursor-grab hover:bg-[#172238] active:cursor-grabbing'
+                        ? 'opacity-40 border-slate-100 dark:border-white/5 cursor-not-allowed' 
+                        : 'border-slate-200 dark:border-white/5 hover:border-[#E2B755]/30 cursor-grab hover:bg-slate-100/50 dark:hover:bg-[#172238] active:cursor-grabbing'
                     }`}
                   >
                     <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#E2B755]/70" />
                     <div className="flex items-start justify-between mb-1">
-                      <span className="text-xs font-bold text-white tracking-wide">{item.label}</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-white tracking-wide">{item.label}</span>
                       {!onCanvas && (
                         <span className="text-[8px] font-bold text-[#E2B755] bg-[#E2B755]/10 px-1.5 py-0.5 rounded uppercase">Arrastar</span>
                       )}
                     </div>
-                    <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
                   </div>
                 );
               })}
@@ -479,7 +478,7 @@ export default function CadeiaValorPage() {
 
           {/* De Apoio Section */}
           <div className="space-y-3">
-            <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#4F73F5]" />
               Modelos de Apoio
             </h3>
@@ -491,20 +490,20 @@ export default function CadeiaValorPage() {
                     key={item.id}
                     draggable={!onCanvas}
                     onDragStart={(e) => handleDragStart(e, item)}
-                    className={`p-3 bg-[#131B2B] border rounded-xl relative overflow-hidden transition-all group ${
+                    className={`p-3 bg-slate-50 dark:bg-[#131B2B] border rounded-xl relative overflow-hidden transition-all group ${
                       onCanvas 
-                        ? 'opacity-40 border-white/5 cursor-not-allowed' 
-                        : 'border-white/5 hover:border-[#4F73F5]/30 cursor-grab hover:bg-[#172238] active:cursor-grabbing'
+                        ? 'opacity-40 border-slate-100 dark:border-white/5 cursor-not-allowed' 
+                        : 'border-slate-200 dark:border-white/5 hover:border-[#4F73F5]/30 cursor-grab hover:bg-slate-100/50 dark:hover:bg-[#172238] active:cursor-grabbing'
                     }`}
                   >
                     <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#4F73F5]/70" />
                     <div className="flex items-start justify-between mb-1">
-                      <span className="text-xs font-bold text-white tracking-wide">{item.label}</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-white tracking-wide">{item.label}</span>
                       {!onCanvas && (
                         <span className="text-[8px] font-bold text-[#4F73F5] bg-[#4F73F5]/10 px-1.5 py-0.5 rounded uppercase">Arrastar</span>
                       )}
                     </div>
-                    <p className="text-[10px] text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
                   </div>
                 );
               })}
@@ -513,37 +512,37 @@ export default function CadeiaValorPage() {
         </div>
 
         {/* RIGHT COLUMN: Whiteboard canvas */}
-        <div className="flex-1 flex flex-col relative overflow-hidden bg-[#090E17]">
+        <div className="flex-1 flex flex-col relative overflow-hidden bg-[#F8FAFC] dark:bg-[#090E17]">
           {/* Instructions banner */}
-          <div className="absolute top-4 left-4 z-20 flex items-center gap-2 p-3 rounded-xl bg-[#0F172A]/90 border border-white/5 shadow-2xl backdrop-blur-md max-w-sm">
+          <div className="absolute top-4 left-4 z-20 flex items-center gap-2 p-3 rounded-xl bg-white/95 dark:bg-[#0F172A]/90 border border-slate-200 dark:border-white/5 shadow-2xl backdrop-blur-md max-w-sm">
             <BookOpen size={16} className="text-[#4F73F5] flex-shrink-0" />
-            <p className="text-[10px] text-slate-300 leading-relaxed">
-              Arrastando os blocos da lateral, você constrói o mapa estratégico. <strong className="text-white">Dê um duplo clique</strong> em qualquer bloco no quadro para editar seu Briefing e Fluxo BPMN.
+            <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">
+              Arrastando os blocos da lateral, você constrói o mapa estratégico. <strong className="text-slate-800 dark:text-white">Dê um duplo clique</strong> em qualquer bloco no quadro para editar seu Briefing e Fluxo BPMN.
             </p>
           </div>
 
           {/* Zoom controls */}
-          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-1 p-1.5 bg-[#0F172A]/90 border border-white/5 rounded-2xl shadow-xl backdrop-blur-md">
+          <div className="absolute bottom-6 left-6 z-20 flex items-center gap-1 p-1.5 bg-white/95 dark:bg-[#0F172A]/90 border border-slate-200 dark:border-white/5 rounded-2xl shadow-xl backdrop-blur-md">
             <button 
               onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+              className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
               title="Zoom Out"
             >
               <ZoomOut size={14} />
             </button>
-            <span className="text-[10px] font-bold px-2 text-white/70 min-w-[36px] text-center">
+            <span className="text-[10px] font-bold px-2 text-slate-700 dark:text-white/70 min-w-[36px] text-center">
               {Math.round(zoom * 100)}%
             </span>
             <button 
               onClick={() => setZoom(z => Math.min(1.5, z + 0.1))}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+              className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
               title="Zoom In"
             >
               <ZoomIn size={14} />
             </button>
             <button 
               onClick={() => setZoom(1)}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+              className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
               title="Ajustar"
             >
               <Maximize2 size={14} />
@@ -552,7 +551,7 @@ export default function CadeiaValorPage() {
 
           {/* Connected Links details panel if selected */}
           {selectedNodeId && (
-            <div className="absolute top-4 right-4 z-20 w-80 bg-[#0F172A]/95 border border-white/5 rounded-2xl p-4 shadow-2xl backdrop-blur-md">
+            <div className="absolute top-4 right-4 z-20 w-80 bg-white/95 dark:bg-[#0F172A]/95 border border-slate-200 dark:border-white/5 rounded-2xl p-4 shadow-2xl backdrop-blur-md">
               {(() => {
                 const node = nodes.find(n => n.id === selectedNodeId);
                 if (!node) return null;
@@ -562,38 +561,38 @@ export default function CadeiaValorPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${node.category === 'principal' ? 'bg-[#E2B755]' : 'bg-[#4F73F5]'}`} />
-                        <h4 className="text-xs font-black uppercase text-white tracking-wide truncate max-w-[170px]">{node.label}</h4>
+                        <h4 className="text-xs font-black uppercase text-slate-800 dark:text-white tracking-wide truncate max-w-[170px]">{node.label}</h4>
                       </div>
                       <button 
                         onClick={() => setSelectedNodeId(null)}
-                        className="text-[9px] font-semibold text-slate-400 hover:text-white"
+                        className="text-[9px] font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-white"
                       >
                         Fechar
                       </button>
                     </div>
 
-                    <p className="text-[11px] text-slate-300 leading-relaxed bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-white/[0.02] p-2.5 rounded-lg border border-slate-100 dark:border-white/5">
                       {node.description}
                     </p>
 
                     <div className="space-y-2">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Conexões Ativas ({nodeConns.length})</p>
+                      <p className="text-[9px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">Conexões Ativas ({nodeConns.length})</p>
                       {nodeConns.length > 0 ? (
                         <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar pr-1">
                           {nodeConns.map(conn => {
                             const other = nodes.find(n => n.id === (conn.from === node.id ? conn.to : conn.from));
                             return (
-                              <div key={conn.id} className="flex items-center justify-between p-2 bg-white/[0.03] border border-white/5 rounded-lg">
+                              <div key={conn.id} className="flex items-center justify-between p-2 bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-lg">
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-[10px] text-white truncate font-medium">
+                                  <p className="text-[10px] text-slate-700 dark:text-white truncate font-medium">
                                     {conn.from === node.id ? 'Destino: ' : 'Origem: '}
-                                    <span className="text-[#6D8CFF]">{other?.label || 'Processo'}</span>
+                                    <span className="text-[#4F73F5] dark:text-[#6D8CFF]">{other?.label || 'Processo'}</span>
                                   </p>
-                                  <p className="text-[8px] text-slate-400 italic truncate">"{conn.label}"</p>
+                                  <p className="text-[8px] text-slate-500 dark:text-slate-400 italic truncate">"{conn.label}"</p>
                                 </div>
                                 <button 
                                   onClick={() => handleDeleteConnection(conn.id)}
-                                  className="p-1 hover:text-red-400 text-slate-500 transition-colors"
+                                  className="p-1 hover:text-red-400 text-slate-400 dark:text-slate-500 transition-colors"
                                   title="Remover conexão"
                                 >
                                   <Trash2 size={10} />
@@ -603,7 +602,7 @@ export default function CadeiaValorPage() {
                           })}
                         </div>
                       ) : (
-                        <p className="text-[10px] text-slate-500 italic">Sem conexões registradas</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 italic">Sem conexões registradas</p>
                       )}
                     </div>
 
@@ -625,10 +624,10 @@ export default function CadeiaValorPage() {
             ref={canvasRef}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            className="flex-1 w-full h-full relative cursor-grab bg-dot-pattern text-slate-700 overflow-hidden"
+            className="flex-1 w-full h-full relative cursor-grab bg-dot-pattern overflow-hidden"
             style={{ 
-              backgroundColor: '#090E17',
-              color: 'rgba(255, 255, 255, 0.05)'
+              backgroundColor: isDark ? '#090E17' : '#F8FAFC',
+              color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'
             }}
           >
             {/* Whiteboard Scale Layer */}
@@ -649,7 +648,7 @@ export default function CadeiaValorPage() {
                     markerHeight="6"
                     orient="auto-start-reverse"
                   >
-                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#4F73F5" />
+                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill={isDark ? '#4F73F5' : '#3B82F6'} />
                   </marker>
                 </defs>
 
@@ -661,7 +660,7 @@ export default function CadeiaValorPage() {
                       <path
                         d={path}
                         fill="none"
-                        stroke="#4F73F5"
+                        stroke={isDark ? '#4F73F5' : '#3B82F6'}
                         strokeWidth={2}
                         strokeDasharray="4,4"
                         markerEnd="url(#arrow)"
@@ -680,8 +679,8 @@ export default function CadeiaValorPage() {
                         width={(conn.label.length * 6) + 12}
                         height={16}
                         rx={4}
-                        fill="#0F172A"
-                        stroke="rgba(79, 115, 245, 0.2)"
+                        fill={isDark ? '#0F172A' : '#FFFFFF'}
+                        stroke={isDark ? 'rgba(79, 115, 245, 0.2)' : 'rgba(59, 130, 246, 0.2)'}
                         strokeWidth={1}
                         className="group-hover:stroke-[#E2B755]"
                       />
@@ -689,11 +688,11 @@ export default function CadeiaValorPage() {
                       <text
                         x={textX}
                         y={textY + 3}
-                        fill="#94A3B8"
+                        fill={isDark ? '#94A3B8' : '#475569'}
                         fontSize={8}
                         fontWeight="bold"
                         textAnchor="middle"
-                        className="group-hover:fill-white font-sans select-none"
+                        className="group-hover:fill-[#4F73F5] dark:group-hover:fill-white font-sans select-none"
                       >
                         {conn.label}
                       </text>
@@ -710,10 +709,10 @@ export default function CadeiaValorPage() {
                   onPointerMove={(e) => handleNodePointerMove(e, node)}
                   onPointerUp={(e) => handleNodePointerUp(e, node)}
                   onDoubleClick={() => navigate(`/app/gestao/briefing/${node.id}`)}
-                  className={`absolute w-[280px] rounded-2xl p-4 bg-[#131B2B] border cursor-move transition-shadow z-10 select-none ${
+                  className={`absolute w-[280px] rounded-2xl p-4 bg-white dark:bg-[#131B2B] border cursor-move transition-shadow z-10 select-none ${
                     selectedNodeId === node.id 
                       ? 'border-[#E2B755] shadow-lg shadow-yellow-500/10' 
-                      : 'border-white/5 hover:border-white/10 hover:shadow-2xl shadow-black/40'
+                      : 'border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 hover:shadow-lg dark:hover:shadow-2xl shadow-black/[0.03] dark:shadow-black/40'
                   }`}
                   style={{ 
                     left: node.x, 
@@ -725,23 +724,23 @@ export default function CadeiaValorPage() {
                     <span className={`text-[8px] font-black px-2 py-0.5 rounded-full tracking-wider uppercase ${
                       node.category === 'principal' 
                         ? 'bg-[#E2B755]/10 text-[#E2B755]' 
-                        : 'bg-[#4F73F5]/10 text-[#6D8CFF]'
+                        : 'bg-[#4F73F5]/10 text-[#4F73F5] dark:text-[#6D8CFF]'
                     }`}>
                       {node.category === 'principal' ? 'Principal' : 'Apoio'}
                     </span>
                     <button 
                       onClick={(e) => handleDeleteNode(e, node.id)}
-                      className="opacity-0 group-hover:opacity-100 hover:text-red-400 text-slate-500 transition-all p-1 hover:bg-white/5 rounded-md"
+                      className="opacity-0 group-hover:opacity-100 hover:text-red-400 text-slate-400 dark:text-slate-500 transition-all p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md"
                       style={{ opacity: selectedNodeId === node.id ? 1 : undefined }}
                     >
                       <Trash2 size={12} />
                     </button>
                   </div>
 
-                  <h3 className="text-xs font-bold text-white mb-1.5 tracking-wide line-clamp-1">{node.label}</h3>
-                  <p className="text-[10px] text-slate-400 leading-relaxed line-clamp-2 mb-2">{node.description}</p>
+                  <h3 className="text-xs font-bold text-slate-800 dark:text-white mb-1.5 tracking-wide line-clamp-1">{node.label}</h3>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-2">{node.description}</p>
                   
-                  <div className="flex items-center justify-end text-[9px] font-bold text-[#6D8CFF] hover:text-white transition-colors gap-1 pt-1.5 border-t border-white/[0.04]">
+                  <div className="flex items-center justify-end text-[9px] font-bold text-[#4F73F5] dark:text-[#6D8CFF] hover:text-slate-800 dark:hover:text-white transition-colors gap-1 pt-1.5 border-t border-slate-100 dark:border-white/[0.04]">
                     <span>Briefing & BPMN</span>
                     <ChevronRight size={10} />
                   </div>
@@ -750,15 +749,15 @@ export default function CadeiaValorPage() {
 
               {/* Render guidance if canvas is empty */}
               {nodes.length === 0 && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-8 bg-[#131B2B]/60 rounded-3xl border border-white/5 text-center max-w-sm">
-                  <Network size={40} className="text-slate-500 mb-4 animate-pulse" />
-                  <h3 className="text-sm font-bold text-white mb-1.5">Quadro Branco Vazio</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-8 bg-white dark:bg-[#131B2B]/60 rounded-3xl border border-slate-200 dark:border-white/5 text-center max-w-sm shadow-xl">
+                  <Network size={40} className="text-slate-400 dark:text-slate-500 mb-4 animate-pulse" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-1.5">Quadro Branco Vazio</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
                     Arrastar processos do menu lateral para o quadro para desenhar o mapa do seu escritório.
                   </p>
                   <button 
                     onClick={handleGenerateWithAgent}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#4F73F5]/20 hover:bg-[#4F73F5]/30 text-[#6D8CFF] border border-[#4F73F5]/20 rounded-xl text-xs font-bold"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#4F73F5]/20 hover:bg-[#4F73F5]/30 text-[#4F73F5] dark:text-[#6D8CFF] border border-[#4F73F5]/20 rounded-xl text-xs font-bold"
                   >
                     <Sparkles size={13} />
                     Carregar Exemplo com IA
@@ -778,7 +777,7 @@ export default function CadeiaValorPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-[#090E17]/90 z-[100] flex flex-col items-center justify-center p-6 text-center"
+            className="absolute inset-0 bg-slate-900/90 dark:bg-[#090E17]/90 z-[100] flex flex-col items-center justify-center p-6 text-center"
           >
             <div className="relative mb-6">
               <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent flex items-center justify-center rounded-full animate-spin">
@@ -788,7 +787,7 @@ export default function CadeiaValorPage() {
             </div>
 
             <h3 className="text-base font-bold text-white mb-2 tracking-tight">Agente IA de Processos</h3>
-            <p className="text-xs text-slate-400 font-medium max-w-xs leading-relaxed animate-pulse">{aiStatusMsg}</p>
+            <p className="text-xs text-slate-300 dark:text-slate-400 font-medium max-w-xs leading-relaxed animate-pulse">{aiStatusMsg}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -801,13 +800,13 @@ export default function CadeiaValorPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-[#131B2B] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
+              className="w-full max-w-md bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white">Criar Novo Modelo de Processo</h3>
+                <h3 className="text-sm font-bold text-slate-800 dark:text-white">Criar Novo Modelo de Processo</h3>
                 <button 
                   onClick={() => setShowNewNodeModal(false)}
-                  className="text-xs text-slate-500 hover:text-white"
+                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white"
                 >
                   Fechar
                 </button>
@@ -815,22 +814,22 @@ export default function CadeiaValorPage() {
 
               <div className="space-y-3 text-xs">
                 <div className="space-y-1">
-                  <label className="text-slate-400 font-medium">Nome do Processo / Setor</label>
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Nome do Processo / Setor</label>
                   <input
                     type="text"
                     value={newNodeLabel}
                     onChange={(e) => setNewNodeLabel(e.target.value)}
                     placeholder="Ex: Atendimento Previdenciário"
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-2.5"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 font-medium">Categoria</label>
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Categoria</label>
                   <select
                     value={newNodeCategory}
                     onChange={(e) => setNewNodeCategory(e.target.value as 'principal' | 'apoio')}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-2.5"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
                   >
                     <option value="principal">Principal (Intake, Contrato, Operação Jurídica)</option>
                     <option value="apoio">De Apoio (Financeiro, TI, Compliance, Marketing)</option>
@@ -838,13 +837,13 @@ export default function CadeiaValorPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 font-medium">Descrição das Atividades</label>
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Descrição das Atividades</label>
                   <textarea
                     rows={3}
                     value={newNodeDesc}
                     onChange={(e) => setNewNodeDesc(e.target.value)}
                     placeholder="Quais tarefas são realizadas nesta etapa da cadeia do escritório?"
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-2.5 resize-none"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 resize-none focus:ring-1 focus:ring-[#4F73F5] outline-none"
                   />
                 </div>
               </div>
@@ -868,13 +867,13 @@ export default function CadeiaValorPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-[#131B2B] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
+              className="w-full max-w-md bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white">Conectar Processos no Mapa</h3>
+                <h3 className="text-sm font-bold text-slate-800 dark:text-white">Conectar Processos no Mapa</h3>
                 <button 
                   onClick={() => setShowNewConnModal(false)}
-                  className="text-xs text-slate-500 hover:text-white"
+                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white"
                 >
                   Fechar
                 </button>
@@ -882,11 +881,11 @@ export default function CadeiaValorPage() {
 
               <div className="space-y-3 text-xs">
                 <div className="space-y-1">
-                  <label className="text-slate-400 font-medium">Processo de Origem (Saída)</label>
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Processo de Origem (Saída)</label>
                   <select
                     value={connFrom}
                     onChange={(e) => setConnFrom(e.target.value)}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-2.5"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
                   >
                     <option value="">Selecione o emissor...</option>
                     {nodes.map(n => (
@@ -896,11 +895,11 @@ export default function CadeiaValorPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 font-medium">Processo de Destino (Entrada)</label>
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Processo de Destino (Entrada)</label>
                   <select
                     value={connTo}
                     onChange={(e) => setConnTo(e.target.value)}
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-2.5"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
                   >
                     <option value="">Selecione o receptor...</option>
                     {nodes.map(n => (
@@ -910,13 +909,13 @@ export default function CadeiaValorPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-400 font-medium">Etiqueta da Conexão / Ação</label>
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Etiqueta da Conexão / Ação</label>
                   <input
                     type="text"
                     value={connLabel}
                     onChange={(e) => setConnLabel(e.target.value)}
                     placeholder="Ex: Direciona clientes de lead cível"
-                    className="w-full bg-[#1C263A] border-white/5 text-white rounded-xl p-2.5"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
                   />
                 </div>
               </div>
