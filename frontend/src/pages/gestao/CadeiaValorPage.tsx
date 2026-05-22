@@ -501,15 +501,23 @@ export default function CadeiaValorPage() {
   const handleExportAsImage = async () => {
     if (!canvasRef.current) return;
     const originalZoom = zoom;
+    let originalBg = '';
+    
     try {
-      // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar quebras e sobreposições de fontes subpixel
+      // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar quebras de fontes subpixel
       setZoom(1);
       
-      // Aguardar o React aplicar as novas dimensões e escala no DOM
-      await new Promise(resolve => setTimeout(resolve, 150));
-
       const canvasElement = canvasRef.current;
       const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
+
+      // Ativar classes e estilos especiais de exportação no corpo e contêiner interno
+      document.body.classList.add('is-exporting');
+      targetElement.classList.add('bg-miro-grid');
+      originalBg = targetElement.style.backgroundColor;
+      targetElement.style.backgroundColor = isDark ? '#090e17' : '#f8fafc';
+      
+      // Aguardar o React e o navegador aplicarem o novo layout e as fontes com zoom 100%
+      await new Promise(resolve => setTimeout(resolve, 250));
 
       // Calcular o retângulo delimitador exato que contém todos os nós para cropar margens em branco
       let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
@@ -537,7 +545,7 @@ export default function CadeiaValorPage() {
       const canvas = await html2canvas(targetElement, {
         useCORS: true,
         allowTaint: true,
-        backgroundColor: isDark ? '#0b0f19' : '#ffffff',
+        backgroundColor: null, // Deixar renderizar o background do próprio targetElement (com grade Miro!)
         scale: 2, // Altíssima definição
         x: x,
         y: y,
@@ -556,7 +564,14 @@ export default function CadeiaValorPage() {
       console.error('Erro ao exportar imagem:', error);
       alert('Ocorreu um erro ao exportar o canvas como imagem.');
     } finally {
-      // 2. Restaurar o nível de zoom original do usuário
+      // Restaurar o estado original da tela
+      document.body.classList.remove('is-exporting');
+      const canvasElement = canvasRef.current;
+      const targetElement = canvasElement?.querySelector('.origin-top-left') as HTMLElement;
+      if (targetElement) {
+        targetElement.classList.remove('bg-miro-grid');
+        targetElement.style.backgroundColor = originalBg;
+      }
       setZoom(originalZoom);
     }
   };
@@ -565,15 +580,23 @@ export default function CadeiaValorPage() {
   const handleExportAsPdf = async () => {
     if (!canvasRef.current) return;
     const originalZoom = zoom;
+    let originalBg = '';
+    
     try {
       // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar distorções
       setZoom(1);
       
-      // Aguardar o React aplicar as novas dimensões e escala no DOM
-      await new Promise(resolve => setTimeout(resolve, 150));
-
       const canvasElement = canvasRef.current;
       const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
+
+      // Ativar classes e estilos especiais de exportação no corpo e contêiner interno
+      document.body.classList.add('is-exporting');
+      targetElement.classList.add('bg-miro-grid');
+      originalBg = targetElement.style.backgroundColor;
+      targetElement.style.backgroundColor = isDark ? '#090e17' : '#f8fafc';
+      
+      // Aguardar o React e o navegador aplicarem o novo layout e as fontes com zoom 100%
+      await new Promise(resolve => setTimeout(resolve, 250));
 
       // Calcular o retângulo delimitador exato que contém todos os nós para cropar margens em branco
       let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
@@ -600,7 +623,7 @@ export default function CadeiaValorPage() {
       const canvas = await html2canvas(targetElement, {
         useCORS: true,
         allowTaint: true,
-        backgroundColor: isDark ? '#0b0f19' : '#ffffff',
+        backgroundColor: null, // Deixar renderizar o background do próprio targetElement (com grade Miro!)
         scale: 2,
         x: x,
         y: y,
@@ -628,7 +651,14 @@ export default function CadeiaValorPage() {
       console.error('Erro ao exportar PDF:', error);
       alert('Ocorreu um erro ao exportar o canvas como PDF.');
     } finally {
-      // 2. Restaurar o nível de zoom original do usuário
+      // Restaurar o estado original da tela
+      document.body.classList.remove('is-exporting');
+      const canvasElement = canvasRef.current;
+      const targetElement = canvasElement?.querySelector('.origin-top-left') as HTMLElement;
+      if (targetElement) {
+        targetElement.classList.remove('bg-miro-grid');
+        targetElement.style.backgroundColor = originalBg;
+      }
       setZoom(originalZoom);
     }
   };

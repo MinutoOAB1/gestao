@@ -999,3 +999,39 @@ html {
     padding: 0 !important;
   }
 }
+
+/* Fix html2canvas line-clamp cutoff, font rendering and grid background bugs */
+body.is-exporting * {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+body.is-exporting .line-clamp-1 {
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  -webkit-line-clamp: unset !important;
+}
+
+body.is-exporting .line-clamp-2 {
+  display: block !important;
+  max-height: 28px !important;
+  line-height: 14px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  -webkit-line-clamp: unset !important;
+}
+
+body.is-exporting .bg-miro-grid {
+  background-size: 30px 30px !important;
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px) !important;
+}
+
+body.is-exporting.dark .bg-miro-grid {
+  background-size: 30px 30px !important;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px) !important;
+}
