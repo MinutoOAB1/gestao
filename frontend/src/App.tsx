@@ -59,7 +59,6 @@ const UsersPage = lazyWithRetry(() => import('./pages/users/UsersPage'));
 const TimesheetPage = lazyWithRetry(() => import('./pages/timesheet/TimesheetPage'));
 const ProfilePage = lazyWithRetry(() => import('./pages/profile/ProfilePage'));
 const CadeiaValorPage = lazyWithRetry(() => import('./pages/gestao/CadeiaValorPage'));
-const BriefingPage = lazyWithRetry(() => import('./pages/gestao/BriefingPage'));
 const BillingPage = lazyWithRetry(() => import('./pages/settings/BillingPage'));
 const TermsPage = lazyWithRetry(() => import('./pages/legal/TermsPage'));
 const PrivacyPage = lazyWithRetry(() => import('./pages/legal/PrivacyPage'));
@@ -157,8 +156,6 @@ function App() {
                             
                             {/* Gestão do Escritório */}
                             <Route path="gestao/cadeia-valor" element={<CadeiaValorPage />} />
-                            <Route path="gestao/briefing" element={<BriefingPage />} />
-                            <Route path="gestao/briefing/:id" element={<BriefingPage />} />
                           </Route>
 
                           <Route path="/portal/login" element={<PortalLogin />} />

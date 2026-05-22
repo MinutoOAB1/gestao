@@ -23,10 +23,14 @@ import {
   X,
   Search,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Download,
+  FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface ProcessNode {
   id: string;
@@ -99,6 +103,7 @@ export default function CadeiaValorPage() {
   const [draggedItem, setDraggedItem] = useState<Omit<ProcessNode, 'x' | 'y'> | null>(null);
   const [activeDragNodeId, setActiveDragNodeId] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [editingNode, setEditingNode] = useState<ProcessNode | null>(null);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -492,6 +497,78 @@ export default function CadeiaValorPage() {
     }
   };
 
+  // Export canvas as high-resolution PNG image
+  const handleExportAsImage = async () => {
+    if (!canvasRef.current) return;
+    try {
+      const canvasElement = canvasRef.current;
+      
+      const canvas = await html2canvas(canvasElement, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: isDark ? '#0b0f19' : '#ffffff',
+        scale: 2,
+        scrollX: -window.scrollX,
+        scrollY: -window.scrollY
+      });
+
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `cadeia-de-valor-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Erro ao exportar imagem:', error);
+      alert('Ocorreu um erro ao exportar o canvas como imagem.');
+    }
+  };
+
+  // Export canvas as PDF document
+  const handleExportAsPdf = async () => {
+    if (!canvasRef.current) return;
+    try {
+      const canvasElement = canvasRef.current;
+      const canvas = await html2canvas(canvasElement, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: isDark ? '#0b0f19' : '#ffffff',
+        scale: 2
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [canvas.width / 2, canvas.height / 2]
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.save(`cadeia-de-valor-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
+      alert('Ocorreu um erro ao exportar o canvas como PDF.');
+    }
+  };
+
+  // Update process node properties
+  const handleUpdateNode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingNode || !editingNode.label.trim()) return;
+
+    const updatedNodes = nodes.map(n => 
+      n.id === editingNode.id ? { 
+        ...n, 
+        label: editingNode.label, 
+        category: editingNode.category, 
+        description: editingNode.description 
+      } : n
+    );
+
+    saveState(updatedNodes, connections);
+    setEditingNode(null);
+    setSelectedNodeId(null);
+  };
+
   // AI Agent Mappings using real Llama 3.1 70B Endpoint
   const handleGenerateWithAgent = async () => {
     setIsAiLoading(true);
@@ -824,11 +901,11 @@ export default function CadeiaValorPage() {
             <div className="absolute top-4 left-4 z-20 flex items-center gap-2 p-3 rounded-xl bg-white/95 dark:bg-[#0F172A]/90 border border-slate-200 dark:border-white/5 shadow-2xl backdrop-blur-md max-w-sm">
               <BookOpen size={16} className="text-[#4F73F5] flex-shrink-0" />
               <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                Clique e arraste no fundo pontilhado para navegar pelo painel infinito. <strong className="text-slate-800 dark:text-white">Dê um duplo clique</strong> no bloco para editar seu Fluxo BPMN.
+                Clique e arraste no fundo pontilhado para navegar pelo painel infinito. <strong className="text-slate-800 dark:text-white">Dê um duplo clique</strong> no bloco para editar suas propriedades.
               </p>
             </div>
 
-            {/* Zoom controls */}
+            {/* Zoom & Export controls */}
             <div className="absolute bottom-6 left-6 z-20 flex items-center gap-1 p-1.5 bg-white/95 dark:bg-[#0F172A]/90 border border-slate-200 dark:border-white/5 rounded-2xl shadow-xl backdrop-blur-md">
               <button 
                 onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
@@ -853,6 +930,23 @@ export default function CadeiaValorPage() {
                 title="Ajustar"
               >
                 <Maximize2 size={14} />
+              </button>
+              <div className="w-[1px] h-4 bg-slate-200 dark:bg-white/10 mx-1" />
+              <button 
+                onClick={handleExportAsImage}
+                className="p-2 text-slate-400 hover:text-[#4F73F5] dark:hover:text-[#6D8CFF] hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all flex items-center gap-1"
+                title="Exportar Imagem (PNG)"
+              >
+                <Download size={14} />
+                <span className="text-[9px] font-bold hidden sm:inline">PNG</span>
+              </button>
+              <button 
+                onClick={handleExportAsPdf}
+                className="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all flex items-center gap-1"
+                title="Exportar PDF"
+              >
+                <FileText size={14} />
+                <span className="text-[9px] font-bold hidden sm:inline">PDF</span>
               </button>
             </div>
 
@@ -914,11 +1008,11 @@ export default function CadeiaValorPage() {
                       </div>
 
                       <button 
-                        onClick={() => navigate(`/app/gestao/briefing/${node.id}`)}
-                        className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-[#4F73F5] hover:bg-[#4062E0] text-white rounded-xl text-xs font-bold transition-all shadow-md"
+                        onClick={() => setEditingNode(node)}
+                        className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-[#E2B755] hover:bg-[#c99f43] text-white rounded-xl text-xs font-bold transition-all shadow-md"
                       >
-                        Editar Briefing & BPMN
-                        <ArrowRight size={13} />
+                        Editar Bloco
+                        <Sparkles size={13} />
                       </button>
                     </div>
                   );
@@ -1040,7 +1134,7 @@ export default function CadeiaValorPage() {
                     onPointerDown={(e) => handleNodePointerDown(e, node)}
                     onPointerMove={(e) => handleNodePointerMove(e, node)}
                     onPointerUp={(e) => handleNodePointerUp(e, node)}
-                    onDoubleClick={() => navigate(`/app/gestao/briefing/${node.id}`)}
+                    onDoubleClick={() => setEditingNode(node)}
                     className={`absolute w-[280px] rounded-2xl p-4 bg-white dark:bg-[#131B2B] border cursor-move transition-shadow z-10 select-none group ${
                       selectedNodeId === node.id 
                         ? 'border-[#E2B755] shadow-lg shadow-yellow-500/10' 
@@ -1072,8 +1166,11 @@ export default function CadeiaValorPage() {
                     <h3 className="text-xs font-bold text-slate-800 dark:text-white mb-1.5 tracking-wide line-clamp-1">{node.label}</h3>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-2">{node.description}</p>
                     
-                    <div className="flex items-center justify-end text-[9px] font-bold text-[#4F73F5] dark:text-[#6D8CFF] hover:text-slate-800 dark:hover:text-white transition-colors gap-1 pt-1.5 border-t border-slate-100 dark:border-white/[0.04]">
-                      <span>Briefing & BPMN</span>
+                    <div 
+                      onClick={(e) => { e.stopPropagation(); setEditingNode(node); }}
+                      className="flex items-center justify-end text-[9px] font-bold text-[#4F73F5] dark:text-[#6D8CFF] hover:text-[#E2B755] dark:hover:text-amber-400 transition-colors gap-1 pt-1.5 border-t border-slate-100 dark:border-white/[0.04] cursor-pointer"
+                    >
+                      <span>Editar Bloco</span>
                       <ChevronRight size={10} />
                     </div>
                   </div>
@@ -1477,6 +1574,78 @@ export default function CadeiaValorPage() {
               >
                 Conectar Blocos
               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: EDIT PROCESS BLOCK */}
+      <AnimatePresence>
+        {editingNode && (
+          <div className="fixed inset-0 bg-black/60 z-[120] flex items-center justify-center p-4 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={16} className="text-[#E2B755]" />
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white">Editar Bloco de Processo</h3>
+                </div>
+                <button 
+                  onClick={() => setEditingNode(null)}
+                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white"
+                >
+                  Fechar
+                </button>
+              </div>
+
+              <form onSubmit={handleUpdateNode} className="space-y-4 text-xs">
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Nome do Processo</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingNode.label}
+                    onChange={(e) => setEditingNode({ ...editingNode, label: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                    placeholder="Ex: Coleta de Informações Inicial"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Categoria</label>
+                  <select
+                    value={editingNode.category}
+                    onChange={(e) => setEditingNode({ ...editingNode, category: e.target.value as 'principal' | 'apoio' })}
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                  >
+                    <option value="principal">Processo Principal</option>
+                    <option value="apoio">Processo de Apoio</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Descrição / Detalhes de Fluxo</label>
+                  <textarea
+                    rows={4}
+                    value={editingNode.description || ''}
+                    onChange={(e) => setEditingNode({ ...editingNode, description: e.target.value })}
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none resize-none"
+                    placeholder="Descreva as ações, atores e regras deste bloco..."
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-[#E2B755] hover:bg-[#c99f43] text-white rounded-xl text-xs font-bold transition-all shadow-lg flex items-center justify-center gap-1.5"
+                >
+                  <CheckCircle size={14} />
+                  Salvar Alterações
+                </button>
+              </form>
             </motion.div>
           </div>
         )}
