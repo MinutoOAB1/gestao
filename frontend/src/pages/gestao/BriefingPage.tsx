@@ -236,17 +236,24 @@ export default function BriefingPage() {
     const savedHistory = localStorage.getItem(`bpmn-history-${id}`);
     const savedLanes = localStorage.getItem(`bpmn-lanes-${id}`);
     
-    // Load dynamic contextual templates if no localStorage data exists yet
     if (savedNodes && savedConns) {
       try {
         setNodes(JSON.parse(savedNodes));
         setConnections(JSON.parse(savedConns));
       } catch (e) {}
     } else {
-      const template = getDefaultBPMNData(id);
-      setNodes(template.nodes);
-      setConnections(template.connections);
-      setDetails(template.details);
+      // Iniciar com canvas limpo e sem dados mockados
+      setNodes([]);
+      setConnections([]);
+      setDetails({
+        objective: '',
+        owner: '',
+        actors: '',
+        rules: '',
+        dataCollected: '',
+        systemsUsed: '',
+        docsGenerated: ''
+      });
     }
     
     if (savedDetails) {
@@ -254,9 +261,15 @@ export default function BriefingPage() {
         setDetails(JSON.parse(savedDetails));
       } catch (e) {}
     } else if (savedNodes && savedConns) {
-      // Just fallback details if custom data but details missing
-      const template = getDefaultBPMNData(id);
-      setDetails(template.details);
+      setDetails({
+        objective: '',
+        owner: '',
+        actors: '',
+        rules: '',
+        dataCollected: '',
+        systemsUsed: '',
+        docsGenerated: ''
+      });
     }
 
     if (savedLanes) {
@@ -322,6 +335,12 @@ export default function BriefingPage() {
         logRevision(`Conectou o bloco "${nodes.find(n => n.id === connectingNodeId)?.label}" ao bloco "${node.label}"`);
       }
       setConnectingNodeId(null);
+      return;
+    }
+
+    // Evitar arrastar ou capturar o ponteiro se clicar em um botão, select ou input
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('select') || target.closest('a') || target.closest('input')) {
       return;
     }
 

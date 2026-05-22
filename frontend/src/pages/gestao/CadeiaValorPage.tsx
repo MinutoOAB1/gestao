@@ -274,24 +274,9 @@ export default function CadeiaValorPage() {
         console.error('Failed to parse saved Cadeia de Valor:', e);
       }
     } else {
-      // Set initial premium layout
-      const initialNodes: ProcessNode[] = [
-        { id: 'triagem', label: 'Triagem e Qualificação', category: 'principal', description: 'Análise de viabilidade jurídica e qualificação preliminar dos leads de entrada.', x: 150, y: 120 },
-        { id: 'previdenciario', label: 'Assessoria Previdenciária', category: 'principal', description: 'Cálculo de tempo de contribuição, planejamento e requerimento de benefícios.', x: 150, y: 340 },
-        { id: 'atendimento', label: 'Atendimento ao Cliente', category: 'principal', description: 'Realizar o primeiro contato com potenciais clientes, entendendo suas demandas e cadastrando no CRM.', x: 480, y: 230 },
-        { id: 'fechamento', label: 'Fechamento de Contratos', category: 'principal', description: 'Geração e negociação de propostas comerciais, honorários e coleta de assinaturas digitais.', x: 800, y: 230 },
-        { id: 'financeiro', label: 'Financeiro e Custos', category: 'apoio', description: 'Faturamento de honorários, controle de fluxo de caixa, pagamentos e planejamento.', x: 480, y: 460 }
-      ];
-      
-      const initialConns: Connection[] = [
-        { id: 'c1', from: 'triagem', to: 'atendimento', label: 'Gera leads qualificados' },
-        { id: 'c2', from: 'previdenciario', to: 'atendimento', label: 'Filtra clientes de benefício' },
-        { id: 'c3', from: 'atendimento', to: 'fechamento', label: 'Direciona para comercial' },
-        { id: 'c4', from: 'fechamento', to: 'financeiro', label: 'Fatura e cobra honorários' }
-      ];
-      
-      setNodes(initialNodes);
-      setConnections(initialConns);
+      // Começar canvas limpo sem dados mockados
+      setNodes([]);
+      setConnections([]);
     }
     
     if (savedAvailables) {
@@ -353,6 +338,12 @@ export default function CadeiaValorPage() {
   const activeDragNodeIdRef = useRef<string | null>(null);
 
   const handleNodePointerDown = (e: React.PointerEvent<HTMLDivElement>, node: ProcessNode) => {
+    // Evitar arrastar ou capturar o ponteiro se clicar em um botão, select ou input de exclusão/ação
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('select') || target.closest('a') || target.closest('input')) {
+      return;
+    }
+
     e.stopPropagation();
     setSelectedNodeId(node.id);
     activeDragNodeIdRef.current = node.id;
