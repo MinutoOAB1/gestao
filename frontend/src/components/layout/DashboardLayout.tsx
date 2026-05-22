@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { PrefetchLink } from '../ui/PrefetchLink';
 import { BrandLogo } from '../ui/BrandLogo';
-import { Users, FileText, Calendar, DollarSign, Settings, LogOut, ChevronRight, Search, Menu, Home, Plus, Folder, Sun, Moon, ClipboardList, Shield, History, ChevronDown, User, X, MoreHorizontal, Clock, Pause } from 'lucide-react';
+import { Users, FileText, Calendar, DollarSign, Settings, LogOut, ChevronRight, Search, Menu, Home, Plus, Folder, Sun, Moon, ClipboardList, Shield, History, ChevronDown, User, X, MoreHorizontal, Clock, Pause, Network, Workflow } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -215,6 +215,8 @@ const DRAWER_MENU_ITEMS = [
     { icon: Calendar, label: 'Agenda', path: '/app/agenda' },
     { icon: Folder, label: 'Meus Arquivos', path: '/app/documentos' },
     { icon: FileText, label: 'Modelos', path: '/app/modelos' },
+    { icon: Network, label: 'Cadeia de Valor', path: '/app/gestao/cadeia-valor' },
+    { icon: Workflow, label: 'Briefing', path: '/app/gestao/briefing' },
     { icon: Users, label: 'Usuários', path: '/app/usuarios' },
     { icon: User, label: 'Meu Perfil', path: '/app/perfil' },
     { icon: Clock, label: 'Timesheet', path: '/app/timesheet' },
@@ -387,6 +389,16 @@ export default function DashboardLayout() {
                             <SidebarItem icon={ClipboardList} label="Contratos" path="/app/contratos" collapsed={collapsed} />
                             <SidebarItem icon={Folder} label="Meus Arquivos" path="/app/documentos" collapsed={collapsed} />
                             <SidebarItem icon={FileText} label="Modelos" path="/app/modelos" collapsed={collapsed} />
+                            <div className="my-2 border-t border-white/[0.06] mx-4"></div>
+                        </>
+                    )}
+
+                    {/* Gestão do Escritório */}
+                    {user && ['ADMIN', 'LAWYER', 'INTERN'].includes(user.role) && (
+                        <>
+                            <p className={cn("px-4 text-[10px] font-semibold text-white/40 uppercase tracking-widest mb-2 mt-1", collapsed && "hidden")}>Gestão</p>
+                            <SidebarItem icon={Network} label="Cadeia de Valor" path="/app/gestao/cadeia-valor" collapsed={collapsed} />
+                            <SidebarItem icon={Workflow} label="Briefing de Processo" path="/app/gestao/briefing" collapsed={collapsed} />
                             <div className="my-2 border-t border-white/[0.06] mx-4"></div>
                         </>
                     )}
@@ -644,6 +656,7 @@ export default function DashboardLayout() {
                                     if (item.path === '/app/contratos') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
                                     if (item.path === '/app/documentos') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
                                     if (item.path === '/app/modelos') return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
+                                    if (item.path.startsWith('/app/gestao')) return ['ADMIN', 'LAWYER', 'INTERN'].includes(user?.role || '');
                                     if (item.path === '/app/usuarios') return user?.role === 'ADMIN';
                                     return true;
                                 }).map((item) => (
