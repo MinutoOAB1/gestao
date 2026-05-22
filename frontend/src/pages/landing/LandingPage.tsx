@@ -153,59 +153,30 @@ function Navbar() {
     );
 }
 
-// Typewriter animated text hook
-function useTypewriter(words: string[], typingSpeed = 80, erasingSpeed = 50, pauseMs = 1800) {
-    const [displayText, setDisplayText] = useState('');
-    const [wordIndex, setWordIndex] = useState(0);
-    const [isErasing, setIsErasing] = useState(false);
+// Animated counter hook for stats
+function useAnimatedCounter(end: number, duration = 2000, decimals = 0, startOnView = true) {
+    const [count, setCount] = useState('0');
+    const ref = useRef<HTMLDivElement>(null);
+    const isInView = useInView(ref, { once: true, amount: 0.5 });
+    const hasStarted = useRef(false);
 
     useEffect(() => {
-        const currentWord = words[wordIndex];
-        let timeout: ReturnType<typeof setTimeout>;
+        if (!startOnView || !isInView || hasStarted.current) return;
+        hasStarted.current = true;
+        const startTime = Date.now();
+        const step = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // easeOutExpo
+            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            const value = eased * end;
+            setCount(value.toFixed(decimals));
+            if (progress < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    }, [isInView, end, duration, decimals, startOnView]);
 
-        if (!isErasing && displayText.length < currentWord.length) {
-            timeout = setTimeout(() => {
-                setDisplayText(currentWord.slice(0, displayText.length + 1));
-            }, typingSpeed);
-        } else if (!isErasing && displayText.length === currentWord.length) {
-            timeout = setTimeout(() => setIsErasing(true), pauseMs);
-        } else if (isErasing && displayText.length > 0) {
-            timeout = setTimeout(() => {
-                setDisplayText(displayText.slice(0, -1));
-            }, erasingSpeed);
-        } else if (isErasing && displayText.length === 0) {
-            setIsErasing(false);
-            setWordIndex((prev) => (prev + 1) % words.length);
-        }
-
-        return () => clearTimeout(timeout);
-    }, [displayText, isErasing, wordIndex, words, typingSpeed, erasingSpeed, pauseMs]);
-
-    return displayText;
-}
-
-// Typewriter Headline Component
-const TYPEWRITER_WORDS = [
-    'Gestão Financeira',
-    'Gestão de Clientes',
-    'Gestão de Processos',
-    'Agenda de Prazos',
-    'Assinaturas Digitais',
-    'Controle de Honorários',
-    'IA Jurídica',
-    'Relatórios Executivos',
-];
-
-function TypewriterHeadline() {
-    const text = useTypewriter(TYPEWRITER_WORDS, 75, 45, 2000);
-    return (
-        <span className="inline-block min-h-[1.2em]">
-            <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white/90 to-white/40 lowercase">
-                {text}
-            </span>
-            <span className="inline-block w-[3px] h-[0.85em] ml-1 bg-accent align-middle rounded-sm animate-pulse" />
-        </span>
-    );
+    return { count, ref };
 }
 
 // Hero Section
@@ -229,7 +200,7 @@ function HeroSection() {
                         Inteligência Jurídica de Elite
                     </motion.div>
 
-                    {/* Headline with Typewriter */}
+                    {/* Static Headline */}
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -237,7 +208,7 @@ function HeroSection() {
                         className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-tight mb-10 font-display"
                     >
                         A Nova Era da sua{' '}<br className="hidden md:block" />
-                        <TypewriterHeadline />
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent via-white to-primary">Gestão Jurídica</span>
                     </motion.h1>
 
                     {/* Subheadline */}
@@ -294,7 +265,7 @@ function HeroSection() {
                         </div>
                         <div className="flex items-center gap-2">
                             <Check size={16} className="text-accent" />
-                            Suporte 24/7 Concierge
+                            Suporte Especializado 24/7
                         </div>
                     </motion.div>
                 </div>
@@ -408,31 +379,43 @@ function FeaturesSection() {
     );
 }
 
+// Animated Stat Component
+function AnimatedStat({ end, suffix, prefix, label, duration, decimals = 0 }: { end: number; suffix?: string; prefix?: string; label: string; duration?: number; decimals?: number }) {
+    const { count, ref } = useAnimatedCounter(end, duration || 2000, decimals);
+    
+    // Strip trailing .0 if present for integers formatted as floats (e.g. 2.0 to 2)
+    const displayValue = count.endsWith('.0') ? count.slice(0, -2) : count;
+
+    return (
+        <div ref={ref} className="text-center">
+            <div className="text-4xl md:text-6xl font-black text-white mb-4 font-display">
+                {prefix}{displayValue}{suffix}
+            </div>
+            <div className="text-accent text-[10px] font-black uppercase tracking-[0.3em]">
+                {label}
+            </div>
+        </div>
+    );
+}
+
 // Stats Section
 function StatsSection() {
-    const stats = [
-        { value: '500+', label: 'ESCRITÓRIOS DE ELITE' },
-        { value: 'R$ 2B+', label: 'VALORES GERENCIADOS' },
-        { value: '99.9%', label: 'DISPONIBILIDADE' },
-        { value: '24/7', label: 'CONCIERGE VIP' },
-    ];
-
     return (
         <section className="py-32 bg-primary-dark">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-                    {stats.map((stat, idx) => (
-                        <ScrollReveal key={idx} delay={idx * 0.15}>
-                            <div className="text-center">
-                                <div className="text-4xl md:text-6xl font-black text-white mb-4 font-display">
-                                    {stat.value}
-                                </div>
-                                <div className="text-accent text-[10px] font-black uppercase tracking-[0.3em]">
-                                    {stat.label}
-                                </div>
-                            </div>
-                        </ScrollReveal>
-                    ))}
+                    <ScrollReveal delay={0}>
+                        <AnimatedStat end={500} suffix="+" label="ESCRITÓRIOS DE ELITE" />
+                    </ScrollReveal>
+                    <ScrollReveal delay={0.15}>
+                        <AnimatedStat end={2} prefix="R$ " suffix="B+" label="VALORES GERENCIADOS" duration={1800} decimals={1} />
+                    </ScrollReveal>
+                    <ScrollReveal delay={0.3}>
+                        <AnimatedStat end={99.9} suffix="%" label="DISPONIBILIDADE" decimals={1} />
+                    </ScrollReveal>
+                    <ScrollReveal delay={0.45}>
+                        <AnimatedStat end={24} suffix="/7" label="SUPORTE VIP" duration={1500} />
+                    </ScrollReveal>
                 </div>
             </div>
         </section>
@@ -600,7 +583,7 @@ function PricingSection() {
                                 'Inteligência Artificial Ilimitada',
                                 'Financeiro Executivo Completo',
                                 'Ecossistema de Colaboração VIP',
-                                'Suporte Concierge 24/7',
+                                'Suporte Especializado 24/7',
                                 'Armazenamento Seguro em Nuvem',
                                 'Treinamento de Implantação'
                             ].map((feature, idx) => (
@@ -630,112 +613,109 @@ function PricingSection() {
     );
 }
 
+// Helper function to render quotes with styled highlight words
+function renderQuote(content: string, highlight?: string) {
+    if (!highlight) return `"${content}"`;
+    const index = content.toLowerCase().indexOf(highlight.toLowerCase());
+    if (index === -1) return `"${content}"`;
+    
+    const before = content.substring(0, index);
+    const matched = content.substring(index, index + highlight.length);
+    const after = content.substring(index + highlight.length);
+    
+    return (
+        <>
+            "{before}
+            <span className="text-[#B89B5E] font-extrabold">{matched}</span>
+            {after}"
+        </>
+    );
+}
+
 // Testimonials Section — Infinite horizontal marquee, pauses on hover
 function TestimonialsSection() {
     const testimonials = [
         {
-            name: 'Carlos Silva',
-            role: 'ADVOGADO SÊNIOR',
-            company: 'SILVA & ASSOC.',
-            content: 'O Advus redefiniu nossa cultura de produtividade. Não é apenas software, é vantagem competitiva.',
-            avatar: 'CS',
-            stars: 5
+            name: 'Marcos F.',
+            role: 'Terapeuta integrativo',
+            company: 'BH',
+            content: 'Tentei planilha, app de banco, caderninho. Nada durava mais de um mês. O Advus dura porque entende que eu faço sessões e vendo cursos. Tudo aparece num lugar só.',
+            photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80',
+            highlight: 'dura'
         },
         {
-            name: 'Marina Costa',
-            role: 'LEGAL DESIGNER',
-            company: 'COSTA HUB',
-            content: 'A experiência de usuário é impecável. Reflete exatamente o posicionamento premium que temos.',
-            avatar: 'MC',
-            stars: 5
+            name: 'Camila S.',
+            role: 'Consteladora',
+            company: 'Florianópolis',
+            content: 'Sempre tive medo de olhar para os números. Percebi que minha prática estava saudável — eu é que não tinha clareza. Reajustei meus valores com segurança e parei de me sentir culpada.',
+            photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80',
+            highlight: 'saudável'
         },
         {
-            name: 'Roberto Mendes',
-            role: 'CEO',
-            company: 'MENDES GROUP',
-            content: 'A IA Jurídica do Advus é o nosso filtro mais confiável em auditorias complexas. Indispensável.',
-            avatar: 'RM',
-            stars: 5
+            name: 'Roberta T.',
+            role: 'Psicanalista',
+            company: 'Curitiba',
+            content: 'Em três meses entendi pela primeira vez quanto custa o meu consultório de verdade. Era muito mais do que eu imaginava — e agora eu cobro o que vale.',
+            photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80',
+            highlight: 'de verdade'
         },
         {
-            name: 'Ana Beatriz Lopes',
-            role: 'SÓCIA FUNDADORA',
-            company: 'LOPES ADVOCACIA',
-            content: 'Desde que adotamos o Advus, reduzimos em 60% o tempo gasto com tarefas administrativas repetitivas.',
-            avatar: 'AL',
-            stars: 5
-        },
-        {
-            name: 'Fernando Dias',
-            role: 'ADVOGADO TRIBUTARISTA',
-            company: 'DIAS & LIMA',
-            content: 'O controle financeiro integrado aos processos é genial. Finalmente tenho visibilidade real dos honorários.',
-            avatar: 'FD',
-            stars: 5
-        },
-        {
-            name: 'Juliana Martins',
-            role: 'GESTORA JURÍDICA',
-            company: 'JM LEGAL',
-            content: 'A assinatura digital integrada eliminou uma dor operacional enorme. Tudo em um único lugar.',
-            avatar: 'JM',
-            stars: 5
-        },
+            name: 'Ana Paula',
+            role: 'Psicóloga',
+            company: 'São Paulo',
+            content: 'Nos primeiros atendimentos eu já estava pagando a assinatura de um ano inteiro do Advus. O controle financeiro e a facilidade de fechar contratos mudaram o jogo.',
+            photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80',
+            highlight: 'mudaram o jogo'
+        }
     ];
 
-    // Duplicate for seamless loop
-    const marqueeItems = [...testimonials, ...testimonials];
+    // Triple for seamless loop
+    const marqueeItems = [...testimonials, ...testimonials, ...testimonials];
 
     return (
-        <section id="testimonials" className="py-32 md:py-48 bg-primary-dark overflow-hidden">
-            <ScrollReveal className="text-center mb-24 px-4">
-                <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
-                    Depoimentos <br />
-                    <span className="text-white/30">de Quem Decide</span>
+        <section id="testimonials" className="py-16 md:py-20 bg-[#F4F1EC] overflow-hidden">
+            <ScrollReveal className="text-center mb-10 px-4">
+                <h2 className="text-3xl md:text-5xl font-black text-[#2E2C29] tracking-tighter font-display">
+                    Depoimentos <span className="text-[#2E2C29]/40">de Quem Decide</span>
                 </h2>
             </ScrollReveal>
 
-            {/* Marquee container with edge shadows */}
-            <div className="relative">
-                {/* Left shadow fade */}
-                <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-primary-dark to-transparent z-10 pointer-events-none" />
-                {/* Right shadow fade */}
-                <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-primary-dark to-transparent z-10 pointer-events-none" />
+            {/* Marquee container with warm edge shadows */}
+            <div className="relative py-4">
+                <div className="absolute left-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-r from-[#F4F1EC] via-[#F4F1EC]/90 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-[#F4F1EC] via-[#F4F1EC]/90 to-transparent z-10 pointer-events-none" />
 
-                {/* Infinite marquee — pauses on hover via CSS */}
                 <div
-                    className="flex gap-8 hover:[animation-play-state:paused]"
-                    style={{
-                        animation: 'marquee-scroll 40s linear infinite',
-                        width: 'max-content',
-                    }}
+                    className="flex gap-8"
+                    style={{ animation: 'marquee-scroll 38s linear infinite', width: 'max-content' }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
                 >
-                    {marqueeItems.map((testimonial, idx) => (
+                    {marqueeItems.map((t, idx) => (
                         <div
                             key={idx}
-                            className="flex-shrink-0 w-[380px] p-8 bg-white/[0.03] rounded-[2rem] border border-white/5 hover:border-accent/20 transition-all duration-300 hover:bg-white/[0.06]"
+                            className="flex-shrink-0 w-[440px] bg-[#FAF8F5] rounded-[2rem] border border-[#EAE6DF] shadow-[0_8px_30px_rgba(46,44,41,0.03)] hover:shadow-[0_12px_40px_rgba(46,44,41,0.06)] hover:border-[#D4CFC5] transition-all duration-300 p-10 flex flex-col justify-between"
                         >
-                            {/* Stars */}
-                            <div className="flex gap-1 mb-6">
-                                {[...Array(testimonial.stars)].map((_, i) => (
-                                    <Star key={i} size={14} className="text-accent fill-accent" />
-                                ))}
+                            {/* Avatar on top-left */}
+                            <div className="flex justify-start mb-6">
+                                <img
+                                    src={t.photo}
+                                    alt={t.name}
+                                    className="w-16 h-16 rounded-full object-cover border border-[#EAE6DF] shadow-sm"
+                                />
                             </div>
-                            <p className="text-white/60 leading-relaxed font-medium italic mb-8 text-sm min-h-[72px]">
-                                "{testimonial.content}"
-                            </p>
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent font-black border border-accent/20 text-lg">
-                                    {testimonial.avatar}
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-white uppercase tracking-tight text-sm">
-                                        {testimonial.name}
-                                    </h4>
-                                    <p className="text-[10px] text-accent font-black uppercase tracking-widest">
-                                        {testimonial.role} • {testimonial.company}
+                            {/* Quote */}
+                            <div className="flex-1 mb-8">
+                                <p className="text-[#2E2C29] font-serif italic text-base leading-relaxed text-left min-h-[72px]">
+                                    {renderQuote(t.content, t.highlight)}
+                                </p>
+                            </div>
+                            {/* Divider and Author details */}
+                            <div>
+                                <div className="border-t border-[#EAE6DF] pt-6 flex flex-col items-start">
+                                    <h4 className="font-bold text-[#1A1A1A] text-sm mb-1">{t.name}</h4>
+                                    <p className="font-mono text-[10px] text-[#8C8882] uppercase tracking-wider">
+                                        {t.role} · {t.company}
                                     </p>
                                 </div>
                             </div>
@@ -744,11 +724,10 @@ function TestimonialsSection() {
                 </div>
             </div>
 
-            {/* Inject marquee keyframes */}
             <style>{`
                 @keyframes marquee-scroll {
                     0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+                    100% { transform: translateX(-33.3333%); }
                 }
             `}</style>
         </section>
@@ -766,7 +745,7 @@ function FAQSection() {
         },
         {
             question: 'Quanto custa o plano ADV Plus Elite?',
-            answer: 'O plano ADV Plus Elite está disponível por R$ 47/mês (de R$ 147). Você tem acesso completo a todos os recursos: usuários e clientes ilimitados, IA Jurídica sem restrições, controle financeiro executivo, assinaturas digitais via Autentique, armazenamento em nuvem e suporte Concierge 24/7. Sem limites artificiais.'
+            answer: 'O plano ADV Plus Elite está disponível por R$ 47/mês (de R$ 147). Você tem acesso completo a todos os recursos: usuários e clientes ilimitados, IA Jurídica sem restrições, controle financeiro executivo, assinaturas digitais via Autentique, armazenamento em nuvem e suporte VIP 24/7. Sem limites artificiais.'
         },
         {
             question: 'Como funciona a IA Jurídica da plataforma?',
@@ -794,7 +773,7 @@ function FAQSection() {
         },
         {
             question: 'Como é feito o onboarding e implantação?',
-            answer: 'Todos os planos incluem treinamento de implantação com nossa equipe. O processo é guiado: cadastro de clientes, importação de processos, configuração da agenda de prazos, integração financeira e configuração de equipe. Nossa equipe de Concierge acompanha você em cada etapa.'
+            answer: 'Todos os planos incluem treinamento de implantação com nossa equipe. O processo é guiado: cadastro de clientes, importação de processos, configuração da agenda de prazos, integração financeira e configuração de equipe. Nossa equipe de suporte acompanha você em cada etapa.'
         },
         {
             question: 'O Advus funciona em dispositivos móveis?',
@@ -884,7 +863,7 @@ function FAQSection() {
                 {/* Bottom CTA */}
                 <div className="mt-20 text-center p-12 rounded-[2.5rem] bg-white/[0.02] border border-white/5">
                     <p className="text-white/50 text-base mb-2 font-medium">Ainda tem dúvidas?</p>
-                    <p className="text-white font-black text-xl mb-8 uppercase tracking-tight">Nossa equipe Concierge está disponível 24/7</p>
+                    <p className="text-white font-black text-xl mb-8 uppercase tracking-tight">Nossa equipe de suporte está disponível 24/7</p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
                             href="https://wa.me/5511999999999"
@@ -977,7 +956,7 @@ function Footer() {
                         <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Assinatura</h4>
                         <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
                             <li><a href="#pricing" className="hover:text-accent transition-colors">Planos Elite</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Concierge</a></li>
+                            <li><a href="#" className="hover:text-accent transition-colors">Suporte</a></li>
                             <li><a href="#" className="hover:text-accent transition-colors">Treinamentos</a></li>
                             <li><a href="#" className="hover:text-accent transition-colors">Upgrade</a></li>
                         </ul>
