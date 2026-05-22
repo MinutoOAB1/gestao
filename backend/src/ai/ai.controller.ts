@@ -119,5 +119,17 @@ export class AiController {
             throw new BadRequestException(`Erro ao otimizar briefing: ${error.message}`);
         }
     }
+
+    @Post('gestao/crm/estrategia')
+    async gerarEstrategiaCrm(@Body() body: { name: string, area: string, details: string }) {
+        console.log('[AI Controller] Gerando estratégia de CRM para o lead:', body.name);
+        try {
+            const strategy = await this.aiService.generateCrmStrategy(body.name, body.area, body.details);
+            return { strategy };
+        } catch (error: any) {
+            console.error('[AI Controller] Erro ao gerar estratégia de CRM:', error.message);
+            throw new BadRequestException(`Erro ao gerar estratégia de CRM: ${error.message}`);
+        }
+    }
 }
 

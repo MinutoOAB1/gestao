@@ -551,4 +551,43 @@ export class AiService {
       throw new Error('A IA não retornou um formato de Processo BPMN otimizado válido. Tente novamente.');
     }
   }
+
+  async generateCrmStrategy(leadName: string, area: string, details: string) {
+    const systemPrompt = `
+      Você é um Consultor Estratégico de Elite especializado em Atendimento, Onboarding de Clientes e CRM Jurídico no Brasil.
+      Sua missão é criar um plano tático, roteiro de perguntas e roteiro de qualificação impecável para um novo cliente (Lead) que acabou de entrar no funil de atendimento do escritório.
+
+      DADOS DO NOVO CLIENTE:
+      - Nome: ${leadName}
+      - Área Jurídica de Demanda: ${area}
+      - Informações / Descrição do caso fornecido pelo cliente: ${details || 'Nenhum detalhe adicional inserido.'}
+
+      Elabore um plano rico, estruturado, profissional e persuasivo dividido exatamente nos seguintes tópicos em formato HTML limpo e elegante (use tags <h3 class="text-sm font-bold text-slate-800 dark:text-white mt-4 mb-2">, <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2">, <ul class="list-disc pl-4 text-xs text-slate-600 dark:text-slate-300 mb-2">, e <li>):
+
+      1. 🎯 ANÁLISE DE ENQUADRAMENTO E PREMISSAS:
+         - Quais são os principais direitos constitucionais ou infraconstitucionais envolvidos no caso desta área específica.
+         - Viabilidade preliminar com base nas informações.
+
+      2. 📋 QUESTIONÁRIO DE QUALIFICAÇÃO (PERGUNTAS-CHAVE):
+         - Liste de 4 a 6 perguntas específicas que o advogado de atendimento DEVE fazer a este cliente para qualificar o caso (ex: prazos, datas, contratos existentes, histórico).
+
+      3. 📑 CHECKLIST DE DOCUMENTOS E PROVAS EXIGIDOS:
+         - Documentos indispensáveis para ingressar com a ação jurídica ou consultoria técnica para este tipo de caso.
+
+      4. 🛡️ PRINCIPAIS OBJEÇÕES & COMO CONTORNAR:
+         - Antecipe 2 objeções comuns que este cliente pode ter (ex: "tempo de demora do processo", "custo de honorários", "falta de provas") e dê scripts curtos e persuasivos de contorno.
+
+      5. 🚀 PRÓXIMOS PASSOS NO FUNIL:
+         - Ação imediata sugerida para avançar o cliente do estágio de "Coleta" para o estágio de "Fechamento".
+
+      Retorne apenas o HTML limpo e pronto para renderização direta, sem blocos de código markdown ou cabeçalhos desnecessários.
+    `;
+
+    const result = await this.callOpenRouter(
+      [{ role: 'user', content: systemPrompt }], 
+      false, 
+      'meta-llama/llama-3.1-70b-instruct'
+    );
+    return result;
+  }
 }
