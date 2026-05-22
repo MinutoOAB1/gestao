@@ -73,9 +73,22 @@ export default function CadeiaValorPage() {
   // Canvas State
   const [nodes, setNodes] = useState<ProcessNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [availableNodes, setAvailableNodes] = useState<Omit<ProcessNode, 'x' | 'y'>[]>(DEFAULT_AVAILABLE_NODES);
   const [history, setHistory] = useState<{ nodes: ProcessNode[]; connections: Connection[] }[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // Flow Models State
+  const [flowModels, setFlowModels] = useState<any[]>([]);
+  const [activeModelId, setActiveModelId] = useState<string | null>(null);
+  const [isLoadingFlows, setIsLoadingFlows] = useState(false);
+  const [showNewModelModal, setShowNewModelModal] = useState(false);
+  const [newModelName, setNewModelName] = useState('');
+  const [newModelDesc, setNewModelDesc] = useState('');
+
+  // Interactive Connecting Mode State
+  const [connectingFrom, setConnectingFrom] = useState<{
+    nodeId: string;
+    port: 'top' | 'bottom' | 'left' | 'right';
+  } | null>(null);
   
   // New custom node creator state
   const [showNewNodeModal, setShowNewNodeModal] = useState(false);
@@ -275,48 +288,78 @@ export default function CadeiaValorPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    const loadData = async () => {
+    const loadFlowModels = async () => {
+      setIsLoadingFlows(true);
       try {
         const response = await api.get('/value-chain');
-        const dbData = response.data;
-        if (dbData && dbData.nodes && dbData.nodes.length > 0) {
-          setNodes(dbData.nodes);
-          setConnections(dbData.connections || []);
-          return;
+        let models = response.data;
+        
+        // Seed default models if empty
+        if (!models || models.length === 0) {
+          // 1. Triagem e Qualificação
+          const triagemModel = {
+            name: 'Triagem e Qualificação',
+            description: 'Fluxo principal de atendimento primário, análise de leads e triagem de viabilidade jurídica.',
+            nodes: [
+              { id: 't1', label: 'Recepção e Boas-Vindas', category: 'principal', description: 'Atendimento inicial ao cliente potencial, coleta de dados cadastrais e escuta da demanda.', x: 100, y: 150 },
+              { id: 't2', label: 'Coleta de Provas e Documentos', category: 'principal', description: 'Coleta de RG, CPF, comprovante de residência e documentos comprobatórios do caso.', x: 450, y: 150 },
+              { id: 't3', label: 'Triagem de Viabilidade Jurídica', category: 'principal', description: 'Análise técnica da viabilidade jurídica, jurisprudência e probabilidade de êxito.', x: 800, y: 150 },
+              { id: 't4', label: 'Fechamento Comercial & Contrato', category: 'principal', description: 'Assinatura digital do contrato de honorários e procurações digitais.', x: 1150, y: 150 }
+            ],
+            connections: [
+              { id: 'c1', from: 't1', to: 't2', label: 'Fluxo de dados' },
+              { id: 'c2', from: 't2', to: 't3', label: 'Envio para triagem' },
+              { id: 'c3', from: 't3', to: 't4', label: 'Fechamento de contrato' }
+            ]
+          };
+          
+          // 2. Direito Previdenciário
+          const prevModel = {
+            name: 'Direito Previdenciário',
+            description: 'Mapeamento de aposentadoria, contagem de tempo de contribuição e benefício previdenciário.',
+            nodes: [
+              { id: 'p1', label: 'Análise de Contribuições (CNIS)', category: 'principal', description: 'Extração e verificação do extrato CNIS do cliente junto ao portal Meu INSS.', x: 100, y: 150 },
+              { id: 'p2', label: 'Simulação de Regras de Transição', category: 'principal', description: 'Cálculo de pedágio, pontos e definição da melhor regra de transição pós-Reforma.', x: 450, y: 150 },
+              { id: 'p3', label: 'Requerimento Administrativo INSS', category: 'principal', description: 'Protocolo digital no sistema Meu INSS com petição fundamentada de aposentadoria.', x: 800, y: 150 },
+              { id: 'p4', label: 'Concessão do Benefício', category: 'principal', description: 'Auditoria da carta de concessão de benefício e implantação dos pagamentos.', x: 1150, y: 150 }
+            ],
+            connections: [
+              { id: 'cp1', from: 'p1', to: 'p2', label: 'Dados de cálculo' },
+              { id: 'cp2', from: 'p2', to: 'p3', label: 'Petição INSS' },
+              { id: 'cp3', from: 'p3', to: 'p4', label: 'Aprovação INSS' }
+            ]
+          };
+
+          // Post both to backend
+          await api.post('/value-chain', triagemModel);
+          await api.post('/value-chain', prevModel);
+          
+          // Fetch again
+          const fetchRes = await api.get('/value-chain');
+          models = fetchRes.data;
+        }
+
+        setFlowModels(models);
+        
+        // Auto select first flow model
+        if (models && models.length > 0) {
+          const first = models[0];
+          setActiveModelId(first.id);
+          setNodes(first.nodes || []);
+          setConnections(first.connections || []);
+          
+          // Set initial history
+          setHistory([{ nodes: first.nodes || [], connections: first.connections || [] }]);
+          setHistoryIndex(0);
         }
       } catch (err) {
-        console.error('Failed to load from database, trying localStorage fallback:', err);
-      }
-
-      // Fallback to localStorage
-      const savedNodes = localStorage.getItem('cadeia-valor-nodes');
-      const savedConns = localStorage.getItem('cadeia-valor-connections');
-      if (savedNodes && savedConns) {
-        try {
-          const parsedNodes = JSON.parse(savedNodes);
-          const parsedConns = JSON.parse(savedConns);
-          setNodes(parsedNodes);
-          setConnections(parsedConns);
-          
-          // Migrate to database automatically
-          await api.post('/value-chain', { nodes: parsedNodes, connections: parsedConns });
-        } catch (e) {
-          console.error('Failed to parse saved localStorage Cadeia de Valor:', e);
-        }
-      } else {
-        setNodes([]);
-        setConnections([]);
+        console.error('Failed to load flow models:', err);
+      } finally {
+        setIsLoadingFlows(false);
       }
     };
 
-    loadData();
-
-    const savedAvailables = localStorage.getItem('cadeia-valor-availables');
-    if (savedAvailables) {
-      try {
-        setAvailableNodes(JSON.parse(savedAvailables));
-      } catch (e) {}
-    }
+    loadFlowModels();
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
@@ -333,46 +376,108 @@ export default function CadeiaValorPage() {
     setHistory([...nextHistory, { nodes: newNodes, connections: newConns }]);
     setHistoryIndex(nextHistory.length);
 
-    try {
-      await api.post('/value-chain', { nodes: newNodes, connections: newConns });
-    } catch (err) {
-      console.error('Failed to save Cadeia de Valor to database:', err);
+    if (activeModelId) {
+      try {
+        await api.put(`/value-chain/${activeModelId}`, { nodes: newNodes, connections: newConns });
+        // Update list inline to keep sync
+        setFlowModels(prev => prev.map(m => m.id === activeModelId ? { ...m, nodes: newNodes, connections: newConns } : m));
+      } catch (err) {
+        console.error('Failed to save flow to database:', err);
+      }
     }
   };
 
-  // Drag & Drop available node to Canvas (HTML5 Drag over & Drop)
-  const handleDragStart = (e: React.DragEvent, item: Omit<ProcessNode, 'x' | 'y'>) => {
-    setDraggedItem(item);
-    e.dataTransfer.setData('text/plain', item.id);
+  // Flow selection and management
+  const handleSelectFlowModel = (model: any) => {
+    setActiveModelId(model.id);
+    setNodes(model.nodes || []);
+    setConnections(model.connections || []);
+    setHistory([{ nodes: model.nodes || [], connections: model.connections || [] }]);
+    setHistoryIndex(0);
+    setConnectingFrom(null);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (!draggedItem || !canvasRef.current) return;
-
-    // Check if node is already on canvas
-    if (nodes.some(n => n.id === draggedItem.id)) {
-      alert('Este elemento já está posicionado no quadro.');
+  const handleDeleteFlowModel = async (e: React.MouseEvent, modelId: string) => {
+    e.stopPropagation();
+    if (flowModels.length <= 1) {
+      alert('Você deve manter pelo menos um modelo de fluxo ativo no painel.');
       return;
     }
+    if (confirm('Tem certeza de que deseja excluir permanentemente este modelo de fluxo estratégico?')) {
+      try {
+        await api.delete(`/value-chain/${modelId}`);
+        const updatedModels = flowModels.filter(m => m.id !== modelId);
+        setFlowModels(updatedModels);
+        
+        // Switch active model if we deleted it
+        if (activeModelId === modelId) {
+          const nextModel = updatedModels[0];
+          handleSelectFlowModel(nextModel);
+        }
+      } catch (err) {
+        console.error('Failed to delete flow model:', err);
+        alert('Erro ao excluir modelo de fluxo.');
+      }
+    }
+  };
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left - 150) / zoom); // Centered relative to card width
-    const y = Math.round((e.clientY - rect.top - 50) / zoom);
+  const handleCreateNewFlowModel = async (name: string, description: string) => {
+    if (!name.trim()) return;
+    try {
+      const response = await api.post('/value-chain', {
+        name,
+        description,
+        nodes: [],
+        connections: []
+      });
+      const newModel = response.data;
+      setFlowModels(prev => [...prev, newModel]);
+      handleSelectFlowModel(newModel);
+      setShowNewModelModal(false);
+      setNewModelName('');
+      setNewModelDesc('');
+    } catch (err) {
+      console.error('Failed to create new flow model:', err);
+      alert('Erro ao criar novo modelo de fluxo.');
+    }
+  };
 
+  // Interactive Connecting Mode Trigger
+  const handleStartConnection = (nodeId: string, port: 'top' | 'bottom' | 'left' | 'right') => {
+    setConnectingFrom({ nodeId, port });
+  };
+
+  // Direct Toolbar Block Inserter
+  const handleAddPrincipalBlock = () => {
+    const id = `node_p_${Date.now()}`;
     const newNode: ProcessNode = {
-      ...draggedItem,
-      x: Math.max(50, x),
-      y: Math.max(50, y)
+      id,
+      label: 'Novo Processo Principal',
+      category: 'principal',
+      description: 'Descrição do seu processo principal. Dê duplo clique para editar.',
+      x: 200,
+      y: 200
     };
+    saveState([...nodes, newNode], connections);
+  };
 
-    const updatedNodes = [...nodes, newNode];
-    saveState(updatedNodes, connections);
-    setDraggedItem(null);
+  const handleAddSupportBlock = () => {
+    const id = `node_s_${Date.now()}`;
+    const newNode: ProcessNode = {
+      id,
+      label: 'Novo Processo de Apoio',
+      category: 'apoio',
+      description: 'Descrição do seu processo de apoio. Dê duplo clique para editar.',
+      x: 200,
+      y: 400
+    };
+    saveState([...nodes, newNode], connections);
+  };
+
+  const handleClearAll = () => {
+    if (confirm('Tem certeza de que deseja limpar todos os blocos deste fluxo?')) {
+      saveState([], []);
+    }
   };
 
   // Node Dragging inside Canvas (Custom pointer tracking for React 19 compatibility with refs)
@@ -386,6 +491,26 @@ export default function CadeiaValorPage() {
     }
 
     e.stopPropagation();
+
+    // INTERCEPT: If connection mode is active, select this node as target
+    if (connectingFrom) {
+      if (connectingFrom.nodeId === node.id) {
+        setConnectingFrom(null); // Cancel connecting
+        return;
+      }
+      
+      const newConn: Connection = {
+        id: `conn_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        from: connectingFrom.nodeId,
+        to: node.id,
+        label: 'Fluxo operacional'
+      };
+      
+      saveState(nodes, [...connections, newConn]);
+      setConnectingFrom(null);
+      return;
+    }
+
     setSelectedNodeId(node.id);
     activeDragNodeIdRef.current = node.id;
     setActiveDragNodeId(node.id);
@@ -443,16 +568,16 @@ export default function CadeiaValorPage() {
     if (!newNodeLabel.trim()) return;
     
     const uniqueId = `custom_${Date.now()}`;
-    const newAvailable: Omit<ProcessNode, 'x' | 'y'> = {
+    const newNode: ProcessNode = {
       id: uniqueId,
       label: newNodeLabel,
       category: newNodeCategory,
-      description: newNodeDesc || 'Processo customizado criado pelo escritório de advocacia.'
+      description: newNodeDesc || 'Processo customizado criado pelo escritório de advocacia.',
+      x: 250,
+      y: 250
     };
 
-    const updatedAvailables = [...availableNodes, newAvailable];
-    setAvailableNodes(updatedAvailables);
-    localStorage.setItem('cadeia-valor-availables', JSON.stringify(updatedAvailables));
+    saveState([...nodes, newNode], connections);
 
     // Reset Form
     setNewNodeLabel('');
@@ -1104,93 +1229,119 @@ export default function CadeiaValorPage() {
             
             {/* Create custom process model button */}
             <button 
-              onClick={() => setShowNewNodeModal(true)}
+              onClick={() => setShowNewModelModal(true)}
               className="w-full flex items-center justify-center gap-2 p-3 bg-slate-100 hover:bg-slate-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.07] border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-bold text-slate-700 dark:text-white transition-all group"
             >
               <Plus size={15} className="text-[#4F73F5] group-hover:scale-125 transition-transform" />
               Criar Novo Modelo
             </button>
 
-            {/* Link connections button */}
-            <button 
-              onClick={() => setShowNewConnModal(true)}
-              className="w-full flex items-center justify-center gap-2 p-3 bg-[#4F73F5]/10 hover:bg-[#4F73F5]/20 border border-[#4F73F5]/20 rounded-2xl text-xs font-bold text-[#4F73F5] dark:text-[#6D8CFF] transition-all"
-            >
-              <Network size={14} />
-              Conectar Processos
-            </button>
-
-            {/* Principais Section */}
-            <div className="space-y-3">
+            {/* Flow Models Section */}
+            <div className="space-y-3 flex-1 flex flex-col min-h-0">
               <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#E2B755]" />
-                Modelos Principais
+                Seus Modelos de Fluxo
               </h3>
-              <div className="space-y-2">
-                {availableNodes.filter(n => n.category === 'principal').map(item => {
-                  const onCanvas = nodes.some(n => n.id === item.id);
-                  return (
-                    <div
-                      key={item.id}
-                      draggable={!onCanvas}
-                      onDragStart={(e) => handleDragStart(e, item)}
-                      className={`p-3 bg-slate-50 dark:bg-[#131B2B] border rounded-xl relative overflow-hidden transition-all group ${
-                        onCanvas 
-                          ? 'opacity-40 border-slate-100 dark:border-white/5 cursor-not-allowed' 
-                          : 'border-slate-200 dark:border-white/5 hover:border-[#E2B755]/30 cursor-grab hover:bg-slate-100/50 dark:hover:bg-[#172238] active:cursor-grabbing'
-                      }`}
-                    >
-                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#E2B755]/70" />
-                      <div className="flex items-start justify-between mb-1">
-                        <span className="text-xs font-bold text-slate-800 dark:text-white tracking-wide">{item.label}</span>
-                        {!onCanvas && (
-                          <span className="text-[8px] font-bold text-[#E2B755] bg-[#E2B755]/10 px-1.5 py-0.5 rounded uppercase">Arrastar</span>
-                        )}
+              
+              {isLoadingFlows ? (
+                <div className="flex items-center justify-center py-10 flex-1">
+                  <div className="w-5 h-5 border-2 border-[#4F73F5] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-2 overflow-y-auto custom-scrollbar flex-1 pr-1">
+                  {flowModels.map(model => {
+                    const isActive = activeModelId === model.id;
+                    return (
+                      <div
+                        key={model.id}
+                        onClick={() => handleSelectFlowModel(model)}
+                        className={`p-3 border rounded-xl relative overflow-hidden transition-all cursor-pointer group flex flex-col ${
+                          isActive 
+                            ? 'bg-[#4F73F5]/5 border-[#4F73F5] dark:bg-[#4F73F5]/10 dark:border-[#4F73F5]' 
+                            : 'bg-slate-50 dark:bg-[#131B2B] border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 hover:bg-slate-100/50 dark:hover:bg-[#172238]'
+                        }`}
+                      >
+                        <div className={`absolute right-0 top-0 bottom-0 w-1 ${isActive ? 'bg-[#4F73F5]' : 'bg-slate-300 dark:bg-slate-700'}`} />
+                        <div className="flex items-start justify-between gap-2">
+                          <span className={`text-xs font-bold tracking-wide transition-colors ${
+                            isActive ? 'text-[#4F73F5] dark:text-[#6D8CFF]' : 'text-slate-800 dark:text-white'
+                          }`}>{model.name}</span>
+                          
+                          <button
+                            onClick={(e) => handleDeleteFlowModel(e, model.id)}
+                            className="text-slate-400 hover:text-red-500 p-1 hover:bg-slate-200 dark:hover:bg-white/5 rounded transition-all opacity-0 group-hover:opacity-100"
+                            title="Excluir fluxo"
+                          >
+                            <Trash2 size={11} />
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mt-1">{model.description || 'Sem descrição cadastrada.'}</p>
                       </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
+                    );
+                  })}
+                  
+                  {flowModels.length === 0 && (
+                    <div className="text-center py-8 text-xs text-slate-400">
+                      Nenhum modelo cadastrado.
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Apoio Section */}
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#4F73F5]" />
-                Processos de Apoio
-              </h3>
-              <div className="space-y-2">
-                {availableNodes.filter(n => n.category === 'apoio').map(item => {
-                  const onCanvas = nodes.some(n => n.id === item.id);
-                  return (
-                    <div
-                      key={item.id}
-                      draggable={!onCanvas}
-                      onDragStart={(e) => handleDragStart(e, item)}
-                      className={`p-3 bg-slate-50 dark:bg-[#131B2B] border rounded-xl relative overflow-hidden transition-all group ${
-                        onCanvas 
-                          ? 'opacity-40 border-slate-100 dark:border-white/5 cursor-not-allowed' 
-                          : 'border-slate-200 dark:border-white/5 hover:border-[#4F73F5]/30 cursor-grab hover:bg-slate-100/50 dark:hover:bg-[#172238] active:cursor-grabbing'
-                      }`}
-                    >
-                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#4F73F5]/70" />
-                      <div className="flex items-start justify-between mb-1">
-                        <span className="text-xs font-bold text-slate-800 dark:text-white tracking-wide">{item.label}</span>
-                        {!onCanvas && (
-                          <span className="text-[8px] font-bold text-[#4F73F5] bg-[#4F73F5]/10 px-1.5 py-0.5 rounded uppercase">Arrastar</span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>
-                    </div>
-                  );
-                })}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
           {/* RIGHT COLUMN: Whiteboard canvas */}
           <div className="flex-1 flex flex-col relative overflow-hidden bg-[#F8FAFC] dark:bg-[#090E17]">
+            
+            {/* FLOATING CONNECTING STATUS INDICATOR */}
+            {connectingFrom && (() => {
+              const sourceNode = nodes.find(n => n.id === connectingFrom.nodeId);
+              return (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2.5 bg-[#4F73F5] text-white text-xs font-bold rounded-2xl shadow-2xl animate-bounce">
+                  <Sparkles size={14} className="animate-spin" />
+                  <span>
+                    Conectando de <strong className="underline font-black">{sourceNode?.label}</strong> ({connectingFrom.port}). Clique no bloco de destino...
+                  </span>
+                  <button 
+                    onClick={() => setConnectingFrom(null)}
+                    className="ml-2 bg-black/20 hover:bg-black/40 text-white rounded-full p-1 transition-all"
+                    title="Cancelar"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              );
+            })()}
+
+            {/* FLOATING EDITING TOOLBOX (Miro Style) */}
+            <div className="absolute left-4 top-1/3 z-20 flex flex-col gap-2.5 p-2 bg-white/95 dark:bg-[#0F172A]/90 border border-slate-200 dark:border-white/5 rounded-2xl shadow-2xl backdrop-blur-md">
+              <button
+                onClick={handleAddPrincipalBlock}
+                className="p-3 bg-[#E2B755]/10 hover:bg-[#E2B755]/20 text-[#E2B755] rounded-xl transition-all flex flex-col items-center gap-1 group relative cursor-pointer"
+                title="Adicionar Bloco Principal"
+              >
+                <Plus size={15} strokeWidth={3} />
+                <span className="text-[8px] font-black uppercase">Principal</span>
+              </button>
+              <button
+                onClick={handleAddSupportBlock}
+                className="p-3 bg-[#4F73F5]/10 hover:bg-[#4F73F5]/20 text-[#4F73F5] dark:text-[#6D8CFF] rounded-xl transition-all flex flex-col items-center gap-1 group relative cursor-pointer"
+                title="Adicionar Bloco de Apoio"
+              >
+                <Plus size={15} strokeWidth={3} />
+                <span className="text-[8px] font-black uppercase">Apoio</span>
+              </button>
+              <div className="h-[1px] bg-slate-200 dark:bg-white/10 my-1" />
+              <button
+                onClick={handleClearAll}
+                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all flex flex-col items-center gap-1 cursor-pointer"
+                title="Limpar quadro"
+              >
+                <Trash2 size={14} />
+                <span className="text-[8px] font-bold">Limpar</span>
+              </button>
+            </div>
+
             {/* Instructions banner */}
             <div className="absolute top-4 left-4 z-20 flex items-center gap-2 p-3 rounded-xl bg-white/95 dark:bg-[#0F172A]/90 border border-slate-200 dark:border-white/5 shadow-2xl backdrop-blur-md max-w-sm">
               <BookOpen size={16} className="text-[#4F73F5] flex-shrink-0" />
@@ -1314,11 +1465,8 @@ export default function CadeiaValorPage() {
               </div>
             )}
 
-            {/* GRID CANVAS wrapper with pointer handlers for panning */}
             <div 
               ref={canvasRef}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
               onPointerDown={handleCanvasPointerDown}
               onPointerMove={handleCanvasPointerMove}
               onPointerUp={handleCanvasPointerUp}
@@ -1467,6 +1615,36 @@ export default function CadeiaValorPage() {
                       <span>Editar Bloco</span>
                       <ChevronRight size={10} />
                     </div>
+
+                    {/* Miro Quick Connection Ports on 4 sides */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStartConnection(node.id, 'top'); }}
+                      className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#4F73F5] text-white hover:bg-[#E2B755] flex items-center justify-center border border-white dark:border-[#131B2B] shadow-md opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer scale-90 hover:scale-110 active:scale-95"
+                      title="Conectar do topo"
+                    >
+                      <Plus size={10} strokeWidth={3} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStartConnection(node.id, 'bottom'); }}
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-5 h-5 rounded-full bg-[#4F73F5] text-white hover:bg-[#E2B755] flex items-center justify-center border border-white dark:border-[#131B2B] shadow-md opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer scale-90 hover:scale-110 active:scale-95"
+                      title="Conectar da base"
+                    >
+                      <Plus size={10} strokeWidth={3} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStartConnection(node.id, 'left'); }}
+                      className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#4F73F5] text-white hover:bg-[#E2B755] flex items-center justify-center border border-white dark:border-[#131B2B] shadow-md opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer scale-90 hover:scale-110 active:scale-95"
+                      title="Conectar da esquerda"
+                    >
+                      <Plus size={10} strokeWidth={3} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleStartConnection(node.id, 'right'); }}
+                      className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#4F73F5] text-white hover:bg-[#E2B755] flex items-center justify-center border border-white dark:border-[#131B2B] shadow-md opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer scale-90 hover:scale-110 active:scale-95"
+                      title="Conectar da direita"
+                    >
+                      <Plus size={10} strokeWidth={3} />
+                    </button>
                   </div>
                 ))}
 
@@ -1476,11 +1654,11 @@ export default function CadeiaValorPage() {
                     <Network size={40} className="text-slate-400 dark:text-slate-500 mb-4 animate-pulse" />
                     <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-1.5">Quadro Branco Vazio</h3>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
-                      Arrastar processos do menu lateral para o quadro para desenhar o mapa do seu escritório.
+                      Utilize a barra de ferramentas flutuante à esquerda para adicionar blocos operacionais de processos ou conectores.
                     </p>
                     <button 
                       onClick={() => setShowAiModal(true)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-[#4F73F5]/20 hover:bg-[#4F73F5]/30 text-[#4F73F5] dark:text-[#6D8CFF] border border-[#4F73F5]/20 rounded-xl text-xs font-bold"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-[#4F73F5]/20 hover:bg-[#4F73F5]/30 text-[#4F73F5] dark:text-[#6D8CFF] border border-[#4F73F5]/20 rounded-xl text-xs font-bold cursor-pointer"
                     >
                       <Sparkles size={13} />
                       Carregar Exemplo com IA
@@ -2148,6 +2326,68 @@ export default function CadeiaValorPage() {
                   Contatar via WhatsApp
                 </a>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL: CREATE NEW FLOW MODEL */}
+      <AnimatePresence>
+        {showNewModelModal && (
+          <div className="fixed inset-0 bg-black/60 z-[120] flex items-center justify-center p-4 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-md bg-white dark:bg-[#131B2B] border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-2xl space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-slate-800 dark:text-white">Criar Novo Modelo de Fluxo</h3>
+                <button 
+                  onClick={() => setShowNewModelModal(false)}
+                  className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white cursor-pointer"
+                >
+                  Fechar
+                </button>
+              </div>
+
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreateNewFlowModel(newModelName, newModelDesc);
+                }} 
+                className="space-y-3 text-xs"
+              >
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Nome do Fluxo / Modelo</label>
+                  <input
+                    type="text"
+                    required
+                    value={newModelName}
+                    onChange={(e) => setNewModelName(e.target.value)}
+                    placeholder="Ex: Direito Previdenciário - Concessão"
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 focus:ring-1 focus:ring-[#4F73F5] outline-none font-medium"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-slate-500 dark:text-slate-400 font-medium">Descrição Estratégica</label>
+                  <textarea
+                    rows={3}
+                    value={newModelDesc}
+                    onChange={(e) => setNewModelDesc(e.target.value)}
+                    placeholder="Descreva brevemente o propósito deste mapeamento de fluxo..."
+                    className="w-full bg-slate-50 dark:bg-[#1C263A] border border-slate-200 dark:border-white/5 text-slate-800 dark:text-white rounded-xl p-2.5 resize-none focus:ring-1 focus:ring-[#4F73F5] outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-[#4F73F5] hover:bg-[#4062E0] text-white rounded-xl text-xs font-bold transition-all shadow-lg mt-2 cursor-pointer"
+                >
+                  Criar Modelo e Abrir Canva
+                </button>
+              </form>
             </motion.div>
           </div>
         )}
