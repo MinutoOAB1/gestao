@@ -80,26 +80,26 @@ function Navbar() {
     const navigate = useNavigate();
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-2xl border-b border-white/5">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#F4F1EC]/85 backdrop-blur-2xl border-b border-[#EAE6DF]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <BrandLogo variant="light" size="md" />
+                        <BrandLogo variant="dark" size="md" />
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-10">
-                        <a href="#features" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#features" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             Recursos
                         </a>
-                        <a href="#pricing" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#pricing" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             Assinatura
                         </a>
-                        <a href="#testimonials" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#testimonials" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             Ecossistema
                         </a>
-                        <a href="#faq" className="text-white/60 hover:text-accent font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#faq" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             FAQ
                         </a>
                     </div>
@@ -108,13 +108,13 @@ function Navbar() {
                     <div className="hidden md:flex items-center gap-6">
                         <button
                             onClick={() => navigate('/login')}
-                            className="text-white/70 font-bold hover:text-white transition-colors text-sm"
+                            className="text-[#2E2C29]/70 font-bold hover:text-[#2E2C29] transition-colors text-sm"
                         >
                             ENTRAR
                         </button>
                         <button
                             onClick={() => navigate('/register')}
-                            className="px-6 py-2.5 bg-accent text-primary-dark font-black rounded-xl hover:bg-white transition-all shadow-lg shadow-accent/10 text-xs uppercase tracking-tighter"
+                            className="px-6 py-2.5 bg-[#4F73F5] text-white font-black rounded-xl hover:bg-black transition-all shadow-lg shadow-primary/10 text-xs uppercase tracking-tighter"
                         >
                             SOLICITE UMA DEMO
                         </button>
@@ -123,7 +123,7 @@ function Navbar() {
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 text-white"
+                        className="md:hidden p-2 text-[#2E2C29]"
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -131,17 +131,17 @@ function Navbar() {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden py-6 border-t border-white/10 bg-black/90 backdrop-blur-3xl px-4 rounded-b-3xl">
+                    <div className="md:hidden py-6 border-t border-[#EAE6DF] bg-[#FAF8F5] backdrop-blur-3xl px-4 rounded-b-3xl shadow-lg">
                         <div className="flex flex-col gap-5">
-                            <a href="#features" className="text-white/80 font-medium text-lg">Recursos</a>
-                            <a href="#pricing" className="text-white/80 font-medium text-lg">Assinatura</a>
-                            <a href="#testimonials" className="text-white/80 font-medium text-lg">Ecossistema</a>
-                            <a href="#faq" className="text-white/80 font-medium text-lg">FAQ</a>
-                            <div className="flex flex-col gap-3 pt-6 border-t border-white/10">
-                                <button onClick={() => navigate('/login')} className="py-4 text-center text-white font-bold border border-white/10 rounded-2xl">
+                            <a href="#features" className="text-[#2E2C29] font-medium text-lg">Recursos</a>
+                            <a href="#pricing" className="text-[#2E2C29] font-medium text-lg">Assinatura</a>
+                            <a href="#testimonials" className="text-[#2E2C29] font-medium text-lg">Ecossistema</a>
+                            <a href="#faq" className="text-[#2E2C29] font-medium text-lg">FAQ</a>
+                            <div className="flex flex-col gap-3 pt-6 border-t border-[#EAE6DF]">
+                                <button onClick={() => navigate('/login')} className="py-4 text-center text-[#2E2C29] font-bold border border-[#EAE6DF] rounded-2xl bg-white">
                                     ENTRAR
                                 </button>
-                                <button onClick={() => navigate('/register')} className="py-4 text-center bg-accent text-primary-dark font-black rounded-2xl">
+                                <button onClick={() => navigate('/register')} className="py-4 text-center bg-[#4F73F5] text-white font-black rounded-2xl shadow-sm">
                                     SOLICITE UMA DEMO
                                 </button>
                             </div>
@@ -184,7 +184,7 @@ function HeroSection() {
     const navigate = useNavigate();
 
     return (
-        <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 overflow-hidden bg-primary-dark">
+        <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 overflow-hidden bg-[#F4F1EC]">
             {/* Animated Background */}
             <AnimatedHeroBackground />
             
@@ -194,7 +194,7 @@ function HeroSection() {
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-accent rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-2xl backdrop-blur-md"
+                        className="inline-flex items-center gap-3 px-4 py-2 bg-white/60 border border-[#EAE6DF] text-[#B89B5E] rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-sm backdrop-blur-md"
                     >
                         <Sparkles size={14} className="animate-pulse" />
                         Inteligência Jurídica de Elite
@@ -205,10 +205,10 @@ function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-tight mb-10 font-display"
+                        className="text-5xl md:text-7xl lg:text-8xl font-black text-[#2E2C29] tracking-tighter leading-tight mb-10 font-display"
                     >
                         A Nova Era da sua{' '}<br className="hidden md:block" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent via-white to-primary">Gestão Jurídica</span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#B89B5E] via-[#2E2C29] to-[#4F73F5]">Gestão Jurídica</span>
                     </motion.h1>
 
                     {/* Subheadline */}
@@ -216,7 +216,7 @@ function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="text-lg md:text-2xl text-white/50 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
+                        className="text-lg md:text-2xl text-[#2E2C29]/60 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
                     >
                         Advus é uma plataforma de gestão jurídica integrada, projetada para escritórios de advocacia que buscam eficiência, controle financeiro e satisfação de clientes.
                     </motion.p>
@@ -230,19 +230,19 @@ function HeroSection() {
                     >
                         <motion.button
                             onClick={() => navigate('/register')}
-                            whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(79,115,245,0.45)' }}
+                            whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(79,115,245,0.25)' }}
                             whileTap={{ scale: 0.97 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl shadow-[0_20px_50px_rgba(79,115,245,0.15)] group uppercase tracking-widest text-sm"
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl shadow-lg group uppercase tracking-widest text-sm"
                         >
                             Começar Agora
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </motion.button>
                         <motion.button
-                            whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(212,175,55,0.2)' }}
+                            whileHover={{ scale: 1.05, backgroundColor: '#FAF8F5' }}
                             whileTap={{ scale: 0.97 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white/5 text-white font-bold rounded-2xl border border-white/10 backdrop-blur-md uppercase tracking-widest text-sm"
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white text-[#2E2C29] font-bold rounded-2xl border border-[#EAE6DF] shadow-sm uppercase tracking-widest text-sm"
                         >
                             Solicite uma Demo
                         </motion.button>
@@ -253,18 +253,18 @@ function HeroSection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-[10px] font-black uppercase tracking-[0.2em] text-white/30"
+                        className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-[10px] font-black uppercase tracking-[0.2em] text-[#2E2C29]/40"
                     >
                         <div className="flex items-center gap-2">
-                            <Check size={16} className="text-accent" />
+                            <Check size={16} className="text-[#B89B5E]" />
                             Criptografia AES-256-GCM
                         </div>
                         <div className="flex items-center gap-2">
-                            <Check size={16} className="text-accent" />
+                            <Check size={16} className="text-[#B89B5E]" />
                             Assinaturas via Autentique
                         </div>
                         <div className="flex items-center gap-2">
-                            <Check size={16} className="text-accent" />
+                            <Check size={16} className="text-[#B89B5E]" />
                             Suporte Especializado 24/7
                         </div>
                     </motion.div>
@@ -388,10 +388,10 @@ function AnimatedStat({ end, suffix, prefix, label, duration, decimals = 0 }: { 
 
     return (
         <div ref={ref} className="text-center">
-            <div className="text-4xl md:text-6xl font-black text-white mb-4 font-display">
+            <div className="text-4xl md:text-6xl font-black text-[#2E2C29] mb-4 font-display">
                 {prefix}{displayValue}{suffix}
             </div>
-            <div className="text-accent text-[10px] font-black uppercase tracking-[0.3em]">
+            <div className="text-[#B89B5E] text-[10px] font-black uppercase tracking-[0.3em]">
                 {label}
             </div>
         </div>
@@ -401,9 +401,9 @@ function AnimatedStat({ end, suffix, prefix, label, duration, decimals = 0 }: { 
 // Stats Section
 function StatsSection() {
     return (
-        <section className="py-32 bg-primary-dark">
+        <section className="py-20 bg-[#F4F1EC]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-[#EAE6DF] pt-20">
                     <ScrollReveal delay={0}>
                         <AnimatedStat end={500} suffix="+" label="ESCRITÓRIOS DE ELITE" />
                     </ScrollReveal>
@@ -437,48 +437,48 @@ function EngagementSection() {
     }, [hoursSaved, teamSize]);
 
     return (
-        <section className="py-32 md:py-48 bg-primary-dark/50 relative overflow-hidden">
+        <section className="py-24 bg-[#FAF8F5] relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <ScrollReveal className="text-center mb-24">
-                    <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter font-display">
+                <ScrollReveal className="text-center mb-20">
+                    <h2 className="text-4xl md:text-6xl font-black text-[#2E2C29] tracking-tighter font-display">
                         Ferramentas <br />
-                        <span className="text-white/30">de Engajamento</span>
+                        <span className="text-[#2E2C29]/40">de Engajamento</span>
                     </h2>
                 </ScrollReveal>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {/* ROI Calculator */}
-                    <div className="p-10 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10">
+                    <div className="p-10 bg-white rounded-[2.5rem] border border-[#EAE6DF] shadow-[0_8px_30px_rgba(46,44,41,0.02)]">
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                            <div className="w-12 h-12 bg-[#B89B5E]/10 rounded-2xl flex items-center justify-center text-[#B89B5E]">
                                 <DollarSign size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-white uppercase tracking-tight">Calculadora de ROI</h3>
+                            <h3 className="text-xl font-black text-[#2E2C29] uppercase tracking-tight">Calculadora de ROI</h3>
                         </div>
                         <div className="space-y-8">
                             <div>
-                                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">
+                                <label className="block text-[10px] font-black text-[#2E2C29]/50 uppercase tracking-widest mb-4">
                                     Horas economizadas/mês por advogado: {hoursSaved}h
                                 </label>
                                 <input 
                                     type="range" min="1" max="40" value={hoursSaved}
                                     onChange={(e) => setHoursSaved(parseInt(e.target.value))}
-                                    className="w-full accent-accent"
+                                    className="w-full accent-[#4F73F5]"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-4">
+                                <label className="block text-[10px] font-black text-[#2E2C29]/50 uppercase tracking-widest mb-4">
                                     Tamanho da Equipe: {teamSize}
                                 </label>
                                 <input 
                                     type="range" min="1" max="50" value={teamSize}
                                     onChange={(e) => setTeamSize(parseInt(e.target.value))}
-                                    className="w-full accent-accent"
+                                    className="w-full accent-[#4F73F5]"
                                 />
                             </div>
-                            <div className="pt-8 border-t border-white/5">
-                                <div className="text-[10px] font-black text-accent uppercase tracking-[0.2em] mb-2">Economia Anual Estimada</div>
-                                <div className="text-4xl font-black text-white font-display">
+                            <div className="pt-8 border-t border-[#EAE6DF]">
+                                <div className="text-[10px] font-black text-[#B89B5E] uppercase tracking-[0.2em] mb-2">Economia Anual Estimada</div>
+                                <div className="text-4xl font-black text-[#2E2C29] font-display">
                                     R$ {roi.toLocaleString('pt-BR')}
                                 </div>
                             </div>
@@ -486,12 +486,12 @@ function EngagementSection() {
                     </div>
 
                     {/* Onboarding Checklist */}
-                    <div className="p-10 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10">
+                    <div className="p-10 bg-white rounded-[2.5rem] border border-[#EAE6DF] shadow-[0_8px_30px_rgba(46,44,41,0.02)]">
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                            <div className="w-12 h-12 bg-[#B89B5E]/10 rounded-2xl flex items-center justify-center text-[#B89B5E]">
                                 <Check size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-white uppercase tracking-tight">Checklist de Onboarding</h3>
+                            <h3 className="text-xl font-black text-[#2E2C29] uppercase tracking-tight">Checklist de Onboarding</h3>
                         </div>
                         <div className="space-y-4">
                             {[
@@ -501,39 +501,39 @@ function EngagementSection() {
                                 'Agenda de Prazos',
                                 'Configuração de Equipe'
                             ].map((item, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-accent/30 transition-colors cursor-pointer group">
-                                    <div className="w-6 h-6 rounded-lg border-2 border-white/10 group-hover:border-accent flex items-center justify-center transition-colors">
-                                        <Check size={14} className="text-accent opacity-0 group-hover:opacity-100" />
+                                <div key={i} className="flex items-center gap-4 p-4 bg-[#FAF8F5] rounded-2xl border border-[#EAE6DF] hover:border-[#B89B5E]/50 transition-colors cursor-pointer group">
+                                    <div className="w-6 h-6 rounded-lg border-2 border-[#EAE6DF] group-hover:border-[#B89B5E] flex items-center justify-center transition-colors">
+                                        <Check size={14} className="text-[#B89B5E] opacity-0 group-hover:opacity-100" />
                                     </div>
-                                    <span className="text-xs font-bold text-white/70 uppercase tracking-tight">{item}</span>
+                                    <span className="text-xs font-bold text-[#2E2C29]/80 uppercase tracking-tight">{item}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Management Quiz */}
-                    <div className="p-10 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10">
+                    <div className="p-10 bg-white rounded-[2.5rem] border border-[#EAE6DF] shadow-[0_8px_30px_rgba(46,44,41,0.02)]">
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center text-accent">
+                            <div className="w-12 h-12 bg-[#B89B5E]/10 rounded-2xl flex items-center justify-center text-[#B89B5E]">
                                 <Sparkles size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-white uppercase tracking-tight">Quiz de Necessidades</h3>
+                            <h3 className="text-xl font-black text-[#2E2C29] uppercase tracking-tight">Quiz de Necessidades</h3>
                         </div>
                         <div className="text-center py-10">
-                            <p className="text-white/50 text-sm mb-8 leading-relaxed">
+                            <p className="text-[#2E2C29]/60 text-sm mb-8 leading-relaxed">
                                 Descubra o nível de maturidade digital do seu escritório em 2 minutos.
                             </p>
                             <button 
                                 onClick={() => navigate('/register')}
-                                className="w-full py-4 bg-accent text-primary-dark font-black rounded-2xl hover:bg-white transition-all uppercase tracking-widest text-xs"
+                                className="w-full py-4 bg-[#4F73F5] text-white font-black rounded-2xl hover:bg-black transition-all uppercase tracking-widest text-xs shadow-md shadow-primary/10"
                             >
                                 Iniciar Avaliação
                             </button>
                         </div>
                         <div className="mt-8 grid grid-cols-3 gap-2">
-                            <div className="h-1 bg-accent rounded-full"></div>
-                            <div className="h-1 bg-white/10 rounded-full"></div>
-                            <div className="h-1 bg-white/10 rounded-full"></div>
+                            <div className="h-1 bg-[#B89B5E] rounded-full"></div>
+                            <div className="h-1 bg-[#EAE6DF] rounded-full"></div>
+                            <div className="h-1 bg-[#EAE6DF] rounded-full"></div>
                         </div>
                     </div>
                 </div>
@@ -636,34 +636,34 @@ function renderQuote(content: string, highlight?: string) {
 function TestimonialsSection() {
     const testimonials = [
         {
-            name: 'Marcos F.',
-            role: 'Terapeuta integrativo',
-            company: 'BH',
-            content: 'Tentei planilha, app de banco, caderninho. Nada durava mais de um mês. O Advus dura porque entende que eu faço sessões e vendo cursos. Tudo aparece num lugar só.',
+            name: 'Dr. Marcos F.',
+            role: 'Advogado Previdenciarista',
+            company: 'Belo Horizonte',
+            content: 'Tentei planilha, app de banco, caderninho. Nada durava mais de um mês. O Advus dura porque entende que eu faço audiências e atendo clientes. Tudo aparece num lugar só.',
             photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80',
             highlight: 'dura'
         },
         {
-            name: 'Camila S.',
-            role: 'Consteladora',
+            name: 'Dra. Camila S.',
+            role: 'Sócia de Escritório',
             company: 'Florianópolis',
-            content: 'Sempre tive medo de olhar para os números. Percebi que minha prática estava saudável — eu é que não tinha clareza. Reajustei meus valores com segurança e parei de me sentir culpada.',
+            content: 'Sempre tive medo de olhar para os números. Percebi que minha prática jurídica estava saudável — eu é que não tinha clareza. Reajustei meus honorários com segurança e parei de perder prazos.',
             photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80',
             highlight: 'saudável'
         },
         {
-            name: 'Roberta T.',
-            role: 'Psicanalista',
+            name: 'Dra. Roberta T.',
+            role: 'Advogada Tributarista',
             company: 'Curitiba',
-            content: 'Em três meses entendi pela primeira vez quanto custa o meu consultório de verdade. Era muito mais do que eu imaginava — e agora eu cobro o que vale.',
+            content: 'Em três meses entendi pela primeira vez quanto custa o meu escritório de verdade. Era muito mais do que eu imaginava — e agora eu cobro o que vale por cada contrato.',
             photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80',
             highlight: 'de verdade'
         },
         {
-            name: 'Ana Paula',
-            role: 'Psicóloga',
+            name: 'Dra. Ana Paula',
+            role: 'Gestora Jurídica',
             company: 'São Paulo',
-            content: 'Nos primeiros atendimentos eu já estava pagando a assinatura de um ano inteiro do Advus. O controle financeiro e a facilidade de fechar contratos mudaram o jogo.',
+            content: 'Nos primeiros atendimentos eu já estava pagando a assinatura de um ano inteiro do Advus. O controle financeiro e a facilidade de gerar briefing de processos mudaram o jogo.',
             photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80',
             highlight: 'mudaram o jogo'
         }
@@ -924,58 +924,58 @@ function CTASection() {
 function Footer() {
     const navigate = useNavigate();
     return (
-        <footer id="contact" className="py-24 bg-primary-dark border-t border-white/5 text-white/30">
+        <footer id="contact" className="py-24 bg-[#F4F1EC] border-t border-[#EAE6DF] text-[#2E2C29]/50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-16 mb-20">
                     <div className="col-span-2 md:col-span-1">
-                        <BrandLogo variant="light" size="sm" className="mb-8" />
-                        <p className="text-xs font-medium leading-loose mb-8 max-w-xs">
+                        <BrandLogo variant="dark" size="sm" className="mb-8" />
+                        <p className="text-xs font-medium leading-loose mb-8 max-w-xs text-[#2E2C29]/60">
                             A plataforma definitiva para escritórios de advocacia que não aceitam nada menos que a excelência.
                         </p>
                         <div className="flex gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-accent hover:text-primary-dark transition-all cursor-pointer border border-white/5">
+                            <div className="w-10 h-10 rounded-xl bg-[#2E2C29]/5 flex items-center justify-center hover:bg-[#4F73F5] hover:text-white transition-all cursor-pointer border border-[#EAE6DF]">
                                 <Globe size={18} />
                             </div>
-                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-accent hover:text-primary-dark transition-all cursor-pointer border border-white/5">
+                            <div className="w-10 h-10 rounded-xl bg-[#2E2C29]/5 flex items-center justify-center hover:bg-[#4F73F5] hover:text-white transition-all cursor-pointer border border-[#EAE6DF]">
                                 <Shield size={18} />
                             </div>
                         </div>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Tecnologia</h4>
+                        <h4 className="text-[#2E2C29] font-black uppercase tracking-[0.2em] text-[10px] mb-8">Tecnologia</h4>
                         <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
-                            <li><a href="#features" className="hover:text-accent transition-colors">Recursos</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">IA Jurídica</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Segurança</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">API Dev</a></li>
+                            <li><a href="#features" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Recursos</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">IA Jurídica</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Segurança</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">API Dev</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Assinatura</h4>
+                        <h4 className="text-[#2E2C29] font-black uppercase tracking-[0.2em] text-[10px] mb-8">Assinatura</h4>
                         <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
-                            <li><a href="#pricing" className="hover:text-accent transition-colors">Planos Elite</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Suporte</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Treinamentos</a></li>
-                            <li><a href="#" className="hover:text-accent transition-colors">Upgrade</a></li>
+                            <li><a href="#pricing" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Planos Elite</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Suporte</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Treinamentos</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Upgrade</a></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-black uppercase tracking-[0.2em] text-[10px] mb-8">Institucional</h4>
+                        <h4 className="text-[#2E2C29] font-black uppercase tracking-[0.2em] text-[10px] mb-8">Institucional</h4>
                         <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
-                            <li><button onClick={() => navigate('/about')} className="hover:text-accent transition-colors text-left uppercase">Sobre</button></li>
-                            <li><button onClick={() => navigate('/privacy')} className="hover:text-accent transition-colors text-left uppercase">Privacidade</button></li>
-                            <li><button onClick={() => navigate('/lgpd')} className="hover:text-accent transition-colors text-left uppercase">LGPD</button></li>
-                            <li><button onClick={() => navigate('/terms')} className="hover:text-accent transition-colors text-left uppercase">Termos</button></li>
+                            <li><button onClick={() => navigate('/about')} className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors text-left uppercase">Sobre</button></li>
+                            <li><button onClick={() => navigate('/privacy')} className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors text-left uppercase">Privacidade</button></li>
+                            <li><button onClick={() => navigate('/lgpd')} className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors text-left uppercase">LGPD</button></li>
+                            <li><button onClick={() => navigate('/terms')} className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors text-left uppercase">Termos</button></li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
+                <div className="pt-12 border-t border-[#EAE6DF] flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] font-black uppercase tracking-[0.2em]">
                     <p>© 2026 Advus Global. Todos os direitos reservados.</p>
-                    <p className="text-accent">Feito para a Elite</p>
+                    <p className="text-[#B89B5E]">Feito para a Elite</p>
                 </div>
             </div>
         </footer>
