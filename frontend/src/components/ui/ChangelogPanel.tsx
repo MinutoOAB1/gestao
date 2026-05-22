@@ -15,6 +15,13 @@ export interface ChangelogItem {
 // Adicione novas entradas no TOPO deste array ao publicar novas funcionalidades.
 const CHANGELOG_DATA: ChangelogItem[] = [
     {
+        id: 'cl-v2.6.0',
+        title: 'Exportador de Cadeia de Valor 100% Preciso (Canvas 2D)',
+        description: 'Substituição completa do html2canvas por um motor de desenho nativo em Canvas 2D no Whiteboard da Cadeia de Valor.\n- Renderização offline pixel-perfect garantida em qualquer navegador\n- Resolução de todos os problemas visuais de sobreposição e clipping de textos em PDFs e PNGs\n- Ajustes de responsividade móvel com auto-colapso do menu lateral e cabeçalho flexível adaptativo.',
+        version: 'v2.6.0',
+        date: '2026-05-22T04:30:00.000Z',
+    },
+    {
         id: 'cl-v2.5.0',
         title: 'Changelog do Sistema e Melhorias Visuais',
         description: 'Novo botão de Changelog com ícone de foguete no cabeçalho, separando as atualizações da plataforma das notificações do escritório. O painel exibe todas as melhorias recentes com versões, datas e descrições detalhadas.\n- Disponível no cabeçalho, ao lado do ícone de notificações\nIndicador verde pulsante aparece automaticamente quando há atualizações que o usuário ainda não visualizou.\n- Disponível para todos os perfis de usuário',

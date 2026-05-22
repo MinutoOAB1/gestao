@@ -267,6 +267,14 @@ export default function CadeiaValorPage() {
 
   // Load from localStorage on mount
   useEffect(() => {
+    const checkMobile = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarCollapsed(true);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
     const savedNodes = localStorage.getItem('cadeia-valor-nodes');
     const savedConns = localStorage.getItem('cadeia-valor-connections');
     const savedAvailables = localStorage.getItem('cadeia-valor-availables');
@@ -289,6 +297,8 @@ export default function CadeiaValorPage() {
         setAvailableNodes(JSON.parse(savedAvailables));
       } catch (e) {}
     }
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Save changes & record history
@@ -962,8 +972,8 @@ export default function CadeiaValorPage() {
   return (
     <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#090E17] text-slate-800 dark:text-slate-100 select-none overflow-hidden relative">
       {/* Upper header */}
-      <div className="flex h-16 items-center justify-between px-6 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0F172A]/70 backdrop-blur-md z-30">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col lg:flex-row lg:h-16 py-3 lg:py-0 items-center justify-between px-4 lg:px-6 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#0F172A]/70 backdrop-blur-md z-30 gap-3">
+        <div className="flex items-center gap-3 w-full lg:w-auto">
           {activeTab === 'map' && (
             <button 
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -977,75 +987,79 @@ export default function CadeiaValorPage() {
           <div className="p-2 bg-[#4F73F5]/10 rounded-xl">
             <Network size={20} className="text-[#4F73F5]" />
           </div>
-          <div>
-            <h1 className="text-base font-bold tracking-tight text-slate-800 dark:text-white">Cadeia de Valor & CRM de Entrada</h1>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Gestão integrada de processos estratégicos e funil de atendimento ao cliente</p>
+          <div className="min-w-0">
+            <h1 className="text-sm md:text-base font-bold tracking-tight text-slate-800 dark:text-white truncate max-w-[200px] sm:max-w-none">Cadeia de Valor & CRM de Entrada</h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden md:block">Gestão integrada de processos estratégicos e funil de atendimento ao cliente</p>
           </div>
         </div>
 
         {/* Tab switchers in header */}
-        <div className="flex bg-slate-100 dark:bg-white/[0.04] p-1 rounded-xl border border-slate-200 dark:border-white/10">
+        <div className="flex bg-slate-100 dark:bg-white/[0.04] p-1 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-auto justify-center">
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'map'
                 ? 'bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <Network size={14} />
-            Whiteboard Map
+            <span className="hidden sm:inline">Whiteboard Map</span>
+            <span className="sm:hidden">Mapa</span>
           </button>
           <button
             onClick={() => setActiveTab('crm')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'crm'
                 ? 'bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <Users size={14} />
-            Funil de Atendimento (CRM)
+            <span className="hidden sm:inline">Funil de Atendimento (CRM)</span>
+            <span className="sm:hidden">CRM</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
           {activeTab === 'map' ? (
             <>
               {/* AI trigger */}
               <button 
                 onClick={() => setShowAiModal(true)}
                 disabled={isAiLoading}
-                className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-[#4F73F5] to-[#7C3AED] hover:from-[#4062E0] hover:to-[#6D28D9] text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/10 disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#4F73F5] to-[#7C3AED] hover:from-[#4062E0] hover:to-[#6D28D9] text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-500/10 disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-[0.98] flex-1 lg:flex-initial"
               >
                 <Sparkles size={14} className={isAiLoading ? 'animate-spin' : ''} />
-                {isAiLoading ? 'Mapeando com Agente...' : 'Gerar com Agente'}
+                <span>{isAiLoading ? 'Agente...' : 'Gerar com Agente'}</span>
               </button>
               
-              <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10" />
+              <div className="w-[1px] h-6 bg-slate-200 dark:bg-white/10 hidden lg:block" />
 
               {/* Undo / Redo */}
-              <button 
-                onClick={handleUndo} 
-                disabled={historyIndex <= 0}
-                className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
-                title="Desfazer"
-              >
-                <RotateCcw size={15} />
-              </button>
-              <button 
-                onClick={handleRedo} 
-                disabled={historyIndex >= history.length - 1}
-                className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
-                title="Refazer"
-              >
-                <RotateCw size={15} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={handleUndo} 
+                  disabled={historyIndex <= 0}
+                  className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
+                  title="Desfazer"
+                >
+                  <RotateCcw size={15} />
+                </button>
+                <button 
+                  onClick={handleRedo} 
+                  disabled={historyIndex >= history.length - 1}
+                  className="p-2 text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
+                  title="Refazer"
+                >
+                  <RotateCw size={15} />
+                </button>
+              </div>
             </>
           ) : (
             <button
               onClick={() => setShowAddLeadModal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#4F73F5] hover:bg-[#4062E0] text-white rounded-xl text-xs font-bold shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 bg-[#4F73F5] hover:bg-[#4062E0] text-white rounded-xl text-xs font-bold shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] w-full lg:w-auto"
             >
               <Plus size={14} />
               Novo Lead (Cliente)
