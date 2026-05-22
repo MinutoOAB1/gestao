@@ -180,10 +180,13 @@ export default function CadeiaValorPage() {
     setDraggedItem(null);
   };
 
-  // Node Dragging inside Canvas (Custom pointer tracking for React 19 compatibility)
+  // Node Dragging inside Canvas (Custom pointer tracking for React 19 compatibility with refs)
+  const activeDragNodeIdRef = useRef<string | null>(null);
+
   const handleNodePointerDown = (e: React.PointerEvent<HTMLDivElement>, node: ProcessNode) => {
     e.stopPropagation();
     setSelectedNodeId(node.id);
+    activeDragNodeIdRef.current = node.id;
     setActiveDragNodeId(node.id);
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -196,26 +199,30 @@ export default function CadeiaValorPage() {
   };
 
   const handleNodePointerMove = (e: React.PointerEvent<HTMLDivElement>, node: ProcessNode) => {
-    if (activeDragNodeId !== node.id || !canvasRef.current) return;
+    if (activeDragNodeIdRef.current !== node.id || !canvasRef.current) return;
     e.stopPropagation();
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
     const x = Math.round((e.clientX - canvasRect.left) / zoom - dragOffset.current.x);
     const y = Math.round((e.clientY - canvasRect.top) / zoom - dragOffset.current.y);
 
-    const updatedNodes = nodes.map(n => 
+    setNodes(prevNodes => prevNodes.map(n => 
       n.id === node.id ? { ...n, x: Math.max(20, x), y: Math.max(20, y) } : n
-    );
-    setNodes(updatedNodes);
+    ));
   };
 
   const handleNodePointerUp = (e: React.PointerEvent<HTMLDivElement>, node: ProcessNode) => {
-    if (activeDragNodeId === node.id) {
+    if (activeDragNodeIdRef.current === node.id) {
       e.stopPropagation();
+      activeDragNodeIdRef.current = null;
       setActiveDragNodeId(null);
       e.currentTarget.releasePointerCapture(e.pointerId);
-      // Persist state
-      saveState(nodes, connections);
+      
+      // Save final state using functional update to ensure fresh state
+      setNodes(currentNodes => {
+        saveState(currentNodes, connections);
+        return currentNodes;
+      });
     }
   };
 
@@ -628,10 +635,9 @@ export default function CadeiaValorPage() {
             ref={canvasRef}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            className="flex-1 w-full h-full relative cursor-grab bg-dot-pattern overflow-hidden"
+            className="flex-1 w-full h-full relative cursor-grab bg-miro-grid overflow-hidden"
             style={{ 
-              backgroundColor: isDark ? '#090E17' : '#F8FAFC',
-              color: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'
+              backgroundColor: isDark ? '#090E17' : '#F8FAFC'
             }}
           >
             {/* Whiteboard Scale Layer */}

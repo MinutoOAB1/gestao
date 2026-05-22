@@ -113,6 +113,19 @@
   background-size: 24px 24px;
 }
 
+.bg-miro-grid {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+}
+
+.dark .bg-miro-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
 .dark .kanban-scrollbar::-webkit-scrollbar-track {
   background: rgba(15, 15, 15, 0.5); /* Deep Black */
 }

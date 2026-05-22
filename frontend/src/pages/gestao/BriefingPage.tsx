@@ -303,7 +303,9 @@ export default function BriefingPage() {
     localStorage.setItem(`bpmn-history-${id}`, JSON.stringify(updatedLogs));
   };
 
-  // Node Dragging inside Canvas (React 19 PointerEvents)
+  // Node Dragging inside Canvas (React 19 PointerEvents with refs and functional updates)
+  const activeDragNodeIdRef = useRef<string | null>(null);
+
   const handleNodePointerDown = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
     if (connectingNodeId) {
       e.stopPropagation();
@@ -325,6 +327,7 @@ export default function BriefingPage() {
 
     e.stopPropagation();
     setSelectedNodeId(node.id);
+    activeDragNodeIdRef.current = node.id;
     setActiveDragNodeId(node.id);
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -337,25 +340,30 @@ export default function BriefingPage() {
   };
 
   const handleNodePointerMove = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
-    if (activeDragNodeId !== node.id || !canvasRef.current) return;
+    if (activeDragNodeIdRef.current !== node.id || !canvasRef.current) return;
     e.stopPropagation();
 
     const canvasRect = canvasRef.current.getBoundingClientRect();
     const x = Math.round((e.clientX - canvasRect.left) / zoom - dragOffset.current.x);
     const y = Math.round((e.clientY - canvasRect.top) / zoom - dragOffset.current.y);
 
-    const updated = nodes.map(n => 
+    setNodes(prevNodes => prevNodes.map(n => 
       n.id === node.id ? { ...n, x: Math.max(20, x), y: Math.max(20, y) } : n
-    );
-    setNodes(updated);
+    ));
   };
 
   const handleNodePointerUp = (e: React.PointerEvent<HTMLDivElement>, node: BpmnNode) => {
-    if (activeDragNodeId === node.id) {
+    if (activeDragNodeIdRef.current === node.id) {
       e.stopPropagation();
+      activeDragNodeIdRef.current = null;
       setActiveDragNodeId(null);
       e.currentTarget.releasePointerCapture(e.pointerId);
-      saveState(nodes, connections);
+      
+      // Save final state using functional update to ensure fresh state
+      setNodes(currentNodes => {
+        saveState(currentNodes, connections);
+        return currentNodes;
+      });
     }
   };
 
@@ -782,10 +790,9 @@ export default function BriefingPage() {
 
                 <div 
                   ref={canvasRef}
-                  className="w-full h-full relative cursor-grab bg-dot-pattern overflow-hidden pl-[40px]"
+                  className="w-full h-full relative cursor-grab bg-miro-grid overflow-hidden pl-[40px]"
                   style={{ 
-                    backgroundColor: isDark ? '#090E17' : '#F8FAFC',
-                    color: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)'
+                    backgroundColor: isDark ? '#090E17' : '#F8FAFC'
                   }}
                 >
                   {/* Outer container of lanes inside canvas */}

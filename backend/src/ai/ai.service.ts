@@ -442,31 +442,40 @@ export class AiService {
     const userPrompt = prompt ? `\nContexto adicional fornecido pelo usuário: "${prompt}"` : '';
     const systemPrompt = `
       Você é um Consultor de Engenharia de Processos e IA de Elite, especializado em estruturar fluxos de valor de escritórios de advocacia no Brasil.
-      Sua missão é gerar um mapeamento estratégico de Cadeia de Valor completo para a área de atuação: "${officeArea}".${userPrompt}
+      Sua missão é gerar um mapeamento estratégico de Cadeia de Valor completo e altamente detalhado para a área de atuação: "${officeArea}".${userPrompt}
+
+      O usuário solicitou expressamente que a cadeia de valor seja focada em elaborar automaticamente um FLUXO DE ATENDIMENTO COMPLETO DO ZERO para esta área jurídica, contemplando:
+      - Recepção e Boas-Vindas do cliente (Primeiro contato e acolhimento)
+      - Coleta de Informações Básicas (dados de qualificação e histórico inicial do caso)
+      - Coleta de Provas e Documentos Comprobatórios (RG, CPF, contratos, comprovantes de residência)
+      - Análise de Questionamentos/Objeções comuns da área jurídica específica (dúvidas frequentes de clientes sobre tempo, custos, riscos)
+      - Triagem de Viabilidade Jurídica (análise de requisitos técnicos para a ação)
+      - Fechamento Comercial & Contrato (negociação de honorários e assinatura eletrônica de procurações/contratos)
+      - Distribuição / Encaminhamento (direcionamento técnico para elaboração da peça inicial)
 
       Você deve planejar os blocos (nodes) divididos em duas categorias:
-      1. "primary" (Atividades-fim do escritório, ex: Atendimento, Triagem, Elaboração de Petições, Distribuição Judicial, Audiências, Execução de Sentenças)
-      2. "support" (Atividades de apoio, ex: Faturamento, Controladoria, Marketing Jurídico, Pós-venda, TI)
+      1. "primary" (Atividades-fim do escritório, ex: Recepção e Coleta de Provas, Triagem e Análise de Objeções, Fechamento de Contratos)
+      2. "support" (Atividades de apoio, ex: Faturamento Comercial, Controladoria de Prazos, Marketing Jurídico, TI e Assinatura Eletrônica)
 
-      Posicione os blocos no espaço bidimensional (x, y) de forma organizada:
-      - Atividades-fim ("primary") devem fluir sequencialmente na horizontal do início ao fim do processo principal (ex: y entre 80 e 150, x de 80 a 1100).
-      - Atividades de apoio ("support") devem ser posicionadas logo abaixo (ex: y entre 250 e 320, x distribuído cobrindo as áreas de apoio correspondentes).
+      Posicione os blocos no espaço bidimensional (x, y) de forma organizada, espaçada e sequencial para evitar QUALQUER sobreposição:
+      - Atividades-fim ("primary") devem fluir sequencialmente na horizontal do início ao fim do processo (ex: y constante em 150, com x iniciando em 100 e incrementando de 350 em 350 pixels para cada bloco: 100, 450, 800, 1150, 1500, 1850, 2200, etc.).
+      - Atividades de apoio ("support") devem ser posicionadas logo abaixo na horizontal (ex: y constante em 450, com x distribuído cobrindo as áreas de suporte correspondentes: 300, 750, 1200, 1650, etc.).
 
       RETORNE APENAS um JSON válido com a seguinte estrutura (sem blocos de código markdown \`\`\`):
       {
         "nodes": [
-          { "id": "process_id_unico", "label": "Nome curto legível do setor", "category": "primary" | "support", "x": 120, "y": 100 }
+          { "id": "process_id_unico", "label": "Nome curto legível do setor", "category": "primary" | "support", "description": "Descrição extremamente rica sobre quais questionamentos e dados são coletados e processados nesta etapa", "x": 120, "y": 100 }
         ],
         "connections": [
-          { "id": "conn_id_unico", "from": "node_origem", "to": "node_destino", "label": "Ex: Direciona lead" }
+          { "id": "conn_id_unico", "from": "node_origem", "to": "node_destino", "label": "Fluxo ou transição de dados" }
         ]
       }
 
       REGRAS:
-      - IDs de processos primários devem ser descritivos como "atendimento", "triagem", "elaboracao", "distribuicao", "audiencia", "financeiro", "pos_venda", etc.
-      - Crie entre 5 e 8 blocos no total para garantir um mapa rico porém limpo.
-      - As conexões devem representar o fluxo real de trabalho e as transferências de tarefas.
-      - Responda apenas com o JSON puro, sem textos adicionais.
+      - IDs de processos devem ser curtos e legíveis como "atendimento_inicial", "coleta_documentos", "analise_objecoes", "fechamento_contratos", etc.
+      - Crie entre 6 e 9 blocos no total para garantir um mapa rico, extremamente profissional e completo de ponta a ponta.
+      - As conexões devem representar o fluxo real de trabalho e as transições de arquivos e dados.
+      - Responda apenas com o JSON puro, sem textos ou comentários adicionais.
     `;
 
     const result = await this.callOpenRouter(
