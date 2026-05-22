@@ -497,111 +497,281 @@ export default function CadeiaValorPage() {
     }
   };
 
-  // Helper: patch all card elements for html2canvas compatibility (line-clamp → overflow:hidden)
-  const patchCardsForExport = (container: HTMLElement): Array<{ el: HTMLElement; original: string }> => {
-    const savedStyles: Array<{ el: HTMLElement; original: string }> = [];
-    
-    // Force overflow:hidden on every card (absolute positioned divs with w-[280px])
-    const cards = container.querySelectorAll<HTMLElement>('.absolute.rounded-2xl');
-    cards.forEach(card => {
-      savedStyles.push({ el: card, original: card.getAttribute('style') || '' });
-      card.style.overflow = 'hidden';
-      card.style.maxHeight = '160px';
-    });
+  // ── PROGRAMMATIC CANVAS 2D EXPORT (bypasses html2canvas entirely) ──
 
-    // Fix h3 titles: replace line-clamp-1 with simple ellipsis
-    const titles = container.querySelectorAll<HTMLElement>('.line-clamp-1');
-    titles.forEach(el => {
-      savedStyles.push({ el, original: el.getAttribute('style') || '' });
-      el.style.display = 'block';
-      el.style.whiteSpace = 'nowrap';
-      el.style.overflow = 'hidden';
-      el.style.textOverflow = 'ellipsis';
-      el.style.webkitLineClamp = 'unset';
-      el.style.maxHeight = '18px';
-    });
-
-    // Fix p descriptions: replace line-clamp-2 with simple 2-line truncation
-    const descs = container.querySelectorAll<HTMLElement>('.line-clamp-2');
-    descs.forEach(el => {
-      savedStyles.push({ el, original: el.getAttribute('style') || '' });
-      el.style.display = 'block';
-      el.style.overflow = 'hidden';
-      el.style.textOverflow = 'ellipsis';
-      el.style.webkitLineClamp = 'unset';
-      el.style.maxHeight = '30px';
-      el.style.lineHeight = '15px';
-    });
-
-    return savedStyles;
-  };
-
-  // Helper: restore card elements to original state after export
-  const restoreCardsAfterExport = (savedStyles: Array<{ el: HTMLElement; original: string }>) => {
-    savedStyles.forEach(({ el, original }) => {
-      el.setAttribute('style', original);
-    });
-  };
-
-  // Helper: compute bounding box for all nodes  
+  // Helper: compute bounding box for all nodes
   const computeBounds = () => {
-    let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
+    let minX = Infinity, minY = Infinity, maxX = 0, maxY = 0;
     if (nodes.length > 0) {
-      nodes.forEach(node => {
-        if (node.x < minX) minX = node.x;
-        if (node.y < minY) minY = node.y;
-        if (node.x + 280 > maxX) maxX = node.x + 280;
-        if (node.y + 160 > maxY) maxY = node.y + 160;
+      nodes.forEach(n => {
+        if (n.x < minX) minX = n.x;
+        if (n.y < minY) minY = n.y;
+        if (n.x + 280 > maxX) maxX = n.x + 280;
+        if (n.y + 140 > maxY) maxY = n.y + 140;
       });
     } else {
-      minX = 0; minY = 0; maxX = 1200; maxY = 800;
+      minX = 0; minY = 0; maxX = 800; maxY = 600;
     }
-    const padding = 80;
-    return {
-      x: Math.max(0, minX - padding),
-      y: Math.max(0, minY - padding),
-      width: Math.min(4000, (maxX - minX) + (padding * 2)),
-      height: Math.min(4000, (maxY - minY) + (padding * 2))
-    };
+    const pad = 80;
+    return { minX: minX - pad, minY: minY - pad, w: (maxX - minX) + pad * 2, h: (maxY - minY) + pad * 2 };
   };
 
-  // Export canvas as high-resolution PNG image
-  const handleExportAsImage = async () => {
-    if (!canvasRef.current) return;
-    const originalZoom = zoom;
-    let savedStyles: Array<{ el: HTMLElement; original: string }> = [];
-    let originalBg = '';
+  // Helper: draw a rounded rectangle
+  const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
 
-    try {
-      setZoom(1);
-      await new Promise(resolve => setTimeout(resolve, 100));
+  // Helper: truncate text to fit within a max pixel width
+  const truncateText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string => {
+    if (ctx.measureText(text).width <= maxWidth) return text;
+    let t = text;
+    while (t.length > 0 && ctx.measureText(t + '...').width > maxWidth) {
+      t = t.slice(0, -1);
+    }
+    return t + '...';
+  };
 
-      const canvasElement = canvasRef.current;
-      const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
+  // Helper: wrap text to multiple lines with a max number of lines
+  const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number): string[] => {
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
 
-      // Inject Miro grid background onto the capture target
-      targetElement.classList.add('bg-miro-grid');
-      originalBg = targetElement.style.backgroundColor;
-      targetElement.style.backgroundColor = isDark ? '#090e17' : '#f8fafc';
+    for (const word of words) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+        if (lines.length >= maxLines) break;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine && lines.length < maxLines) lines.push(currentLine);
 
-      // CRITICAL: directly patch every card's inline styles to fix html2canvas line-clamp bug
-      savedStyles = patchCardsForExport(targetElement);
+    // Truncate last visible line if there are remaining words
+    if (lines.length === maxLines) {
+      lines[maxLines - 1] = truncateText(ctx, lines[maxLines - 1], maxWidth);
+    }
+    return lines;
+  };
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+  // Helper: draw an arrowhead at the end of a bezier curve
+  const drawArrowhead = (ctx: CanvasRenderingContext2D, toX: number, toY: number, cpx: number, cpy: number) => {
+    const angle = Math.atan2(toY - cpy, toX - cpx);
+    const size = 8;
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - size * Math.cos(angle - Math.PI / 6), toY - size * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - size * Math.cos(angle + Math.PI / 6), toY - size * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+  };
 
-      const { x, y, width, height } = computeBounds();
+  // Core: render the entire canvas to an offscreen canvas element
+  const renderToCanvas = (scale: number = 2): HTMLCanvasElement => {
+    const bounds = computeBounds();
+    const { minX, minY, w, h } = bounds;
 
-      const canvas = await html2canvas(targetElement, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        scale: 2,
-        x, y, width, height,
-        windowWidth: 4000,
-        windowHeight: 4000
+    const offscreen = document.createElement('canvas');
+    offscreen.width = w * scale;
+    offscreen.height = h * scale;
+    const ctx = offscreen.getContext('2d')!;
+    ctx.scale(scale, scale);
+
+    // ── Background ──
+    ctx.fillStyle = isDark ? '#090E17' : '#F8FAFC';
+    ctx.fillRect(0, 0, w, h);
+
+    // ── Miro Grid ──
+    const gridSize = 30;
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(148,163,184,0.12)';
+    ctx.lineWidth = 0.5;
+    for (let gx = 0; gx < w; gx += gridSize) {
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke();
+    }
+    for (let gy = 0; gy < h; gy += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+    }
+
+    // ── Connection Lines ──
+    const CARD_W = 280;
+    const CARD_H = 140;
+    const connColor = isDark ? '#4F73F5' : '#3B82F6';
+
+    connections.forEach(conn => {
+      const fromNode = nodes.find(n => n.id === conn.from);
+      const toNode = nodes.find(n => n.id === conn.to);
+      if (!fromNode || !toNode) return;
+
+      // Closest-port logic (replicating drawConnectorPath)
+      const fromPorts = [
+        { x: fromNode.x + CARD_W, y: fromNode.y + CARD_H / 2, dir: 'R' },
+        { x: fromNode.x, y: fromNode.y + CARD_H / 2, dir: 'L' },
+        { x: fromNode.x + CARD_W / 2, y: fromNode.y, dir: 'T' },
+        { x: fromNode.x + CARD_W / 2, y: fromNode.y + CARD_H, dir: 'B' }
+      ];
+      const toPorts = [
+        { x: toNode.x + CARD_W, y: toNode.y + CARD_H / 2, dir: 'R' },
+        { x: toNode.x, y: toNode.y + CARD_H / 2, dir: 'L' },
+        { x: toNode.x + CARD_W / 2, y: toNode.y, dir: 'T' },
+        { x: toNode.x + CARD_W / 2, y: toNode.y + CARD_H, dir: 'B' }
+      ];
+
+      let bestFrom = fromPorts[0], bestTo = toPorts[1], bestDist = Infinity;
+      for (const fp of fromPorts) {
+        for (const tp of toPorts) {
+          const d = Math.hypot(fp.x - tp.x, fp.y - tp.y);
+          if (d < bestDist) { bestDist = d; bestFrom = fp; bestTo = tp; }
+        }
+      }
+
+      const fx = bestFrom.x - minX, fy = bestFrom.y - minY;
+      const tx = bestTo.x - minX, ty = bestTo.y - minY;
+      const offset = Math.min(100, Math.max(40, Math.abs(tx - fx) / 2));
+
+      let cpx1 = fx, cpy1 = fy, cpx2 = tx, cpy2 = ty;
+      if (bestFrom.dir === 'R') cpx1 += offset;
+      else if (bestFrom.dir === 'L') cpx1 -= offset;
+      else if (bestFrom.dir === 'B') cpy1 += offset;
+      else if (bestFrom.dir === 'T') cpy1 -= offset;
+
+      if (bestTo.dir === 'R') cpx2 += offset;
+      else if (bestTo.dir === 'L') cpx2 -= offset;
+      else if (bestTo.dir === 'B') cpy2 += offset;
+      else if (bestTo.dir === 'T') cpy2 -= offset;
+
+      // Draw curve
+      ctx.strokeStyle = connColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(fx, fy);
+      ctx.bezierCurveTo(cpx1, cpy1, cpx2, cpy2, tx, ty);
+      ctx.stroke();
+
+      // Draw arrowhead
+      ctx.fillStyle = connColor;
+      drawArrowhead(ctx, tx, ty, cpx2, cpy2);
+
+      // Draw label badge
+      if (conn.label) {
+        const labelX = (fx + tx) / 2;
+        const labelY = (fy + ty) / 2 - 8;
+        ctx.font = 'bold 9px "Segoe UI", sans-serif';
+        const tw = ctx.measureText(conn.label).width;
+        const bw = tw + 12, bh = 16;
+
+        roundRect(ctx, labelX - bw / 2, labelY - bh / 2, bw, bh, 4);
+        ctx.fillStyle = isDark ? '#1E293B' : '#FFFFFF';
+        ctx.fill();
+        ctx.strokeStyle = isDark ? 'rgba(79,115,245,0.2)' : 'rgba(59,130,246,0.2)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = isDark ? '#94A3B8' : '#475569';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(conn.label, labelX, labelY);
+      }
+    });
+
+    // ── Process Node Cards ──
+    nodes.forEach(node => {
+      const cx = node.x - minX;
+      const cy = node.y - minY;
+      const cw = CARD_W;
+      const ch = CARD_H;
+      const r = 16;
+
+      // Card shadow
+      ctx.save();
+      ctx.shadowColor = isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.08)';
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 4;
+      roundRect(ctx, cx, cy, cw, ch, r);
+      ctx.fillStyle = isDark ? '#131B2B' : '#FFFFFF';
+      ctx.fill();
+      ctx.restore();
+
+      // Card border
+      roundRect(ctx, cx, cy, cw, ch, r);
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Category badge
+      const isPrincipal = node.category === 'principal';
+      const badgeText = isPrincipal ? 'PRINCIPAL' : 'APOIO';
+      ctx.font = 'bold 8px "Segoe UI", sans-serif';
+      const badgeTw = ctx.measureText(badgeText).width;
+      const badgeW = badgeTw + 12, badgeH = 16, badgeR = 8;
+      const badgeX = cx + 16;
+      const badgeY = cy + 14;
+
+      roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeR);
+      ctx.fillStyle = isPrincipal
+        ? (isDark ? 'rgba(226,183,85,0.1)' : 'rgba(226,183,85,0.1)')
+        : (isDark ? 'rgba(79,115,245,0.1)' : 'rgba(79,115,245,0.1)');
+      ctx.fill();
+
+      ctx.fillStyle = isPrincipal ? '#E2B755' : '#4F73F5';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(badgeText, badgeX + 6, badgeY + badgeH / 2);
+
+      // Title (single line, truncated)
+      ctx.font = 'bold 12px "Segoe UI", sans-serif';
+      ctx.fillStyle = isDark ? '#FFFFFF' : '#1E293B';
+      ctx.textBaseline = 'top';
+      const titleMaxW = cw - 32;
+      const titleText = truncateText(ctx, node.label, titleMaxW);
+      ctx.fillText(titleText, cx + 16, cy + 38);
+
+      // Description (2 lines max, wrapped)
+      ctx.font = '10px "Segoe UI", sans-serif';
+      ctx.fillStyle = isDark ? '#94A3B8' : '#64748B';
+      const descMaxW = cw - 32;
+      const descLines = wrapText(ctx, node.description || '', descMaxW, 2);
+      descLines.forEach((line, i) => {
+        ctx.fillText(line, cx + 16, cy + 56 + (i * 14));
       });
 
-      const dataUrl = canvas.toDataURL('image/png');
+      // Footer separator
+      const footerY = cy + ch - 30;
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.04)' : '#F1F5F9';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx + 16, footerY);
+      ctx.lineTo(cx + cw - 16, footerY);
+      ctx.stroke();
+
+      // Footer "Editar Bloco >"
+      ctx.font = 'bold 9px "Segoe UI", sans-serif';
+      ctx.fillStyle = isDark ? '#6D8CFF' : '#4F73F5';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.fillText('Editar Bloco ›', cx + cw - 16, footerY + 6);
+    });
+
+    ctx.textAlign = 'left'; // reset
+    return offscreen;
+  };
+
+  // Export as PNG
+  const handleExportAsImage = async () => {
+    try {
+      const offscreen = renderToCanvas(2);
+      const dataUrl = offscreen.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `cadeia-de-valor-${Date.now()}.png`;
       link.href = dataUrl;
@@ -609,78 +779,28 @@ export default function CadeiaValorPage() {
     } catch (error) {
       console.error('Erro ao exportar imagem:', error);
       alert('Ocorreu um erro ao exportar o canvas como imagem.');
-    } finally {
-      restoreCardsAfterExport(savedStyles);
-      const canvasElement = canvasRef.current;
-      const targetElement = canvasElement?.querySelector('.origin-top-left') as HTMLElement;
-      if (targetElement) {
-        targetElement.classList.remove('bg-miro-grid');
-        targetElement.style.backgroundColor = originalBg;
-      }
-      setZoom(originalZoom);
     }
   };
 
-  // Export canvas as PDF document
+  // Export as PDF
   const handleExportAsPdf = async () => {
-    if (!canvasRef.current) return;
-    const originalZoom = zoom;
-    let savedStyles: Array<{ el: HTMLElement; original: string }> = [];
-    let originalBg = '';
-
     try {
-      setZoom(1);
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const canvasElement = canvasRef.current;
-      const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
-
-      // Inject Miro grid background onto the capture target
-      targetElement.classList.add('bg-miro-grid');
-      originalBg = targetElement.style.backgroundColor;
-      targetElement.style.backgroundColor = isDark ? '#090e17' : '#f8fafc';
-
-      // CRITICAL: directly patch every card's inline styles to fix html2canvas line-clamp bug
-      savedStyles = patchCardsForExport(targetElement);
-
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const { x, y, width, height } = computeBounds();
-
-      const canvas = await html2canvas(targetElement, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        scale: 2,
-        x, y, width, height,
-        windowWidth: 4000,
-        windowHeight: 4000
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdfWidth = width;
-      const pdfHeight = height;
+      const offscreen = renderToCanvas(2);
+      const imgData = offscreen.toDataURL('image/png');
+      const pdfW = offscreen.width / 2;
+      const pdfH = offscreen.height / 2;
 
       const pdf = new jsPDF({
-        orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
+        orientation: pdfW > pdfH ? 'landscape' : 'portrait',
         unit: 'px',
-        format: [pdfWidth, pdfHeight]
+        format: [pdfW, pdfH]
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
       pdf.save(`cadeia-de-valor-${Date.now()}.pdf`);
     } catch (error) {
       console.error('Erro ao exportar PDF:', error);
       alert('Ocorreu um erro ao exportar o canvas como PDF.');
-    } finally {
-      restoreCardsAfterExport(savedStyles);
-      const canvasElement = canvasRef.current;
-      const targetElement = canvasElement?.querySelector('.origin-top-left') as HTMLElement;
-      if (targetElement) {
-        targetElement.classList.remove('bg-miro-grid');
-        targetElement.style.backgroundColor = originalBg;
-      }
-      setZoom(originalZoom);
     }
   };
 
