@@ -497,60 +497,106 @@ export default function CadeiaValorPage() {
     }
   };
 
+  // Helper: patch all card elements for html2canvas compatibility (line-clamp → overflow:hidden)
+  const patchCardsForExport = (container: HTMLElement): Array<{ el: HTMLElement; original: string }> => {
+    const savedStyles: Array<{ el: HTMLElement; original: string }> = [];
+    
+    // Force overflow:hidden on every card (absolute positioned divs with w-[280px])
+    const cards = container.querySelectorAll<HTMLElement>('.absolute.rounded-2xl');
+    cards.forEach(card => {
+      savedStyles.push({ el: card, original: card.getAttribute('style') || '' });
+      card.style.overflow = 'hidden';
+      card.style.maxHeight = '160px';
+    });
+
+    // Fix h3 titles: replace line-clamp-1 with simple ellipsis
+    const titles = container.querySelectorAll<HTMLElement>('.line-clamp-1');
+    titles.forEach(el => {
+      savedStyles.push({ el, original: el.getAttribute('style') || '' });
+      el.style.display = 'block';
+      el.style.whiteSpace = 'nowrap';
+      el.style.overflow = 'hidden';
+      el.style.textOverflow = 'ellipsis';
+      el.style.webkitLineClamp = 'unset';
+      el.style.maxHeight = '18px';
+    });
+
+    // Fix p descriptions: replace line-clamp-2 with simple 2-line truncation
+    const descs = container.querySelectorAll<HTMLElement>('.line-clamp-2');
+    descs.forEach(el => {
+      savedStyles.push({ el, original: el.getAttribute('style') || '' });
+      el.style.display = 'block';
+      el.style.overflow = 'hidden';
+      el.style.textOverflow = 'ellipsis';
+      el.style.webkitLineClamp = 'unset';
+      el.style.maxHeight = '30px';
+      el.style.lineHeight = '15px';
+    });
+
+    return savedStyles;
+  };
+
+  // Helper: restore card elements to original state after export
+  const restoreCardsAfterExport = (savedStyles: Array<{ el: HTMLElement; original: string }>) => {
+    savedStyles.forEach(({ el, original }) => {
+      el.setAttribute('style', original);
+    });
+  };
+
+  // Helper: compute bounding box for all nodes  
+  const computeBounds = () => {
+    let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
+    if (nodes.length > 0) {
+      nodes.forEach(node => {
+        if (node.x < minX) minX = node.x;
+        if (node.y < minY) minY = node.y;
+        if (node.x + 280 > maxX) maxX = node.x + 280;
+        if (node.y + 160 > maxY) maxY = node.y + 160;
+      });
+    } else {
+      minX = 0; minY = 0; maxX = 1200; maxY = 800;
+    }
+    const padding = 80;
+    return {
+      x: Math.max(0, minX - padding),
+      y: Math.max(0, minY - padding),
+      width: Math.min(4000, (maxX - minX) + (padding * 2)),
+      height: Math.min(4000, (maxY - minY) + (padding * 2))
+    };
+  };
+
   // Export canvas as high-resolution PNG image
   const handleExportAsImage = async () => {
     if (!canvasRef.current) return;
     const originalZoom = zoom;
+    let savedStyles: Array<{ el: HTMLElement; original: string }> = [];
     let originalBg = '';
-    
+
     try {
-      // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar quebras de fontes subpixel
       setZoom(1);
-      
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const canvasElement = canvasRef.current;
       const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
 
-      // Ativar classes e estilos especiais de exportação no corpo e contêiner interno
-      document.body.classList.add('is-exporting');
+      // Inject Miro grid background onto the capture target
       targetElement.classList.add('bg-miro-grid');
       originalBg = targetElement.style.backgroundColor;
       targetElement.style.backgroundColor = isDark ? '#090e17' : '#f8fafc';
-      
-      // Aguardar o React e o navegador aplicarem o novo layout e as fontes com zoom 100%
-      await new Promise(resolve => setTimeout(resolve, 250));
 
-      // Calcular o retângulo delimitador exato que contém todos os nós para cropar margens em branco
-      let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
-      if (nodes.length > 0) {
-        nodes.forEach(node => {
-          if (node.x < minX) minX = node.x;
-          if (node.y < minY) minY = node.y;
-          if (node.x + 280 > maxX) maxX = node.x + 280;
-          if (node.y + 150 > maxY) maxY = node.y + 150;
-        });
-      } else {
-        minX = 0;
-        minY = 0;
-        maxX = 1200;
-        maxY = 800;
-      }
+      // CRITICAL: directly patch every card's inline styles to fix html2canvas line-clamp bug
+      savedStyles = patchCardsForExport(targetElement);
 
-      // Adicionar preenchimento confortável ao redor do fluxo de blocos
-      const padding = 60;
-      const x = Math.max(0, minX - padding);
-      const y = Math.max(0, minY - padding);
-      const width = Math.min(4000, (maxX - minX) + (padding * 2));
-      const height = Math.min(4000, (maxY - minY) + (padding * 2));
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const { x, y, width, height } = computeBounds();
 
       const canvas = await html2canvas(targetElement, {
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null, // Deixar renderizar o background do próprio targetElement (com grade Miro!)
-        scale: 2, // Altíssima definição
-        x: x,
-        y: y,
-        width: width,
-        height: height,
+        backgroundColor: null,
+        scale: 2,
+        x, y, width, height,
         windowWidth: 4000,
         windowHeight: 4000
       });
@@ -564,8 +610,7 @@ export default function CadeiaValorPage() {
       console.error('Erro ao exportar imagem:', error);
       alert('Ocorreu um erro ao exportar o canvas como imagem.');
     } finally {
-      // Restaurar o estado original da tela
-      document.body.classList.remove('is-exporting');
+      restoreCardsAfterExport(savedStyles);
       const canvasElement = canvasRef.current;
       const targetElement = canvasElement?.querySelector('.origin-top-left') as HTMLElement;
       if (targetElement) {
@@ -580,62 +625,39 @@ export default function CadeiaValorPage() {
   const handleExportAsPdf = async () => {
     if (!canvasRef.current) return;
     const originalZoom = zoom;
+    let savedStyles: Array<{ el: HTMLElement; original: string }> = [];
     let originalBg = '';
-    
+
     try {
-      // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar distorções
       setZoom(1);
-      
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const canvasElement = canvasRef.current;
       const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
 
-      // Ativar classes e estilos especiais de exportação no corpo e contêiner interno
-      document.body.classList.add('is-exporting');
+      // Inject Miro grid background onto the capture target
       targetElement.classList.add('bg-miro-grid');
       originalBg = targetElement.style.backgroundColor;
       targetElement.style.backgroundColor = isDark ? '#090e17' : '#f8fafc';
-      
-      // Aguardar o React e o navegador aplicarem o novo layout e as fontes com zoom 100%
-      await new Promise(resolve => setTimeout(resolve, 250));
 
-      // Calcular o retângulo delimitador exato que contém todos os nós para cropar margens em branco
-      let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
-      if (nodes.length > 0) {
-        nodes.forEach(node => {
-          if (node.x < minX) minX = node.x;
-          if (node.y < minY) minY = node.y;
-          if (node.x + 280 > maxX) maxX = node.x + 280;
-          if (node.y + 150 > maxY) maxY = node.y + 150;
-        });
-      } else {
-        minX = 0;
-        minY = 0;
-        maxX = 1200;
-        maxY = 800;
-      }
+      // CRITICAL: directly patch every card's inline styles to fix html2canvas line-clamp bug
+      savedStyles = patchCardsForExport(targetElement);
 
-      const padding = 60;
-      const x = Math.max(0, minX - padding);
-      const y = Math.max(0, minY - padding);
-      const width = Math.min(4000, (maxX - minX) + (padding * 2));
-      const height = Math.min(4000, (maxY - minY) + (padding * 2));
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const { x, y, width, height } = computeBounds();
 
       const canvas = await html2canvas(targetElement, {
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null, // Deixar renderizar o background do próprio targetElement (com grade Miro!)
+        backgroundColor: null,
         scale: 2,
-        x: x,
-        y: y,
-        width: width,
-        height: height,
+        x, y, width, height,
         windowWidth: 4000,
         windowHeight: 4000
       });
 
       const imgData = canvas.toDataURL('image/png');
-      
-      // Ajustar dimensões do PDF correspondentes ao tamanho real do fluxo gerado
       const pdfWidth = width;
       const pdfHeight = height;
 
@@ -651,8 +673,7 @@ export default function CadeiaValorPage() {
       console.error('Erro ao exportar PDF:', error);
       alert('Ocorreu um erro ao exportar o canvas como PDF.');
     } finally {
-      // Restaurar o estado original da tela
-      document.body.classList.remove('is-exporting');
+      restoreCardsAfterExport(savedStyles);
       const canvasElement = canvasRef.current;
       const targetElement = canvasElement?.querySelector('.origin-top-left') as HTMLElement;
       if (targetElement) {
