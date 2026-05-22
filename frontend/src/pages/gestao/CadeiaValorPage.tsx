@@ -500,16 +500,51 @@ export default function CadeiaValorPage() {
   // Export canvas as high-resolution PNG image
   const handleExportAsImage = async () => {
     if (!canvasRef.current) return;
+    const originalZoom = zoom;
     try {
-      const canvasElement = canvasRef.current;
+      // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar quebras e sobreposições de fontes subpixel
+      setZoom(1);
       
-      const canvas = await html2canvas(canvasElement, {
+      // Aguardar o React aplicar as novas dimensões e escala no DOM
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      const canvasElement = canvasRef.current;
+      const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
+
+      // Calcular o retângulo delimitador exato que contém todos os nós para cropar margens em branco
+      let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
+      if (nodes.length > 0) {
+        nodes.forEach(node => {
+          if (node.x < minX) minX = node.x;
+          if (node.y < minY) minY = node.y;
+          if (node.x + 280 > maxX) maxX = node.x + 280;
+          if (node.y + 150 > maxY) maxY = node.y + 150;
+        });
+      } else {
+        minX = 0;
+        minY = 0;
+        maxX = 1200;
+        maxY = 800;
+      }
+
+      // Adicionar preenchimento confortável ao redor do fluxo de blocos
+      const padding = 60;
+      const x = Math.max(0, minX - padding);
+      const y = Math.max(0, minY - padding);
+      const width = Math.min(4000, (maxX - minX) + (padding * 2));
+      const height = Math.min(4000, (maxY - minY) + (padding * 2));
+
+      const canvas = await html2canvas(targetElement, {
         useCORS: true,
         allowTaint: true,
         backgroundColor: isDark ? '#0b0f19' : '#ffffff',
-        scale: 2,
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY
+        scale: 2, // Altíssima definição
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        windowWidth: 4000,
+        windowHeight: 4000
       });
 
       const dataUrl = canvas.toDataURL('image/png');
@@ -520,33 +555,81 @@ export default function CadeiaValorPage() {
     } catch (error) {
       console.error('Erro ao exportar imagem:', error);
       alert('Ocorreu um erro ao exportar o canvas como imagem.');
+    } finally {
+      // 2. Restaurar o nível de zoom original do usuário
+      setZoom(originalZoom);
     }
   };
 
   // Export canvas as PDF document
   const handleExportAsPdf = async () => {
     if (!canvasRef.current) return;
+    const originalZoom = zoom;
     try {
+      // 1. Redefinir temporariamente o zoom para 1 (100%) para evitar distorções
+      setZoom(1);
+      
+      // Aguardar o React aplicar as novas dimensões e escala no DOM
+      await new Promise(resolve => setTimeout(resolve, 150));
+
       const canvasElement = canvasRef.current;
-      const canvas = await html2canvas(canvasElement, {
+      const targetElement = canvasElement.querySelector('.origin-top-left') as HTMLElement || canvasElement;
+
+      // Calcular o retângulo delimitador exato que contém todos os nós para cropar margens em branco
+      let minX = 4000, minY = 4000, maxX = 0, maxY = 0;
+      if (nodes.length > 0) {
+        nodes.forEach(node => {
+          if (node.x < minX) minX = node.x;
+          if (node.y < minY) minY = node.y;
+          if (node.x + 280 > maxX) maxX = node.x + 280;
+          if (node.y + 150 > maxY) maxY = node.y + 150;
+        });
+      } else {
+        minX = 0;
+        minY = 0;
+        maxX = 1200;
+        maxY = 800;
+      }
+
+      const padding = 60;
+      const x = Math.max(0, minX - padding);
+      const y = Math.max(0, minY - padding);
+      const width = Math.min(4000, (maxX - minX) + (padding * 2));
+      const height = Math.min(4000, (maxY - minY) + (padding * 2));
+
+      const canvas = await html2canvas(targetElement, {
         useCORS: true,
         allowTaint: true,
         backgroundColor: isDark ? '#0b0f19' : '#ffffff',
-        scale: 2
+        scale: 2,
+        x: x,
+        y: y,
+        width: width,
+        height: height,
+        windowWidth: 4000,
+        windowHeight: 4000
       });
 
       const imgData = canvas.toDataURL('image/png');
+      
+      // Ajustar dimensões do PDF correspondentes ao tamanho real do fluxo gerado
+      const pdfWidth = width;
+      const pdfHeight = height;
+
       const pdf = new jsPDF({
-        orientation: 'landscape',
+        orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
         unit: 'px',
-        format: [canvas.width / 2, canvas.height / 2]
+        format: [pdfWidth, pdfHeight]
       });
 
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`cadeia-de-valor-${Date.now()}.pdf`);
     } catch (error) {
       console.error('Erro ao exportar PDF:', error);
       alert('Ocorreu um erro ao exportar o canvas como PDF.');
+    } finally {
+      // 2. Restaurar o nível de zoom original do usuário
+      setZoom(originalZoom);
     }
   };
 
