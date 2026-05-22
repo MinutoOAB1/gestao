@@ -265,7 +265,7 @@ export default function CadeiaValorPage() {
     }
   }, [activeTab]);
 
-  // Load from localStorage on mount
+  // Load from database on mount, fall back to localStorage if empty
   useEffect(() => {
     const checkMobile = () => {
       if (window.innerWidth < 768) {
@@ -275,23 +275,43 @@ export default function CadeiaValorPage() {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    const savedNodes = localStorage.getItem('cadeia-valor-nodes');
-    const savedConns = localStorage.getItem('cadeia-valor-connections');
-    const savedAvailables = localStorage.getItem('cadeia-valor-availables');
-    
-    if (savedNodes && savedConns) {
+    const loadData = async () => {
       try {
-        setNodes(JSON.parse(savedNodes));
-        setConnections(JSON.parse(savedConns));
-      } catch (e) {
-        console.error('Failed to parse saved Cadeia de Valor:', e);
+        const response = await api.get('/value-chain');
+        const dbData = response.data;
+        if (dbData && dbData.nodes && dbData.nodes.length > 0) {
+          setNodes(dbData.nodes);
+          setConnections(dbData.connections || []);
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to load from database, trying localStorage fallback:', err);
       }
-    } else {
-      // Começar canvas limpo sem dados mockados
-      setNodes([]);
-      setConnections([]);
-    }
-    
+
+      // Fallback to localStorage
+      const savedNodes = localStorage.getItem('cadeia-valor-nodes');
+      const savedConns = localStorage.getItem('cadeia-valor-connections');
+      if (savedNodes && savedConns) {
+        try {
+          const parsedNodes = JSON.parse(savedNodes);
+          const parsedConns = JSON.parse(savedConns);
+          setNodes(parsedNodes);
+          setConnections(parsedConns);
+          
+          // Migrate to database automatically
+          await api.post('/value-chain', { nodes: parsedNodes, connections: parsedConns });
+        } catch (e) {
+          console.error('Failed to parse saved localStorage Cadeia de Valor:', e);
+        }
+      } else {
+        setNodes([]);
+        setConnections([]);
+      }
+    };
+
+    loadData();
+
+    const savedAvailables = localStorage.getItem('cadeia-valor-availables');
     if (savedAvailables) {
       try {
         setAvailableNodes(JSON.parse(savedAvailables));
@@ -302,7 +322,7 @@ export default function CadeiaValorPage() {
   }, []);
 
   // Save changes & record history
-  const saveState = (newNodes: ProcessNode[], newConns: Connection[]) => {
+  const saveState = async (newNodes: ProcessNode[], newConns: Connection[]) => {
     setNodes(newNodes);
     setConnections(newConns);
     localStorage.setItem('cadeia-valor-nodes', JSON.stringify(newNodes));
@@ -312,6 +332,12 @@ export default function CadeiaValorPage() {
     const nextHistory = history.slice(0, historyIndex + 1);
     setHistory([...nextHistory, { nodes: newNodes, connections: newConns }]);
     setHistoryIndex(nextHistory.length);
+
+    try {
+      await api.post('/value-chain', { nodes: newNodes, connections: newConns });
+    } catch (err) {
+      console.error('Failed to save Cadeia de Valor to database:', err);
+    }
   };
 
   // Drag & Drop available node to Canvas (HTML5 Drag over & Drop)

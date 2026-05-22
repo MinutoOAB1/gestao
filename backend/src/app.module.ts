@@ -38,6 +38,8 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { PortalModule } from './portal/portal.module';
 import { DatajudModule } from './integrations/datajud/datajud.module';
 import { ChangelogModule } from './changelog/changelog.module';
+import { ValueChainModule } from './value-chain/value-chain.module';
+
 
 
 @Module({
@@ -79,7 +81,9 @@ import { ChangelogModule } from './changelog/changelog.module';
     SubscriptionsModule,
     PortalModule,
     ChangelogModule,
+    ValueChainModule,
   ],
+
   controllers: [AppController, HealthController],
   providers: [
     AppService,

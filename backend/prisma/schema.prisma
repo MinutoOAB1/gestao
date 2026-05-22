@@ -45,6 +45,7 @@ model Tenant {
   financialCategories  FinancialCategory[]
   chatChannels         ChatChannel[]
   directMessages       DirectMessage[]
+  valueChain           ValueChain?
 }
 
 model User {
@@ -804,3 +805,14 @@ model Changelog {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model ValueChain {
+  id          String   @id @default(uuid())
+  nodes       Json     // Store nodes JSON
+  connections Json     // Store connections JSON
+  tenantId    String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+}
+
