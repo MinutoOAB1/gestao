@@ -15,6 +15,7 @@ export const DroppableColumn = memo(function DroppableColumn({
     onDeleteColumn,
     onAddCard,
     onOpenModal,
+    onGenerateStrategy,
 }: {
     column: Column;
     processes: Process[];
@@ -23,6 +24,7 @@ export const DroppableColumn = memo(function DroppableColumn({
     onDeleteColumn: (id: string) => void;
     onAddCard: (columnId: string) => void;
     onOpenModal: (id: string) => void;
+    onGenerateStrategy: (process: Process) => void;
 }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(column.title);
@@ -118,7 +120,12 @@ export const DroppableColumn = memo(function DroppableColumn({
             >
                 <SortableContext items={processes.map(p => p.id)} strategy={verticalListSortingStrategy}>
                     {processes.map((process) => (
-                        <DraggableCard key={process.id} process={process} onOpenModal={onOpenModal} />
+                        <DraggableCard 
+                            key={process.id} 
+                            process={process} 
+                            onOpenModal={onOpenModal} 
+                            onGenerateStrategy={onGenerateStrategy} 
+                        />
                     ))}
                 </SortableContext>
 

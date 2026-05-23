@@ -988,9 +988,13 @@ export default function LandingPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        document.documentElement.classList.add('landing-page-body');
         if (isAuthenticated) {
             navigate('/app');
         }
+        return () => {
+            document.documentElement.classList.remove('landing-page-body');
+        };
     }, [isAuthenticated, navigate]);
 
     return (

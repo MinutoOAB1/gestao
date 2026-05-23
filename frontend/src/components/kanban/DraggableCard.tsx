@@ -1,11 +1,11 @@
 import React, { memo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { CheckSquare, MessageSquare, Calendar, AlertTriangle, CheckCircle, MoreVertical } from 'lucide-react';
+import { CheckSquare, MessageSquare, Calendar, AlertTriangle, CheckCircle, MoreVertical, Sparkles } from 'lucide-react';
 import { Process } from '../../types/kanban';
 import { AREA_COLORS, formatDeadline, formatRelativeDate } from '../../utils/kanban';
 
-export const DraggableCard = memo(function DraggableCard({ process, onOpenModal }: { process: Process; onOpenModal: (id: string) => void }) {
+export const DraggableCard = memo(function DraggableCard({ process, onOpenModal, onGenerateStrategy }: { process: Process; onOpenModal: (id: string) => void; onGenerateStrategy: (process: Process) => void }) {
     const {
         attributes,
         listeners,
@@ -130,7 +130,18 @@ export const DraggableCard = memo(function DraggableCard({ process, onOpenModal 
                         </span>
                     )}
 
-                    {isCompleted && <CheckCircle size={12} className="text-black dark:text-white ml-auto" />}
+                    {/* Llama AI Strategic Plan trigger */}
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onGenerateStrategy(process); }}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 hover:from-purple-500/20 hover:to-indigo-500/20 border border-purple-500/25 hover:border-purple-500/40 text-[#7C3AED] dark:text-[#A78BFA] rounded-md text-[10px] font-extrabold transition-all shadow-sm active:scale-95 ml-auto touch-manipulation cursor-pointer"
+                        title="Gerar Roteiro Estratégico com Llama 3.1 AI"
+                    >
+                        <Sparkles size={10} className="animate-pulse shrink-0" />
+                        <span>Roteiro Llama</span>
+                    </button>
+
+                    {isCompleted && <CheckCircle size={12} className="text-black dark:text-white" />}
                 </div>
 
                 {/* Progress Bar (checklist) */}

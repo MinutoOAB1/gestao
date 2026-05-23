@@ -14,6 +14,8 @@ import {
   ArrowRight,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
+  ChevronUp,
   BookOpen,
   Menu,
   Users,
@@ -72,6 +74,7 @@ export default function CadeiaValorPage() {
   
   // Canvas State
   const [nodes, setNodes] = useState<ProcessNode[]>([]);
+  const [expandedNodeIds, setExpandedNodeIds] = useState<string[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [history, setHistory] = useState<{ nodes: ProcessNode[]; connections: Connection[] }[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -1605,15 +1608,44 @@ export default function CadeiaValorPage() {
                       </button>
                     </div>
 
-                    <h3 className="text-xs font-bold text-slate-800 dark:text-white mb-1.5 tracking-wide line-clamp-1">{node.label}</h3>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-2">{node.description}</p>
+                    <h3 className={`text-xs font-bold text-slate-800 dark:text-white mb-1.5 tracking-wide ${expandedNodeIds.includes(node.id) ? '' : 'line-clamp-1'}`}>{node.label}</h3>
+                    <p className={`text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed mb-2 ${expandedNodeIds.includes(node.id) ? '' : 'line-clamp-2'}`}>{node.description}</p>
                     
-                    <div 
-                      onClick={(e) => { e.stopPropagation(); setEditingNode(node); }}
-                      className="flex items-center justify-end text-[9px] font-bold text-[#4F73F5] dark:text-[#6D8CFF] hover:text-[#E2B755] dark:hover:text-amber-400 transition-colors gap-1 pt-1.5 border-t border-slate-100 dark:border-white/[0.04] cursor-pointer"
-                    >
-                      <span>Editar Bloco</span>
-                      <ChevronRight size={10} />
+                    <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-white/[0.04] mt-2">
+                      {((node.description && node.description.length > 60) || (node.label && node.label.length > 25)) ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedNodeIds(prev => 
+                              prev.includes(node.id) 
+                                ? prev.filter(id => id !== node.id) 
+                                : [...prev, node.id]
+                            );
+                          }}
+                          className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500 hover:text-[#4F73F5] dark:hover:text-white transition-colors cursor-pointer"
+                        >
+                          {expandedNodeIds.includes(node.id) ? (
+                            <>
+                              <span>Recolher</span>
+                              <ChevronUp size={10} />
+                            </>
+                          ) : (
+                            <>
+                              <span>Ver mais</span>
+                              <ChevronDown size={10} />
+                            </>
+                          )}
+                        </button>
+                      ) : <div />}
+
+                      <div 
+                        onClick={(e) => { e.stopPropagation(); setEditingNode(node); }}
+                        className="flex items-center text-[9px] font-bold text-[#4F73F5] dark:text-[#6D8CFF] hover:text-[#E2B755] dark:hover:text-amber-400 transition-colors gap-1 cursor-pointer"
+                      >
+                        <span>Editar Bloco</span>
+                        <ChevronRight size={10} />
+                      </div>
                     </div>
 
                     {/* Miro Quick Connection Ports on 4 sides */}

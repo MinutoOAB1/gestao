@@ -134,26 +134,26 @@
   background-color: #404040; /* Dark Neutral */
 }
 
-/* Global and Custom scrollbar matching platform signature colors */
-::-webkit-scrollbar,
+/* Global and Custom scrollbar matching platform signature colors only on landing page */
+.landing-page-body::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track,
+.landing-page-body::-webkit-scrollbar-track,
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #090E17; /* Midnight */
 }
 
-::-webkit-scrollbar-thumb,
+.landing-page-body::-webkit-scrollbar-thumb,
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #4F73F5; /* Royal Blue */
   border-radius: 4px;
   border: 1px solid #090E17;
 }
 
-::-webkit-scrollbar-thumb:hover,
+.landing-page-body::-webkit-scrollbar-thumb:hover,
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #D4AF37; /* Gold on hover */
 }

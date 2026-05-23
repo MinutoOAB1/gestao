@@ -22,6 +22,8 @@ import {
     Plus, Search, Filter, MoreVertical, Calendar, AlertTriangle, CheckCircle, X, Save, LayoutGrid, List, Users
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { TrendingUp, Sparkles, Clock, Phone } from 'lucide-react';
 import api from '../../services/api';
 import { Protect } from '../../components/auth/Protect';
 import CardDetailModal from '../../components/kanban/CardDetailModal';
@@ -39,6 +41,12 @@ export default function KanbanPage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { addToast } = useToast();
     const [processes, setProcesses] = useState<Process[]>([]);
+
+    // CRM stats and Llama AI Strategy states
+    const [crmLeads, setCrmLeads] = useState<any[]>([]);
+    const [selectedLeadForStrategy, setSelectedLeadForStrategy] = useState<any | null>(null);
+    const [isStrategyLoading, setIsStrategyLoading] = useState(false);
+    const [crmStrategyHtml, setCrmStrategyHtml] = useState<string | null>(null);
     const [columns, setColumns] = useState<Column[]>(() => {
         const saved = localStorage.getItem('kanban-columns');
         if (saved) {
@@ -89,6 +97,7 @@ export default function KanbanPage() {
         fetchTeamMembers();
         fetchLabels();
         fetchClients();
+        fetchCrmLeads();
     }, []);
 
     const fetchTeamMembers = async () => {
@@ -116,6 +125,61 @@ export default function KanbanPage() {
         } catch (error) {
             console.error('Error fetching clients:', error);
         }
+    };
+
+    const fetchCrmLeads = async () => {
+        try {
+            const res = await api.get('/clients');
+            const clientsData = res.data || [];
+            const storedStages = localStorage.getItem('bpmn-crm-stages');
+            const stageMap = storedStages ? JSON.parse(storedStages) : {};
+            const mapped = clientsData.map((c: any) => ({
+                id: c.id,
+                name: c.name,
+                phone: c.phone || 'Sem Telefone',
+                email: c.email || 'Sem E-mail',
+                document: c.document || 'Sem Documento',
+                createdAt: c.createdAt || new Date().toISOString(),
+                urgency: c.urgencyLevel || 'NORMAL',
+                area: c.demandType || 'Geral',
+                stage: stageMap[c.id] || 'novo',
+                details: c.notes?.map((n: any) => n.content).join('; ') || ''
+            }));
+            setCrmLeads(mapped);
+        } catch (err) {
+            console.error('Error fetching CRM clients in Kanban:', err);
+        }
+    };
+
+    const handleGenerateLeadStrategy = async (lead: any) => {
+        setSelectedLeadForStrategy(lead);
+        setIsStrategyLoading(true);
+        setCrmStrategyHtml(null);
+        try {
+            const response = await api.post('/ai/gestao/crm/estrategia', {
+                name: lead.name,
+                area: lead.area || 'Geral',
+                details: lead.details || 'Caso comum de ' + (lead.area || 'Geral')
+            });
+            setCrmStrategyHtml(response.data.strategy);
+        } catch (err) {
+            console.error(err);
+            setCrmStrategyHtml('<p class="text-xs text-red-500 font-bold p-4">Erro ao processar estratégia de atendimento via IA. Tente novamente.</p>');
+        } finally {
+            setIsStrategyLoading(false);
+        }
+    };
+
+    const handleGenerateCardStrategy = (process: Process) => {
+        const lead = {
+            name: process.client?.name || process.title,
+            phone: 'WhatsApp',
+            email: process.client?.email || 'Sem E-mail',
+            area: process.area || 'Geral',
+            urgency: process.deadline ? 'ALTA' : 'NORMAL',
+            details: process.description || process.title
+        };
+        handleGenerateLeadStrategy(lead);
     };
 
     useEffect(() => {
@@ -291,8 +355,55 @@ export default function KanbanPage() {
 
                     <div className="hidden xl:block h-8 w-px bg-gray-200 dark:bg-slate-700 mx-2"></div>
 
-                    {/* View Toggles */}
-                    <div className="flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 overflow-x-auto max-w-full">
+                    {/* CRM Overview stats replacing View Toggles */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1 xl:max-w-4xl">
+                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
+                            <div className="min-w-0">
+                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Total em Atendimento</p>
+                                <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5 truncate">{crmLeads.length} Leads</h4>
+                            </div>
+                            <div className="p-2 bg-blue-500/10 rounded-lg shrink-0 ml-2">
+                                <Users size={14} className="text-blue-500" />
+                            </div>
+                        </div>
+                        
+                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
+                            <div className="min-w-0">
+                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Aguardando Coleta</p>
+                                <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5 truncate">
+                                    {crmLeads.filter(c => c.stage === 'coleta').length} Clientes
+                                </h4>
+                            </div>
+                            <div className="p-2 bg-amber-500/10 rounded-lg shrink-0 ml-2">
+                                <Clock size={14} className="text-amber-500" />
+                            </div>
+                        </div>
+
+                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
+                            <div className="min-w-0">
+                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Fechamentos Concluídos</p>
+                                <h4 className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">
+                                    {crmLeads.filter(c => c.stage === 'concluido').length} Fechados
+                                </h4>
+                            </div>
+                            <div className="p-2 bg-emerald-500/10 rounded-lg shrink-0 ml-2">
+                                <CheckCircle size={14} className="text-emerald-500" />
+                            </div>
+                        </div>
+
+                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
+                            <div className="min-w-0">
+                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Taxa de Conversão</p>
+                                <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5 truncate">
+                                    {crmLeads.length > 0 ? Math.round((crmLeads.filter(c => c.stage === 'concluido').length / crmLeads.length) * 100) : 0}%
+                                </h4>
+                            </div>
+                            <div className="p-2 bg-purple-500/10 rounded-lg shrink-0 ml-2">
+                                <TrendingUp size={14} className="text-purple-500" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="hidden flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 overflow-x-auto max-w-full">
                         <button
                             onClick={() => navigate('/app/processos')}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg transition-colors whitespace-nowrap"
@@ -399,6 +510,7 @@ export default function KanbanPage() {
                                 onDeleteColumn={handleDeleteColumn}
                                 onAddCard={handleAddCard}
                                 onOpenModal={handleOpenModal}
+                                onGenerateStrategy={handleGenerateCardStrategy}
                             />
                         ))}
 
@@ -448,6 +560,89 @@ export default function KanbanPage() {
                 onApply={setFilters}
                 teamMembers={teamMembers}
             />
+
+            {/* DRAWER: IA STRATEGY FOR KANBAN PROCESS (Llama AI) */}
+            <AnimatePresence>
+                {selectedLeadForStrategy && (
+                    <div className="fixed inset-0 z-[130] flex justify-end">
+                        {/* Backdrop */}
+                        <div 
+                            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                            onClick={() => setSelectedLeadForStrategy(null)}
+                        />
+
+                        {/* Slide over */}
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="relative w-full max-w-lg bg-white dark:bg-[#0D1424] border-l border-slate-200 dark:border-white/10 h-full flex flex-col shadow-2xl p-6 overflow-hidden text-left"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5 shrink-0">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1.5 bg-[#7C3AED]/10 text-[#7C3AED] rounded-lg">
+                                        <Sparkles size={18} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-black text-slate-800 dark:text-white leading-none">Roteiro Llama 3.1 AI</h3>
+                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 uppercase font-bold tracking-wider">
+                                            Estratégia: {selectedLeadForStrategy.area || 'Geral'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedLeadForStrategy(null)}
+                                    className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 overflow-y-auto py-4 pr-1 scrollbar-hide">
+                                {/* Lead Details Summary card */}
+                                <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-white/5 rounded-2xl mb-5">
+                                    <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wide">{selectedLeadForStrategy.name}</h4>
+                                    <div className="flex flex-wrap gap-2.5 mt-2">
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                            <Phone size={10} />
+                                            {selectedLeadForStrategy.phone}
+                                        </span>
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                            <FileText size={10} />
+                                            {selectedLeadForStrategy.email}
+                                        </span>
+                                    </div>
+                                    {selectedLeadForStrategy.details && (
+                                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2.5 bg-white dark:bg-[#0D1424] p-2.5 rounded-lg border border-slate-100 dark:border-white/5">
+                                            {selectedLeadForStrategy.details}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Loading state */}
+                                {isStrategyLoading ? (
+                                    <div className="flex flex-col items-center justify-center py-16 gap-3">
+                                        <div className="w-10 h-10 border-4 border-[#7C3AED] border-t-transparent flex items-center justify-center rounded-full animate-spin">
+                                            <div className="w-4 h-4 bg-[#7C3AED] rounded-full animate-pulse" />
+                                        </div>
+                                        <p className="text-xs text-[#7C3AED] font-bold animate-pulse uppercase tracking-wider text-center">Llama IA gerando estratégia...</p>
+                                    </div>
+                                ) : crmStrategyHtml ? (
+                                    <div 
+                                        className="prose dark:prose-invert prose-xs text-xs max-w-none text-slate-600 dark:text-slate-300 space-y-4"
+                                        dangerouslySetInnerHTML={{ __html: crmStrategyHtml }}
+                                    />
+                                ) : (
+                                    <p className="text-xs text-slate-400 italic">Estratégia não carregada.</p>
+                                )}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             {/* Card Detail Modal */}
             {cardModalId && (
