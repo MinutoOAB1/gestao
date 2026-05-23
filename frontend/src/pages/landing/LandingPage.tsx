@@ -256,7 +256,7 @@ function HeroSection() {
     const navigate = useNavigate();
 
     return (
-        <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 overflow-hidden bg-[#F4F1EC]">
+        <section className="relative pt-32 md:pt-48 pb-24 md:pb-40 overflow-hidden bg-black">
             {/* Animated Background */}
             <AnimatedHeroBackground />
             
@@ -266,7 +266,7 @@ function HeroSection() {
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-3 px-4 py-2 bg-white/60 border border-[#EAE6DF] text-[#B89B5E] rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-sm backdrop-blur-md"
+                        className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-[#B89B5E] rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-sm backdrop-blur-md"
                     >
                         <Sparkles size={14} className="animate-pulse" />
                         Inteligência Jurídica de Elite
@@ -277,10 +277,10 @@ function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-5xl md:text-7xl lg:text-8xl font-black text-[#2E2C29] tracking-tighter leading-tight mb-10 font-display"
+                        className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-tight mb-10 font-display"
                     >
                         A Nova Era da sua{' '}<br className="hidden md:block" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#B89B5E] via-[#2E2C29] to-[#4F73F5]">Gestão Jurídica</span>
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#B89B5E] via-[#4F73F5] to-white">Gestão Jurídica</span>
                     </motion.h1>
 
                     {/* Subheadline */}
@@ -288,7 +288,7 @@ function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="text-lg md:text-2xl text-[#2E2C29]/60 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
+                        className="text-lg md:text-2xl text-white/75 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
                     >
                         Advus é uma plataforma de gestão jurídica integrada, projetada para escritórios de advocacia que buscam eficiência, controle financeiro e satisfação de clientes.
                     </motion.p>
@@ -312,10 +312,10 @@ function HeroSection() {
                         </motion.button>
                         <motion.button
                             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-                            whileHover={{ scale: 1.05, backgroundColor: '#FAF8F5' }}
+                            whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }}
                             whileTap={{ scale: 0.97 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white text-[#2E2C29] font-bold rounded-2xl border border-[#EAE6DF] shadow-sm uppercase tracking-widest text-sm"
+                            className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/10 shadow-sm uppercase tracking-widest text-sm"
                         >
                             Ver Planos
                         </motion.button>
@@ -326,7 +326,7 @@ function HeroSection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-[10px] font-black uppercase tracking-[0.2em] text-[#2E2C29]/40"
+                        className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 text-[10px] font-black uppercase tracking-[0.2em] text-white/50"
                     >
                         <div className="flex items-center gap-2">
                             <Check size={16} className="text-[#B89B5E]" />
@@ -1076,9 +1076,9 @@ function PwaMobileSection() {
                                     
                                     {/* Image with beautiful rounded borders */}
                                     <img 
-                                        src="/image-celular.png" 
+                                        src="/imagem22.png" 
                                         alt="Advus Mobile Platform" 
-                                        className="relative w-full max-w-[340px] aspect-[9/18.5] object-cover rounded-[2rem] border-4 border-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transform hover:scale-[1.02] transition-all duration-500"
+                                        className="relative w-full max-w-[440px] rounded-[1.5rem] border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transform hover:scale-[1.02] transition-all duration-500"
                                         draggable={false}
                                     />
                                 </div>
