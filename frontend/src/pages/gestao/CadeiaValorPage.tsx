@@ -1147,33 +1147,7 @@ export default function CadeiaValorPage() {
           </div>
         </div>
 
-        {/* Tab switchers in header */}
-        <div className="flex bg-slate-100 dark:bg-white/[0.04] p-1 rounded-xl border border-slate-200 dark:border-white/10 w-full lg:w-auto justify-center">
-          <button
-            onClick={() => setActiveTab('map')}
-            className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeTab === 'map'
-                ? 'bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
-            }`}
-          >
-            <Network size={14} />
-            <span className="hidden sm:inline">Whiteboard Map</span>
-            <span className="sm:hidden">Mapa</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('crm')}
-            className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeTab === 'crm'
-                ? 'bg-white dark:bg-[#1E293B] text-slate-800 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
-            }`}
-          >
-            <Users size={14} />
-            <span className="hidden sm:inline">Funil de Atendimento (CRM)</span>
-            <span className="sm:hidden">CRM</span>
-          </button>
-        </div>
+
 
         <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
           {activeTab === 'map' ? (

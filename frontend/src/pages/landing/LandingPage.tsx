@@ -1002,7 +1002,6 @@ export default function LandingPage() {
             <HeroSection />
             <FeaturesSection />
             <StatsSection />
-            <EngagementSection />
             <PricingSection />
             <TestimonialsSection />
             <FAQSection />

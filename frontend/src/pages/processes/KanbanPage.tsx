@@ -334,7 +334,7 @@ export default function KanbanPage() {
     }
 
     return (
-        <div className="flex flex-col h-[calc(100dvh-140px)] min-h-[600px] md:min-h-0 md:h-[calc(100vh-4rem)] bg-gray-50 dark:bg-slate-900">
+        <div className="flex flex-col h-full flex-1 bg-gray-50 dark:bg-slate-900 overflow-hidden">
             {/* Header */}
             <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-4 sm:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 w-full">
@@ -355,52 +355,66 @@ export default function KanbanPage() {
 
                     <div className="hidden xl:block h-8 w-px bg-gray-200 dark:bg-slate-700 mx-2"></div>
 
-                    {/* CRM Overview stats replacing View Toggles */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1 xl:max-w-4xl">
-                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
-                            <div className="min-w-0">
-                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Total em Atendimento</p>
-                                <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5 truncate">{crmLeads.length} Leads</h4>
+                    {/* CRM Overview stats with search bar on the right */}
+                    <div className="flex flex-col lg:flex-row items-center gap-4 flex-1 w-full xl:max-w-6xl">
+                        {/* 4 Premium Stats Blocks */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1 w-full">
+                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                                <div className="min-w-0">
+                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Total em Atendimento</p>
+                                    <h4 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1.5 truncate">{crmLeads.length} Leads</h4>
+                                </div>
+                                <div className="p-3 bg-blue-500/10 rounded-xl shrink-0 ml-3">
+                                    <Users size={20} className="text-blue-500" />
+                                </div>
                             </div>
-                            <div className="p-2 bg-blue-500/10 rounded-lg shrink-0 ml-2">
-                                <Users size={14} className="text-blue-500" />
+                            
+                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                                <div className="min-w-0">
+                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Aguardando Coleta</p>
+                                    <h4 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1.5 truncate">
+                                        {crmLeads.filter(c => c.stage === 'coleta').length} Clientes
+                                    </h4>
+                                </div>
+                                <div className="p-3 bg-amber-500/10 rounded-xl shrink-0 ml-3">
+                                    <Clock size={20} className="text-amber-500" />
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
-                            <div className="min-w-0">
-                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Aguardando Coleta</p>
-                                <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5 truncate">
-                                    {crmLeads.filter(c => c.stage === 'coleta').length} Clientes
-                                </h4>
+
+                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                                <div className="min-w-0">
+                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Fechamentos Concluídos</p>
+                                    <h4 className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 mt-1.5 truncate">
+                                        {crmLeads.filter(c => c.stage === 'concluido').length} Fechados
+                                    </h4>
+                                </div>
+                                <div className="p-3 bg-emerald-500/10 rounded-xl shrink-0 ml-3">
+                                    <CheckCircle size={20} className="text-emerald-500" />
+                                </div>
                             </div>
-                            <div className="p-2 bg-amber-500/10 rounded-lg shrink-0 ml-2">
-                                <Clock size={14} className="text-amber-500" />
+
+                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+                                <div className="min-w-0">
+                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Taxa de Conversão</p>
+                                    <h4 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1.5 truncate">
+                                        {crmLeads.length > 0 ? Math.round((crmLeads.filter(c => c.stage === 'concluido').length / crmLeads.length) * 100) : 0}%
+                                    </h4>
+                                </div>
+                                <div className="p-3 bg-purple-500/10 rounded-xl shrink-0 ml-3">
+                                    <TrendingUp size={20} className="text-purple-500" />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
-                            <div className="min-w-0">
-                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Fechamentos Concluídos</p>
-                                <h4 className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5 truncate">
-                                    {crmLeads.filter(c => c.stage === 'concluido').length} Fechados
-                                </h4>
-                            </div>
-                            <div className="p-2 bg-emerald-500/10 rounded-lg shrink-0 ml-2">
-                                <CheckCircle size={14} className="text-emerald-500" />
-                            </div>
-                        </div>
-
-                        <div className="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl flex items-center justify-between shadow-sm">
-                            <div className="min-w-0">
-                                <p className="text-[9px] text-gray-400 dark:text-slate-400 font-bold uppercase tracking-wider truncate">Taxa de Conversão</p>
-                                <h4 className="text-sm font-black text-gray-900 dark:text-white mt-0.5 truncate">
-                                    {crmLeads.length > 0 ? Math.round((crmLeads.filter(c => c.stage === 'concluido').length / crmLeads.length) * 100) : 0}%
-                                </h4>
-                            </div>
-                            <div className="p-2 bg-purple-500/10 rounded-lg shrink-0 ml-2">
-                                <TrendingUp size={14} className="text-purple-500" />
-                            </div>
+                        {/* Search Input on the right of stats */}
+                        <div className="relative w-full lg:w-72 shrink-0">
+                            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl py-3 pl-10 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-h-[48px] sm:min-h-[52px] transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]"
+                                placeholder="Buscar caso..."
+                                value={searchQuery}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                            />
                         </div>
                     </div>
                     <div className="hidden flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 overflow-x-auto max-w-full">
