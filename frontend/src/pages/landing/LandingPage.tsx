@@ -15,45 +15,117 @@ function useScrollReveal(threshold = 0.15) {
     const isInView = useInView(ref, { once: true, amount: threshold });
     return { ref, isInView };
 }
-
-// Animated Hero Background with floating orbs
+// Animated Hero Background with constellation grid (Inspired by premium Kwai dark wave pattern)
 function AnimatedHeroBackground() {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let animationFrameId: number;
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Constellation nodes (cybernetic dots)
+        const numNodes = Math.min(80, Math.floor((width * height) / 18000));
+        const nodes: Array<{ x: number; y: number; vx: number; vy: number; radius: number }> = [];
+
+        for (let i = 0; i < numNodes; i++) {
+            nodes.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                radius: Math.random() * 2 + 1,
+            });
+        }
+
+        const draw = () => {
+            ctx.clearRect(0, 0, width, height);
+
+            // Subtle dark background grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+            ctx.lineWidth = 1;
+            const gridSize = 65;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // Draw constellation lines (cybernetic web)
+            for (let i = 0; i < numNodes; i++) {
+                const nodeA = nodes[i];
+                nodeA.x += nodeA.vx;
+                nodeA.y += nodeA.vy;
+
+                // Edge bounce
+                if (nodeA.x < 0 || nodeA.x > width) nodeA.vx *= -1;
+                if (nodeA.y < 0 || nodeA.y > height) nodeA.vy *= -1;
+
+                // Draw dot
+                ctx.beginPath();
+                ctx.arc(nodeA.x, nodeA.y, nodeA.radius, 0, Math.PI * 2);
+                ctx.fillStyle = i % 3 === 0 ? 'rgba(184, 155, 94, 0.4)' : 'rgba(79, 115, 245, 0.5)';
+                ctx.fill();
+
+                // Draw connections
+                for (let j = i + 1; j < numNodes; j++) {
+                    const nodeB = nodes[j];
+                    const dx = nodeA.x - nodeB.x;
+                    const dy = nodeA.y - nodeB.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 160) {
+                        const alpha = (1 - dist / 160) * 0.15;
+                        ctx.beginPath();
+                        ctx.moveTo(nodeA.x, nodeA.y);
+                        ctx.lineTo(nodeB.x, nodeB.y);
+                        ctx.strokeStyle = `rgba(79, 115, 245, ${alpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(draw);
+        };
+
+        draw();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Animated gradient orbs */}
-            <motion.div
-                className="absolute w-[600px] h-[600px] rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(79,115,245,0.15) 0%, transparent 70%)', top: '-10%', right: '-5%' }}
-                animate={{ x: [0, 30, -20, 0], y: [0, -40, 20, 0], scale: [1, 1.1, 0.95, 1] }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-                className="absolute w-[500px] h-[500px] rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)', bottom: '5%', left: '-8%' }}
-                animate={{ x: [0, -25, 35, 0], y: [0, 30, -25, 0], scale: [1, 0.9, 1.15, 1] }}
-                transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-                className="absolute w-[350px] h-[350px] rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(79,115,245,0.1) 0%, transparent 70%)', top: '40%', left: '30%' }}
-                animate={{ x: [0, 40, -30, 0], y: [0, -20, 40, 0], scale: [1, 1.2, 0.85, 1] }}
-                transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            {/* Grid pattern overlay */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-                backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                backgroundSize: '60px 60px'
-            }} />
-            {/* Floating particles */}
-            {[...Array(6)].map((_, i) => (
-                <motion.div
-                    key={i}
-                    className="absolute w-1 h-1 bg-accent/30 rounded-full"
-                    style={{ top: `${15 + i * 14}%`, left: `${10 + i * 15}%` }}
-                    animate={{ y: [0, -30, 0], opacity: [0.2, 0.7, 0.2] }}
-                    transition={{ duration: 4 + i, repeat: Infinity, delay: i * 0.5 }}
-                />
-            ))}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+            {/* Base dark canvas backdrop overlay */}
+            <div className="absolute inset-0 bg-[#000000] z-[-2]" />
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-70 z-[-1]" />
+
+            {/* Glowing peripheral gradient backlights */}
+            <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-[#4F73F5]/10 blur-[130px] pointer-events-none" />
+            <div className="absolute bottom-[5%] left-[-8%] w-[500px] h-[500px] rounded-full bg-[#B89B5E]/5 blur-[100px] pointer-events-none" />
         </div>
     );
 }
@@ -80,26 +152,26 @@ function Navbar() {
     const navigate = useNavigate();
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-[#F4F1EC]/85 backdrop-blur-2xl border-b border-[#EAE6DF]">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-2xl border-b border-white/10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
                     <div className="flex items-center gap-3">
-                        <BrandLogo variant="dark" size="md" />
+                        <BrandLogo variant="light" size="md" />
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-10">
-                        <a href="#features" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#features" className="text-white/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             Recursos
                         </a>
-                        <a href="#pricing" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#pricing" className="text-white/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             Assinatura
                         </a>
-                        <a href="#testimonials" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#testimonials" className="text-white/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             Ecossistema
                         </a>
-                        <a href="#faq" className="text-[#2E2C29]/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
+                        <a href="#faq" className="text-white/70 hover:text-[#B89B5E] font-medium transition-colors text-sm uppercase tracking-widest">
                             FAQ
                         </a>
                     </div>
@@ -108,22 +180,22 @@ function Navbar() {
                     <div className="hidden md:flex items-center gap-6">
                         <button
                             onClick={() => navigate('/login')}
-                            className="text-[#2E2C29]/70 font-bold hover:text-[#2E2C29] transition-colors text-sm"
+                            className="text-white/70 font-bold hover:text-white transition-colors text-sm"
                         >
                             ENTRAR
                         </button>
                         <button
                             onClick={() => navigate('/register')}
-                            className="px-6 py-2.5 bg-[#4F73F5] text-white font-black rounded-xl hover:bg-black transition-all shadow-lg shadow-primary/10 text-xs uppercase tracking-tighter"
+                            className="px-6 py-2.5 bg-[#4F73F5] text-white font-black rounded-xl hover:bg-white hover:text-black transition-all shadow-lg shadow-primary/10 text-xs uppercase tracking-tighter"
                         >
-                            SOLICITE UMA DEMO
+                            CRIAR CONTA
                         </button>
                     </div>
 
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 text-[#2E2C29]"
+                        className="md:hidden p-2 text-white"
                     >
                         {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -131,18 +203,18 @@ function Navbar() {
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden py-6 border-t border-[#EAE6DF] bg-[#FAF8F5] backdrop-blur-3xl px-4 rounded-b-3xl shadow-lg">
+                    <div className="md:hidden py-6 border-t border-white/10 bg-black/95 backdrop-blur-3xl px-4 rounded-b-3xl shadow-lg">
                         <div className="flex flex-col gap-5">
-                            <a href="#features" className="text-[#2E2C29] font-medium text-lg">Recursos</a>
-                            <a href="#pricing" className="text-[#2E2C29] font-medium text-lg">Assinatura</a>
-                            <a href="#testimonials" className="text-[#2E2C29] font-medium text-lg">Ecossistema</a>
-                            <a href="#faq" className="text-[#2E2C29] font-medium text-lg">FAQ</a>
-                            <div className="flex flex-col gap-3 pt-6 border-t border-[#EAE6DF]">
-                                <button onClick={() => navigate('/login')} className="py-4 text-center text-[#2E2C29] font-bold border border-[#EAE6DF] rounded-2xl bg-white">
+                            <a href="#features" className="text-white font-medium text-lg">Recursos</a>
+                            <a href="#pricing" className="text-white font-medium text-lg">Assinatura</a>
+                            <a href="#testimonials" className="text-white font-medium text-lg">Ecossistema</a>
+                            <a href="#faq" className="text-white font-medium text-lg">FAQ</a>
+                            <div className="flex flex-col gap-3 pt-6 border-t border-white/10">
+                                <button onClick={() => navigate('/login')} className="py-4 text-center text-white font-bold border border-white/10 rounded-2xl bg-white/5">
                                     ENTRAR
                                 </button>
                                 <button onClick={() => navigate('/register')} className="py-4 text-center bg-[#4F73F5] text-white font-black rounded-2xl shadow-sm">
-                                    SOLICITE UMA DEMO
+                                    CRIAR CONTA
                                 </button>
                             </div>
                         </div>
@@ -235,16 +307,17 @@ function HeroSection() {
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                             className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl shadow-lg group uppercase tracking-widest text-sm"
                         >
-                            Começar Agora
+                            Criar Conta
                             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                         </motion.button>
                         <motion.button
+                            onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                             whileHover={{ scale: 1.05, backgroundColor: '#FAF8F5' }}
                             whileTap={{ scale: 0.97 }}
                             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                             className="w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-5 bg-white text-[#2E2C29] font-bold rounded-2xl border border-[#EAE6DF] shadow-sm uppercase tracking-widest text-sm"
                         >
-                            Solicite uma Demo
+                            Ver Planos
                         </motion.button>
                     </motion.div>
 
@@ -981,6 +1054,100 @@ function Footer() {
     );
 }
 
+// PWA Mobile Section (Inspired by premium Xtracky banner with rounded borders smartphone mockup)
+function PwaMobileSection() {
+    const navigate = useNavigate();
+    
+    return (
+        <section className="py-24 bg-black relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <ScrollReveal>
+                    <div className="relative bg-gradient-to-br from-[#0F172A] via-[#090E17] to-black rounded-[2.5rem] md:rounded-[4rem] border border-white/10 p-8 sm:p-12 lg:p-20 overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
+                        {/* Abstract Glow Elements */}
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#4F73F5]/10 blur-[120px] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#B89B5E]/5 blur-[80px] rounded-full -translate-x-1/3 translate-y-1/3 pointer-events-none" />
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
+                            {/* Phone Mockup Image on the left (5 columns) */}
+                            <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                                <div className="relative group">
+                                    {/* Neon Backlight Glow */}
+                                    <div className="absolute -inset-1.5 bg-gradient-to-r from-[#4F73F5] to-[#B89B5E] rounded-[2.2rem] blur opacity-40 group-hover:opacity-60 transition duration-1000" />
+                                    
+                                    {/* Image with beautiful rounded borders */}
+                                    <img 
+                                        src="/image-celular.png" 
+                                        alt="Advus Mobile Platform" 
+                                        className="relative w-full max-w-[340px] aspect-[9/18.5] object-cover rounded-[2rem] border-4 border-black shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transform hover:scale-[1.02] transition-all duration-500"
+                                        draggable={false}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Info Content on the right (7 columns) */}
+                            <div className="lg:col-span-7 space-y-8 text-left">
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#4F73F5]/10 border border-[#4F73F5]/30 rounded-full text-xs font-black uppercase tracking-widest text-[#4F73F5]">
+                                    <span className="w-2 h-2 rounded-full bg-[#4F73F5] animate-ping" />
+                                    Progressive Web App (PWA)
+                                </div>
+
+                                <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter leading-none font-display">
+                                    Sua operação jurídica, <br />
+                                    <span className="text-white/40">na palma da mão.</span>
+                                </h2>
+
+                                <p className="text-white/50 text-base sm:text-lg leading-relaxed font-medium">
+                                    Acesse o ecossistema Advus diretamente do celular com a mesma robustez e velocidade do desktop. 
+                                    Sem necessidade de downloads em lojas virtuais (App Store ou Google Play), nossa plataforma utiliza tecnologia PWA 
+                                    para rodar em alto desempenho com instalação instantânea de um clique.
+                                </p>
+
+                                <hr className="border-white/5" />
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-6 h-6 rounded-lg bg-[#B89B5E]/20 flex items-center justify-center text-[#B89B5E] text-xs font-bold">1</div>
+                                            <h4 className="text-xs font-black uppercase tracking-wider text-white">Como Instalar no iOS (Safari)</h4>
+                                        </div>
+                                        <p className="text-white/40 text-xs leading-relaxed pl-9">
+                                            Toque no ícone de <strong>Compartilhar</strong> (seta para cima) no Safari e selecione <strong>Adicionar à Tela de Início</strong>.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-6 h-6 rounded-lg bg-[#4F73F5]/20 flex items-center justify-center text-[#4F73F5] text-xs font-bold">2</div>
+                                            <h4 className="text-xs font-black uppercase tracking-wider text-white">Como Instalar no Android (Chrome)</h4>
+                                        </div>
+                                        <p className="text-white/40 text-xs leading-relaxed pl-9">
+                                            Clique no menu de <strong>três pontos</strong> do Chrome e selecione a opção <strong>Instalar Aplicativo</strong> ou Adicionar à tela inicial.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 flex flex-col sm:flex-row gap-4">
+                                    <button 
+                                        onClick={() => navigate('/register')}
+                                        className="px-8 py-4 bg-[#4F73F5] hover:bg-white hover:text-black text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(79,115,245,0.25)]"
+                                    >
+                                        Criar Conta Grátis
+                                    </button>
+                                    <button 
+                                        onClick={() => navigate('/login')}
+                                        className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all"
+                                    >
+                                        Acessar Plataforma
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ScrollReveal>
+            </div>
+        </section>
+    );
+}
+
 // Main Landing Page Component
 export default function LandingPage() {
     const { isAuthenticated } = useAuth();
@@ -1002,6 +1169,7 @@ export default function LandingPage() {
             <HeroSection />
             <FeaturesSection />
             <StatsSection />
+            <PwaMobileSection />
             <PricingSection />
             <TestimonialsSection />
             <FAQSection />

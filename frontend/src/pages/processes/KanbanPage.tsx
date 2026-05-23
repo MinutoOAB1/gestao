@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, Sparkles, Clock, Phone } from 'lucide-react';
+import { TrendingUp, Sparkles, Clock, Phone, ChevronDown } from 'lucide-react';
 import api from '../../services/api';
 import { Protect } from '../../components/auth/Protect';
 import CardDetailModal from '../../components/kanban/CardDetailModal';
@@ -355,67 +355,63 @@ export default function KanbanPage() {
 
                     <div className="hidden xl:block h-8 w-px bg-gray-200 dark:bg-slate-700 mx-2"></div>
 
-                    {/* CRM Overview stats with search bar on the right */}
-                    <div className="flex flex-col lg:flex-row items-center gap-4 flex-1 w-full xl:max-w-6xl">
-                        {/* 4 Premium Stats Blocks */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1 w-full">
-                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                                <div className="min-w-0">
-                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Total em Atendimento</p>
-                                    <h4 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1.5 truncate">{crmLeads.length} Leads</h4>
-                                </div>
-                                <div className="p-3 bg-blue-500/10 rounded-xl shrink-0 ml-3">
-                                    <Users size={20} className="text-blue-500" />
-                                </div>
-                            </div>
-                            
-                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                                <div className="min-w-0">
-                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Aguardando Coleta</p>
-                                    <h4 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1.5 truncate">
-                                        {crmLeads.filter(c => c.stage === 'coleta').length} Clientes
-                                    </h4>
-                                </div>
-                                <div className="p-3 bg-amber-500/10 rounded-xl shrink-0 ml-3">
-                                    <Clock size={20} className="text-amber-500" />
+                    {/* Reorganized Header Controls (Filters, Search, Create Case) */}
+                    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 flex-1 w-full xl:max-w-6xl">
+                        <div className="flex flex-wrap items-center gap-3 flex-1 w-full">
+                            {/* Prazos Filter */}
+                            <div className="relative shrink-0 w-full sm:w-auto">
+                                <select
+                                    value={showDeadlineFilter}
+                                    onChange={(e) => setShowDeadlineFilter(e.target.value as any)}
+                                    className={`w-full sm:w-auto appearance-none bg-white dark:bg-slate-800 border rounded-2xl py-3 pl-4 pr-10 text-sm font-semibold transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)] outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[48px] cursor-pointer ${
+                                        showDeadlineFilter !== 'all'
+                                            ? 'text-blue-600 dark:text-blue-400 border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/20'
+                                            : 'text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-700'
+                                    }`}
+                                >
+                                    <option value="all">📅 Todos os Prazos</option>
+                                    <option value="today">Hoje</option>
+                                    <option value="week">Esta Semana</option>
+                                    <option value="overdue">Atrasados</option>
+                                </select>
+                                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <ChevronDown size={16} />
                                 </div>
                             </div>
 
-                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                                <div className="min-w-0">
-                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Fechamentos Concluídos</p>
-                                    <h4 className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 mt-1.5 truncate">
-                                        {crmLeads.filter(c => c.stage === 'concluido').length} Fechados
-                                    </h4>
-                                </div>
-                                <div className="p-3 bg-emerald-500/10 rounded-xl shrink-0 ml-3">
-                                    <CheckCircle size={20} className="text-emerald-500" />
-                                </div>
-                            </div>
+                            {/* Responsabilidade Filter */}
+                            <button
+                                onClick={() => setFilters(prev => ({ ...prev, assignedToMe: !prev.assignedToMe }))}
+                                className={`w-full sm:w-auto flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)] border min-h-[48px] hover:scale-[1.02] active:scale-[0.98] ${
+                                    filters.assignedToMe
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-[0_4px_20px_rgba(37,99,235,0.2)]'
+                                        : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-200 hover:border-blue-400 hover:text-blue-600'
+                                }`}
+                            >
+                                <Users size={16} />
+                                <span>Responsabilidade: {filters.assignedToMe ? 'Meus Casos' : 'Todos'}</span>
+                            </button>
 
-                            <div className="p-4 sm:p-5 bg-white dark:bg-slate-800/80 border border-gray-200/80 dark:border-slate-700/80 rounded-2xl flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-                                <div className="min-w-0">
-                                    <p className="text-[10px] sm:text-xs text-gray-400 dark:text-slate-400 font-extrabold uppercase tracking-wider truncate">Taxa de Conversão</p>
-                                    <h4 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mt-1.5 truncate">
-                                        {crmLeads.length > 0 ? Math.round((crmLeads.filter(c => c.stage === 'concluido').length / crmLeads.length) * 100) : 0}%
-                                    </h4>
-                                </div>
-                                <div className="p-3 bg-purple-500/10 rounded-xl shrink-0 ml-3">
-                                    <TrendingUp size={20} className="text-purple-500" />
-                                </div>
+                            {/* Search Input */}
+                            <div className="relative flex-1 min-w-[200px] w-full">
+                                <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <input
+                                    className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl py-3 pl-10 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-h-[48px] transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]"
+                                    placeholder="Buscar caso..."
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                />
                             </div>
                         </div>
 
-                        {/* Search Input on the right of stats */}
-                        <div className="relative w-full lg:w-72 shrink-0">
-                            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                                className="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl py-3 pl-10 pr-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-h-[48px] sm:min-h-[52px] transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]"
-                                placeholder="Buscar caso..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                            />
-                        </div>
+                        {/* Create Case Button */}
+                        <button
+                            onClick={() => navigate('/app/processos/novo')}
+                            className="w-full xl:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-2xl shadow-[0_4px_20px_rgba(22,163,74,0.15)] hover:shadow-[0_8px_30px_rgba(22,163,74,0.25)] transition-all hover:scale-[1.02] active:scale-[0.98] font-bold text-sm min-h-[48px] shrink-0"
+                        >
+                            <Plus size={18} />
+                            <span className="whitespace-nowrap">Novo Caso</span>
+                        </button>
                     </div>
                     <div className="hidden flex items-center gap-1 bg-gray-100 dark:bg-slate-800 rounded-xl p-1 shrink-0 overflow-x-auto max-w-full">
                         <button
