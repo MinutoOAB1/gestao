@@ -15,7 +15,7 @@ function useScrollReveal(threshold = 0.15) {
     const isInView = useInView(ref, { once: true, amount: threshold });
     return { ref, isInView };
 }
-// Animated Hero Background with constellation grid (Inspired by premium Kwai dark wave pattern)
+// Static Hero Background with curved topographic wave grid
 function AnimatedHeroBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -25,37 +25,15 @@ function AnimatedHeroBackground() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        let animationFrameId: number;
         let width = (canvas.width = window.innerWidth);
         let height = (canvas.height = window.innerHeight);
 
-        const handleResize = () => {
-            if (!canvas) return;
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        // Constellation nodes (cybernetic dots)
-        const numNodes = Math.min(80, Math.floor((width * height) / 18000));
-        const nodes: Array<{ x: number; y: number; vx: number; vy: number; radius: number }> = [];
-
-        for (let i = 0; i < numNodes; i++) {
-            nodes.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.3,
-                vy: (Math.random() - 0.5) * 0.3,
-                radius: Math.random() * 2 + 1,
-            });
-        }
-
-        const draw = () => {
+        const drawWaves = () => {
+            if (!canvas || !ctx) return;
             ctx.clearRect(0, 0, width, height);
 
             // Subtle dark background grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.015)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.01)';
             ctx.lineWidth = 1;
             const gridSize = 65;
             for (let x = 0; x < width; x += gridSize) {
@@ -71,49 +49,46 @@ function AnimatedHeroBackground() {
                 ctx.stroke();
             }
 
-            // Draw constellation lines (cybernetic web)
-            for (let i = 0; i < numNodes; i++) {
-                const nodeA = nodes[i];
-                nodeA.x += nodeA.vx;
-                nodeA.y += nodeA.vy;
-
-                // Edge bounce
-                if (nodeA.x < 0 || nodeA.x > width) nodeA.vx *= -1;
-                if (nodeA.y < 0 || nodeA.y > height) nodeA.vy *= -1;
-
-                // Draw dot
+            // Draw premium elegant static wave lines (topographic curved waves)
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(79, 115, 245, 0.15)';
+            
+            const numWaves = 7;
+            for (let w = 0; w < numWaves; w++) {
                 ctx.beginPath();
-                ctx.arc(nodeA.x, nodeA.y, nodeA.radius, 0, Math.PI * 2);
-                ctx.fillStyle = i % 3 === 0 ? 'rgba(184, 155, 94, 0.4)' : 'rgba(79, 115, 245, 0.5)';
-                ctx.fill();
+                ctx.lineWidth = 1.0;
+                
+                const opacity = 0.03 + (w * 0.015);
+                ctx.strokeStyle = w % 2 === 0 ? `rgba(184, 155, 94, ${opacity})` : `rgba(79, 115, 245, ${opacity})`;
 
-                // Draw connections
-                for (let j = i + 1; j < numNodes; j++) {
-                    const nodeB = nodes[j];
-                    const dx = nodeA.x - nodeB.x;
-                    const dy = nodeA.y - nodeB.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < 160) {
-                        const alpha = (1 - dist / 160) * 0.15;
-                        ctx.beginPath();
-                        ctx.moveTo(nodeA.x, nodeA.y);
-                        ctx.lineTo(nodeB.x, nodeB.y);
-                        ctx.strokeStyle = `rgba(79, 115, 245, ${alpha})`;
-                        ctx.lineWidth = 0.8;
-                        ctx.stroke();
+                // Draw a beautiful smooth curved static wave across the screen
+                for (let x = 0; x <= width; x += 10) {
+                    const y = height * 0.62 + 
+                              Math.sin(x * 0.0018 + w * 0.55) * 75 + 
+                              Math.cos(x * 0.0009 - w * 0.25) * 45;
+                    
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
                     }
                 }
+                ctx.stroke();
             }
-
-            animationFrameId = requestAnimationFrame(draw);
         };
 
-        draw();
+        drawWaves();
 
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            drawWaves();
+        };
+
+        window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
-            cancelAnimationFrame(animationFrameId);
         };
     }, []);
 
@@ -121,7 +96,7 @@ function AnimatedHeroBackground() {
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
             {/* Base dark canvas backdrop overlay */}
             <div className="absolute inset-0 bg-[#000000] z-[-2]" />
-            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-70 z-[-1]" />
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-80 z-[-1]" />
 
             {/* Glowing peripheral gradient backlights */}
             <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-[#4F73F5]/10 blur-[130px] pointer-events-none" />
@@ -1060,7 +1035,7 @@ function PwaMobileSection() {
     
     return (
         <section className="py-24 bg-black relative overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <ScrollReveal>
                     <div className="relative bg-gradient-to-br from-[#0F172A] via-[#090E17] to-black rounded-[2.5rem] md:rounded-[4rem] border border-white/10 p-8 sm:p-12 lg:p-20 overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
                         {/* Abstract Glow Elements */}
@@ -1168,7 +1143,6 @@ export default function LandingPage() {
             <Navbar />
             <HeroSection />
             <FeaturesSection />
-            <StatsSection />
             <PwaMobileSection />
             <PricingSection />
             <TestimonialsSection />
