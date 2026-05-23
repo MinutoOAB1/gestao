@@ -686,8 +686,7 @@ function TestimonialsSection() {
                 <div className="absolute right-0 top-0 bottom-0 w-24 md:w-40 bg-gradient-to-l from-[#F4F1EC] via-[#F4F1EC]/90 to-transparent z-10 pointer-events-none" />
 
                 <div
-                    className="flex gap-8"
-                    style={{ animation: 'marquee-scroll 38s linear infinite', width: 'max-content' }}
+                    className="animate-marquee-scroll"
                     onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'paused'; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.animationPlayState = 'running'; }}
                 >

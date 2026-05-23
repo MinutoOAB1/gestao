@@ -426,7 +426,7 @@ export default function KanbanPage() {
                         </button>
                     </div>
 
-                    {/* Search */}
+                    <div className="hidden">
                     <div className="relative flex-1 min-w-[200px] xl:max-w-md w-full">
                         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
@@ -485,6 +485,7 @@ export default function KanbanPage() {
                             <span className="sm:hidden">Novo</span>
                         </button>
                     </div>
+                </div>
                 </div>
             </header>
 
