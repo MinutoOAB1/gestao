@@ -357,8 +357,7 @@ function HeroSection() {
                         Integrado nativamente com as melhores soluções do mercado
                     </span>
                 </div>
-                
-                <style>{`
+                    <style>{`
                     @keyframes marquee {
                         0% { transform: translateX(0); }
                         100% { transform: translateX(-100%); }
@@ -366,6 +365,7 @@ function HeroSection() {
                     .animate-marquee-track {
                         display: flex;
                         align-items: center;
+                        flex-shrink: 0;
                         animation: marquee 25s linear infinite;
                         will-change: transform;
                     }
@@ -376,7 +376,7 @@ function HeroSection() {
                     <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-l-full" />
                     <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-r-full" />
                     
-                    <div className="flex w-max">
+                    <div className="flex w-max shrink-0">
                         {/* Track 1 */}
                         <div className="animate-marquee-track pr-20 gap-10">
                             {[
