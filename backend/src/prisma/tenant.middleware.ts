@@ -14,12 +14,20 @@ export class TenantMiddleware implements NestMiddleware {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
-        const decoded: any = jwt.decode(token);
+        // 🔒 SEGURANÇA [VULN-2]: Valida rigorosamente a assinatura do token usando a chave secreta.
+        // Evita a extração de tenantId de JWTs forjados ou não assinados (CWE-287 / Anti-padrão A2).
+        const secret = process.env.JWT_SECRET || (process.env.NODE_ENV !== 'production' ? 'super-secret' : null);
+        if (!secret) {
+          throw new Error('JWT_SECRET environment variable is missing in production!');
+        }
+        
+        const decoded: any = jwt.verify(token, secret);
         if (decoded && decoded.tenantId) {
           tenantId = decoded.tenantId;
         }
       } catch (err) {
-        // Ignore decode errors, AuthGuard will handle verification
+        // Log de aviso de segurança para auditorias e monitoramento
+        console.warn(`[SECURITY WARN] Tenant context forgery or invalid JWT attempt: ${err.message}`);
       }
     }
 

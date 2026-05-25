@@ -35,18 +35,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       
       // ALWAYS set the context, even if it's empty or bypassed, to prevent connection pool leakage.
       try {
-        // IMPORTANT: We use SET LOCAL so the setting only lasts for the current transaction.
-        // This is critical for connection poolers (PgBouncer/Supabase Pooler).
-        if (bypass) {
-          await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'on';");
-        } else {
-          await this.$executeRawUnsafe("SET LOCAL app.bypass_rls = 'off';");
-        }
+        // 🔒 SEGURANÇA [VULN-1]: Usa SELECT set_config parametrizado com queryRaw para evitar SQL Injection (CWE-89)
+        // Isso previne que entradas maliciosas no tenantId injetem comandos arbitrários no banco de dados.
+        const bypassVal = bypass ? 'on' : 'off';
+        await this.$queryRaw`SELECT set_config('app.bypass_rls', ${bypassVal}, true);`;
 
         if (tenantId) {
-          await this.$executeRawUnsafe(`SET LOCAL app.current_tenant_id = '${tenantId}';`);
+          await this.$queryRaw`SELECT set_config('app.current_tenant_id', ${tenantId}, true);`;
         } else {
-          await this.$executeRawUnsafe("SET LOCAL app.current_tenant_id = '';");
+          await this.$queryRaw`SELECT set_config('app.current_tenant_id', '', true);`;
         }
       } catch (error) {
         console.error('RLS CONTEXT SETUP ERROR:', error.message);

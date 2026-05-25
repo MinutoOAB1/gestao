@@ -5,10 +5,16 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor() {
+        const secret = process.env.JWT_SECRET;
+        if (!secret && process.env.NODE_ENV === 'production') {
+            throw new Error('FATAL: JWT_SECRET environment variable is missing in production!');
+        }
+        
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.JWT_SECRET || 'super-secret',
+            // 🔒 SEGURANÇA [VULN-3]: Impede o uso de chave padrão em ambiente de produção
+            secretOrKey: secret || 'super-secret',
         });
     }
 
