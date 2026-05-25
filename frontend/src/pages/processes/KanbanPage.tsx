@@ -211,7 +211,7 @@ export default function KanbanPage() {
             try {
                 await api.post('/settings/kanban-columns', { kanbanColumns: JSON.stringify(columns) });
             } catch (err) {
-                print("Error saving columns:", err)
+                console.error("Error saving columns:", err);
             }
         };
         saveColumns();
