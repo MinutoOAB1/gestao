@@ -357,28 +357,33 @@ function HeroSection() {
                         Integrado nativamente com as melhores soluções do mercado
                     </span>
                 </div>
-                    <style>{`
-                    @keyframes marquee {
+                <style>{`
+                    @keyframes marquee-scroll {
                         0% { transform: translateX(0); }
-                        100% { transform: translateX(-100%); }
+                        100% { transform: translateX(-50%); }
                     }
-                    .animate-marquee-track {
+                    .marquee-inner {
+                        display: flex;
+                        width: max-content;
+                        animation: marquee-scroll 20s linear infinite;
+                    }
+                    .marquee-group {
                         display: flex;
                         align-items: center;
                         flex-shrink: 0;
-                        animation: marquee 25s linear infinite;
-                        will-change: transform;
+                        gap: 2.5rem;
+                        padding-right: 2.5rem;
                     }
                 `}</style>
                 
-                <div className="max-w-4xl mx-auto rounded-full border border-white/[0.08] bg-[#050505]/40 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden py-3 flex">
+                <div className="max-w-4xl mx-auto rounded-full border border-white/[0.08] bg-[#050505]/40 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden py-3">
                     {/* Left & Right fading gradient overlays for depth */}
                     <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-l-full" />
                     <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-r-full" />
                     
-                    <div className="flex w-max shrink-0">
+                    <div className="marquee-inner">
                         {/* Track 1 */}
-                        <div className="animate-marquee-track pr-20 gap-10">
+                        <div className="marquee-group">
                             {[
                                 {
                                     label: 'WhatsApp API',
@@ -436,7 +441,7 @@ function HeroSection() {
                         </div>
                         
                         {/* Track 2 (Identical for seamless loops) */}
-                        <div className="animate-marquee-track pr-20 gap-10" aria-hidden="true">
+                        <div className="marquee-group" aria-hidden="true">
                             {[
                                 {
                                     label: 'WhatsApp API',
