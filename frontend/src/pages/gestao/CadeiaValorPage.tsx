@@ -155,9 +155,6 @@ export default function CadeiaValorPage() {
       const response = await api.get('/clients');
       const clientsData = response.data;
       
-      const storedStages = localStorage.getItem('bpmn-crm-stages');
-      const stageMap = storedStages ? JSON.parse(storedStages) : {};
-      
       const mapped = clientsData.map((c: any) => ({
         id: c.id,
         name: c.name,
@@ -167,7 +164,7 @@ export default function CadeiaValorPage() {
         createdAt: c.createdAt || new Date().toISOString(),
         urgency: c.urgencyLevel || 'NORMAL',
         area: c.demandType || 'Geral',
-        stage: stageMap[c.id] || 'novo',
+        stage: c.leadStatus || 'novo',
         details: c.notes?.map((n: any) => n.content).join('; ') || ''
       }));
       
@@ -180,10 +177,11 @@ export default function CadeiaValorPage() {
   };
 
   const moveCrmLead = async (leadId: string, newStage: string) => {
-    const storedStages = localStorage.getItem('bpmn-crm-stages');
-    const stageMap = storedStages ? JSON.parse(storedStages) : {};
-    stageMap[leadId] = newStage;
-    localStorage.setItem('bpmn-crm-stages', JSON.stringify(stageMap));
+    try {
+      await api.patch(`/clients/${leadId}`, { leadStatus: newStage });
+    } catch (e) {
+      console.error('Error updating leadStatus in database:', e);
+    }
 
     setCrmLeads(prev => prev.map(lead => lead.id === leadId ? { ...lead, stage: newStage } : lead));
 
@@ -208,23 +206,16 @@ export default function CadeiaValorPage() {
     if (!newLeadForm.name) return;
 
     try {
-      const response = await api.post('/clients', {
+      await api.post('/clients', {
         name: newLeadForm.name,
         phone: newLeadForm.phone,
         email: newLeadForm.email,
         document: newLeadForm.document,
         demandType: newLeadForm.area,
         urgencyLevel: newLeadForm.urgency,
-        status: 'ATIVO'
+        status: 'ATIVO',
+        leadStatus: 'novo'
       });
-
-      const newClient = response.data;
-      
-      // Store in 'novo' stage
-      const storedStages = localStorage.getItem('bpmn-crm-stages');
-      const stageMap = storedStages ? JSON.parse(storedStages) : {};
-      stageMap[newClient.id] = 'novo';
-      localStorage.setItem('bpmn-crm-stages', JSON.stringify(stageMap));
 
       // Reset form & reload
       setNewLeadForm({

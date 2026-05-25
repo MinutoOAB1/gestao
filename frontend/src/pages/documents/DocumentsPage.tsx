@@ -96,15 +96,38 @@ export default function DocumentsPage() {
     const [selectedDestinationFolderId, setSelectedDestinationFolderId] = useState<string>('');
 
 
-    // Kanban Column Titles (editable, stored in localStorage)
-    const [kanbanTitles, setKanbanTitles] = useState<Record<string, string>>(() => {
-        const saved = localStorage.getItem('doc-kanban-titles');
-        return saved ? JSON.parse(saved) : { TODO: 'A Fazer', IN_PROGRESS: 'Em Progresso', REVIEW: 'Em Revisão', DONE: 'Concluído' };
+    // Kanban Column Titles (editable, stored in DB settings)
+    const [kanbanTitles, setKanbanTitles] = useState<Record<string, string>>({
+        TODO: 'A Fazer',
+        IN_PROGRESS: 'Em Progresso',
+        REVIEW: 'Em Revisão',
+        DONE: 'Concluído'
     });
-    const updateKanbanTitle = (id: string, title: string) => {
+
+    const fetchDocSettings = async () => {
+        try {
+            const res = await api.get('/settings');
+            if (res.data?.docKanbanTitles) {
+                try {
+                    const parsed = JSON.parse(res.data.docKanbanTitles);
+                    setKanbanTitles(parsed);
+                } catch (e) {
+                    console.error('Error parsing docKanbanTitles:', e);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching settings for doc-kanban-titles:', error);
+        }
+    };
+
+    const updateKanbanTitle = async (id: string, title: string) => {
         const updated = { ...kanbanTitles, [id]: title };
         setKanbanTitles(updated);
-        localStorage.setItem('doc-kanban-titles', JSON.stringify(updated));
+        try {
+            await api.post('/settings/doc-kanban-titles', { docKanbanTitles: JSON.stringify(updated) });
+        } catch (err) {
+            console.error('Error saving docKanbanTitles to DB:', err);
+        }
     };
 
 
@@ -142,6 +165,7 @@ export default function DocumentsPage() {
     useEffect(() => {
         fetchData(currentFolderId);
         fetchStorageInfo();
+        fetchDocSettings();
         // Fetch users for permissions modal
         api.get('/users').then(res => setAllUsers(res.data)).catch(() => { });
     }, [currentFolderId]);

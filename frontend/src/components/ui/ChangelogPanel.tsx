@@ -15,6 +15,13 @@ export interface ChangelogItem {
 // Adicione novas entradas no TOPO deste array ao publicar novas funcionalidades.
 const CHANGELOG_DATA: ChangelogItem[] = [
     {
+        id: 'cl-v2.7.0',
+        title: 'Persistência Robusta em Banco de Dados e Segurança Reforçada',
+        description: 'Transição completa do armazenamento temporário em localStorage para banco de dados relacional e blindagem de segurança universal (Zero-Trust).\n- Sincronização Multi-Dispositivo: Colunas do Kanban de Processos, títulos personalizados de Documentos e estágios do CRM salvos nativamente no banco de dados.\n- Segurança Hardening: Sanitização avançada de entradas (contra XSS e injeção), proteção CSRF, mitigação de vazamento de credenciais e isolamento multi-tenant de dados sensíveis.\n- Consistência do Pipeline CRM: Estágio de leads sincronizados na coluna leadStatus do banco de dados, evitando perdas.',
+        version: 'v2.7.0',
+        date: '2026-05-25T19:20:00.000Z',
+    },
+    {
         id: 'cl-v2.6.0',
         title: 'Exportador de Cadeia de Valor 100% Preciso (Canvas 2D)',
         description: 'Substituição completa do html2canvas por um motor de desenho nativo em Canvas 2D no Whiteboard da Cadeia de Valor.\n- Renderização offline pixel-perfect garantida em qualquer navegador\n- Resolução de todos os problemas visuais de sobreposição e clipping de textos em PDFs e PNGs\n- Ajustes de responsividade móvel com auto-colapso do menu lateral e cabeçalho flexível adaptativo.',

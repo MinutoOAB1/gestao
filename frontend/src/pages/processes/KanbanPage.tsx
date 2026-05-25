@@ -47,21 +47,7 @@ export default function KanbanPage() {
     const [selectedLeadForStrategy, setSelectedLeadForStrategy] = useState<any | null>(null);
     const [isStrategyLoading, setIsStrategyLoading] = useState(false);
     const [crmStrategyHtml, setCrmStrategyHtml] = useState<string | null>(null);
-    const [columns, setColumns] = useState<Column[]>(() => {
-        const saved = localStorage.getItem('kanban-columns');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                return parsed.map((col: Column, index: number) => ({
-                    ...col,
-                    color: COLUMN_COLORS[index % COLUMN_COLORS.length]
-                }));
-            } catch {
-                return DEFAULT_COLUMNS;
-            }
-        }
-        return DEFAULT_COLUMNS;
-    });
+    const [columns, setColumns] = useState<Column[]>(DEFAULT_COLUMNS);
     const [activeProcess, setActiveProcess] = useState<Process | null>(null);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -92,7 +78,29 @@ export default function KanbanPage() {
         searchTimeoutRef.current = setTimeout(() => setDebouncedSearch(value), 250);
     }, []);
 
+    const isFirstRender = useRef(true);
+
+    const fetchSettings = async () => {
+        try {
+            const res = await api.get('/settings');
+            if (res.data?.kanbanColumns) {
+                try {
+                    const parsed = JSON.parse(res.data.kanbanColumns);
+                    setColumns(parsed.map((col: Column, index: number) => ({
+                        ...col,
+                        color: COLUMN_COLORS[index % COLUMN_COLORS.length]
+                    })));
+                } catch (e) {
+                    console.error('Error parsing kanbanColumns:', e);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching settings:', error);
+        }
+    };
+
     useEffect(() => {
+        fetchSettings();
         fetchProcesses();
         fetchTeamMembers();
         fetchLabels();
@@ -131,8 +139,6 @@ export default function KanbanPage() {
         try {
             const res = await api.get('/clients');
             const clientsData = res.data || [];
-            const storedStages = localStorage.getItem('bpmn-crm-stages');
-            const stageMap = storedStages ? JSON.parse(storedStages) : {};
             const mapped = clientsData.map((c: any) => ({
                 id: c.id,
                 name: c.name,
@@ -142,7 +148,7 @@ export default function KanbanPage() {
                 createdAt: c.createdAt || new Date().toISOString(),
                 urgency: c.urgencyLevel || 'NORMAL',
                 area: c.demandType || 'Geral',
-                stage: stageMap[c.id] || 'novo',
+                stage: c.leadStatus || 'novo',
                 details: c.notes?.map((n: any) => n.content).join('; ') || ''
             }));
             setCrmLeads(mapped);
@@ -197,7 +203,18 @@ export default function KanbanPage() {
     }, [searchParams, setSearchParams]);
 
     useEffect(() => {
-        localStorage.setItem('kanban-columns', JSON.stringify(columns));
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+        const saveColumns = async () => {
+            try {
+                await api.post('/settings/kanban-columns', { kanbanColumns: JSON.stringify(columns) });
+            } catch (err) {
+                print("Error saving columns:", err)
+            }
+        };
+        saveColumns();
     }, [columns]);
 
     const fetchProcesses = async () => {

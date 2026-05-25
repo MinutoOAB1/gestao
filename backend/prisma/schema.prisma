@@ -618,6 +618,8 @@ model TenantSettings {
   asaasApiKey        String?
   logoUrl            String?
   autentiqueApiKey   String?
+  kanbanColumns      String?
+  docKanbanTitles    String?
   tenant             Tenant  @relation(fields: [tenantId], references: [id])
 }
 

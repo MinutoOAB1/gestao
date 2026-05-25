@@ -28,5 +28,18 @@ export class SettingsController {
         if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
         return this.settingsService.getStorageInfo(tenantId);
     }
-    
+
+    @Post('kanban-columns')
+    async updateKanbanColumns(@Request() req, @Body('kanbanColumns') kanbanColumns: string) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.settingsService.updateKanbanColumns(kanbanColumns, tenantId);
+    }
+
+    @Post('doc-kanban-titles')
+    async updateDocKanbanTitles(@Request() req, @Body('docKanbanTitles') docKanbanTitles: string) {
+        const tenantId = req.user?.tenantId;
+        if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+        return this.settingsService.updateDocKanbanTitles(docKanbanTitles, tenantId);
+    }
 }

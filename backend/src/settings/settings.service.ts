@@ -21,7 +21,8 @@ export class SettingsService {
         const {
             officeName, cnpj, email, website, language, timezone, dateFormat,
             emailNotifications, processUpdates, deadlineReminders,
-            twoFactor, loginAlerts, logoUrl, asaasApiKey, autentiqueApiKey
+            twoFactor, loginAlerts, logoUrl, asaasApiKey, autentiqueApiKey,
+            kanbanColumns, docKanbanTitles
         } = settings;
 
         // Encrypt sensitive API keys if provided
@@ -36,6 +37,7 @@ export class SettingsService {
                 officeName, cnpj, email, website, language, timezone, dateFormat,
                 emailNotifications, processUpdates, deadlineReminders,
                 twoFactor, loginAlerts, logoUrl,
+                kanbanColumns, docKanbanTitles,
                 ...(encryptedAsaasKey && { asaasApiKey: encryptedAsaasKey }),
                 ...(encryptedAutentiqueKey && { autentiqueApiKey: encryptedAutentiqueKey }),
             },
@@ -44,9 +46,26 @@ export class SettingsService {
                 officeName, cnpj, email, website, language, timezone, dateFormat,
                 emailNotifications, processUpdates, deadlineReminders,
                 twoFactor, loginAlerts, logoUrl,
+                kanbanColumns, docKanbanTitles,
                 asaasApiKey: encryptedAsaasKey,
                 autentiqueApiKey: encryptedAutentiqueKey,
             }
+        });
+    }
+
+    async updateKanbanColumns(kanbanColumns: string, tenantId: string) {
+        return this.prisma.tenantSettings.upsert({
+            where: { tenantId },
+            update: { kanbanColumns },
+            create: { tenantId, kanbanColumns }
+        });
+    }
+
+    async updateDocKanbanTitles(docKanbanTitles: string, tenantId: string) {
+        return this.prisma.tenantSettings.upsert({
+            where: { tenantId },
+            update: { docKanbanTitles },
+            create: { tenantId, docKanbanTitles }
         });
     }
 
