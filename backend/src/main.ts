@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 import { join } from 'path';
+import { InputSanitizerInterceptor } from './common/security/input-sanitizer.interceptor';
 
 // @ts-ignore
 const compression = require('compression');
@@ -29,6 +30,9 @@ async function createServer() {
     }
   }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+  // 🔒 SEGURANÇA [XSS-PREVENTION]: Habilita sanitizador global de entradas (XSS e Injeções de Script)
+  app.useGlobalInterceptors(new InputSanitizerInterceptor());
 
   app.enableCors({
     origin: true,
@@ -65,6 +69,9 @@ if (!process.env.VERCEL) {
   }));
     app.use(express.urlencoded({ extended: true, limit: '50mb' }));
     app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+
+    // 🔒 SEGURANÇA [XSS-PREVENTION]: Habilita sanitizador global de entradas no ambiente de desenvolvimento local
+    app.useGlobalInterceptors(new InputSanitizerInterceptor());
 
     app.enableCors({
       origin: true,
