@@ -5,7 +5,9 @@ import { BrandLogo } from '../../components/ui/BrandLogo';
 import {
     FileText, Users, DollarSign, Calendar, Shield,
     Check, ArrowRight, Menu, X, Sparkles,
-    Globe, Clock, MessageSquare, Folder, ChevronDown, Star
+    Globe, Clock, MessageSquare, Folder, ChevronDown, Star,
+    AlertTriangle, CheckCircle2, Send, Search, ShieldCheck,
+    Layers, Lock, CheckSquare, ChevronUp, Award
 } from 'lucide-react';
 import { motion, AnimatePresence, useInView, useScroll, useTransform } from 'framer-motion';
 
@@ -346,6 +348,77 @@ function HeroSection() {
                         </div>
                     </div>
                 </motion.div>
+
+                {/* Infinite Marquee Scroll of Integrations */}
+                <div className="mt-28 border-t border-white/5 pt-12 relative z-10 w-full overflow-hidden">
+                    <div className="text-center mb-8">
+                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">
+                            Integrado nativamente com as melhores soluções do mercado
+                        </span>
+                    </div>
+                    
+                    <style>{`
+                        @keyframes marquee {
+                            0% { transform: translateX(0%); }
+                            100% { transform: translateX(-50%); }
+                        }
+                        .animate-marquee {
+                            display: flex;
+                            width: max-content;
+                            animation: marquee 25s linear infinite;
+                        }
+                        .animate-marquee:hover {
+                            animation-play-state: paused;
+                        }
+                    `}</style>
+                    
+                    <div className="relative w-full overflow-hidden flex">
+                        {/* Left & Right fading gradient overlays for depth */}
+                        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+                        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+                        
+                        <div className="animate-marquee gap-6">
+                            {/* First Set */}
+                            {[
+                                { label: 'WhatsApp API', icon: MessageSquare, desc: 'Notificações Automáticas' },
+                                { label: 'Autentique', icon: ShieldCheck, desc: 'Assinaturas Digitais' },
+                                { label: 'Google Calendar', icon: Calendar, desc: 'Agendamento Sincronizado' },
+                                { label: 'Asaas Gateway', icon: DollarSign, desc: 'Boletos e Pix' },
+                                { label: 'PJe & Tribunais', icon: Globe, desc: 'Rastreamento de Prazos' },
+                                { label: 'Nuvem Segura AWS', icon: Lock, desc: 'Backup Criptografado' },
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#4F73F5]/30 hover:bg-white/10 transition-all duration-300 cursor-pointer">
+                                    <div className="w-10 h-10 rounded-xl bg-[#4F73F5]/10 flex items-center justify-center text-[#4F73F5]">
+                                        <item.icon size={20} />
+                                    </div>
+                                    <div className="text-left">
+                                        <span className="text-xs font-black uppercase tracking-wider text-white block">{item.label}</span>
+                                        <span className="text-[9px] text-white/40 font-medium block">{item.desc}</span>
+                                    </div>
+                                </div>
+                            ))}
+                            {/* Duplicated Set for infinite loop */}
+                            {[
+                                { label: 'WhatsApp API', icon: MessageSquare, desc: 'Notificações Automáticas' },
+                                { label: 'Autentique', icon: ShieldCheck, desc: 'Assinaturas Digitais' },
+                                { label: 'Google Calendar', icon: Calendar, desc: 'Agendamento Sincronizado' },
+                                { label: 'Asaas Gateway', icon: DollarSign, desc: 'Boletos e Pix' },
+                                { label: 'PJe & Tribunais', icon: Globe, desc: 'Rastreamento de Prazos' },
+                                { label: 'Nuvem Segura AWS', icon: Lock, desc: 'Backup Criptografado' },
+                            ].map((item, idx) => (
+                                <div key={`dup-${idx}`} className="flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#4F73F5]/30 hover:bg-white/10 transition-all duration-300 cursor-pointer">
+                                    <div className="w-10 h-10 rounded-xl bg-[#4F73F5]/10 flex items-center justify-center text-[#4F73F5]">
+                                        <item.icon size={20} />
+                                    </div>
+                                    <div className="text-left">
+                                        <span className="text-xs font-black uppercase tracking-wider text-white block">{item.label}</span>
+                                        <span className="text-[9px] text-white/40 font-medium block">{item.desc}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
@@ -1027,6 +1100,411 @@ function Footer() {
     );
 }
 
+// Interactive AI Simulator Section (Item 1)
+function AiSimulatorSection() {
+    const documents = [
+        {
+            id: 'contrato',
+            name: 'Contrato de Aluguel.docx',
+            type: 'Contrato de Locação',
+            safeScore: 78,
+            analysis: {
+                summary: 'Contrato de locação residencial padrão. Identificadas cláusulas com riscos potenciais de rescisão antecipada e reajuste acima dos limites legais.',
+                risks: [
+                    { title: 'Reajuste Abusivo', desc: 'Cláusula 4.2 permite reajuste semestral. A lei exige reajuste anual.' },
+                    { title: 'Foro de Eleição Desvantajoso', desc: 'Cláusula 12 define foro de eleição em comarca distante do imóvel.' },
+                ],
+                suggestions: 'Alterar a periodicidade de reajuste para anual (conforme Lei do Inquilinato) e estabelecer o foro na comarca do imóvel.'
+            },
+            questions: [
+                { q: 'Existem multas de rescisão abusivas?', a: 'Sim. A Cláusula 9 estipula multa de rescisão equivalente a 6 meses de aluguel, o que ultrapassa a prática legal comum de 3 meses proporcionais. Sugerimos readequar.' },
+                { q: 'Qual o índice de correção utilizado?', a: 'O contrato menciona IGPM. Dada a alta volatilidade histórica do IGPM, é recomendável adicionar o IPCA como índice alternativo ou teto.' },
+            ]
+        },
+        {
+            id: 'peticao',
+            name: 'Petição Inicial Cobrança.pdf',
+            type: 'Ação Monitória',
+            safeScore: 92,
+            analysis: {
+                summary: 'Petição inicial de cobrança fundamentada em duplicatas vencidas. Estrutura processual robusta com fatos bem delineados e pedidos alinhados à jurisprudência.',
+                risks: [
+                    { title: 'Juros de Mora Excedentes', desc: 'Cláusula de juros estipulada em 2% ao mês. O teto legal é 1% ao mês salvo convenção específica.' },
+                ],
+                suggestions: 'Reduzir os juros de mora para 1% ao mês para mitigar riscos de contestação parcial e sucumbência recíproca.'
+            },
+            questions: [
+                { q: 'O valor da causa está correto?', a: 'O valor da causa reflete exatamente o somatório do principal corrigido mais juros legais acumulados até a data da propositura (R$ 48.550,00). Está em plena conformidade com o Art. 292 do CPC.' },
+                { q: 'Há risco de prescrição da dívida?', a: 'As duplicatas venceram há 3 anos. O prazo prescricional para cobrança de dívidas líquidas constantes de instrumento público ou particular é de 5 anos (Art. 206, § 5º, I do CC). Logo, está seguro.' },
+            ]
+        },
+        {
+            id: 'trabalhista',
+            name: 'Acordo Homologação.docx',
+            type: 'Acordo Extrajudicial',
+            safeScore: 65,
+            analysis: {
+                summary: 'Minuta de termo de acordo trabalhista extrajudicial. Pede atenção especial para as verbas indenizatórias e a quitação geral do contrato de trabalho.',
+                risks: [
+                    { title: 'Quitação Geral Irrestrita', desc: 'Cláusula 5 prevê quitação geral irrestrita sem ressalvas, o que pode sofrer resistência de homologação em juízo.' },
+                    { title: 'Multa por Descumprimento', desc: 'Cláusula penal fixada em 100% do saldo restante. Jurisprudência costuma moderar para 50%.' },
+                ],
+                suggestions: 'Especificar detalhadamente as verbas objeto da quitação para garantir a segurança jurídica da homologação.'
+            },
+            questions: [
+                { q: 'Quais verbas estão inclusas no acordo?', a: 'O termo inclui saldo de salário, férias proporcionais + 1/3, 13º proporcional e indenização estabilidade. Não há discriminação de FGTS, o que exige atenção.' },
+                { q: 'Este termo prevê assistência sindical?', a: 'Não há menção à assistência sindical. Para termos de acordo extrajudiciais, a homologação exige que as partes estejam devidamente representadas por advogados distintos.' },
+            ]
+        }
+    ];
+
+    const [activeDocId, setActiveDocId] = useState('contrato');
+    const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([
+        { sender: 'ai', text: 'Olá! Sou a IA do Advus. Selecione um documento ao lado e clique em qualquer pergunta sugerida para simular a análise automática.' }
+    ]);
+    const [isTyping, setIsTyping] = useState(false);
+
+    const doc = documents.find(d => d.id === activeDocId) || documents[0];
+
+    const handleSelectDoc = (id: string) => {
+        setActiveDocId(id);
+        const selected = documents.find(d => d.id === id) || documents[0];
+        setChatMessages([
+            { sender: 'ai', text: `Olá! Sou a IA do Advus. Analisei o documento "${selected.name}". O score de conformidade jurídica é de ${selected.safeScore}%. O que deseja saber sobre ele?` }
+        ]);
+    };
+
+    const handleQuestionClick = (questionText: string, answerText: string) => {
+        if (isTyping) return;
+        
+        // Add user question
+        setChatMessages(prev => [...prev, { sender: 'user', text: questionText }]);
+        setIsTyping(true);
+
+        // Simulate typing
+        setTimeout(() => {
+            setIsTyping(false);
+            setChatMessages(prev => [...prev, { sender: 'ai', text: answerText }]);
+        }, 1200);
+    };
+
+    return (
+        <section className="py-24 bg-[#050505] relative overflow-hidden">
+            {/* Soft Glow Elements */}
+            <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-[#4F73F5]/5 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-[#B89B5E]/5 blur-[120px] rounded-full pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center max-w-3xl mx-auto mb-20">
+                    <ScrollReveal>
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#4F73F5]/10 border border-[#4F73F5]/30 rounded-full text-xs font-black uppercase tracking-widest text-[#4F73F5] mb-6">
+                            <Sparkles size={14} className="animate-pulse" />
+                            Inteligência Artificial Integrada
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter leading-none font-display uppercase">
+                            Simulador de IA <span className="text-[#4F73F5]">Advus</span>
+                        </h2>
+                        <p className="mt-6 text-white/50 text-base sm:text-lg leading-relaxed font-medium">
+                            Teste como nossa inteligência artificial audita riscos jurídicos, aponta inconformidades e responde a dúvidas complexas em segundos.
+                        </p>
+                    </ScrollReveal>
+                </div>
+
+                <ScrollReveal>
+                    {/* Simulated Interface Layout */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-[#0D0D0D] border border-white/5 rounded-[2.5rem] p-6 md:p-10 shadow-[0_50px_100px_rgba(0,0,0,0.8)] backdrop-blur-3xl relative z-10">
+                        
+                        {/* Sidebar: Documents selector (4 columns) */}
+                        <div className="lg:col-span-4 space-y-6 lg:border-r lg:border-white/5 lg:pr-8">
+                            <h3 className="text-xs font-black uppercase tracking-widest text-white/40 mb-4">Selecione o Documento</h3>
+                            <div className="space-y-3">
+                                {documents.map(d => (
+                                    <button
+                                        key={d.id}
+                                        onClick={() => handleSelectDoc(d.id)}
+                                        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 text-left ${
+                                            activeDocId === d.id
+                                                ? 'bg-[#4F73F5]/10 border-[#4F73F5]/50 text-white'
+                                                : 'bg-white/5 border-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <FileText size={20} className={activeDocId === d.id ? 'text-[#4F73F5]' : 'text-white/40'} />
+                                            <div>
+                                                <p className="text-sm font-bold truncate max-w-[180px]">{d.name}</p>
+                                                <p className="text-[10px] text-white/40 font-medium">{d.type}</p>
+                                            </div>
+                                        </div>
+                                        <div className={`px-2 py-1 rounded-lg text-xs font-black font-display ${
+                                            d.safeScore >= 80 
+                                                ? 'bg-emerald-500/10 text-emerald-400' 
+                                                : 'bg-amber-500/10 text-amber-400'
+                                        }`}>
+                                            {d.safeScore}%
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Automatic Analysis Summary */}
+                            <div className="p-5 bg-white/5 border border-white/5 rounded-2xl space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-xs font-black uppercase tracking-wider text-white">Análise do Advus</h4>
+                                    <span className="text-[10px] text-emerald-400 font-black uppercase bg-emerald-500/10 px-2 py-0.5 rounded-full">Pronto</span>
+                                </div>
+                                <p className="text-xs text-white/55 leading-relaxed font-medium">
+                                    {doc.analysis.summary}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Analysis & Chat Simulation (8 columns) */}
+                        <div className="lg:col-span-8 flex flex-col h-[520px] justify-between lg:pl-4">
+                            {/* Top Risk & Suggestion Badges */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-6 border-b border-white/5">
+                                <div className="space-y-2">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                                        <AlertTriangle size={12} /> Riscos Identificados
+                                    </span>
+                                    <div className="space-y-1.5">
+                                        {doc.analysis.risks.map((r, i) => (
+                                            <div key={i} className="text-xs text-white/70 bg-rose-500/5 border border-rose-500/10 p-2.5 rounded-xl">
+                                                <strong className="text-white font-bold block">{r.title}</strong>
+                                                <span className="text-white/50 text-[11px] leading-tight block mt-0.5">{r.desc}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                                        <CheckCircle2 size={12} /> Sugestão da IA Advus
+                                    </span>
+                                    <div className="text-xs text-white/70 bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl h-[86px] overflow-y-auto leading-relaxed">
+                                        {doc.analysis.suggestions}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Chat Screen area */}
+                            <div className="flex-1 overflow-y-auto my-4 space-y-4 pr-2 custom-scrollbar">
+                                {chatMessages.map((msg, index) => (
+                                    <div
+                                        key={index}
+                                        className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        <div className={`max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed ${
+                                            msg.sender === 'user'
+                                                ? 'bg-[#4F73F5] text-white font-medium rounded-tr-none'
+                                                : 'bg-white/5 border border-white/5 text-white/80 rounded-tl-none font-medium'
+                                        }`}>
+                                            {msg.text}
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {isTyping && (
+                                    <div className="flex justify-start">
+                                        <div className="bg-white/5 border border-white/5 rounded-2xl rounded-tl-none p-3 text-xs text-white/40 flex items-center gap-1">
+                                            <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                            <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                            <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Question Suggestion pill row & placeholder input */}
+                            <div className="space-y-4 pt-4 border-t border-white/5">
+                                <div className="space-y-1.5">
+                                    <p className="text-[10px] font-black uppercase tracking-wider text-white/30">Sugestões de Perguntas:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {doc.questions.map((q, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleQuestionClick(q.q, q.a)}
+                                                disabled={isTyping}
+                                                className="text-[11px] font-bold bg-[#4F73F5]/10 hover:bg-[#4F73F5]/20 border border-[#4F73F5]/20 text-[#4F73F5] px-3.5 py-1.5 rounded-full transition-all duration-300 disabled:opacity-50 text-left"
+                                            >
+                                                {q.q}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        placeholder="Selecione uma das perguntas sugeridas acima para simular..."
+                                        className="w-full bg-white/5 border border-white/5 rounded-xl py-3 px-4 text-xs text-white/30 placeholder-white/20 outline-none cursor-not-allowed"
+                                    />
+                                    <button disabled className="absolute right-2.5 top-2 p-1.5 bg-white/5 text-white/20 rounded-lg cursor-not-allowed">
+                                        <Send size={14} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </ScrollReveal>
+            </div>
+        </section>
+    );
+}
+
+
+
+// Interactive Comparison Table Section (Item 3)
+function ComparisonSection() {
+    const comparisonData: any = [
+        {
+            category: 'Gestão de Processos & Prazos',
+            items: [
+                { feature: 'Painel visual Kanban interativo de andamento processual', advus: true, legacy: 'Lista simples', sheet: 'Não possui' },
+                { feature: 'Varredura automática e alertas de novos prazos e intimações', advus: true, legacy: 'Muitas falhas', sheet: 'Manual' },
+                { feature: 'Agenda jurídica compartilhada e sincronizada', advus: true, legacy: 'Básico', sheet: 'Manual' }
+            ]
+        },
+        {
+            category: 'Inteligência Artificial (IA)',
+            items: [
+                { feature: 'Auditoria de contratos e peças jurídicas com score de segurança', advus: true, legacy: 'Não possui', sheet: 'Não possui' },
+                { feature: 'Cláusulas de risco destacadas com sugestão automática de correção', advus: true, legacy: 'Não possui', sheet: 'Não possui' },
+                { feature: 'Chatbot inteligente de auditoria integrado a cada arquivo', advus: true, legacy: 'Não possui', sheet: 'Não possui' }
+            ]
+        },
+        {
+            category: 'Controle Financeiro & Honorários',
+            items: [
+                { feature: 'Módulo financeiro integrado com fluxo de caixa consolidado', advus: true, legacy: 'Pago à parte', sheet: 'Desconectado' },
+                { feature: 'Lançamento automático de honorários contratuais e sucumbenciais', advus: true, legacy: 'Parcial', sheet: 'Manual' },
+                { feature: 'Geração nativa de boletos e chaves Pix via integração Asaas', advus: true, legacy: 'Sem integração', sheet: 'Não possui' }
+            ]
+        },
+        {
+            category: 'Cadeia de Valor & Horas (Timesheet)',
+            items: [
+                { feature: 'Mapeamento visual e otimização por Cadeia de Valor', advus: true, legacy: 'Não possui', sheet: 'Não possui' },
+                { feature: 'Lançamento de horas faturáveis (Timesheet) integrado a clientes', advus: true, legacy: 'Não possui', sheet: 'Manual' }
+            ]
+        },
+        {
+            category: 'Documentos & Assinaturas',
+            items: [
+                { feature: 'Editor de textos avançado integrado com templates (modelos)', advus: true, legacy: 'Upload de Word', sheet: 'Local' },
+                { feature: 'Assinatura digital integrada com validade legal (Autentique)', advus: true, legacy: 'Pago à parte', sheet: 'Não possui' }
+            ]
+        }
+    ];
+
+    const [openCategoryIdx, setOpenCategoryIdx] = useState<number>(0);
+
+    const toggleCategory = (idx: number) => {
+        setOpenCategoryIdx(openCategoryIdx === idx ? -1 : idx);
+    };
+
+    return (
+        <section className="py-24 bg-[#FAF8F5] relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-[10%] right-[-10%] w-[400px] h-[400px] bg-[#4F73F5]/5 blur-[120px] rounded-full pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div className="text-center max-w-3xl mx-auto mb-20">
+                    <ScrollReveal>
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#4F73F5]/10 border border-[#4F73F5]/30 rounded-full text-xs font-black uppercase tracking-widest text-[#4F73F5] mb-6">
+                            <CheckSquare size={14} />
+                            Comparação de Mercado
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-black text-[#2E2C29] tracking-tighter leading-none font-display uppercase">
+                            Compare o <span className="text-[#4F73F5]">Advus</span> com Alternativas
+                        </h2>
+                        <p className="mt-6 text-[#2E2C29]/65 text-base sm:text-lg leading-relaxed font-medium">
+                            Veja em detalhes o salto tecnológico que sua operação jurídica ganha ao migrar para a inteligência artificial do Advus.
+                        </p>
+                    </ScrollReveal>
+                </div>
+
+                <ScrollReveal>
+                    {/* Matrix Card Grid container */}
+                    <div className="bg-white border border-[#EAE6DF] rounded-[2.5rem] p-4 md:p-8 shadow-[0_15px_40px_rgba(79,115,245,0.03)]">
+                        {/* Table Header Row */}
+                        <div className="hidden md:grid grid-cols-12 gap-4 pb-6 border-b border-[#EAE6DF] text-center text-xs font-black uppercase tracking-widest text-[#2E2C29]/50">
+                            <div className="col-span-6 text-left pl-4">Recursos & Funcionalidades</div>
+                            <div className="col-span-2 text-[#4F73F5] font-black">ADVUS (COM IA)</div>
+                            <div className="col-span-2">SISTEMAS LEGADOS</div>
+                            <div className="col-span-2">PLANILHAS / PAPEL</div>
+                        </div>
+
+                        {/* Accordion Categories */}
+                        <div className="space-y-4 mt-6">
+                            {comparisonData.map((cat, catIdx) => {
+                                const isOpen = openCategoryIdx === catIdx;
+                                return (
+                                    <div key={catIdx} className="border border-[#EAE6DF] rounded-2xl overflow-hidden transition-all duration-300">
+                                        {/* Accordion Trigger Header */}
+                                        <button
+                                            onClick={() => toggleCategory(catIdx)}
+                                            className="w-full flex items-center justify-between p-5 bg-[#FAF8F5] hover:bg-[#FAF8F5]/80 transition-all text-left"
+                                        >
+                                            <h3 className="text-sm md:text-base font-black text-[#2E2C29] uppercase tracking-tight font-display">{cat.category}</h3>
+                                            <span className="text-[#2E2C29]/40">
+                                                {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                            </span>
+                                        </button>
+
+                                        {/* Accordion Rows */}
+                                        {isOpen && (
+                                            <div className="divide-y divide-[#EAE6DF] bg-white">
+                                                {cat.items.map((item, itemIdx) => (
+                                                    <div key={itemIdx} className="grid grid-cols-1 md:grid-cols-12 gap-4 py-5 px-5 items-center text-center text-xs font-medium">
+                                                        
+                                                        {/* Feature Description */}
+                                                        <div className="col-span-1 md:col-span-6 text-left text-[#2E2C29]/80 font-semibold md:pl-2">
+                                                            {item.feature}
+                                                        </div>
+
+                                                        {/* Advus column */}
+                                                        <div className="col-span-1 md:col-span-2 bg-[#4F73F5]/5 md:bg-transparent py-2.5 md:py-0 rounded-xl md:rounded-none border border-[#4F73F5]/10 md:border-none">
+                                                            <span className="md:hidden block text-[10px] text-[#2E2C29]/40 uppercase tracking-widest font-black mb-1">Advus</span>
+                                                            <div className="flex justify-center text-emerald-600 font-bold text-xs">
+                                                                {item.advus === true ? <Check size={18} className="text-emerald-500" /> : item.advus}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Legacy software column */}
+                                                        <div className="col-span-1 md:col-span-2 py-2.5 md:py-0">
+                                                            <span className="md:hidden block text-[10px] text-[#2E2C29]/40 uppercase tracking-widest font-black mb-1">Sistemas Legados</span>
+                                                            <div className="flex justify-center text-[#2E2C29]/50 text-xs font-bold">
+                                                                {item.legacy === false ? <X size={18} className="text-rose-500/80" /> : item.legacy}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Sheets / Manual column */}
+                                                        <div className="col-span-1 md:col-span-2 py-2.5 md:py-0">
+                                                            <span className="md:hidden block text-[10px] text-[#2E2C29]/40 uppercase tracking-widest font-black mb-1">Planilhas</span>
+                                                            <div className="flex justify-center text-[#2E2C29]/50 text-xs font-bold">
+                                                                {item.sheet === false ? <X size={18} className="text-rose-500/80" /> : item.sheet}
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </ScrollReveal>
+            </div>
+        </section>
+    );
+}
+
+
+
 // Main Landing Page Component
 export default function LandingPage() {
     const { isAuthenticated } = useAuth();
@@ -1047,7 +1525,9 @@ export default function LandingPage() {
             <Navbar />
             <HeroSection />
             <FeaturesSection />
+            <AiSimulatorSection />
             <PricingSection />
+            <ComparisonSection />
             <TestimonialsSection />
             <FAQSection />
             <CTASection />
