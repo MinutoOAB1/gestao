@@ -358,21 +358,9 @@ function HeroSection() {
                     </span>
                 </div>
                 <style>{`
-                    @keyframes marquee-scroll {
+                    @keyframes integrations-scroll {
                         0% { transform: translateX(0); }
                         100% { transform: translateX(-50%); }
-                    }
-                    .marquee-inner {
-                        display: flex;
-                        width: max-content;
-                        animation: marquee-scroll 20s linear infinite;
-                    }
-                    .marquee-group {
-                        display: flex;
-                        align-items: center;
-                        flex-shrink: 0;
-                        gap: 2.5rem;
-                        padding-right: 2.5rem;
                     }
                 `}</style>
                 
@@ -381,9 +369,9 @@ function HeroSection() {
                     <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-l-full" />
                     <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-r-full" />
                     
-                    <div className="marquee-inner">
+                    <div style={{ display: 'flex', width: 'max-content', animation: 'integrations-scroll 20s linear infinite' }}>
                         {/* Track 1 */}
-                        <div className="marquee-group">
+                        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: '2.5rem', paddingRight: '2.5rem' }}>
                             {[
                                 {
                                     label: 'WhatsApp API',
@@ -428,11 +416,11 @@ function HeroSection() {
                                     )
                                 }
                             ].map((item, idx) => (
-                                <div key={idx} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20">
+                                <div key={idx} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20" style={{ flexShrink: 0 }}>
                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                         <item.logo />
                                     </div>
-                                    <div className="text-left">
+                                    <div className="text-left" style={{ whiteSpace: 'nowrap' }}>
                                         <span className="text-xs font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
                                         <span className="text-[9px] text-white/35 font-medium block leading-none mt-1.5">{item.desc}</span>
                                     </div>
@@ -441,7 +429,7 @@ function HeroSection() {
                         </div>
                         
                         {/* Track 2 (Identical for seamless loops) */}
-                        <div className="marquee-group" aria-hidden="true">
+                        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: '2.5rem', paddingRight: '2.5rem' }} aria-hidden="true">
                             {[
                                 {
                                     label: 'WhatsApp API',
@@ -486,11 +474,11 @@ function HeroSection() {
                                     )
                                 }
                             ].map((item, idx) => (
-                                <div key={`dup-${idx}`} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20">
+                                <div key={`dup-${idx}`} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20" style={{ flexShrink: 0 }}>
                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                         <item.logo />
                                     </div>
-                                    <div className="text-left">
+                                    <div className="text-left" style={{ whiteSpace: 'nowrap' }}>
                                         <span className="text-xs font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
                                         <span className="text-[9px] text-white/35 font-medium block leading-none mt-1.5">{item.desc}</span>
                                     </div>
@@ -921,13 +909,6 @@ function TestimonialsSection() {
                     ))}
                 </div>
             </div>
-
-            <style>{`
-                @keyframes marquee-scroll {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-33.3333%); }
-                }
-            `}</style>
         </section>
     );
 }
