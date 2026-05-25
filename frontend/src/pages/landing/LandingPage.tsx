@@ -351,9 +351,9 @@ function HeroSection() {
             </div>
 
             {/* Infinite Marquee Scroll of Integrations */}
-            <div className="mt-16 border-t border-white/5 pt-8 relative z-10 w-full overflow-hidden">
-                <div className="text-center mb-6">
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">
+            <div className="mt-24 border-t border-white/5 pt-12 relative z-10 w-full overflow-hidden">
+                <div className="text-center mb-8">
+                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
                         Integrado nativamente com as melhores soluções do mercado
                     </span>
                 </div>
@@ -366,7 +366,7 @@ function HeroSection() {
                     .animate-marquee-track {
                         display: flex;
                         align-items: center;
-                        animation: marquee 25s linear infinite;
+                        animation: marquee 28s linear infinite;
                         will-change: transform;
                     }
                     .animate-marquee-track:hover {
@@ -374,14 +374,14 @@ function HeroSection() {
                     }
                 `}</style>
                 
-                <div className="relative w-full overflow-hidden py-2 bg-white/[0.01] border-y border-white/[0.03] backdrop-blur-md flex">
+                <div className="relative w-full overflow-hidden py-4 bg-white/[0.01] border-y border-white/[0.04] backdrop-blur-md flex">
                     {/* Left & Right fading gradient overlays for depth */}
-                    <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
                     
                     <div className="flex w-max">
                         {/* Track 1 */}
-                        <div className="animate-marquee-track pr-16 gap-8">
+                        <div className="animate-marquee-track pr-20 gap-10">
                             {[
                                 {
                                     label: 'WhatsApp API',
@@ -390,7 +390,7 @@ function HeroSection() {
                                         <img 
                                             src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
                                             alt="WhatsApp" 
-                                            className="w-5 h-5 object-contain"
+                                            className="w-7 h-7 object-contain"
                                         />
                                     )
                                 },
@@ -398,7 +398,7 @@ function HeroSection() {
                                     label: 'Autentique',
                                     desc: 'Assinaturas Digitais',
                                     logo: () => (
-                                        <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" fill="#1AD1B5">
+                                        <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#1AD1B5">
                                             <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
                                         </svg>
                                     )
@@ -410,7 +410,7 @@ function HeroSection() {
                                         <img 
                                             src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
                                             alt="Google Calendar" 
-                                            className="w-5 h-5 object-contain"
+                                            className="w-7 h-7 object-contain"
                                         />
                                     )
                                 },
@@ -421,25 +421,25 @@ function HeroSection() {
                                         <img 
                                             src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
                                             alt="Asaas" 
-                                            className="w-5 h-5 object-contain rounded-sm"
+                                            className="w-7 h-7 object-contain rounded-sm"
                                         />
                                     )
                                 }
                             ].map((item, idx) => (
-                                <div key={idx} className="flex items-center gap-3 px-6 py-1 opacity-40 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <div key={idx} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20">
+                                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                         <item.logo />
                                     </div>
                                     <div className="text-left">
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
-                                        <span className="text-[8px] text-white/30 font-medium block leading-none mt-1">{item.desc}</span>
+                                        <span className="text-xs font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
+                                        <span className="text-[9px] text-white/35 font-medium block leading-none mt-1.5">{item.desc}</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         
                         {/* Track 2 (Identical for seamless loops) */}
-                        <div className="animate-marquee-track pr-16 gap-8" aria-hidden="true">
+                        <div className="animate-marquee-track pr-20 gap-10" aria-hidden="true">
                             {[
                                 {
                                     label: 'WhatsApp API',
@@ -448,7 +448,7 @@ function HeroSection() {
                                         <img 
                                             src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
                                             alt="WhatsApp" 
-                                            className="w-5 h-5 object-contain"
+                                            className="w-7 h-7 object-contain"
                                         />
                                     )
                                 },
@@ -456,7 +456,7 @@ function HeroSection() {
                                     label: 'Autentique',
                                     desc: 'Assinaturas Digitais',
                                     logo: () => (
-                                        <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" fill="#1AD1B5">
+                                        <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#1AD1B5">
                                             <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
                                         </svg>
                                     )
@@ -468,7 +468,7 @@ function HeroSection() {
                                         <img 
                                             src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
                                             alt="Google Calendar" 
-                                            className="w-5 h-5 object-contain"
+                                            className="w-7 h-7 object-contain"
                                         />
                                     )
                                 },
@@ -479,18 +479,18 @@ function HeroSection() {
                                         <img 
                                             src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
                                             alt="Asaas" 
-                                            className="w-5 h-5 object-contain rounded-sm"
+                                            className="w-7 h-7 object-contain rounded-sm"
                                         />
                                     )
                                 }
                             ].map((item, idx) => (
-                                <div key={`dup-${idx}`} className="flex items-center gap-3 px-6 py-1 opacity-40 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                <div key={`dup-${idx}`} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20">
+                                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                         <item.logo />
                                     </div>
                                     <div className="text-left">
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
-                                        <span className="text-[8px] text-white/30 font-medium block leading-none mt-1">{item.desc}</span>
+                                        <span className="text-xs font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
+                                        <span className="text-[9px] text-white/35 font-medium block leading-none mt-1.5">{item.desc}</span>
                                     </div>
                                 </div>
                             ))}
