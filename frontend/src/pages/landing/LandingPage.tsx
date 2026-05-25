@@ -351,8 +351,8 @@ function HeroSection() {
             </div>
 
             {/* Infinite Marquee Scroll of Integrations */}
-            <div className="mt-24 border-t border-white/5 pt-12 relative z-10 w-full overflow-hidden">
-                <div className="text-center mb-8">
+            <div className="mt-16 relative z-10 w-full px-4">
+                <div className="text-center mb-6">
                     <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
                         Integrado nativamente com as melhores soluções do mercado
                     </span>
@@ -366,18 +366,15 @@ function HeroSection() {
                     .animate-marquee-track {
                         display: flex;
                         align-items: center;
-                        animation: marquee 28s linear infinite;
+                        animation: marquee 25s linear infinite;
                         will-change: transform;
-                    }
-                    .animate-marquee-track:hover {
-                        animation-play-state: paused;
                     }
                 `}</style>
                 
-                <div className="relative w-full overflow-hidden py-4 bg-white/[0.01] border-y border-white/[0.04] backdrop-blur-md flex">
+                <div className="max-w-4xl mx-auto rounded-full border border-white/[0.08] bg-[#050505]/40 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden py-3 flex">
                     {/* Left & Right fading gradient overlays for depth */}
-                    <div className="absolute left-0 top-0 bottom-0 w-40 bg-gradient-to-r from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-40 bg-gradient-to-l from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-l-full" />
+                    <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#050505] via-[#050505]/80 to-transparent z-10 pointer-events-none rounded-r-full" />
                     
                     <div className="flex w-max">
                         {/* Track 1 */}
