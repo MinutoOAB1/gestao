@@ -385,8 +385,8 @@ function HeroSection() {
                                 label: 'WhatsApp API',
                                 desc: 'Notificações Automáticas',
                                 logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="currentColor">
-                                        <path d="M12.012 2C6.48 2 2 6.48 2 12.012c0 2.213.722 4.26 1.942 5.922L2.5 22.5l4.743-1.42A9.972 9.972 0 0012.012 22c5.532 0 10.012-4.48 10.012-10.012S17.544 2 12.012 2zm6.262 13.916c-.255.722-1.3 1.34-1.895 1.42-.51.066-1.173.08-3.327-.812-2.766-1.144-4.526-3.95-4.664-4.135-.138-.184-1.12-1.493-1.12-2.85 0-1.355.704-2.02.955-2.285.25-.265.556-.33.74-.33h.53c.17 0 .393-.066.61.464.225.545.77 1.88.835 2.013.067.132.112.288.02.464-.092.18-.138.28-.277.444-.138.163-.294.364-.42.488-.138.136-.285.285-.12.568.164.28.728 1.205 1.56 1.946.832.742 1.536.972 1.83 1.12.292.148.463.125.635-.072.173-.198.74-.86.94-1.15.2-.295.4-.247.67-.148.273.1.1.25.1.33v.38c0 .24-.1.49-.24.71z" fill="#25D366" />
+                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#25D366">
+                                        <path d="M20.52 3.48A11.96 11.96 0 0 0 11.97 0a12 12 0 0 0-10.4 18l.12 4.2L6 20.84a12 12 0 0 0 5.97 1.6h.01a12 12 0 0 0 8.54-20.96Zm-8.55 17.55a9.92 9.92 0 0 1-5.07-1.39l-.36-.21-3.76 1.18 1.18-3.66-.23-.38a9.91 9.91 0 1 1 8.24 4.46Zm5.44-7.42c-.3-.15-1.78-.88-2.05-1a.33.33 0 0 0-.17-.05c-.15 0-.3.2-.41.34-.11.14-.23.28-.33.41l-.22.25c-.1.12-.2.14-.52 0-.29-.15-1.22-.45-2.32-1.43a8.67 8.67 0 0 1-1.61-2.05c-.15-.24-.13-.37.1-.51l.3-.2c.1-.06.17-.15.25-.23.08-.09.11-.15.17-.25.06-.1 0-.19-.03-.27l-.46-1.12c-.11-.26-.22-.22-.3-.22h-.25c-.09 0-.24.03-.38.19-.14.15-.55.53-.55 1.3 0 .77.57 1.51.65 1.62.08.11 1.12 2.72 2.72 3.82.37.26.66.41 1.05.52.45.14.86.12 1.19.07.36-.05 1.12-.46 1.28-.9.16-.44.16-.82.11-.9-.05-.08-.18-.13-.38-.23Z" />
                                     </svg>
                                 )
                             },
@@ -394,10 +394,8 @@ function HeroSection() {
                                 label: 'Autentique',
                                 desc: 'Assinaturas Digitais',
                                 logo: () => (
-                                    <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="48" fill="#1AD1B5" />
-                                        <path d="M50 25 L32 68 L68 68 Z" stroke="#fff" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M42 52 H58" stroke="#fff" strokeWidth="8" strokeLinecap="round" />
+                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#1AD1B5">
+                                        <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
                                     </svg>
                                 )
                             },
@@ -405,13 +403,8 @@ function HeroSection() {
                                 label: 'Google Calendar',
                                 desc: 'Agendamento Sincronizado',
                                 logo: () => (
-                                    <svg viewBox="0 0 48 48" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <path d="M40 8H8C5.8 8 4 9.8 4 12v24c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V12c0-2.2-1.8-4-4-4z" fill="#fff" />
-                                        <path d="M44 14H4v22c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V14z" fill="#EAEAEA" />
-                                        <path d="M44 12c0-2.2-1.8-4-4-4H8C5.8 8 4 9.8 4 12v4h40v-4z" fill="#4285F4" />
-                                        <circle cx="12" cy="12" r="2.5" fill="#fff" />
-                                        <circle cx="36" cy="12" r="2.5" fill="#fff" />
-                                        <text x="24" y="32" fill="#4285F4" fontSize="16" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">31</text>
+                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#4285F4">
+                                        <path d="M22.0113 3.269h-5.8219a4.2894 4.2894 0 0 0-4.1854 3.3452A4.2894 4.2894 0 0 0 7.8186 3.269h-5.818A2.0007 2.0007 0 0 0 0 5.2697v10.2434a2.0007 2.0007 0 0 0 2.0007 2.0007h3.7372c4.2574 0 5.5299 1.0244 6.138 3.133a.112.112 0 0 0 .1121.084h.024a.112.112 0 0 0 .112-.084c.6122-2.1086 1.8807-3.133 6.138-3.133h3.7372a2.0007 2.0007 0 0 0 2.0007-2.0007V5.2697a2.0007 2.0007 0 0 0-2.0007-2.0007z" />
                                     </svg>
                                 )
                             },
@@ -420,9 +413,14 @@ function HeroSection() {
                                 desc: 'Boletos e Pix',
                                 logo: () => (
                                     <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="48" fill="#0030B8" />
-                                        <path d="M45 42c-4 0-6 2-6 5.5s2 5.5 6 5.5 6-2 6-5.5-2-5.5-6-5.5z" fill="#fff" />
-                                        <path d="M57 36v28h-6v-3.5c-2 2.5-5 4-8 4-6.5 0-11-4.5-11-11s4.5-11 11-11c3 0 6 1.5 8 4V36h6z" fill="#fff" />
+                                        <defs>
+                                            <linearGradient id="asaasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stopColor="#00A3FF" />
+                                                <stop offset="100%" stopColor="#0030B8" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="50" cy="50" r="46" fill="url(#asaasGrad)" />
+                                        <path d="M32 52 l12 12 l28 -28" stroke="#fff" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 )
                             },
@@ -431,11 +429,12 @@ function HeroSection() {
                                 desc: 'Rastreamento de Prazos',
                                 logo: () => (
                                     <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="48" fill="#004A8F" />
-                                        <path d="M50 20v60M25 40h50M35 55c0 8 7 15 15 15s15-7 15-15" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-                                        <circle cx="50" cy="20" r="4" fill="#FFB900" />
-                                        <circle cx="25" cy="40" r="4" fill="#FFB900" />
-                                        <circle cx="75" cy="40" r="4" fill="#FFB900" />
+                                        <circle cx="50" cy="50" r="46" fill="#004A8F" />
+                                        <path d="M50 22 v52 M30 38 h40 M38 52 c0 6 5 11 12 11 s12-5 12-11" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+                                        <circle cx="50" cy="22" r="3" fill="#FFB900" />
+                                        <circle cx="30" cy="38" r="3" fill="#FFB900" />
+                                        <circle cx="70" cy="38" r="3" fill="#FFB900" />
+                                        <text x="50" y="82" fill="#fff" fontSize="16" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">PJe</text>
                                     </svg>
                                 )
                             },
@@ -452,7 +451,7 @@ function HeroSection() {
                             }
                         ].map((item, idx) => (
                             <div key={idx} className="flex items-center gap-4 px-8 py-2 opacity-50 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                                <div className="flex-shrink-0">
+                                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                     <item.logo />
                                 </div>
                                 <div className="text-left">
@@ -468,8 +467,8 @@ function HeroSection() {
                                 label: 'WhatsApp API',
                                 desc: 'Notificações Automáticas',
                                 logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="currentColor">
-                                        <path d="M12.012 2C6.48 2 2 6.48 2 12.012c0 2.213.722 4.26 1.942 5.922L2.5 22.5l4.743-1.42A9.972 9.972 0 0012.012 22c5.532 0 10.012-4.48 10.012-10.012S17.544 2 12.012 2zm6.262 13.916c-.255.722-1.3 1.34-1.895 1.42-.51.066-1.173.08-3.327-.812-2.766-1.144-4.526-3.95-4.664-4.135-.138-.184-1.12-1.493-1.12-2.85 0-1.355.704-2.02.955-2.285.25-.265.556-.33.74-.33h.53c.17 0 .393-.066.61.464.225.545.77 1.88.835 2.013.067.132.112.288.02.464-.092.18-.138.28-.277.444-.138.163-.294.364-.42.488-.138.136-.285.285-.12.568.164.28.728 1.205 1.56 1.946.832.742 1.536.972 1.83 1.12.292.148.463.125.635-.072.173-.198.74-.86.94-1.15.2-.295.4-.247.67-.148.273.1.1.25.1.33v.38c0 .24-.1.49-.24.71z" fill="#25D366" />
+                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#25D366">
+                                        <path d="M20.52 3.48A11.96 11.96 0 0 0 11.97 0a12 12 0 0 0-10.4 18l.12 4.2L6 20.84a12 12 0 0 0 5.97 1.6h.01a12 12 0 0 0 8.54-20.96Zm-8.55 17.55a9.92 9.92 0 0 1-5.07-1.39l-.36-.21-3.76 1.18 1.18-3.66-.23-.38a9.91 9.91 0 1 1 8.24 4.46Zm5.44-7.42c-.3-.15-1.78-.88-2.05-1a.33.33 0 0 0-.17-.05c-.15 0-.3.2-.41.34-.11.14-.23.28-.33.41l-.22.25c-.1.12-.2.14-.52 0-.29-.15-1.22-.45-2.32-1.43a8.67 8.67 0 0 1-1.61-2.05c-.15-.24-.13-.37.1-.51l.3-.2c.1-.06.17-.15.25-.23.08-.09.11-.15.17-.25.06-.1 0-.19-.03-.27l-.46-1.12c-.11-.26-.22-.22-.3-.22h-.25c-.09 0-.24.03-.38.19-.14.15-.55.53-.55 1.3 0 .77.57 1.51.65 1.62.08.11 1.12 2.72 2.72 3.82.37.26.66.41 1.05.52.45.14.86.12 1.19.07.36-.05 1.12-.46 1.28-.9.16-.44.16-.82.11-.9-.05-.08-.18-.13-.38-.23Z" />
                                     </svg>
                                 )
                             },
@@ -477,10 +476,8 @@ function HeroSection() {
                                 label: 'Autentique',
                                 desc: 'Assinaturas Digitais',
                                 logo: () => (
-                                    <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="48" fill="#1AD1B5" />
-                                        <path d="M50 25 L32 68 L68 68 Z" stroke="#fff" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M42 52 H58" stroke="#fff" strokeWidth="8" strokeLinecap="round" />
+                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#1AD1B5">
+                                        <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
                                     </svg>
                                 )
                             },
@@ -488,13 +485,8 @@ function HeroSection() {
                                 label: 'Google Calendar',
                                 desc: 'Agendamento Sincronizado',
                                 logo: () => (
-                                    <svg viewBox="0 0 48 48" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <path d="M40 8H8C5.8 8 4 9.8 4 12v24c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V12c0-2.2-1.8-4-4-4z" fill="#fff" />
-                                        <path d="M44 14H4v22c0 2.2 1.8 4 4 4h32c2.2 0 4-1.8 4-4V14z" fill="#EAEAEA" />
-                                        <path d="M44 12c0-2.2-1.8-4-4-4H8C5.8 8 4 9.8 4 12v4h40v-4z" fill="#4285F4" />
-                                        <circle cx="12" cy="12" r="2.5" fill="#fff" />
-                                        <circle cx="36" cy="12" r="2.5" fill="#fff" />
-                                        <text x="24" y="32" fill="#4285F4" fontSize="16" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">31</text>
+                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#4285F4">
+                                        <path d="M22.0113 3.269h-5.8219a4.2894 4.2894 0 0 0-4.1854 3.3452A4.2894 4.2894 0 0 0 7.8186 3.269h-5.818A2.0007 2.0007 0 0 0 0 5.2697v10.2434a2.0007 2.0007 0 0 0 2.0007 2.0007h3.7372c4.2574 0 5.5299 1.0244 6.138 3.133a.112.112 0 0 0 .1121.084h.024a.112.112 0 0 0 .112-.084c.6122-2.1086 1.8807-3.133 6.138-3.133h3.7372a2.0007 2.0007 0 0 0 2.0007-2.0007V5.2697a2.0007 2.0007 0 0 0-2.0007-2.0007z" />
                                     </svg>
                                 )
                             },
@@ -503,9 +495,14 @@ function HeroSection() {
                                 desc: 'Boletos e Pix',
                                 logo: () => (
                                     <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="48" fill="#0030B8" />
-                                        <path d="M45 42c-4 0-6 2-6 5.5s2 5.5 6 5.5 6-2 6-5.5-2-5.5-6-5.5z" fill="#fff" />
-                                        <path d="M57 36v28h-6v-3.5c-2 2.5-5 4-8 4-6.5 0-11-4.5-11-11s4.5-11 11-11c3 0 6 1.5 8 4V36h6z" fill="#fff" />
+                                        <defs>
+                                            <linearGradient id="asaasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stopColor="#00A3FF" />
+                                                <stop offset="100%" stopColor="#0030B8" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="50" cy="50" r="46" fill="url(#asaasGrad)" />
+                                        <path d="M32 52 l12 12 l28 -28" stroke="#fff" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 )
                             },
@@ -514,11 +511,12 @@ function HeroSection() {
                                 desc: 'Rastreamento de Prazos',
                                 logo: () => (
                                     <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="48" fill="#004A8F" />
-                                        <path d="M50 20v60M25 40h50M35 55c0 8 7 15 15 15s15-7 15-15" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-                                        <circle cx="50" cy="20" r="4" fill="#FFB900" />
-                                        <circle cx="25" cy="40" r="4" fill="#FFB900" />
-                                        <circle cx="75" cy="40" r="4" fill="#FFB900" />
+                                        <circle cx="50" cy="50" r="46" fill="#004A8F" />
+                                        <path d="M50 22 v52 M30 38 h40 M38 52 c0 6 5 11 12 11 s12-5 12-11" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+                                        <circle cx="50" cy="22" r="3" fill="#FFB900" />
+                                        <circle cx="30" cy="38" r="3" fill="#FFB900" />
+                                        <circle cx="70" cy="38" r="3" fill="#FFB900" />
+                                        <text x="50" y="82" fill="#fff" fontSize="16" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">PJe</text>
                                     </svg>
                                 )
                             },
@@ -535,7 +533,7 @@ function HeroSection() {
                             }
                         ].map((item, idx) => (
                             <div key={`dup-${idx}`} className="flex items-center gap-4 px-8 py-2 opacity-50 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                                <div className="flex-shrink-0">
+                                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                     <item.logo />
                                 </div>
                                 <div className="text-left">
