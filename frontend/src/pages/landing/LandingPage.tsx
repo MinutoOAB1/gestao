@@ -228,6 +228,53 @@ function useAnimatedCounter(end: number, duration = 2000, decimals = 0, startOnV
     return { count, ref };
 }
 
+// Integrations custom high-fidelity vector icons designed to bypass local CSP blocks
+const INTEGRATIONS_DATA = [
+    {
+        label: 'WhatsApp API',
+        desc: 'Notificações Automáticas',
+        logo: () => (
+            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#25D366">
+                <path d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.73.44 3.4 1.28 4.88L2 22l5.3-1.39c1.43.78 3.03 1.2 4.7 1.2 5.52 0 10-4.48 10-10.006C22.004 6.48 17.524 2 12.004 2zm0 18.008c-1.46 0-2.89-.38-4.14-1.1l-.3-.18-3.07.8.82-2.99-.2-.31a8.006 8.006 0 01-1.22-4.228c0-4.41 3.59-8 8-8s8 3.59 8 8c0 4.41-3.59 8-8 8z" />
+            </svg>
+        )
+    },
+    {
+        label: 'Autentique',
+        desc: 'Assinaturas Digitais',
+        logo: () => (
+            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#1AD1B5">
+                <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
+            </svg>
+        )
+    },
+    {
+        label: 'Google Calendar',
+        desc: 'Agendamento Sincronizado',
+        logo: () => (
+            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0">
+                <rect x="3" y="4" width="18" height="16" rx="3" fill="#4285F4" />
+                <path d="M3 7V6a2 2 0 012-2h14a2 2 0 012 2v1H3z" fill="#EA4335" />
+                <rect x="5" y="8" width="14" height="10" rx="1.5" fill="#FFFFFF" />
+                <text x="12" y="16" fill="#4285F4" fontSize="8" fontWeight="black" textAnchor="middle" fontFamily="sans-serif">31</text>
+            </svg>
+        )
+    },
+    {
+        label: 'Asaas Gateway',
+        desc: 'Boletos e Pix',
+        logo: () => (
+            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="none" stroke="#0066FF" strokeWidth="2">
+                <rect x="2" y="5" width="20" height="14" rx="3" fill="rgba(0, 102, 255, 0.1)" strokeLinejoin="round" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+                <rect x="5" y="14" width="3" height="2" rx="0.5" fill="#00D4B2" stroke="none" />
+                <circle cx="17" cy="14" r="1.5" fill="#0066FF" stroke="none" />
+                <circle cx="19" cy="14" r="1.5" fill="#00D4B2" stroke="none" opacity="0.8" />
+            </svg>
+        )
+    }
+];
+
 // Hero Section
 function HeroSection() {
     const navigate = useNavigate();
@@ -372,50 +419,7 @@ function HeroSection() {
                     <div style={{ display: 'flex', width: 'max-content', animation: 'integrations-scroll 20s linear infinite' }}>
                         {/* Track 1 */}
                         <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: '2.5rem', paddingRight: '2.5rem' }}>
-                            {[
-                                {
-                                    label: 'WhatsApp API',
-                                    desc: 'Notificações Automáticas',
-                                    logo: () => (
-                                        <img 
-                                            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
-                                            alt="WhatsApp" 
-                                            className="w-7 h-7 object-contain"
-                                        />
-                                    )
-                                },
-                                {
-                                    label: 'Autentique',
-                                    desc: 'Assinaturas Digitais',
-                                    logo: () => (
-                                        <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#1AD1B5">
-                                            <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
-                                        </svg>
-                                    )
-                                },
-                                {
-                                    label: 'Google Calendar',
-                                    desc: 'Agendamento Sincronizado',
-                                    logo: () => (
-                                        <img 
-                                            src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
-                                            alt="Google Calendar" 
-                                            className="w-7 h-7 object-contain"
-                                        />
-                                    )
-                                },
-                                {
-                                    label: 'Asaas Gateway',
-                                    desc: 'Boletos e Pix',
-                                    logo: () => (
-                                        <img 
-                                            src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
-                                            alt="Asaas" 
-                                            className="w-7 h-7 object-contain rounded-sm"
-                                        />
-                                    )
-                                }
-                            ].map((item, idx) => (
+                            {INTEGRATIONS_DATA.map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20" style={{ flexShrink: 0 }}>
                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                         <item.logo />
@@ -430,50 +434,7 @@ function HeroSection() {
                         
                         {/* Track 2 (Identical for seamless loops) */}
                         <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, gap: '2.5rem', paddingRight: '2.5rem' }} aria-hidden="true">
-                            {[
-                                {
-                                    label: 'WhatsApp API',
-                                    desc: 'Notificações Automáticas',
-                                    logo: () => (
-                                        <img 
-                                            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
-                                            alt="WhatsApp" 
-                                            className="w-7 h-7 object-contain"
-                                        />
-                                    )
-                                },
-                                {
-                                    label: 'Autentique',
-                                    desc: 'Assinaturas Digitais',
-                                    logo: () => (
-                                        <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#1AD1B5">
-                                            <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
-                                        </svg>
-                                    )
-                                },
-                                {
-                                    label: 'Google Calendar',
-                                    desc: 'Agendamento Sincronizado',
-                                    logo: () => (
-                                        <img 
-                                            src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
-                                            alt="Google Calendar" 
-                                            className="w-7 h-7 object-contain"
-                                        />
-                                    )
-                                },
-                                {
-                                    label: 'Asaas Gateway',
-                                    desc: 'Boletos e Pix',
-                                    logo: () => (
-                                        <img 
-                                            src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
-                                            alt="Asaas" 
-                                            className="w-7 h-7 object-contain rounded-sm"
-                                        />
-                                    )
-                                }
-                            ].map((item, idx) => (
+                            {INTEGRATIONS_DATA.map((item, idx) => (
                                 <div key={`dup-${idx}`} className="flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-300 cursor-pointer shadow-lg shadow-black/20" style={{ flexShrink: 0 }}>
                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                                         <item.logo />
