@@ -354,13 +354,7 @@ export default function DashboardHome() {
             case 'finance':
                 return (
                     <motion.div variants={itemVariants}>
-                        <div className="flex justify-between items-end mb-6 px-4">
-                            <div className="space-y-1">
-                                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-app-text-muted">Desempenho de Caixa</h2>
-                                <p className="text-sm font-bold text-app-text-main flex items-center gap-2">
-                                    Total acumulado <TrendingUp size={14} className="text-emerald-500" />
-                                </p>
-                            </div>
+                        <div className="flex justify-end mb-6 px-4">
                             <button
                                 onClick={() => { navigate('/app/financeiro'); haptics.light(); }}
                                 className="px-4 py-2 bg-app-card border border-app-stroke text-app-text-main font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-app-stroke/50 transition-all shadow-sm"
@@ -620,11 +614,7 @@ export default function DashboardHome() {
             animate="visible"
             className="space-y-10 px-1 sm:px-0 pb-24 md:pb-12 bg-app-bg/50"
         >
-            <div className="pt-4 flex items-end justify-between px-4">
-                <div className="space-y-0.5">
-                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-app-text-muted">Painel de Controle</p>
-                    <h1 className="text-3xl font-black text-app-text-main font-display tracking-tighter leading-none">Visão Geral</h1>
-                </div>
+            <div className="pt-4 flex items-center justify-end px-4">
                 <button
                     onClick={() => { setIsEditMode(!isEditMode); haptics.medium(); }}
                     className={clsx(
@@ -681,7 +671,7 @@ export default function DashboardHome() {
             <WelcomeOverlay 
                 isOpen={showWelcome} 
                 onClose={() => setShowWelcome(false)} 
-                userName={JSON.parse(localStorage.getItem('user') || '{}')?.name?.split(' ')[0] || 'Advogado'}
+                userName={user?.name ? user.name.split(' ')[0] : 'Advogado'}
                 stats={{
                     deadlines: productivity.upcomingDeadlines,
                     newProcesses: productivity.newProcesses,
