@@ -255,7 +255,7 @@ function HeroSection() {
                         className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-tight mb-10 font-display"
                     >
                         A Nova Era da sua{' '}<br className="hidden md:block" />
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#B89B5E] via-[#4F73F5] to-white">Gestão Jurídica</span>
+                        <span className="text-[#8B5CF6]">Gestão Jurídica</span>
                     </motion.h1>
 
                     {/* Subheadline */}
@@ -387,17 +387,15 @@ function FeaturesSection() {
     ];
 
     return (
-        <section id="features" className="py-32 md:py-48 bg-black relative">
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(49,46,129,0.1),transparent_50%)]" />
-            
+        <section id="features" className="py-32 md:py-48 bg-[#FAF8F5] relative">
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <ScrollReveal className="text-center max-w-3xl mx-auto mb-32">
-                    <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter font-display">
+                    <h2 className="text-5xl md:text-7xl font-black text-[#2E2C29] mb-8 tracking-tighter font-display">
                         Recursos <br />
-                        <span className="text-white/30">de Gestão</span>
+                        <span className="text-[#2E2C29]/40">de Gestão</span>
                     </h2>
-                    <p className="text-xl text-white/40 leading-relaxed font-medium">
+                    <p className="text-xl text-[#2E2C29]/60 leading-relaxed font-medium">
                         Desenvolvido especificamente para as necessidades da advocacia de alta performance.
                     </p>
                 </ScrollReveal>
@@ -407,15 +405,15 @@ function FeaturesSection() {
                     {features.map((feature, idx) => (
                         <ScrollReveal key={idx} delay={idx * 0.1}>
                             <div
-                                className="group p-10 bg-white/[0.02] hover:bg-white/[0.04] rounded-[2.5rem] border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-2 h-full"
+                                className="group p-10 bg-white rounded-[2.5rem] border border-[#EAE6DF] shadow-[0_8px_30px_rgba(46,44,41,0.02)] hover:shadow-[0_12px_40px_rgba(46,44,41,0.06)] hover:border-[#B89B5E]/30 transition-all duration-500 hover:-translate-y-2 h-full"
                             >
-                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.01] text-accent flex items-center justify-center mb-10 border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                                <div className="w-16 h-16 rounded-2xl bg-[#B89B5E]/10 text-accent flex items-center justify-center mb-10 border border-[#EAE6DF] group-hover:scale-110 transition-transform duration-500">
                                     <feature.icon size={28} />
                                 </div>
-                                <h3 className="text-2xl font-black text-white mb-4 font-display uppercase tracking-tight">
+                                <h3 className="text-2xl font-black text-[#2E2C29] mb-4 font-display uppercase tracking-tight">
                                     {feature.title}
                                 </h3>
-                                <p className="text-white/40 leading-relaxed font-medium">
+                                <p className="text-[#2E2C29]/60 leading-relaxed font-medium">
                                     {feature.description}
                                 </p>
                             </div>
@@ -1035,85 +1033,77 @@ function PwaMobileSection() {
     
     return (
         <section className="py-24 bg-black relative overflow-hidden">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Glow Elements directly on the section background */}
+            <div className="absolute top-[10%] right-[-5%] w-[600px] h-[600px] bg-[#4F73F5]/10 blur-[130px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] bg-[#B89B5E]/5 blur-[100px] rounded-full pointer-events-none" />
+            
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <ScrollReveal>
-                    <div className="relative bg-gradient-to-br from-[#0F172A] via-[#090E17] to-black rounded-[2.5rem] md:rounded-[4rem] border border-white/10 p-8 sm:p-12 lg:p-20 overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.8)]">
-                        {/* Abstract Glow Elements */}
-                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#4F73F5]/10 blur-[120px] rounded-full translate-x-1/3 -translate-y-1/3 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#B89B5E]/5 blur-[80px] rounded-full -translate-x-1/3 translate-y-1/3 pointer-events-none" />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
+                        {/* Phone Mockup Image on the left (5 columns) */}
+                        <div className="lg:col-span-5 flex justify-center lg:justify-start">
+                            <img 
+                                src="/imagem22.png" 
+                                alt="Advus Mobile Platform" 
+                                className="relative w-full max-w-[440px] rounded-[1.5rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transform hover:scale-[1.02] transition-all duration-500"
+                                draggable={false}
+                            />
+                        </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center relative z-10">
-                            {/* Phone Mockup Image on the left (5 columns) */}
-                            <div className="lg:col-span-5 flex justify-center lg:justify-start">
-                                <div className="relative group">
-                                    {/* Neon Backlight Glow */}
-                                    <div className="absolute -inset-1.5 bg-gradient-to-r from-[#4F73F5] to-[#B89B5E] rounded-[2.2rem] blur opacity-40 group-hover:opacity-60 transition duration-1000" />
-                                    
-                                    {/* Image with beautiful rounded borders */}
-                                    <img 
-                                        src="/imagem22.png" 
-                                        alt="Advus Mobile Platform" 
-                                        className="relative w-full max-w-[440px] rounded-[1.5rem] border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] transform hover:scale-[1.02] transition-all duration-500"
-                                        draggable={false}
-                                    />
+                        {/* Info Content on the right (7 columns) */}
+                        <div className="lg:col-span-7 space-y-8 text-left">
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#4F73F5]/10 border border-[#4F73F5]/30 rounded-full text-xs font-black uppercase tracking-widest text-[#4F73F5]">
+                                <span className="w-2 h-2 rounded-full bg-[#4F73F5] animate-ping" />
+                                Progressive Web App (PWA)
+                            </div>
+
+                            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter leading-none font-display">
+                                Sua operação jurídica, <br />
+                                <span className="text-white/40">na palma da mão.</span>
+                            </h2>
+
+                            <p className="text-white/50 text-base sm:text-lg leading-relaxed font-medium">
+                                Acesse o ecossistema Advus diretamente do celular com a mesma robustez e velocidade do desktop. 
+                                Sem necessidade de downloads em lojas virtuais (App Store ou Google Play), nossa plataforma utiliza tecnologia PWA 
+                                para rodar em alto desempenho com instalação instantânea de um clique.
+                            </p>
+
+                            <hr className="border-white/5" />
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded-lg bg-[#B89B5E]/20 flex items-center justify-center text-[#B89B5E] text-xs font-bold">1</div>
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-white">Como Instalar no iOS (Safari)</h4>
+                                    </div>
+                                    <p className="text-white/40 text-xs leading-relaxed pl-9">
+                                        Toque no ícone de <strong>Compartilhar</strong> (seta para cima) no Safari e selecione <strong>Adicionar à Tela de Início</strong>.
+                                    </p>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-6 h-6 rounded-lg bg-[#4F73F5]/20 flex items-center justify-center text-[#4F73F5] text-xs font-bold">2</div>
+                                        <h4 className="text-xs font-black uppercase tracking-wider text-white">Como Instalar no Android (Chrome)</h4>
+                                    </div>
+                                    <p className="text-white/40 text-xs leading-relaxed pl-9">
+                                        Clique no menu de <strong>três pontos</strong> do Chrome e selecione a opção <strong>Instalar Aplicativo</strong> ou Adicionar à tela inicial.
+                                    </p>
                                 </div>
                             </div>
 
-                            {/* Info Content on the right (7 columns) */}
-                            <div className="lg:col-span-7 space-y-8 text-left">
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#4F73F5]/10 border border-[#4F73F5]/30 rounded-full text-xs font-black uppercase tracking-widest text-[#4F73F5]">
-                                    <span className="w-2 h-2 rounded-full bg-[#4F73F5] animate-ping" />
-                                    Progressive Web App (PWA)
-                                </div>
-
-                                <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter leading-none font-display">
-                                    Sua operação jurídica, <br />
-                                    <span className="text-white/40">na palma da mão.</span>
-                                </h2>
-
-                                <p className="text-white/50 text-base sm:text-lg leading-relaxed font-medium">
-                                    Acesse o ecossistema Advus diretamente do celular com a mesma robustez e velocidade do desktop. 
-                                    Sem necessidade de downloads em lojas virtuais (App Store ou Google Play), nossa plataforma utiliza tecnologia PWA 
-                                    para rodar em alto desempenho com instalação instantânea de um clique.
-                                </p>
-
-                                <hr className="border-white/5" />
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-6 h-6 rounded-lg bg-[#B89B5E]/20 flex items-center justify-center text-[#B89B5E] text-xs font-bold">1</div>
-                                            <h4 className="text-xs font-black uppercase tracking-wider text-white">Como Instalar no iOS (Safari)</h4>
-                                        </div>
-                                        <p className="text-white/40 text-xs leading-relaxed pl-9">
-                                            Toque no ícone de <strong>Compartilhar</strong> (seta para cima) no Safari e selecione <strong>Adicionar à Tela de Início</strong>.
-                                        </p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-6 h-6 rounded-lg bg-[#4F73F5]/20 flex items-center justify-center text-[#4F73F5] text-xs font-bold">2</div>
-                                            <h4 className="text-xs font-black uppercase tracking-wider text-white">Como Instalar no Android (Chrome)</h4>
-                                        </div>
-                                        <p className="text-white/40 text-xs leading-relaxed pl-9">
-                                            Clique no menu de <strong>três pontos</strong> do Chrome e selecione a opção <strong>Instalar Aplicativo</strong> ou Adicionar à tela inicial.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 flex flex-col sm:flex-row gap-4">
-                                    <button 
-                                        onClick={() => navigate('/register')}
-                                        className="px-8 py-4 bg-[#4F73F5] hover:bg-white hover:text-black text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(79,115,245,0.25)]"
-                                    >
-                                        Criar Conta Grátis
-                                    </button>
-                                    <button 
-                                        onClick={() => navigate('/login')}
-                                        className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all"
-                                    >
-                                        Acessar Plataforma
-                                    </button>
-                                </div>
+                            <div className="pt-4 flex flex-col sm:flex-row gap-4">
+                                <button 
+                                    onClick={() => navigate('/register')}
+                                    className="px-8 py-4 bg-[#4F73F5] hover:bg-white hover:text-black text-white text-xs font-black uppercase tracking-widest rounded-2xl transition-all shadow-[0_10px_20px_rgba(79,115,245,0.25)]"
+                                >
+                                    Criar Conta Grátis
+                                </button>
+                                <button 
+                                    onClick={() => navigate('/login')}
+                                    className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-xs font-black uppercase tracking-widest rounded-2xl border border-white/10 transition-all"
+                                >
+                                    Acessar Plataforma
+                                </button>
                             </div>
                         </div>
                     </div>
