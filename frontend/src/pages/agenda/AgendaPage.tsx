@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, Bell, X, Check, Circle, CheckCircle2, Users, MapPin, Trash2, Edit3, List, AlertTriangle, Gavel, FileText, MessageSquare, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus, Filter, Bell, X, Check, Circle, CheckCircle2, Users, MapPin, Trash2, Edit3, List, AlertTriangle, Gavel, FileText, MessageSquare, Eye, SidebarOpen, SidebarClose } from 'lucide-react';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../services/api';
@@ -112,6 +112,7 @@ const NotificationToast = ({ event, onDismiss }: { event: Event; onDismiss: () =
 export default function AgendaPage() {
     const { addToast } = useToast();
     const [view, setView] = useState<'day' | 'week' | 'month' | 'list'>('month');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -763,7 +764,10 @@ export default function AgendaPage() {
     }, [filteredEvents, currentMonth, currentYear]);
 
     return (
-        <div className="flex flex-col md:flex-row h-[calc(100dvh-140px)] min-h-[650px] md:min-h-0 md:h-full w-full p-2 sm:p-4 gap-4 bg-app-bg overflow-hidden">
+        <div className={clsx(
+            "flex flex-col md:flex-row h-[calc(100dvh-140px)] min-h-[650px] md:min-h-0 md:h-full w-full p-2 sm:p-4 bg-app-bg overflow-hidden transition-all duration-500",
+            isSidebarCollapsed ? "gap-4 sm:gap-0" : "gap-4"
+        )}>
             {notification && <NotificationToast event={notification} onDismiss={() => setNotification(null)} />}
 
             {/* Main Calendar Area */}
@@ -838,6 +842,15 @@ export default function AgendaPage() {
                                     )}
                                 </AnimatePresence>
                             </div>
+                            
+                            <button
+                                onClick={() => { setIsSidebarCollapsed(!isSidebarCollapsed); haptics.light(); }}
+                                className="hidden sm:flex p-3 border border-app-stroke rounded-2xl transition-all bg-app-card text-app-text-muted hover:text-app-text-main hover:bg-app-stroke/30 shadow-sm hover:shadow-md items-center justify-center"
+                                title={isSidebarCollapsed ? "Mostrar Painel Lateral" : "Ocultar Painel Lateral"}
+                            >
+                                {isSidebarCollapsed ? <SidebarOpen size={18} /> : <SidebarClose size={18} />}
+                            </button>
+
                             <button onClick={() => setIsNewEventOpen(true)} className="flex-1 sm:flex-none bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-2xl text-[11px] font-black flex items-center justify-center gap-2 transition-all shadow-2xl shadow-black/20 dark:shadow-white/10 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-tighter">
                                 <Plus size={20} strokeWidth={3} /> Novo Evento
                             </button>
@@ -1376,7 +1389,8 @@ export default function AgendaPage() {
 
             {/* Premium Sidebar */}
             <aside className={clsx(
-                "fixed inset-y-0 right-0 z-[60] w-[85vw] max-w-sm sm:relative sm:w-full md:w-80 bg-app-card/50 backdrop-blur-2xl border-l sm:border sm:rounded-[2.5rem] flex flex-col shrink-0 shadow-2xl sm:shadow-sm transition-all duration-500 ease-in-out border-app-stroke/50 overflow-hidden",
+                "fixed inset-y-0 right-0 z-[60] w-[85vw] max-w-sm sm:relative flex flex-col shrink-0 shadow-2xl sm:shadow-sm transition-all duration-500 ease-in-out overflow-hidden bg-app-card/50 backdrop-blur-2xl border-l sm:border sm:rounded-[2.5rem] border-app-stroke/50",
+                isSidebarCollapsed ? "sm:w-0 sm:max-w-0 sm:opacity-0 sm:pointer-events-none sm:border-l-0 sm:border-transparent" : "sm:w-full md:w-80 opacity-100",
                 isSidebarOpenMobile ? "translate-x-0" : "translate-x-full sm:translate-x-0"
             )}>
                 <div className="p-6 border-b border-app-stroke/50">
