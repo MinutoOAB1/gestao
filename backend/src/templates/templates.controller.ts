@@ -188,6 +188,9 @@ export class TemplatesController {
         { name: 'preview', maxCount: 1 },
     ], {
         storage: memoryStorage(),
+        limits: {
+            fileSize: 10 * 1024 * 1024, // 10MB max per file
+        }
     }))
     async uploadComplete(
         @UploadedFiles() files: { docx?: Express.Multer.File[], preview?: Express.Multer.File[] },
@@ -198,17 +201,30 @@ export class TemplatesController {
         let previewResult: { filename: string; path: string } | null = null;
 
         if (files.docx?.[0]) {
-            const result = await this.storageService.uploadFile('templates', files.docx[0], tenantId);
+            const file = files.docx[0];
+            // 🔒 SEGURANÇA [FILE-UPLOAD-VALIDATION]: Garante que o arquivo do modelo seja estritamente DOCX [CWE-434]
+            if (file.mimetype !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                throw new BadRequestException('Apenas arquivos de modelo .docx são permitidos.');
+            }
+
+            const result = await this.storageService.uploadFile('templates', file, tenantId);
             docxResult = {
-                filename: files.docx[0].originalname,
+                filename: file.originalname,
                 path: result.fileUrl,
             };
         }
 
         if (files.preview?.[0]) {
-            const result = await this.storageService.uploadFile('previews', files.preview[0], tenantId);
+            const file = files.preview[0];
+            // 🔒 SEGURANÇA [FILE-UPLOAD-VALIDATION]: Garante que a pré-visualização seja PNG, JPG ou WEBP [CWE-434]
+            const allowedPreviewMimes = ['image/png', 'image/jpeg', 'image/webp'];
+            if (!allowedPreviewMimes.includes(file.mimetype)) {
+                throw new BadRequestException('Apenas imagens nos formatos PNG, JPG e WEBP são permitidas para pré-visualização.');
+            }
+
+            const result = await this.storageService.uploadFile('previews', file, tenantId);
             previewResult = {
-                filename: files.preview[0].originalname,
+                filename: file.originalname,
                 path: result.fileUrl,
             };
         }

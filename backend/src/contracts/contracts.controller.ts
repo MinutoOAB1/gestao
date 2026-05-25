@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards, UnauthorizedException, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards, UnauthorizedException, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -14,7 +14,18 @@ export class ContractsController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post('upload-signature')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', {
+        limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+        fileFilter: (req, file, cb) => {
+            // 🔒 SEGURANÇA [FILE-UPLOAD-VALIDATION]: Permite apenas imagens e PDFs para assinaturas de contratos [CWE-434]
+            const allowedMimes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+            if (allowedMimes.includes(file.mimetype)) {
+                cb(null, true);
+            } else {
+                cb(new BadRequestException('Formatos de assinatura permitidos: apenas imagens (PNG, JPG) ou arquivos PDF.'), false);
+            }
+        }
+    }))
     uploadSignature(
         @UploadedFile() file: Express.Multer.File,
         @Body() body: { title: string; signerName: string; signerEmail: string },

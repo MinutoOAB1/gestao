@@ -11,6 +11,7 @@ import {
     UseInterceptors,
     UploadedFile,
     Req,
+    BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -29,6 +30,32 @@ export class UserFilesController {
     @Post('upload')
     @UseInterceptors(FileInterceptor('file', {
         limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
+        fileFilter: (req, file, cb) => {
+            // 🔒 SEGURANÇA [FILE-UPLOAD-VALIDATION]: Permite apenas tipos de arquivos seguros para escritórios de advocacia
+            // Impede o upload de arquivos maliciosos contendo scripts (ex: .html, .svg, .js, .exe) [CWE-434]
+            const allowedMimes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'text/plain',
+                'text/csv',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/webp',
+                'application/zip',
+                'application/x-rar-compressed',
+            ];
+            if (allowedMimes.includes(file.mimetype)) {
+                cb(null, true);
+            } else {
+                cb(new BadRequestException('Tipo de arquivo não suportado para armazenamento de documentos de advocacia (apenas PDFs, Office, imagens e arquivos compactados são permitidos)'), false);
+            }
+        }
     }))
     async uploadFile(
         @UploadedFile() file: Express.Multer.File,
