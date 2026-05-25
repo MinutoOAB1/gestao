@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Search, Plus, FileText, Eye, Trash2, Upload, X, Sparkles
+    Search, Plus, FileText, Eye, Trash2, Upload, X, Sparkles, Download
 } from 'lucide-react';
 import api from '../../services/api';
 import mammoth from 'mammoth';
 import { useToast } from '../../context/ToastContext';
+import Modal from '../../components/ui/Modal';
 
 interface Template {
     id: string;
@@ -38,6 +39,7 @@ export default function TemplatesPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('Todos');
     const [templatePreviews, setTemplatePreviews] = useState<Record<string, string>>({});
+    const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
     // Upload state
     const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -78,30 +80,56 @@ export default function TemplatesPage() {
     const loadTemplatePreviews = async () => {
         const previews: Record<string, string> = {};
 
-        for (const template of templates) {
-            if (template.docxPath) {
-                try {
-                    const response = await api.get(`/templates/${template.id}/file`, {
-                        responseType: 'arraybuffer'
-                    });
-                    const result = await mammoth.convertToHtml(
-                        { arrayBuffer: response.data },
-                        {
-                            convertImage: mammoth.images.imgElement((image) => {
-                                return image.read('base64').then((imageBuffer) => ({
-                                    src: `data:${image.contentType};base64,${imageBuffer}`
-                                }));
-                            })
-                        }
-                    );
-                    previews[template.id] = result.value;
-                } catch (err) {
-                    console.log('Could not load preview for', template.id);
-                }
-            }
+        try {
+            await Promise.all(
+                templates.map(async (template) => {
+                    if (!template.docxPath) return;
+                    try {
+                        const response = await api.get(`/templates/${template.id}/file`, {
+                            responseType: 'arraybuffer'
+                        });
+                        const result = await mammoth.convertToHtml(
+                            { arrayBuffer: response.data },
+                            {
+                                convertImage: mammoth.images.imgElement((image) => {
+                                    return image.read('base64').then((imageBuffer) => ({
+                                        src: `data:${image.contentType};base64,${imageBuffer}`
+                                    }));
+                                })
+                            }
+                        );
+                        previews[template.id] = result.value;
+                    } catch (err) {
+                        console.log('Could not load preview for', template.id);
+                    }
+                })
+            );
+        } catch (err) {
+            console.error('Error loading template previews:', err);
         }
 
         setTemplatePreviews(previews);
+    };
+
+    const handleDownloadTemplate = async (template: Template) => {
+        try {
+            const response = await api.get(`/templates/${template.id}/file`, {
+                responseType: 'blob'
+            });
+            const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `${template.title}.docx`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+            addToast('Download concluído com sucesso!', 'success');
+        } catch (error) {
+            console.error('Error downloading template:', error);
+            addToast('Erro ao baixar modelo.', 'error');
+        }
     };
 
     const handleDeleteTemplate = async (id: string) => {
@@ -304,8 +332,9 @@ export default function TemplatesPage() {
                                 {/* Hover actions */}
                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); openEditor(template); }}
+                                        onClick={(e) => { e.stopPropagation(); setPreviewTemplate(template); }}
                                         className="p-2 bg-white rounded-full hover:bg-gray-100"
+                                        title="Visualizar modelo"
                                     >
                                         <Eye size={18} className="text-gray-700" />
                                     </button>
@@ -447,6 +476,42 @@ export default function TemplatesPage() {
                     </div>
                 </div>
             )}
+
+            {/* Preview Modal */}
+            <Modal
+                isOpen={!!previewTemplate}
+                onClose={() => setPreviewTemplate(null)}
+                title={previewTemplate?.title || ''}
+                size="xl"
+                footer={
+                    <div className="flex gap-2 w-full sm:w-auto justify-end">
+                        <button onClick={() => setPreviewTemplate(null)} className="px-4 py-2 text-app-text-muted hover:bg-app-stroke rounded-lg">Fechar</button>
+                        <button onClick={() => previewTemplate && handleDownloadTemplate(previewTemplate)} className="px-4 py-2 bg-app-card border border-app-stroke text-app-text-main hover:bg-app-stroke/30 rounded-lg flex items-center gap-2">
+                            <Download size={16} /> Baixar .docx
+                        </button>
+                        <button onClick={() => { if (previewTemplate) { setPreviewTemplate(null); openEditor(previewTemplate); } }} className="px-4 py-2 bg-primary text-white rounded-lg flex items-center gap-2">
+                            <FileText size={16} /> Editar Modelo
+                        </button>
+                    </div>
+                }
+            >
+                <div className="min-h-[400px] max-h-[60vh] overflow-y-auto bg-white border border-app-stroke rounded-xl p-6 md:p-10 shadow-inner custom-scrollbar">
+                    {previewTemplate && templatePreviews[previewTemplate.id] ? (
+                        <div
+                            className="prose prose-sm max-w-none text-gray-800"
+                            style={{ fontFamily: "'Times New Roman', serif" }}
+                            dangerouslySetInnerHTML={{
+                                __html: templatePreviews[previewTemplate.id]
+                            }}
+                        />
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20">
+                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+                            <p className="text-app-text-muted text-sm">Carregando visualização do modelo...</p>
+                        </div>
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 }
