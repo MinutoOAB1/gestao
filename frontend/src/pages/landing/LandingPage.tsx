@@ -351,197 +351,150 @@ function HeroSection() {
             </div>
 
             {/* Infinite Marquee Scroll of Integrations */}
-            <div className="mt-28 border-t border-white/5 pt-12 relative z-10 w-full overflow-hidden">
-                <div className="text-center mb-8">
-                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/30">
+            <div className="mt-16 border-t border-white/5 pt-8 relative z-10 w-full overflow-hidden">
+                <div className="text-center mb-6">
+                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30">
                         Integrado nativamente com as melhores soluções do mercado
                     </span>
                 </div>
                 
                 <style>{`
                     @keyframes marquee {
-                        0% { transform: translateX(0%); }
-                        100% { transform: translateX(-50%); }
+                        0% { transform: translateX(0); }
+                        100% { transform: translateX(-100%); }
                     }
-                    .animate-marquee {
+                    .animate-marquee-track {
                         display: flex;
-                        width: max-content;
+                        align-items: center;
                         animation: marquee 25s linear infinite;
+                        will-change: transform;
                     }
-                    .animate-marquee:hover {
+                    .animate-marquee-track:hover {
                         animation-play-state: paused;
                     }
                 `}</style>
                 
-                <div className="relative w-full overflow-hidden flex">
+                <div className="relative w-full overflow-hidden py-2 bg-white/[0.01] border-y border-white/[0.03] backdrop-blur-md flex">
                     {/* Left & Right fading gradient overlays for depth */}
-                    <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#030303] via-[#030303]/80 to-transparent z-10 pointer-events-none" />
                     
-                    <div className="animate-marquee gap-10">
-                        {/* First Set */}
-                        {[
-                            {
-                                label: 'WhatsApp API',
-                                desc: 'Notificações Automáticas',
-                                logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#25D366">
-                                        <path d="M20.52 3.48A11.96 11.96 0 0 0 11.97 0a12 12 0 0 0-10.4 18l.12 4.2L6 20.84a12 12 0 0 0 5.97 1.6h.01a12 12 0 0 0 8.54-20.96Zm-8.55 17.55a9.92 9.92 0 0 1-5.07-1.39l-.36-.21-3.76 1.18 1.18-3.66-.23-.38a9.91 9.91 0 1 1 8.24 4.46Zm5.44-7.42c-.3-.15-1.78-.88-2.05-1a.33.33 0 0 0-.17-.05c-.15 0-.3.2-.41.34-.11.14-.23.28-.33.41l-.22.25c-.1.12-.2.14-.52 0-.29-.15-1.22-.45-2.32-1.43a8.67 8.67 0 0 1-1.61-2.05c-.15-.24-.13-.37.1-.51l.3-.2c.1-.06.17-.15.25-.23.08-.09.11-.15.17-.25.06-.1 0-.19-.03-.27l-.46-1.12c-.11-.26-.22-.22-.3-.22h-.25c-.09 0-.24.03-.38.19-.14.15-.55.53-.55 1.3 0 .77.57 1.51.65 1.62.08.11 1.12 2.72 2.72 3.82.37.26.66.41 1.05.52.45.14.86.12 1.19.07.36-.05 1.12-.46 1.28-.9.16-.44.16-.82.11-.9-.05-.08-.18-.13-.38-.23Z" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Autentique',
-                                desc: 'Assinaturas Digitais',
-                                logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#1AD1B5">
-                                        <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Google Calendar',
-                                desc: 'Agendamento Sincronizado',
-                                logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#4285F4">
-                                        <path d="M22.0113 3.269h-5.8219a4.2894 4.2894 0 0 0-4.1854 3.3452A4.2894 4.2894 0 0 0 7.8186 3.269h-5.818A2.0007 2.0007 0 0 0 0 5.2697v10.2434a2.0007 2.0007 0 0 0 2.0007 2.0007h3.7372c4.2574 0 5.5299 1.0244 6.138 3.133a.112.112 0 0 0 .1121.084h.024a.112.112 0 0 0 .112-.084c.6122-2.1086 1.8807-3.133 6.138-3.133h3.7372a2.0007 2.0007 0 0 0 2.0007-2.0007V5.2697a2.0007 2.0007 0 0 0-2.0007-2.0007z" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Asaas Gateway',
-                                desc: 'Boletos e Pix',
-                                logo: () => (
-                                    <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <defs>
-                                            <linearGradient id="asaasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#00A3FF" />
-                                                <stop offset="100%" stopColor="#0030B8" />
-                                            </linearGradient>
-                                        </defs>
-                                        <circle cx="50" cy="50" r="46" fill="url(#asaasGrad)" />
-                                        <path d="M32 52 l12 12 l28 -28" stroke="#fff" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'PJe & Tribunais',
-                                desc: 'Rastreamento de Prazos',
-                                logo: () => (
-                                    <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="46" fill="#004A8F" />
-                                        <path d="M50 22 v52 M30 38 h40 M38 52 c0 6 5 11 12 11 s12-5 12-11" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-                                        <circle cx="50" cy="22" r="3" fill="#FFB900" />
-                                        <circle cx="30" cy="38" r="3" fill="#FFB900" />
-                                        <circle cx="70" cy="38" r="3" fill="#FFB900" />
-                                        <text x="50" y="82" fill="#fff" fontSize="16" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">PJe</text>
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Nuvem Segura AWS',
-                                desc: 'Backup Criptografado',
-                                logo: () => (
-                                    <svg viewBox="0 0 100 60" className="w-12 h-8 flex-shrink-0" fill="none">
-                                        <path d="M22.5 35c0 4-2 6-5.5 6-3 0-5-2-5-5.5 0-4.5 3-7 10.5-7.5v7zm10.5 5V21h-5v3.5c-2-3-5.5-4-8.5-4C11.5 20.5 6 25 6 32.5c0 7 5 11.5 12.5 11.5 4 0 7-1.5 9-4.5v4.5h5zm20-19l-4.5 16-4.5-16h-5.5l7.5 24h5.5l7.5-24h-6zm15.5 8c0-3.5 2-5 5.5-5 3 0 5 1.5 5 4.5v.5c-7 .5-10.5 2-10.5 5 0 2.5 1.5 4 4.5 4 3 0 5-1.5 6.5-3.5V39c-1.5 2-4.5 3.5-7.5 3.5-5.5 0-8-3-8-7.5zm16 4.5V26.5c0-4-3-6-7.5-6-3.5 0-6.5 1.5-8 3.5l3.5 3c1-1.5 2.5-2.5 4.5-2.5 2.5 0 3.5 1 3.5 3V29c-6 .5-10 2.5-10 7 0 4 3 6.5 7.5 6.5 3.5 0 5.5-1.5 6.5-3.5V39h5z" fill="#fff" />
-                                        <path d="M12 45c10 8 38 12 76 0" stroke="#FF9900" strokeWidth="4" strokeLinecap="round" />
-                                        <path d="M82 42.5l7.5 4.5-5-6.5" stroke="#FF9900" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="#FF9900" />
-                                    </svg>
-                                )
-                            }
-                        ].map((item, idx) => (
-                            <div key={idx} className="flex items-center gap-4 px-8 py-2 opacity-50 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-                                    <item.logo />
+                    <div className="flex w-max">
+                        {/* Track 1 */}
+                        <div className="animate-marquee-track pr-16 gap-8">
+                            {[
+                                {
+                                    label: 'WhatsApp API',
+                                    desc: 'Notificações Automáticas',
+                                    logo: () => (
+                                        <img 
+                                            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                                            alt="WhatsApp" 
+                                            className="w-5 h-5 object-contain"
+                                        />
+                                    )
+                                },
+                                {
+                                    label: 'Autentique',
+                                    desc: 'Assinaturas Digitais',
+                                    logo: () => (
+                                        <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" fill="#1AD1B5">
+                                            <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
+                                        </svg>
+                                    )
+                                },
+                                {
+                                    label: 'Google Calendar',
+                                    desc: 'Agendamento Sincronizado',
+                                    logo: () => (
+                                        <img 
+                                            src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
+                                            alt="Google Calendar" 
+                                            className="w-5 h-5 object-contain"
+                                        />
+                                    )
+                                },
+                                {
+                                    label: 'Asaas Gateway',
+                                    desc: 'Boletos e Pix',
+                                    logo: () => (
+                                        <img 
+                                            src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
+                                            alt="Asaas" 
+                                            className="w-5 h-5 object-contain rounded-sm"
+                                        />
+                                    )
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-3 px-6 py-1 opacity-40 hover:opacity-100 transition-all duration-300 cursor-pointer">
+                                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                        <item.logo />
+                                    </div>
+                                    <div className="text-left">
+                                        <span className="text-[10px] font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
+                                        <span className="text-[8px] text-white/30 font-medium block leading-none mt-1">{item.desc}</span>
+                                    </div>
                                 </div>
-                                <div className="text-left">
-                                    <span className="text-xs font-black uppercase tracking-wider text-white block">{item.label}</span>
-                                    <span className="text-[9px] text-white/40 font-medium block">{item.desc}</span>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                         
-                        {/* Duplicated Set for infinite loop */}
-                        {[
-                            {
-                                label: 'WhatsApp API',
-                                desc: 'Notificações Automáticas',
-                                logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#25D366">
-                                        <path d="M20.52 3.48A11.96 11.96 0 0 0 11.97 0a12 12 0 0 0-10.4 18l.12 4.2L6 20.84a12 12 0 0 0 5.97 1.6h.01a12 12 0 0 0 8.54-20.96Zm-8.55 17.55a9.92 9.92 0 0 1-5.07-1.39l-.36-.21-3.76 1.18 1.18-3.66-.23-.38a9.91 9.91 0 1 1 8.24 4.46Zm5.44-7.42c-.3-.15-1.78-.88-2.05-1a.33.33 0 0 0-.17-.05c-.15 0-.3.2-.41.34-.11.14-.23.28-.33.41l-.22.25c-.1.12-.2.14-.52 0-.29-.15-1.22-.45-2.32-1.43a8.67 8.67 0 0 1-1.61-2.05c-.15-.24-.13-.37.1-.51l.3-.2c.1-.06.17-.15.25-.23.08-.09.11-.15.17-.25.06-.1 0-.19-.03-.27l-.46-1.12c-.11-.26-.22-.22-.3-.22h-.25c-.09 0-.24.03-.38.19-.14.15-.55.53-.55 1.3 0 .77.57 1.51.65 1.62.08.11 1.12 2.72 2.72 3.82.37.26.66.41 1.05.52.45.14.86.12 1.19.07.36-.05 1.12-.46 1.28-.9.16-.44.16-.82.11-.9-.05-.08-.18-.13-.38-.23Z" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Autentique',
-                                desc: 'Assinaturas Digitais',
-                                logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#1AD1B5">
-                                        <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Google Calendar',
-                                desc: 'Agendamento Sincronizado',
-                                logo: () => (
-                                    <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0" fill="#4285F4">
-                                        <path d="M22.0113 3.269h-5.8219a4.2894 4.2894 0 0 0-4.1854 3.3452A4.2894 4.2894 0 0 0 7.8186 3.269h-5.818A2.0007 2.0007 0 0 0 0 5.2697v10.2434a2.0007 2.0007 0 0 0 2.0007 2.0007h3.7372c4.2574 0 5.5299 1.0244 6.138 3.133a.112.112 0 0 0 .1121.084h.024a.112.112 0 0 0 .112-.084c.6122-2.1086 1.8807-3.133 6.138-3.133h3.7372a2.0007 2.0007 0 0 0 2.0007-2.0007V5.2697a2.0007 2.0007 0 0 0-2.0007-2.0007z" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Asaas Gateway',
-                                desc: 'Boletos e Pix',
-                                logo: () => (
-                                    <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <defs>
-                                            <linearGradient id="asaasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#00A3FF" />
-                                                <stop offset="100%" stopColor="#0030B8" />
-                                            </linearGradient>
-                                        </defs>
-                                        <circle cx="50" cy="50" r="46" fill="url(#asaasGrad)" />
-                                        <path d="M32 52 l12 12 l28 -28" stroke="#fff" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'PJe & Tribunais',
-                                desc: 'Rastreamento de Prazos',
-                                logo: () => (
-                                    <svg viewBox="0 0 100 100" className="w-8 h-8 flex-shrink-0" fill="none">
-                                        <circle cx="50" cy="50" r="46" fill="#004A8F" />
-                                        <path d="M50 22 v52 M30 38 h40 M38 52 c0 6 5 11 12 11 s12-5 12-11" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-                                        <circle cx="50" cy="22" r="3" fill="#FFB900" />
-                                        <circle cx="30" cy="38" r="3" fill="#FFB900" />
-                                        <circle cx="70" cy="38" r="3" fill="#FFB900" />
-                                        <text x="50" y="82" fill="#fff" fontSize="16" fontWeight="900" textAnchor="middle" fontFamily="sans-serif">PJe</text>
-                                    </svg>
-                                )
-                            },
-                            {
-                                label: 'Nuvem Segura AWS',
-                                desc: 'Backup Criptografado',
-                                logo: () => (
-                                    <svg viewBox="0 0 100 60" className="w-12 h-8 flex-shrink-0" fill="none">
-                                        <path d="M22.5 35c0 4-2 6-5.5 6-3 0-5-2-5-5.5 0-4.5 3-7 10.5-7.5v7zm10.5 5V21h-5v3.5c-2-3-5.5-4-8.5-4C11.5 20.5 6 25 6 32.5c0 7 5 11.5 12.5 11.5 4 0 7-1.5 9-4.5v4.5h5zm20-19l-4.5 16-4.5-16h-5.5l7.5 24h5.5l7.5-24h-6zm15.5 8c0-3.5 2-5 5.5-5 3 0 5 1.5 5 4.5v.5c-7 .5-10.5 2-10.5 5 0 2.5 1.5 4 4.5 4 3 0 5-1.5 6.5-3.5V39c-1.5 2-4.5 3.5-7.5 3.5-5.5 0-8-3-8-7.5zm16 4.5V26.5c0-4-3-6-7.5-6-3.5 0-6.5 1.5-8 3.5l3.5 3c1-1.5 2.5-2.5 4.5-2.5 2.5 0 3.5 1 3.5 3V29c-6 .5-10 2.5-10 7 0 4 3 6.5 7.5 6.5 3.5 0 5.5-1.5 6.5-3.5V39h5z" fill="#fff" />
-                                        <path d="M12 45c10 8 38 12 76 0" stroke="#FF9900" strokeWidth="4" strokeLinecap="round" />
-                                        <path d="M82 42.5l7.5 4.5-5-6.5" stroke="#FF9900" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="#FF9900" />
-                                    </svg>
-                                )
-                            }
-                        ].map((item, idx) => (
-                            <div key={`dup-${idx}`} className="flex items-center gap-4 px-8 py-2 opacity-50 hover:opacity-100 transition-all duration-300 cursor-pointer">
-                                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-                                    <item.logo />
+                        {/* Track 2 (Identical for seamless loops) */}
+                        <div className="animate-marquee-track pr-16 gap-8" aria-hidden="true">
+                            {[
+                                {
+                                    label: 'WhatsApp API',
+                                    desc: 'Notificações Automáticas',
+                                    logo: () => (
+                                        <img 
+                                            src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                                            alt="WhatsApp" 
+                                            className="w-5 h-5 object-contain"
+                                        />
+                                    )
+                                },
+                                {
+                                    label: 'Autentique',
+                                    desc: 'Assinaturas Digitais',
+                                    logo: () => (
+                                        <svg viewBox="0 0 24 24" className="w-5 h-5 flex-shrink-0" fill="#1AD1B5">
+                                            <path d="m18.54 1.225-.27 1.66a10.57 10.57 0 0 0-6.114-2.32L0 11.99h12.156V6.062c3.199 0 5.74 2.434 5.74 5.917 0 3.687-2.614 5.98-5.73 5.98-2.594 0-4.648-1.557-5.429-3.898L0 11.984c0 6.43 4.591 11.45 11.543 11.45 1.666 0 4.259-.383 6.706-2.325l.29 1.64H24V1.225Z" />
+                                        </svg>
+                                    )
+                                },
+                                {
+                                    label: 'Google Calendar',
+                                    desc: 'Agendamento Sincronizado',
+                                    logo: () => (
+                                        <img 
+                                            src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
+                                            alt="Google Calendar" 
+                                            className="w-5 h-5 object-contain"
+                                        />
+                                    )
+                                },
+                                {
+                                    label: 'Asaas Gateway',
+                                    desc: 'Boletos e Pix',
+                                    logo: () => (
+                                        <img 
+                                            src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
+                                            alt="Asaas" 
+                                            className="w-5 h-5 object-contain rounded-sm"
+                                        />
+                                    )
+                                }
+                            ].map((item, idx) => (
+                                <div key={`dup-${idx}`} className="flex items-center gap-3 px-6 py-1 opacity-40 hover:opacity-100 transition-all duration-300 cursor-pointer">
+                                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                                        <item.logo />
+                                    </div>
+                                    <div className="text-left">
+                                        <span className="text-[10px] font-black uppercase tracking-wider text-white block leading-none">{item.label}</span>
+                                        <span className="text-[8px] text-white/30 font-medium block leading-none mt-1">{item.desc}</span>
+                                    </div>
                                 </div>
-                                <div className="text-left">
-                                    <span className="text-xs font-black uppercase tracking-wider text-white block">{item.label}</span>
-                                    <span className="text-[9px] text-white/40 font-medium block">{item.desc}</span>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
