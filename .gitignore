@@ -4,10 +4,22 @@ dist/
 dist-ssr/
 *.local
 
-# Environment
+# Environment and Secrets (Highly critical)
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+*.pfx
+*.cer
+*.crt
+*.der
+jwt.key
+private.key
+google-creds.json
+credentials.json
+client_secret*.json
+service-account*.json
 
 # OS
 .DS_Store
@@ -28,3 +40,44 @@ api/nest-app/
 mcp-config.json
 scratch/
 backend/*.js
+
+# Database backups, SQLite files and JSON records
+*.sql
+*.sqlite
+*.sqlite-journal
+*.db
+*.db-journal
+*.backup
+**/db_output.json
+**/db_output.txt
+**/db_records.json
+**/db_report.txt
+**/users_list.json
+**/last_client.json
+**/temp_out.json
+**/migration-data.json
+**/out.txt
+**/out2.txt
+**/out3.txt
+**/out4.txt
+**/output.json
+**/result_users.txt
+
+# Private User/Client Uploaded Files/Documents
+/uploads/
+**/uploads/
+
+# Build logs, error log dumps and temp files
+*.log
+**/tmp/
+**/temp/
+**/.tmp/
+**/.temp/
+**/*.log
+**/*errors*.txt
+**/*_errors*.txt
+**/*_errors_new.txt
+**/rls_log.txt
+**/rls_output.txt
+**/test_login.js
+**/testsprite_tests/

@@ -1,3 +1,0 @@
-﻿src/pages/agenda/AgendaPage.tsx(2,166): error TS6133: 'Clock' is declared but its value is never read.
-src/pages/agenda/AgendaPage.tsx(570,11): error TS6133: 'handleEventHover' is declared but its value is never read.
-src/pages/agenda/AgendaPage.tsx(574,11): error TS6133: 'handleEventLeave' is declared but its value is never read.
