@@ -234,9 +234,11 @@ const INTEGRATIONS_DATA = [
         label: 'WhatsApp API',
         desc: 'Notificações Automáticas',
         logo: () => (
-            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="#25D366">
-                <path d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.73.44 3.4 1.28 4.88L2 22l5.3-1.39c1.43.78 3.03 1.2 4.7 1.2 5.52 0 10-4.48 10-10.006C22.004 6.48 17.524 2 12.004 2zm0 18.008c-1.46 0-2.89-.38-4.14-1.1l-.3-.18-3.07.8.82-2.99-.2-.31a8.006 8.006 0 01-1.22-4.228c0-4.41 3.59-8 8-8s8 3.59 8 8c0 4.41-3.59 8-8 8z" />
-            </svg>
+            <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+                alt="WhatsApp" 
+                className="w-7 h-7 object-contain"
+            />
         )
     },
     {
@@ -252,25 +254,22 @@ const INTEGRATIONS_DATA = [
         label: 'Google Calendar',
         desc: 'Agendamento Sincronizado',
         logo: () => (
-            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0">
-                <rect x="3" y="4" width="18" height="16" rx="3" fill="#4285F4" />
-                <path d="M3 7V6a2 2 0 012-2h14a2 2 0 012 2v1H3z" fill="#EA4335" />
-                <rect x="5" y="8" width="14" height="10" rx="1.5" fill="#FFFFFF" />
-                <text x="12" y="16" fill="#4285F4" fontSize="8" fontWeight="black" textAnchor="middle" fontFamily="sans-serif">31</text>
-            </svg>
+            <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Google_Calendar_icon_%282020%29.svg" 
+                alt="Google Calendar" 
+                className="w-7 h-7 object-contain"
+            />
         )
     },
     {
         label: 'Asaas Gateway',
         desc: 'Boletos e Pix',
         logo: () => (
-            <svg viewBox="0 0 24 24" className="w-7 h-7 flex-shrink-0" fill="none" stroke="#0066FF" strokeWidth="2">
-                <rect x="2" y="5" width="20" height="14" rx="3" fill="rgba(0, 102, 255, 0.1)" strokeLinejoin="round" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-                <rect x="5" y="14" width="3" height="2" rx="0.5" fill="#00D4B2" stroke="none" />
-                <circle cx="17" cy="14" r="1.5" fill="#0066FF" stroke="none" />
-                <circle cx="19" cy="14" r="1.5" fill="#00D4B2" stroke="none" opacity="0.8" />
-            </svg>
+            <img 
+                src="https://ps.w.org/woo-asaas/assets/icon-256x256.png" 
+                alt="Asaas" 
+                className="w-7 h-7 object-contain rounded-sm"
+            />
         )
     }
 ];
