@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MoreVertical, Eye, Download, Unlock, Lock, Shield, History, Trash2 } from 'lucide-react';
+import { MoreVertical, Eye, Download, Unlock, Lock, Shield, History, Trash2, Pencil } from 'lucide-react';
 
 interface DocumentActionsMenuProps {
     onPreview: () => void;
@@ -9,6 +9,7 @@ interface DocumentActionsMenuProps {
     onLock: () => void;
     isLocked: boolean;
     onPermissions: () => void;
+    onRename: () => void;
 }
 
 export const DocumentActionsMenu: React.FC<DocumentActionsMenuProps> = ({ 
@@ -18,7 +19,8 @@ export const DocumentActionsMenu: React.FC<DocumentActionsMenuProps> = ({
     onAudit, 
     onLock, 
     isLocked, 
-    onPermissions 
+    onPermissions,
+    onRename
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -48,6 +50,9 @@ export const DocumentActionsMenu: React.FC<DocumentActionsMenuProps> = ({
                     </button>
                     <button onClick={() => { onDownload(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
                         <Download size={14} className="text-green-500" /> Baixar
+                    </button>
+                    <button onClick={() => { onRename(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
+                        <Pencil size={14} className="text-blue-500" /> Renomear
                     </button>
                     <button onClick={() => { onLock(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-app-text-main hover:bg-app-stroke/30 transition-colors">
                         {isLocked ? <Unlock size={14} className="text-amber-500" /> : <Lock size={14} className="text-amber-500" />}

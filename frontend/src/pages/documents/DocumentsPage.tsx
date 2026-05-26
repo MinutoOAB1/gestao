@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Folder, MoreVertical, LayoutGrid, List, FileText, UploadCloud, ChevronRight, Download, Eye, Trash2, Database, FileCheck, Kanban, Lock, Unlock, Shield, History, User, Filter } from 'lucide-react';
+import { Folder, MoreVertical, LayoutGrid, List, FileText, UploadCloud, ChevronRight, Download, Eye, Trash2, Database, FileCheck, Kanban, Lock, Unlock, Shield, History, User, Filter, Pencil } from 'lucide-react';
 import { clsx } from 'clsx';
 import api from '../../services/api';
 import Modal from '../../components/ui/Modal';
@@ -235,6 +235,40 @@ export default function DocumentsPage() {
         } catch (error) { addToast('Erro ao excluir arquivo.', 'error'); }
     };
 
+    const handleRenameFile = async (file: FileItem) => {
+        if (file.isLocked) {
+            addToast('Este arquivo está bloqueado para edição.', 'warning');
+            return;
+        }
+        const newName = prompt(`Digite o novo nome para "${file.name}":`, file.name);
+        if (!newName || !newName.trim() || newName.trim() === file.name) return;
+
+        try {
+            await api.patch(`/documents/${file.id}`, { name: newName.trim() });
+            fetchData(currentFolderId);
+            addToast('Arquivo renomeado com sucesso!', 'success');
+        } catch (error: any) {
+            addToast(error.response?.data?.message || 'Erro ao renomear arquivo.', 'error');
+        }
+    };
+
+    const handleRenameFolder = async (folder: FolderItem) => {
+        if (folder.isLocked) {
+            addToast('Esta pasta está bloqueada para edição.', 'warning');
+            return;
+        }
+        const newName = prompt(`Digite o novo nome para a pasta "${folder.name}":`, folder.name);
+        if (!newName || !newName.trim() || newName.trim() === folder.name) return;
+
+        try {
+            await api.patch(`/documents/folders/${folder.id}`, { name: newName.trim() });
+            fetchData(currentFolderId);
+            addToast('Pasta renomeada com sucesso!', 'success');
+        } catch (error: any) {
+            addToast(error.response?.data?.message || 'Erro ao renomear pasta.', 'error');
+        }
+    };
+
     const handleBulkDownload = () => {
         const filesToDownload = files.filter(f => selectedFileIds.includes(f.id) && f.url);
         if (filesToDownload.length === 0) {
@@ -365,7 +399,7 @@ export default function DocumentsPage() {
         onPreview: () => { setPreviewFile(file); setIsPreviewOpen(true); },
         onDownload: () => file.url && window.open(file.url, '_blank'),
         onDelete: () => handleDelete(file),
-        onRename: () => { },
+        onRename: () => handleRenameFile(file),
         onLock: () => handleLock(file),
         onAudit: () => handleAudit(file),
         onPermissions: () => handlePermissions(file)
@@ -497,9 +531,14 @@ export default function DocumentsPage() {
                                         <span className="font-medium text-sm truncate text-app-text-main">{folder.name}</span>
                                         {folder.isLocked && <Lock size={12} className="text-amber-500 shrink-0" />}
                                     </div>
-                                    <button onClick={e => { e.stopPropagation(); handleFolderLock(folder); }} className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 transition-opacity" title={folder.isLocked ? "Desbloquear pasta" : "Bloquear pasta"}>
-                                        {folder.isLocked ? <Unlock size={14} className="text-gray-500" /> : <Lock size={14} className="text-gray-400" />}
-                                    </button>
+                                    <div className="flex gap-1 shrink-0">
+                                        <button onClick={e => { e.stopPropagation(); handleRenameFolder(folder); }} className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 transition-opacity" title="Renomear pasta">
+                                            <Pencil size={14} className="text-gray-400 hover:text-blue-500" />
+                                        </button>
+                                        <button onClick={e => { e.stopPropagation(); handleFolderLock(folder); }} className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 transition-opacity" title={folder.isLocked ? "Desbloquear pasta" : "Bloquear pasta"}>
+                                            {folder.isLocked ? <Unlock size={14} className="text-gray-500" /> : <Lock size={14} className="text-gray-400" />}
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>

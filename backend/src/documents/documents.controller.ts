@@ -53,12 +53,19 @@ export class DocumentsController {
     return this.documentsService.toggleFolderLock(id, tenantId);
   }
 
+  @Patch('folders/:id')
+  renameFolder(@Request() req, @Param('id') id: string, @Body('name') name: string) {
+    const tenantId = req.user?.tenantId;
+    if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
+    return this.documentsService.renameFolder(id, name, tenantId);
+  }
 
   @Patch(':id')
   update(@Request() req, @Param('id') id: string, @Body() updateDocumentDto: UpdateDocumentDto) {
     const tenantId = req.user?.tenantId;
     if (!tenantId) throw new UnauthorizedException('Tenant ID not found in session');
-    return this.documentsService.update(id, updateDocumentDto, tenantId);
+    const userId = req.user?.id || req.user?.sub;
+    return this.documentsService.update(id, updateDocumentDto, tenantId, userId);
   }
 
   // Advanced Features Endpoints

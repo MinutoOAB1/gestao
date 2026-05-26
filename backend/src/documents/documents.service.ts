@@ -156,11 +156,25 @@ export class DocumentsService {
     });
   }
 
-  update(id: string, updateDocumentDto: UpdateDocumentDto, tenantId: string) {
-    return this.prisma.document.update({
+  async update(id: string, updateDocumentDto: UpdateDocumentDto, tenantId: string, userId?: string) {
+    const oldDoc = await this.findOne(id, tenantId);
+
+    const doc = await this.prisma.document.update({
       where: { id, tenantId },
       data: updateDocumentDto,
     });
+
+    if (userId && oldDoc && oldDoc.name !== doc.name) {
+      await this.logAction({
+        tenantId,
+        documentId: id,
+        action: 'RENAME',
+        userId,
+        details: `Arquivo renomeado de "${oldDoc.name}" para "${doc.name}"`
+      });
+    }
+
+    return doc;
   }
 
   // Folders Logic
@@ -188,6 +202,13 @@ export class DocumentsService {
   removeFolder(id: string, tenantId: string) {
     return this.prisma.folder.delete({
       where: { id, tenantId }
+    });
+  }
+
+  renameFolder(id: string, name: string, tenantId: string) {
+    return this.prisma.folder.update({
+      where: { id, tenantId },
+      data: { name }
     });
   }
 
