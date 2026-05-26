@@ -42,5 +42,11 @@
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/email/daily-summary-trigger",
+      "schedule": "0 10 * * *"
+    }
   ]
 }

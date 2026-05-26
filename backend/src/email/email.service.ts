@@ -65,11 +65,11 @@ export class EmailService {
 
   private getBaseStyles(): string {
     return `
-      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Inter:wght@400;500&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
       
       body { 
-        font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; 
-        background-color: #020617; 
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+        background-color: #F8FAFC; 
         margin: 0; 
         padding: 40px 20px; 
         -webkit-font-smoothing: antialiased;
@@ -78,53 +78,52 @@ export class EmailService {
       .container { 
         max-width: 600px; 
         margin: 0 auto; 
-        background: #0F172A; 
-        border-radius: 24px; 
+        background: #FFFFFF; 
+        border-radius: 20px; 
         overflow: hidden; 
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
       }
       
       .header { 
-        background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%); 
-        padding: 48px 40px; 
+        background: #0F172A; 
+        padding: 44px 40px; 
         text-align: center; 
-        position: relative;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 3px solid #4F73F5;
       }
 
       .logo-text {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-weight: 800;
-        font-size: 32px;
-        letter-spacing: -0.05em;
+        font-size: 26px;
+        letter-spacing: -0.04em;
         color: #FFFFFF;
-        margin-bottom: 24px;
+        margin-bottom: 12px;
         display: inline-block;
       }
       
-      .logo-text span { color: rgba(255, 255, 255, 0.5); }
+      .logo-text span { color: #4F73F5; }
       
       .header h1 { 
-        color: white; 
+        color: #FFFFFF; 
         margin: 0; 
         font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 28px; 
-        font-weight: 800;
+        font-size: 22px; 
+        font-weight: 700;
         letter-spacing: -0.02em;
       }
       
-      .content { padding: 48px 40px; }
+      .content { padding: 40px; }
       
       .content p { 
-        color: #94A3B8; 
-        line-height: 1.7; 
+        color: #475569; 
+        line-height: 1.6; 
         margin: 0 0 20px; 
-        font-size: 16px;
+        font-size: 15px;
       }
       
       .user-greeting {
-        color: #FFFFFF !important;
+        color: #0F172A !important;
         font-weight: 600;
         font-size: 18px !important;
         margin-bottom: 12px !important;
@@ -132,34 +131,33 @@ export class EmailService {
       
       .button-container {
         text-align: center;
-        margin: 40px 0;
+        margin: 32px 0;
       }
       
       .button { 
         display: inline-block; 
-        background: #6366F1; 
+        background: #4F73F5; 
         color: #FFFFFF !important; 
-        padding: 18px 36px; 
+        padding: 14px 28px; 
         text-decoration: none; 
-        border-radius: 16px; 
-        font-weight: 700; 
+        border-radius: 12px; 
+        font-weight: 600; 
         font-family: 'Plus Jakarta Sans', sans-serif;
-        text-transform: uppercase;
         font-size: 14px;
-        letter-spacing: 0.05em;
-        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        letter-spacing: 0.02em;
+        box-shadow: 0 4px 6px -1px rgba(79, 115, 245, 0.2), 0 2px 4px -1px rgba(79, 115, 245, 0.1);
       }
       
       .accent-box { 
-        background: rgba(99, 102, 241, 0.05); 
-        border-radius: 16px;
-        border: 1px solid rgba(99, 102, 241, 0.1); 
-        padding: 20px; 
-        margin: 30px 0; 
+        background: #F8FAFC; 
+        border-radius: 12px;
+        border: 1px solid #E2E8F0; 
+        padding: 18px; 
+        margin: 24px 0; 
       }
 
       .accent-text {
-        color: #6366F1;
+        color: #334155;
         font-size: 14px;
         line-height: 1.5;
         margin: 0 !important;
@@ -167,20 +165,21 @@ export class EmailService {
       
       .divider {
         height: 1px;
-        background: rgba(255, 255, 255, 0.05);
-        margin: 40px 0;
+        background: #E2E8F0;
+        margin: 30px 0;
       }
       
       .footer { 
-        background: #020617; 
-        padding: 32px 40px; 
+        background: #F8FAFC; 
+        padding: 24px 40px; 
         text-align: center; 
+        border-top: 1px solid #E2E8F0;
       }
 
       .footer-text {
         font-size: 12px; 
-        color: #475569; 
-        line-height: 1.8;
+        color: #64748B; 
+        line-height: 1.6;
         margin: 0;
         font-weight: 500;
       }
@@ -224,25 +223,25 @@ export class EmailService {
 
     const content = `
       <p class="user-greeting">Olá, ${userName}!</p>
-      <p>Recebemos uma solicitação para redefinir a segurança da sua conta premium no ecossistema Advus.</p>
+      <p>Recebemos uma solicitação para redefinir a segurança da sua conta no ecossistema Advus.</p>
       <p>Para prosseguir com a criação de uma nova credencial, clique no botão de acesso seguro abaixo:</p>
       
       <div class="button-container">
         <a href="${resetUrl}" class="button">Redefinir Senha Premium</a>
       </div>
 
-      <div class="accent-box" style="background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.1);">
-        <p class="accent-text" style="color: #F59E0B;">
+      <div class="accent-box" style="background: #FFFBEB; border-color: #FDE68A;">
+        <p class="accent-text" style="color: #D97706;">
           <strong>Segurança:</strong> Este link expira automaticamente em 1 hora. Se você não solicitou esta alteração, sua conta permanece segura e você pode ignorar este e-mail.
         </p>
       </div>
       
       <div class="divider"></div>
       
-      <p class="footer-text" style="color: #64748B; text-align: left;">
+      <p class="footer-text" style="color: #64748B; text-align: left; font-size: 13px;">
         Se o botão acima não funcionar, copie e cole o link de segurança em seu navegador:
       </p>
-      <a href="${resetUrl}" style="word-break: break-all; color: #475569; font-size: 11px; text-decoration: none; margin-top: 16px; display: block;">${resetUrl}</a>
+      <a href="${resetUrl}" style="word-break: break-all; color: #4F73F5; font-size: 12px; text-decoration: none; margin-top: 12px; display: block; font-weight: 500;">${resetUrl}</a>
     `;
 
     await this.sendEmail({
@@ -267,13 +266,13 @@ export class EmailService {
       <p>Detectamos um novo acesso à sua conta premium de um dispositivo não reconhecido.</p>
       
       <div class="accent-box">
-        <p class="accent-text"><strong>📅 Data/Hora:</strong> ${now}</p>
-        <p class="accent-text"><strong>🌐 Endereço IP:</strong> ${details.ip || 'Não disponível'}</p>
+        <p class="accent-text" style="margin-bottom: 8px !important;"><strong>📅 Data/Hora:</strong> ${now}</p>
+        <p class="accent-text" style="margin-bottom: 8px !important;"><strong>🌐 Endereço IP:</strong> ${details.ip || 'Não disponível'}</p>
         <p class="accent-text"><strong>💻 Dispositivo:</strong> ${this.parseUserAgent(details.userAgent)}</p>
       </div>
 
-      <div class="accent-box" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
-        <p class="accent-text" style="color: #EF4444;">
+      <div class="accent-box" style="background: #FEF2F2; border-color: #FCA5A5;">
+        <p class="accent-text" style="color: #DC2626; font-weight: 500;">
           ⚠️ Se você não reconhece este login, sua conta pode estar em risco. Recomendamos alterar sua senha imediatamente e ativar a autenticação de dois fatores (2FA).
         </p>
       </div>
@@ -323,10 +322,10 @@ export class EmailService {
       <p class="user-greeting">Olá, ${userName}!</p>
       <p>Este é um lembrete automático sobre um prazo processual importante no seu ecossistema jurídico:</p>
       
-      <div class="accent-box" style="text-align: center; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.1);">
-        <div style="font-size: 24px; font-weight: 800; color: #EF4444; margin-bottom: 8px;">📅 ${deadline.date}</div>
-        <div style="color: #FFFFFF; font-weight: 600; font-size: 16px;">${deadline.title}</div>
-        ${deadline.processNumber ? `<div style="margin-top: 4px; color: #94A3B8; font-size: 14px;">Processo: ${deadline.processNumber}</div>` : ''}
+      <div class="accent-box" style="text-align: center; background: #FEF2F2; border-color: #FCA5A5;">
+        <div style="font-size: 26px; font-weight: 800; color: #DC2626; margin-bottom: 6px; font-family: 'Plus Jakarta Sans', sans-serif;">📅 ${deadline.date}</div>
+        <div style="color: #0F172A; font-weight: 600; font-size: 16px;">${deadline.title}</div>
+        ${deadline.processNumber ? `<div style="margin-top: 4px; color: #475569; font-size: 13px; font-weight: 500;">Processo: ${deadline.processNumber}</div>` : ''}
       </div>
 
       <div class="button-container">
@@ -349,50 +348,25 @@ export class EmailService {
     userName: string,
     update: { processNumber: string; processTitle: string; updateDescription: string }
   ): Promise<void> {
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #10b981, #059669); padding: 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .update-box { background: #f0fdf4; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0; }
-          .button { display: inline-block; background: #3b82f6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-          .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>📋 Atualização de Processo</h1>
-          </div>
-          <div class="content">
-            <p>Olá, <strong>${userName}</strong>!</p>
-            <p>Há uma nova movimentação no seu processo:</p>
-            <div class="update-box">
-              <div style="font-weight: bold; color: #065f46; font-size: 14px;">Processo: ${update.processNumber}</div>
-              <div style="color: #1e293b; font-size: 16px; margin: 5px 0 10px;">${update.processTitle}</div>
-              <div style="color: #4a5568; font-size: 14px;">${update.updateDescription}</div>
-            </div>
-            <a href="${this.getBaseUrl()}/processos" class="button">Ver Processo</a>
-          </div>
-          <div class="footer">
-            Advus - Gestão Jurídica Inteligente
-          </div>
-        </div>
-      </body>
-      </html>
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>Há uma nova movimentação importante no seu processo sob gestão:</p>
+      
+      <div class="accent-box" style="background: #F0FDF4; border-color: #BBF7D0;">
+        <div style="font-weight: 700; color: #166534; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif;">Processo: ${update.processNumber}</div>
+        <div style="color: #0F172A; font-weight: 600; font-size: 16px; margin: 6px 0 10px;">${update.processTitle}</div>
+        <div style="color: #475569; font-size: 14px; line-height: 1.6;">${update.updateDescription}</div>
+      </div>
+
+      <div class="button-container">
+        <a href="${this.getBaseUrl()}/processos" class="button">Ver Processo</a>
+      </div>
     `;
 
     await this.sendEmail({
       to,
       subject: `📋 Atualização: ${update.processNumber} - ${update.processTitle}`,
-      html,
+      html: this.wrapInBaseTemplate('Atualização de Processo', content),
     });
   }
 
@@ -407,65 +381,113 @@ export class EmailService {
   ): Promise<void> {
     const loginUrl = `${this.getBaseUrl()}/login`;
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #10b981, #059669); padding: 30px; text-align: center; }
-          .header h1 { color: white; margin: 0; font-size: 24px; }
-          .content { padding: 30px; }
-          .content p { color: #4a5568; line-height: 1.6; margin: 0 0 15px; }
-          .credentials-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; padding: 20px; margin: 20px 0; }
-          .credential-row { margin: 10px 0; }
-          .credential-label { color: #166534; font-weight: 600; }
-          .credential-value { color: #1e293b; background: white; padding: 8px 12px; border-radius: 6px; font-family: monospace; border: 1px solid #d1d5db; display: inline-block; margin-top: 4px; }
-          .button { display: inline-block; background: #10b981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
-          .warning { background: #fef3cd; border-left: 4px solid #f59e0b; padding: 12px; margin: 15px 0; font-size: 14px; color: #92400e; }
-          .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎉 Bem-vindo ao Advus!</h1>
-          </div>
-          <div class="content">
-            <p>Olá, <strong>${userName}</strong>!</p>
-            <p>${invitedBy ? `Você foi convidado por <strong>${invitedBy}</strong> para fazer parte da equipe.` : 'Sua conta foi criada com sucesso.'}</p>
-            <p>Aqui estão suas credenciais de acesso:</p>
-            <div class="credentials-box">
-              <div class="credential-row">
-                <span class="credential-label">📧 Email:</span><br>
-                <span class="credential-value">${to}</span>
-              </div>
-              <div class="credential-row">
-                <span class="credential-label">🔑 Senha:</span><br>
-                <span class="credential-value">${tempPassword}</span>
-              </div>
-            </div>
-            <div class="warning">
-              ⚠️ <strong>Importante:</strong> Recomendamos que você altere sua senha após o primeiro acesso por questões de segurança.
-            </div>
-            <a href="${loginUrl}" class="button">Acessar o Sistema</a>
-            <p style="font-size: 12px; color: #94a3b8;">Se o botão não funcionar, acesse: ${loginUrl}</p>
-          </div>
-          <div class="footer">
-            Advus - Gestão Jurídica Inteligente<br>
-            Este é um e-mail automático, não responda.
-          </div>
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>${invitedBy ? `Você foi convidado por <strong>${invitedBy}</strong> para fazer parte da equipe.` : 'Sua conta premium foi criada com sucesso.'}</p>
+      <p>Abaixo estão suas credenciais de acesso seguro à plataforma Advus:</p>
+      
+      <div class="accent-box" style="background: #F0FDF4; border-color: #BBF7D0;">
+        <div style="margin-bottom: 14px;">
+          <span style="color: #166534; font-weight: 600; font-size: 12px; font-family: 'Plus Jakarta Sans', sans-serif; tracking-wider">📧 EMAIL DE ACESSO:</span><br>
+          <span style="color: #0F172A; font-family: monospace; font-size: 15px; font-weight: bold; background: #FFFFFF; padding: 6px 12px; border-radius: 6px; border: 1px solid #E2E8F0; display: inline-block; margin-top: 4px;">${to}</span>
         </div>
-      </body>
-      </html>
+        <div>
+          <span style="color: #166534; font-weight: 600; font-size: 12px; font-family: 'Plus Jakarta Sans', sans-serif; tracking-wider">🔑 SENHA TEMPORÁRIA:</span><br>
+          <span style="color: #0F172A; font-family: monospace; font-size: 15px; font-weight: bold; background: #FFFFFF; padding: 6px 12px; border-radius: 6px; border: 1px solid #E2E8F0; display: inline-block; margin-top: 4px;">${tempPassword}</span>
+        </div>
+      </div>
+      
+      <div class="accent-box" style="background: #FFFBEB; border-color: #FDE68A;">
+        <p class="accent-text" style="color: #D97706; font-weight: 500;">
+          ⚠️ <strong>Importante:</strong> Por questões de conformidade e segurança, recomendamos que você altere sua senha no seu primeiro acesso.
+        </p>
+      </div>
+
+      <div class="button-container">
+        <a href="${loginUrl}" class="button">Acessar a Plataforma</a>
+      </div>
     `;
 
     await this.sendEmail({
       to,
       subject: '🎉 Bem-vindo ao Advus - Suas Credenciais de Acesso',
-      html,
+      html: this.wrapInBaseTemplate('Bem-vindo ao Advus', content),
+    });
+  }
+
+  /**
+   * Send daily executive summary with agenda events and financial records
+   */
+  async sendDailySummaryEmail(
+    to: string,
+    userName: string,
+    data: { events: any[]; financialRecords: any[]; dateStr: string }
+  ): Promise<void> {
+    let eventsHtml = '';
+    if (data.events.length === 0) {
+      eventsHtml = `<p style="color: #64748B; font-style: italic; font-size: 14px; margin: 0;">Nenhum compromisso agendado para hoje.</p>`;
+    } else {
+      eventsHtml = data.events.map(event => {
+        const startTime = new Date(event.start).toLocaleTimeString('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZone: 'America/Sao_Paulo'
+        });
+        return `
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; margin-bottom: 12px;">
+            <div style="color: #4F73F5; font-weight: 700; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif;">⏰ ${startTime}</div>
+            <div style="color: #0F172A; font-weight: 600; font-size: 15px; margin: 4px 0 2px;">${event.title}</div>
+            ${event.location ? `<div style="color: #475569; font-size: 12px; margin-top: 2px;">📍 ${event.location}</div>` : ''}
+            ${event.description ? `<div style="color: #64748B; font-size: 12px; margin-top: 4px;">${event.description}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    let financialHtml = '';
+    if (data.financialRecords.length === 0) {
+      financialHtml = `<p style="color: #64748B; font-style: italic; font-size: 14px; margin: 0;">Nenhum vencimento financeiro programado para hoje.</p>`;
+    } else {
+      financialHtml = data.financialRecords.map(record => {
+        const isIncome = record.type === 'INCOME' || record.type === 'RECEITA';
+        const color = isIncome ? '#10B981' : '#EF4444';
+        const badge = isIncome ? '▲ Receita' : '▼ Despesa';
+        return `
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="color: ${color}; font-weight: 700; font-size: 11px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', sans-serif;">${badge}</span>
+              <strong style="color: #0F172A; font-size: 14px;">R$ ${record.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+            </div>
+            <div style="color: #334155; font-size: 13px;">${record.description}</div>
+            ${record.category ? `<div style="color: #64748B; font-size: 11px; margin-top: 2px;">Categoria: ${record.category}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    const content = `
+      <p class="user-greeting">Olá, ${userName}!</p>
+      <p>Aqui está o seu resumo diário do dia <strong>${data.dateStr}</strong> consolidado pela plataforma Advus.</p>
+      
+      <div class="divider"></div>
+      
+      <h3 style="color: #0F172A; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; margin-bottom: 12px;">📅 Compromissos de Hoje</h3>
+      ${eventsHtml}
+      
+      <div class="divider"></div>
+      
+      <h3 style="color: #0F172A; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; margin-bottom: 12px;">💰 Financeiro (A Vencer Hoje)</h3>
+      ${financialHtml}
+      
+      <div class="button-container">
+        <a href="${this.getBaseUrl()}/app" class="button">Acessar Advus</a>
+      </div>
+    `;
+
+    await this.sendEmail({
+      to,
+      subject: `🌅 Seu Resumo Diário Advus - ${data.dateStr}`,
+      html: this.wrapInBaseTemplate('Resumo Executivo Diário', content),
     });
   }
 

@@ -52,7 +52,7 @@ import { ValueChainModule } from './value-chain/value-chain.module';
     //   ttl: 60000,
     //   limit: 100,
     // }]),
-    // ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(),
     EmailModule,
     PrismaModule,
     SupabaseModule,
