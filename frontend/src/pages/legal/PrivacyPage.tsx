@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Download, Lock, Eye, Database, Shield, FileText, CheckCircle2 } from 'lucide-react';
 import { InstitutionalLayout } from '../../components/layout/InstitutionalLayout';
 
 export default function PrivacyPage() {
+    useEffect(() => {
+        document.title = 'Política de Privacidade | Advus - Gestão Jurídica';
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', 'Política de privacidade da Advus. Transparência sobre coleta de dados, segurança AES-256, conformidade LGPD e diretrizes éticas na gestão de escritórios de advocacia.');
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', 'https://advus.app/privacy');
+    }, []);
     const handleDownloadPDF = async () => {
         const { jsPDF } = await import('jspdf');
         const doc = new jsPDF();
@@ -22,7 +29,7 @@ export default function PrivacyPage() {
             '',
             '4. ARMAZENAMENTO E INFRAESTRUTURA: Os dados sao custodiados em servidores de nuvem de alta redundancia (AWS regiao Sao Paulo). A criptografia e obrigatoria em repouso (AES-256) e em transito (TLS 1.3).',
             '',
-            '5. DIREITOS E CONTATO: Como titular ou Controlador, o escritorio possui canal direto de solicitacao de exclusao definitiva, portabilidade ou retificacao de dados. Contato do Encarregado de Dados (DPO): dpo@advus.com.br.'
+            '5. DIREITOS E CONTATO: Como titular ou Controlador, o escritorio possui canal direto de solicitacao de exclusao definitiva, portabilidade ou retificacao de dados. Contato do Encarregado de Dados (DPO): dpo@advus.app.'
         ];
         
         let y = 35;
@@ -161,7 +168,7 @@ export default function PrivacyPage() {
 
                 <div className="pt-12 border-t border-white/5 text-center">
                     <p className="text-white/30 text-xs font-medium italic">
-                        Última revisão em vigor: 23 de Maio de 2026. Encarregado pelo tratamento de dados (DPO): <span className="text-[#B89B5E]">dpo@advus.com.br</span>
+                        Última revisão em vigor: 23 de Maio de 2026. Encarregado pelo tratamento de dados (DPO): <span className="text-[#B89B5E]">dpo@advus.app</span>
                     </p>
                 </div>
             </div>

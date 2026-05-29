@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Scale, AlertCircle, Shield, FileText, ChevronRight } from 'lucide-react';
 import { InstitutionalLayout } from '../../components/layout/InstitutionalLayout';
 
 export default function TermsPage() {
+    useEffect(() => {
+        document.title = 'Termos de Uso | Advus - Gestão Jurídica';
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', 'Termos de uso e licenciamento da plataforma Advus. Regras de licenciamento SaaS, garantias operacionais (SLA 99.9%), propriedade intelectual e disposições contratuais.');
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', 'https://advus.app/terms');
+    }, []);
     const handleDownloadPDF = async () => {
         const { jsPDF } = await import('jspdf');
         const doc = new jsPDF();
@@ -128,7 +135,7 @@ export default function TermsPage() {
 
                     <div className="pt-12 border-t border-white/5 text-center">
                         <p className="text-white/30 text-xs font-medium italic">
-                            Última atualização: 23 de Maio de 2026. Consultas jurídicas adicionais: <span className="text-[#B89B5E]">juridico@advus.com.br</span>
+                            Última atualização: 23 de Maio de 2026. Consultas jurídicas adicionais: <span className="text-[#B89B5E]">juridico@advus.app</span>
                         </p>
                     </div>
                 </div>

@@ -1532,7 +1532,10 @@ export default function LandingPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        document.title = 'Advus | Gestão de Escritórios de Advocacia Premium';
         document.documentElement.classList.add('landing-page-body');
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', 'https://advus.app/');
         if (isAuthenticated) {
             navigate('/app');
         }

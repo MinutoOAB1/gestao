@@ -283,7 +283,7 @@ export default function LoginPage() {
                                                 type="email"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                placeholder="exemplo@advus.com.br"
+                                                placeholder="exemplo@advus.app"
                                                 required
                                                 className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary dark:focus:border-primary-light outline-none transition-all placeholder:text-slate-500 dark:placeholder:text-white/30"
                                             />

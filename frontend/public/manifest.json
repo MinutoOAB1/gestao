@@ -1,11 +1,15 @@
 {
-  "name": "Advus - Gestão Jurídica",
+  "name": "Advus - Gestão Jurídica Premium",
   "short_name": "Advus",
-  "description": "Plataforma premium para gestão de escritórios de advocacia.",
+  "description": "Plataforma premium de gestão para escritórios de advocacia. IA jurídica, controle financeiro, processos, clientes e assinaturas digitais.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0F172A",
   "theme_color": "#0F172A",
+  "lang": "pt-BR",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "/Logo-pwa2.png",

@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, CheckCircle2, Lock, UserCheck, FileSearch, HelpCircle, Scale, Eye, Cpu, Database } from 'lucide-react';
 import { InstitutionalLayout } from '../../components/layout/InstitutionalLayout';
 
 export default function LGPDPage() {
+    useEffect(() => {
+        document.title = 'Conformidade LGPD | Advus - Segurança e Proteção de Dados';
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', 'Conformidade LGPD da plataforma Advus. Privacy by Design, criptografia AES-256, isolamento multi-tenant e proteção de dados pessoais para escritórios de advocacia.');
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', 'https://advus.app/lgpd');
+    }, []);
     return (
         <InstitutionalLayout 
             title="Conformidade LGPD & Segurança Jurídica" 

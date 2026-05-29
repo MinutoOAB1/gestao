@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Target, Users, Shield, Award, Zap, ArrowRight } from 'lucide-react';
@@ -7,6 +7,14 @@ import { BrandLogo } from '../../components/ui/BrandLogo';
 
 export default function AboutPage() {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = 'Sobre a Advus | Plataforma de Gestão Jurídica Premium';
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', 'Conheça a Advus: a plataforma de gestão jurídica que combina inteligência artificial e tecnologia de ponta para escritórios de advocacia de elite no Brasil.');
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', 'https://advus.app/about');
+    }, []);
 
     return (
         <InstitutionalLayout 

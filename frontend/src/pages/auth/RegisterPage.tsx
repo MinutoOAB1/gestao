@@ -170,7 +170,7 @@ export default function RegisterPage() {
                                         O cadastro público para o Advus está temporariamente restrito para garantir a exclusividade e performance dos nossos membros.
                                     </p>
                                     <div className="space-y-4">
-                                        <a href="mailto:contato@advus.com.br" className="block w-full py-3.5 px-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+                                        <a href="mailto:contato@advus.app" className="block w-full py-3.5 px-4 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
                                             Entrar na Fila de Espera
                                         </a>
                                         <Link to="/login" className="block w-full py-3.5 px-4 bg-white text-primary border border-primary/20 rounded-xl font-semibold text-sm hover:bg-primary/5 transition-all">
@@ -227,7 +227,7 @@ export default function RegisterPage() {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        placeholder="exemplo@advus.com.br"
+                                        placeholder="exemplo@advus.app"
                                         required
                                         className="w-full bg-white border border-slate-300 text-slate-900 px-4 py-3 pr-12 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-slate-500"
                                     />

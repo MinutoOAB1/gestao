@@ -1,0 +1,24 @@
+# Advus - Robots.txt
+# Permitir indexação de páginas públicas, bloquear áreas privadas
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /terms
+Allow: /privacy
+Allow: /lgpd
+Allow: /login
+Allow: /register
+
+# Bloquear áreas autenticadas e API
+Disallow: /app
+Disallow: /app/*
+Disallow: /portal
+Disallow: /portal/*
+Disallow: /api
+Disallow: /api/*
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Sitemap
+Sitemap: https://advus.app/sitemap.xml

@@ -169,7 +169,7 @@ function App() {
                             <Route path="processos/:id" element={<PortalProcessDetail />} />
                           </Route>
 
-                          <Route path="*" element={<Navigate to="/app" replace />} />
+                          <Route path="*" element={<HomeHandler />} />
                         </Routes>
                       </ErrorBoundary>
                     </Suspense>

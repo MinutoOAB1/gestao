@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="seu@advus.com.br"
+                                        placeholder="seu@advus.app"
                                         required
                                         className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-3.5 rounded-xl focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all placeholder:text-white/20"
                                     />
