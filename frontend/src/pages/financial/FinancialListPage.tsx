@@ -54,6 +54,10 @@ export default function FinancialListPage() {
     const [activeTab, setActiveTab] = useState<'transactions' | 'repasses' | 'invoices' | 'inadimplencia' | 'dre' | 'audit'>('transactions');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const [selectedMonth, setSelectedMonth] = useState<string>(String(new Date().getMonth() + 1));
+    const [selectedYear, setSelectedYear] = useState<string>(String(new Date().getFullYear()));
+    const [activeChartTab, setActiveChartTab] = useState<'chart' | 'projections'>('chart');
+
     const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
     const [selectedClientForInvoice, setSelectedClientForInvoice] = useState<{id: string, name: string, amount?: number, financialRecordId?: string} | undefined>();
 
@@ -138,18 +142,153 @@ export default function FinancialListPage() {
         partners.reduce((sum, p) => sum + (p.pendingAmount || 0), 0),
         [partners]);
 
-    const currentMonthBalance = useMemo(() => {
-        return records.filter(r => {
+    const dynamicStats = useMemo(() => {
+        const filterYear = selectedYear === 'all' ? null : Number(selectedYear);
+        const filterMonth = selectedMonth === 'all' ? null : Number(selectedMonth);
+
+        const isBeforeOrInPeriod = (dateStr: string) => {
+            if (!dateStr || dateStr.length < 10) return false;
+            const [y, m] = dateStr.substring(0, 10).split('-').map(Number);
+            if (filterYear !== null) {
+                if (y < filterYear) return true;
+                if (y > filterYear) return false;
+                if (filterMonth !== null) {
+                    return m <= filterMonth;
+                }
+                return true;
+            }
+            return true;
+        };
+
+        const isInPeriod = (dateStr: string) => {
+            if (!dateStr || dateStr.length < 10) return false;
+            const [y, m] = dateStr.substring(0, 10).split('-').map(Number);
+            
+            const matchY = filterYear === null || y === filterYear;
+            const matchM = filterMonth === null || m === filterMonth;
+            return matchY && matchM;
+        };
+
+        const realizedBalance = records
+            .filter(r => r.status === 'PAID' && isBeforeOrInPeriod(r.date))
+            .reduce((sum, r) => sum + (r.type === 'INCOME' ? (Number(r.amount) || 0) : -(Number(r.amount) || 0)), 0);
+
+        const projectedBalance = records
+            .filter(r => isBeforeOrInPeriod(r.date))
+            .reduce((sum, r) => sum + (r.type === 'INCOME' ? (Number(r.amount) || 0) : -(Number(r.amount) || 0)), 0);
+
+        const periodIncomeTotal = records
+            .filter(r => r.type === 'INCOME' && isInPeriod(r.date))
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const periodIncomePaid = records
+            .filter(r => r.type === 'INCOME' && r.status === 'PAID' && isInPeriod(r.date))
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const periodIncomePending = records
+            .filter(r => r.type === 'INCOME' && r.status === 'PENDING' && isInPeriod(r.date))
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const pendingIncomeCount = records
+            .filter(r => r.type === 'INCOME' && r.status === 'PENDING' && isInPeriod(r.date))
+            .length;
+
+        const periodExpenseTotal = records
+            .filter(r => r.type === 'EXPENSE' && isInPeriod(r.date))
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const periodExpensePaid = records
+            .filter(r => r.type === 'EXPENSE' && r.status === 'PAID' && isInPeriod(r.date))
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const periodExpensePending = records
+            .filter(r => r.type === 'EXPENSE' && r.status === 'PENDING' && isInPeriod(r.date))
+            .reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dueTodayRecords = records.filter(r => {
+            if (r.status !== 'PENDING') return false;
             if (!r.date || r.date.length < 10) return false;
-            const [year, month, day] = r.date.substring(0, 10).split('-').map(Number);
-            const d = new Date(year, month - 1, day);
-            const now = new Date();
-            now.setHours(0, 0, 0, 0);
-            return r.status === 'PAID' && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-        }).reduce((acc, r) => {
-            return acc + (r.type === 'INCOME' ? (Number(r.amount) || 0) : -(Number(r.amount) || 0));
-        }, 0);
-    }, [records]);
+            return r.date.substring(0, 10) === todayStr && isInPeriod(r.date);
+        });
+
+        const dueTodayCount = dueTodayRecords.length;
+        const dueTodayAmount = dueTodayRecords.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+        const receivedPercent = periodIncomeTotal > 0
+            ? Math.round((periodIncomePaid / periodIncomeTotal) * 100)
+            : 100;
+
+        const periodRealizedResult = periodIncomePaid - periodExpensePaid;
+
+        return {
+            balance: realizedBalance,
+            projectedBalance,
+            pendingIncome: periodIncomePending,
+            pendingIncomeCount,
+            receivedPercent,
+            pendingExpense: periodExpensePending,
+            dueTodayCount,
+            dueTodayAmount,
+            periodIncomeTotal,
+            periodExpenseTotal,
+            periodRealizedResult
+        };
+    }, [records, selectedMonth, selectedYear]);
+
+    const annualProjections = useMemo(() => {
+        const yearToCalculate = selectedYear === 'all' ? new Date().getFullYear() : Number(selectedYear);
+        const projections = [];
+
+        let runningRealized = records
+            .filter(r => r.status === 'PAID' && new Date(r.date).getFullYear() < yearToCalculate)
+            .reduce((sum, r) => sum + (r.type === 'INCOME' ? (Number(r.amount) || 0) : -(Number(r.amount) || 0)), 0);
+
+        let runningProjected = records
+            .filter(r => new Date(r.date).getFullYear() < yearToCalculate)
+            .reduce((sum, r) => sum + (r.type === 'INCOME' ? (Number(r.amount) || 0) : -(Number(r.amount) || 0)), 0);
+
+        const monthNames = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+
+        for (let m = 1; m <= 12; m++) {
+            const monthRecords = records.filter(r => {
+                if (!r.date || r.date.length < 10) return false;
+                const [y, mm] = r.date.substring(0, 10).split('-').map(Number);
+                return y === yearToCalculate && mm === m;
+            });
+
+            const incomePaid = monthRecords.filter(r => r.type === 'INCOME' && r.status === 'PAID').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            const incomePending = monthRecords.filter(r => r.type === 'INCOME' && r.status === 'PENDING').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            const expensePaid = monthRecords.filter(r => r.type === 'EXPENSE' && r.status === 'PAID').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            const expensePending = monthRecords.filter(r => r.type === 'EXPENSE' && r.status === 'PENDING').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+
+            const monthIncomeTotal = incomePaid + incomePending;
+            const monthExpenseTotal = expensePaid + expensePending;
+            const monthProjectedResult = monthIncomeTotal - monthExpenseTotal;
+
+            runningRealized += (incomePaid - expensePaid);
+            runningProjected += monthProjectedResult;
+
+            projections.push({
+                monthNum: m,
+                monthName: monthNames[m - 1],
+                incomeTotal: monthIncomeTotal,
+                incomePaid,
+                incomePending,
+                expenseTotal: monthExpenseTotal,
+                expensePaid,
+                expensePending,
+                projectedResult: monthProjectedResult,
+                projectedBalanceEnd: runningProjected,
+                realizedBalanceEnd: runningRealized
+            });
+        }
+
+        return projections;
+    }, [records, selectedYear]);
 
     const chartData = useMemo(() => {
         const data = [];
@@ -201,14 +340,15 @@ export default function FinancialListPage() {
                 });
             }
         } else if (chartPeriod === '1A') {
-            for (let i = 11; i >= 0; i--) {
-                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const chartYear = selectedYear === 'all' ? now.getFullYear() : Number(selectedYear);
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(chartYear, i, 1);
                 const monthName = date.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
 
                 const monthRecords = records.filter(r => {
                     const recordDate = new Date(r.date);
-                    return recordDate.getMonth() === date.getMonth() &&
-                        recordDate.getFullYear() === date.getFullYear() &&
+                    return recordDate.getMonth() === i &&
+                        recordDate.getFullYear() === chartYear &&
                         r.status === 'PAID';
                 });
 
@@ -225,7 +365,7 @@ export default function FinancialListPage() {
         }
 
         return data;
-    }, [records, chartPeriod]);
+    }, [records, chartPeriod, selectedYear]);
 
     const handleSaveTransaction = useCallback(async () => {
         if (isSubmitting) return;
@@ -667,7 +807,17 @@ export default function FinancialListPage() {
                     if (rDate > end) matchesDate = false;
                 }
             }
-            return matchesSearch && matchesStatus && matchesDate;
+            let matchesMonthYear = true;
+            if (r.date && r.date.length >= 10) {
+                const [yStr, mStr] = r.date.substring(0, 10).split('-');
+                if (selectedYear !== 'all' && yStr !== selectedYear) {
+                    matchesMonthYear = false;
+                }
+                if (selectedMonth !== 'all' && Number(mStr) !== Number(selectedMonth)) {
+                    matchesMonthYear = false;
+                }
+            }
+            return matchesSearch && matchesStatus && matchesDate && matchesMonthYear;
         });
         filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -720,7 +870,7 @@ export default function FinancialListPage() {
             }
         }
         return result;
-    }, [records, debouncedSearch, statusFilter, dateFilterStart, dateFilterEnd]);
+    }, [records, debouncedSearch, statusFilter, dateFilterStart, dateFilterEnd, selectedMonth, selectedYear]);
 
     // Get relative date label
     const getDateLabel = (dateStr: string) => {
@@ -851,19 +1001,19 @@ export default function FinancialListPage() {
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        (stats?.balance || 0) >= 0 ? "bg-gradient-to-br from-emerald-500/10 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-gradient-to-br from-rose-500/10 to-app-card border-rose-500/20 shadow-lg shadow-rose-500/5"
+                        dynamicStats.balance >= 0 ? "bg-gradient-to-br from-emerald-500/10 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-gradient-to-br from-rose-500/10 to-app-card border-rose-500/20 shadow-lg shadow-rose-500/5"
                     )}
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
                     <div className={clsx(
                         "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
-                        (stats?.balance || 0) >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
+                        dynamicStats.balance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
                     )} />
                     <div className="flex justify-between items-start mb-2">
-                        <p className="text-app-text-muted text-xs">Saldo Atual</p>
+                        <p className="text-app-text-muted text-xs">Saldo em Caixa Realizado</p>
                         <div className={clsx(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            (stats?.balance || 0) >= 0 ? "bg-emerald-500" : "bg-rose-500"
+                            dynamicStats.balance >= 0 ? "bg-emerald-500" : "bg-rose-500"
                         )}>
                             <Building size={16} className="text-white" />
                         </div>
@@ -873,50 +1023,87 @@ export default function FinancialListPage() {
                         <p className={clsx(
                             "text-2xl font-bold text-app-text-main"
                         )}>
-                            {formatBRL(stats?.balance || 0).replace('R$', '').trim()}
+                            {formatBRL(dynamicStats.balance).replace('R$', '').trim()}
                         </p>
-                        {(stats?.balance || 0) >= 0 ? (
+                        {dynamicStats.balance >= 0 ? (
                             <TrendingUp size={20} className="text-emerald-500" />
                         ) : (
                             <TrendingDown size={20} className="text-rose-500" />
                         )}
                     </div>
                     <p className="text-xs text-app-text-muted mt-1">
-                        Disponível em Caixa
+                        Disponível até o fim do período
                     </p>
                 </motion.div>
 
-                {/* Contas a Receber */}
+                {/* Saldo Projetado */}
                 <motion.div
                     className={clsx(
                         "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        (stats?.pendingIncome || 0) > 0 ? "bg-gradient-to-br from-emerald-500/5 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-app-card border-app-stroke"
+                        dynamicStats.projectedBalance >= 0 ? "bg-gradient-to-br from-emerald-500/10 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-gradient-to-br from-rose-500/10 to-app-card border-rose-500/20 shadow-lg shadow-rose-500/5"
                     )}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                >
+                    <div className={clsx(
+                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
+                        dynamicStats.projectedBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
+                    )} />
+                    <div className="flex justify-between items-start mb-2">
+                        <div>
+                            <p className="text-app-text-muted text-xs">Saldo Projetado</p>
+                            <p className="text-[10px] text-app-text-muted">(Fim do Período)</p>
+                        </div>
+                        <div className={clsx(
+                            "w-8 h-8 rounded-lg flex items-center justify-center",
+                            dynamicStats.projectedBalance >= 0 ? "bg-emerald-500" : "bg-rose-500"
+                        )}>
+                            <DollarSign size={16} className="text-white" />
+                        </div>
+                    </div>
+                    <p className="text-sm text-app-text-muted">R$</p>
+                    <div className="flex items-center gap-2">
+                        <p className="text-2xl font-bold text-app-text-main">
+                            {formatBRL(dynamicStats.projectedBalance).replace('R$', '').trim()}
+                        </p>
+                        {dynamicStats.projectedBalance >= 0 ? (
+                            <TrendingUp size={20} className="text-emerald-500" />
+                        ) : (
+                            <TrendingDown size={20} className="text-rose-500" />
+                        )}
+                    </div>
+                    <p className="text-xs text-app-text-muted mt-1">
+                        Se todos os pendentes forem liquidados
+                    </p>
+                </motion.div>
+
+                {/* Receitas no Período */}
+                <motion.div
+                    className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden"
                     whileHover={{ scale: 1.02, y: -2 }}
                 >
                     <div className="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <div>
-                            <p className="text-app-text-muted text-xs">Contas a Receber</p>
-                            <p className="text-[10px] text-app-text-muted">(Mês Atual)</p>
+                            <p className="text-app-text-muted text-xs">Receitas Previstas</p>
+                            <p className="text-[10px] text-app-text-muted">(No Período)</p>
                         </div>
                         <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full">
-                            {stats?.pendingIncomeCount || 0} Pendentes
+                            {dynamicStats.pendingIncomeCount} Pendentes
                         </span>
                     </div>
-                    <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatBRL(stats?.pendingIncome || 0)}</p>
+                    <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{formatBRL(dynamicStats.periodIncomeTotal)}</p>
                     <div className="mt-2 pt-2 border-t border-app-stroke">
                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] text-app-text-muted">Progresso do Mês</span>
-                            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">{stats?.receivedPercent || 0}% Recebido</span>
+                            <span className="text-[10px] text-app-text-muted">Progresso do Período</span>
+                            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">{dynamicStats.receivedPercent}% Recebido</span>
                         </div>
                         <div className="h-1.5 bg-app-stroke rounded-full overflow-hidden">
-                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${stats?.receivedPercent || 0}%` }} />
+                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${dynamicStats.receivedPercent}%` }} />
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Contas a Pagar */}
+                {/* Despesas no Período */}
                 <motion.div
                     className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden"
                     whileHover={{ scale: 1.02, y: -2 }}
@@ -924,76 +1111,25 @@ export default function FinancialListPage() {
                     <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
                     <div className="flex justify-between items-start mb-2">
                         <div>
-                            <p className="text-app-text-muted text-xs">Contas a Pagar</p>
-                            <p className="text-[10px] text-app-text-muted">(Total Pendente)</p>
+                            <p className="text-app-text-muted text-xs">Despesas Previstas</p>
+                            <p className="text-[10px] text-app-text-muted">(No Período)</p>
                         </div>
                         <span className={clsx(
                             "px-2 py-0.5 text-[10px] font-bold rounded-full",
-                            (stats?.dueTodayCount || 0) > 0 ? "bg-amber-500 text-white animate-pulse" : "bg-app-stroke text-app-text-muted"
+                            dynamicStats.dueTodayCount > 0 ? "bg-amber-500 text-white animate-pulse" : "bg-app-stroke text-app-text-muted"
                         )}>
-                            {stats?.dueTodayCount || 0} Vencendo
+                            {dynamicStats.dueTodayCount} Vencendo Hoje
                         </span>
                     </div>
-                    <p className="text-2xl font-bold text-rose-600 dark:text-rose-400">{formatBRL(stats?.pendingExpense || 0)}</p>
+                    <p className="text-2xl font-bold text-rose-600 dark:text-rose-400">{formatBRL(dynamicStats.periodExpenseTotal)}</p>
                     <div className="mt-2 pt-2 border-t border-app-stroke flex justify-between items-center">
                         <span className="text-xs text-app-text-muted">
-                            Vencimento Hoje:
+                            Pendente / A Pagar:
                         </span>
-                        <span className={clsx(
-                            "text-sm font-bold text-app-text-main"
-                        )}>
-                            {formatBRL(stats?.dueTodayAmount || 0)}
+                        <span className="text-sm font-bold text-rose-500">
+                            {formatBRL(dynamicStats.pendingExpense)}
                         </span>
                     </div>
-                </motion.div>
-
-                {/* Resultado do Mês (New Metric) */}
-                <motion.div
-                    className={clsx(
-                        "border rounded-2xl p-5 relative overflow-hidden transition-all",
-                        currentMonthBalance >= 0 ? "bg-gradient-to-br from-emerald-500/5 to-app-card border-emerald-500/20 shadow-lg shadow-emerald-500/5" : "bg-gradient-to-br from-rose-500/5 to-app-card border-rose-500/20 shadow-lg shadow-rose-500/5"
-                    )}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                >
-                    <div className={clsx(
-                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl",
-                        currentMonthBalance >= 0 ? "bg-emerald-500/20" : "bg-rose-500/20"
-                    )} />
-                    <div className="flex justify-between items-start mb-2">
-                        <p className="text-app-text-muted text-xs">Resultado Realizado (Mês Atual)</p>
-                        <div className={clsx(
-                            "w-8 h-8 rounded-lg flex items-center justify-center",
-                            currentMonthBalance >= 0 ? "bg-emerald-500" : "bg-rose-500"
-                        )}>
-                            {currentMonthBalance >= 0 ? <TrendingUp size={16} className="text-white" /> : <TrendingDown size={16} className="text-white" />}
-                        </div>
-                    </div>
-                    <p className="text-sm text-app-text-muted">R$</p>
-                    <p className={clsx(
-                        "text-2xl font-bold",
-                        currentMonthBalance >= 0 ? "text-emerald-600" : "text-rose-600"
-                    )}>
-                        {formatBRL(Math.abs(currentMonthBalance)).replace('R$', '').trim()}
-                    </p>
-                    <p className="text-xs text-app-text-muted mt-1">
-                        {currentMonthBalance >= 0 ? 'Lucro Recebido' : 'Prejuízo Efetivo'}
-                    </p>
-                </motion.div>
-
-                {/* Repasses de Parcerias */}
-                <motion.div
-                    className="bg-app-card border border-app-stroke rounded-2xl p-5 relative overflow-hidden hidden"
-                    whileHover={{ scale: 1.02, y: -2 }}
-                >
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-violet-500/10 rounded-full blur-2xl" />
-                    <div className="flex justify-between items-start mb-2">
-                        <p className="text-app-text-muted text-xs">Repasses de Parcerias</p>
-                        <div className="w-8 h-8 bg-violet-500/10 rounded-lg flex items-center justify-center">
-                            <Users size={16} className="text-violet-600" />
-                        </div>
-                    </div>
-                    <p className="text-2xl font-bold text-app-text-main">{formatBRL(totalRepasses)}</p>
-                    <p className="text-xs text-app-text-muted mt-1">A repassar este mês</p>
                 </motion.div>
             </div>
 
@@ -1004,59 +1140,140 @@ export default function FinancialListPage() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <div>
                             <h3 className="text-app-text-main font-bold text-lg">Fluxo de Caixa</h3>
-                            <p className="text-app-text-muted text-xs">Entradas vs Saídas e projeção para o próximo trimestre</p>
+                            <p className="text-app-text-muted text-xs">Entradas vs Saídas e projeções acumuladas</p>
                         </div>
-                        <div className="flex bg-app-bg border border-app-stroke rounded-lg p-1">
-                            {(['7D', '1M', '1A'] as const).map((period) => (
+                        <div className="flex items-center gap-2">
+                            {/* Toggle Visualização */}
+                            <div className="flex bg-app-bg border border-app-stroke rounded-lg p-1 mr-2">
                                 <button
-                                    key={period}
-                                    onClick={() => setChartPeriod(period)}
+                                    onClick={() => setActiveChartTab('chart')}
                                     className={clsx(
-                                        "relative px-3 py-1 text-xs font-medium rounded-md transition-colors",
-                                        chartPeriod === period
-                                            ? "text-app-text-main"
-                                            : "text-app-text-muted hover:text-app-text-main"
+                                        "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                                        activeChartTab === 'chart' ? "bg-black text-white dark:bg-white dark:text-black shadow-sm" : "text-app-text-muted hover:text-app-text-main"
                                     )}
                                 >
-                                    {chartPeriod === period && (
-                                        <motion.div
-                                            layoutId="chartPeriodTab"
-                                            className="absolute inset-0 bg-app-card rounded-md shadow"
-                                            initial={false}
-                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                        />
-                                    )}
-                                    <span className="relative z-10">{period === '7D' ? '7 Dias' : period === '1M' ? '30 Dias' : '90 Dias'}</span>
+                                    Gráfico
                                 </button>
-                            ))}
+                                <button
+                                    onClick={() => setActiveChartTab('projections')}
+                                    className={clsx(
+                                        "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                                        activeChartTab === 'projections' ? "bg-black text-white dark:bg-white dark:text-black shadow-sm" : "text-app-text-muted hover:text-app-text-main"
+                                    )}
+                                >
+                                    Projeções Mensais
+                                </button>
+                            </div>
+
+                            {activeChartTab === 'chart' && (
+                                <div className="flex bg-app-bg border border-app-stroke rounded-lg p-1">
+                                    {(['7D', '1M', '1A'] as const).map((period) => (
+                                        <button
+                                            key={period}
+                                            onClick={() => setChartPeriod(period)}
+                                            className={clsx(
+                                                "relative px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                                                chartPeriod === period
+                                                    ? "text-app-text-main"
+                                                    : "text-app-text-muted hover:text-app-text-main"
+                                            )}
+                                        >
+                                            <span className="relative z-10">{period === '7D' ? '7 Dias' : period === '1M' ? '30 Dias' : '1 Ano'}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Interactive Wave Chart */}
-                    <div className="h-64 relative w-full mt-4">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart
-                                data={chartData}
-                                margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                            >
-                                <defs>
-                                    <linearGradient id="colorSaldo" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <XAxis dataKey="name" stroke="#888888" fontSize={10} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#888888" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value / 1000 > 0 ? (value / 1000) + 'k' : value}`} />
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--app-stroke)" />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: 'var(--app-card)', border: '1px solid var(--app-stroke)', borderRadius: '12px', color: 'var(--app-text-main)' }}
-                                    itemStyle={{ color: 'var(--app-text-main)' }}
-                                    formatter={(value: any) => [new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value), '']}
-                                />
-                                <Area type="monotone" dataKey="Saldo" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorSaldo)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
+                    {activeChartTab === 'chart' ? (
+                        <div className="h-64 relative w-full mt-4">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart
+                                    data={chartData}
+                                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                >
+                                    <defs>
+                                        <linearGradient id="colorSaldo" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
+                                            <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="name" stroke="#888888" fontSize={10} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="#888888" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `R$ ${value / 1000 > 0 ? (value / 1000) + 'k' : value}`} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--app-stroke)" />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--app-card)', border: '1px solid var(--app-stroke)', borderRadius: '12px', color: 'var(--app-text-main)' }}
+                                        itemStyle={{ color: 'var(--app-text-main)' }}
+                                        formatter={(value: any) => [new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value), '']}
+                                    />
+                                    <Area type="monotone" dataKey="Saldo" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorSaldo)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    ) : (
+                        <div className="mt-4 overflow-x-auto max-h-64 overflow-y-auto custom-scrollbar">
+                            <table className="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr className="border-b border-app-stroke bg-app-bg/50">
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider">Mês</th>
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider text-right">Receitas Previstas</th>
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider text-right">Despesas Previstas</th>
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider text-right">Resultado</th>
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider text-right">Saldo Projetado</th>
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider text-center">Status</th>
+                                        <th className="py-2.5 px-3 font-semibold text-app-text-label uppercase tracking-wider text-center">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {annualProjections.map((proj) => (
+                                        <tr key={proj.monthNum} className="border-b border-app-stroke/30 hover:bg-app-bg/30 transition-colors">
+                                            <td className="py-2 px-3 font-semibold text-app-text-main">{proj.monthName}</td>
+                                            <td className="py-2 px-3 text-right text-emerald-600 dark:text-emerald-400 font-medium">
+                                                <div>{formatBRL(proj.incomeTotal)}</div>
+                                                <div className="text-[9px] text-app-text-muted">Pago: {formatBRL(proj.incomePaid)}</div>
+                                            </td>
+                                            <td className="py-2 px-3 text-right text-rose-600 dark:text-rose-400 font-medium">
+                                                <div>{formatBRL(proj.expenseTotal)}</div>
+                                                <div className="text-[9px] text-app-text-muted">Pago: {formatBRL(proj.expensePaid)}</div>
+                                            </td>
+                                            <td className={clsx(
+                                                "py-2 px-3 text-right font-bold",
+                                                proj.projectedResult >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                                            )}>
+                                                {formatBRL(proj.projectedResult)}
+                                            </td>
+                                            <td className={clsx(
+                                                "py-2 px-3 text-right font-black",
+                                                proj.projectedBalanceEnd >= 0 ? "text-app-text-main" : "text-rose-500"
+                                            )}>
+                                                {formatBRL(proj.projectedBalanceEnd)}
+                                            </td>
+                                            <td className="py-2 px-3 text-center">
+                                                <span className={clsx(
+                                                    "px-2 py-0.5 rounded-full text-[9px] font-bold",
+                                                    proj.projectedResult >= 0 ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"
+                                                )}>
+                                                    {proj.projectedResult >= 0 ? 'SUPERÁVIT' : 'DÉFICIT'}
+                                                </span>
+                                            </td>
+                                            <td className="py-2 px-3 text-center">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedMonth(String(proj.monthNum));
+                                                        setActiveTab('transactions');
+                                                    }}
+                                                    className="px-2.5 py-1 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 hover:text-primary rounded text-[10px] font-bold transition-all"
+                                                >
+                                                    Filtrar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
 
                 {/* Partnership Contracts */}
@@ -1220,7 +1437,48 @@ export default function FinancialListPage() {
                         </div>
 
                         {/* Dropdowns e Filtros de Data */}
-                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+                        <div className="flex flex-wrap gap-3 w-full md:w-auto items-stretch sm:items-center">
+                            {/* Filtro de Ano */}
+                            <div className="flex items-center bg-app-bg border border-app-stroke rounded-xl px-3 py-1.5">
+                                <Calendar size={14} className="text-app-text-muted mr-2" />
+                                <select
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                    className="bg-transparent text-sm text-app-text-main focus:outline-none cursor-pointer pr-4"
+                                >
+                                    <option value="all">Todos os Anos</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                </select>
+                            </div>
+
+                            {/* Filtro de Mês */}
+                            <div className="flex items-center bg-app-bg border border-app-stroke rounded-xl px-3 py-1.5">
+                                <Calendar size={14} className="text-app-text-muted mr-2" />
+                                <select
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    className="bg-transparent text-sm text-app-text-main focus:outline-none cursor-pointer pr-4"
+                                >
+                                    <option value="all">Todos os Meses</option>
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
+
                             {/* Filtro de Status */}
                             <div className="flex items-center bg-app-bg border border-app-stroke rounded-xl px-3 py-1.5">
                                 <Filter size={14} className="text-app-text-muted mr-2" />
@@ -1259,13 +1517,15 @@ export default function FinancialListPage() {
                             </div>
 
                             {/* Limpar Filtros */}
-                            {(searchQuery || statusFilter !== 'all' || dateFilterStart || dateFilterEnd) && (
+                            {(searchQuery || statusFilter !== 'all' || dateFilterStart || dateFilterEnd || selectedMonth !== 'all' || selectedYear !== 'all') && (
                                 <button
                                     onClick={() => {
                                         setSearchQuery('');
                                         setStatusFilter('all');
                                         setDateFilterStart('');
                                         setDateFilterEnd('');
+                                        setSelectedMonth('all');
+                                        setSelectedYear('all');
                                     }}
                                     className="flex items-center justify-center gap-1.5 px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-xs font-semibold transition-all"
                                     title="Limpar Filtros"
