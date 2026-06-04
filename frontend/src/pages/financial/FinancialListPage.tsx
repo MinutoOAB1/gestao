@@ -720,7 +720,7 @@ export default function FinancialListPage() {
             }
         }
         return result;
-    }, [records, debouncedSearch, statusFilter]);
+    }, [records, debouncedSearch, statusFilter, dateFilterStart, dateFilterEnd]);
 
     // Get relative date label
     const getDateLabel = (dateStr: string) => {
@@ -1197,6 +1197,86 @@ export default function FinancialListPage() {
             {/* Content Area */}
             {activeTab === 'transactions' ? (
                 <div className="space-y-6">
+                    {/* Filtros e Barra de Busca */}
+                    <div className="bg-app-card border border-app-stroke rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between shadow-sm">
+                        {/* Campo de Busca */}
+                        <div className="relative w-full md:w-72">
+                            <Search className="absolute left-3 top-2.5 text-app-text-muted" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Buscar por descrição ou categoria..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 bg-app-bg border border-app-stroke rounded-xl text-sm text-app-text-main placeholder-app-text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-3 top-2.5 text-app-text-muted hover:text-app-text-main"
+                                >
+                                    <X size={16} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Dropdowns e Filtros de Data */}
+                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+                            {/* Filtro de Status */}
+                            <div className="flex items-center bg-app-bg border border-app-stroke rounded-xl px-3 py-1.5">
+                                <Filter size={14} className="text-app-text-muted mr-2" />
+                                <select
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="bg-transparent text-sm text-app-text-main focus:outline-none cursor-pointer pr-4"
+                                >
+                                    <option value="all">Todos os Status</option>
+                                    <option value="paid">Pago / Liquidado</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="overdue">Atrasado</option>
+                                </select>
+                            </div>
+
+                            {/* Data Inicial */}
+                            <div className="flex items-center bg-app-bg border border-app-stroke rounded-xl px-3 py-1.5">
+                                <span className="text-xs text-app-text-muted mr-2">De:</span>
+                                <input
+                                    type="date"
+                                    value={dateFilterStart}
+                                    onChange={(e) => setDateFilterStart(e.target.value)}
+                                    className="bg-transparent text-sm text-app-text-main focus:outline-none cursor-pointer"
+                                />
+                            </div>
+
+                            {/* Data Final */}
+                            <div className="flex items-center bg-app-bg border border-app-stroke rounded-xl px-3 py-1.5">
+                                <span className="text-xs text-app-text-muted mr-2">Até:</span>
+                                <input
+                                    type="date"
+                                    value={dateFilterEnd}
+                                    onChange={(e) => setDateFilterEnd(e.target.value)}
+                                    className="bg-transparent text-sm text-app-text-main focus:outline-none cursor-pointer"
+                                />
+                            </div>
+
+                            {/* Limpar Filtros */}
+                            {(searchQuery || statusFilter !== 'all' || dateFilterStart || dateFilterEnd) && (
+                                <button
+                                    onClick={() => {
+                                        setSearchQuery('');
+                                        setStatusFilter('all');
+                                        setDateFilterStart('');
+                                        setDateFilterEnd('');
+                                    }}
+                                    className="flex items-center justify-center gap-1.5 px-3 py-2 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-xs font-semibold transition-all"
+                                    title="Limpar Filtros"
+                                >
+                                    <X size={14} />
+                                    Limpar
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
                     {/* Summary View Mobile */}
                     <div className="md:hidden flex flex-col gap-3">
                         {groupedRecords.length > 0 ? (
@@ -1229,10 +1309,13 @@ export default function FinancialListPage() {
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-app-bg/50">
                                 <tr>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke w-10">#</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Descrição / Categoria</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Data</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke w-1">#</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke w-32">Data</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Descrição / Cliente</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke">Categoria / C. Custo</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-center">Parcelas</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-center">Obs</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-center">Status</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-right">Valor</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase text-app-text-label tracking-widest border-b border-app-stroke text-right">Ações</th>
                                 </tr>
@@ -1259,7 +1342,7 @@ export default function FinancialListPage() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={6} className="px-6 py-20 text-center text-app-text-muted font-medium">
+                                            <td colSpan={9} className="px-6 py-20 text-center text-app-text-muted font-medium">
                                                 Nenhum registro encontrado.
                                             </td>
                                         </tr>

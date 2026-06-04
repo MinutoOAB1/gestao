@@ -24,6 +24,9 @@ export class DashboardController {
             upcomingHearings,
             activeClients,
             pendingPayments,
+            paidIncome,
+            paidExpense,
+            monthExpenses,
             recentUpdates,
             urgentPayments,
             newComments,
@@ -94,6 +97,36 @@ export class DashboardController {
                     tenantId,
                     status: 'PENDING',
                     type: 'INCOME'
+                },
+                _sum: { amount: true }
+            }),
+            // Total de receitas pagas
+            this.prisma.financialRecord.aggregate({
+                where: {
+                    tenantId,
+                    status: 'PAID',
+                    type: 'INCOME'
+                },
+                _sum: { amount: true }
+            }),
+            // Total de despesas pagas
+            this.prisma.financialRecord.aggregate({
+                where: {
+                    tenantId,
+                    status: 'PAID',
+                    type: 'EXPENSE'
+                },
+                _sum: { amount: true }
+            }),
+            // Total de despesas do mês atual
+            this.prisma.financialRecord.aggregate({
+                where: {
+                    tenantId,
+                    type: 'EXPENSE',
+                    date: {
+                        gte: new Date(now.getFullYear(), now.getMonth(), 1),
+                        lte: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
+                    }
                 },
                 _sum: { amount: true }
             }),
@@ -190,6 +223,9 @@ export class DashboardController {
             upcomingHearings,
             activeClients,
             pendingPayments: pendingPayments._sum.amount || 0,
+            pendingIncome: pendingPayments._sum.amount || 0,
+            monthExpenses: monthExpenses._sum.amount || 0,
+            balance: (paidIncome._sum.amount || 0) - (paidExpense._sum.amount || 0),
             urgentPayments,
             recentUpdates,
             newComments,

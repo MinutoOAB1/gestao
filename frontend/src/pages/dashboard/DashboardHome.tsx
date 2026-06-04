@@ -233,9 +233,9 @@ export default function DashboardHome() {
                 const events = summary.agenda || [];
 
                 setData({
-                    totalIncome: summary.pendingPayments || 0,
-                    totalExpense: 0,
-                    balance: (summary.pendingPayments || 0),
+                    totalIncome: summary.pendingIncome || 0,
+                    totalExpense: summary.monthExpenses || 0,
+                    balance: summary.balance || 0,
                     clientsCount: summary.totalClients || 0,
                     processesCount: summary.totalProcesses || 0,
                     eventsCount: events.length,
