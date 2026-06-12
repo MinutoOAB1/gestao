@@ -28,5 +28,25 @@ export const paymentsService = {
   cancel: async (id: string) => {
     const response = await api.post(`/payments/${id}/cancel`);
     return response.data;
+  },
+
+  getAsaasConfig: async () => {
+    const response = await api.get('/payments/asaas/config');
+    return response.data;
+  },
+
+  linkAsaasAccount: async (apiKey: string) => {
+    const response = await api.post('/payments/asaas/link', { apiKey });
+    return response.data;
+  },
+
+  createAsaasSubaccount: async (data: any) => {
+    const response = await api.post('/payments/asaas/create-subaccount', data);
+    return response.data;
+  },
+
+  disconnectAsaas: async () => {
+    const response = await api.post('/payments/asaas/disconnect');
+    return response.data;
   }
 };

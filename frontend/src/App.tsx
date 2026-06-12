@@ -60,6 +60,7 @@ const TimesheetPage = lazyWithRetry(() => import('./pages/timesheet/TimesheetPag
 const ProfilePage = lazyWithRetry(() => import('./pages/profile/ProfilePage'));
 const CadeiaValorPage = lazyWithRetry(() => import('./pages/gestao/CadeiaValorPage'));
 const BillingPage = lazyWithRetry(() => import('./pages/settings/BillingPage'));
+const AsaasConfigPage = lazyWithRetry(() => import('./pages/settings/AsaasConfigPage'));
 const TermsPage = lazyWithRetry(() => import('./pages/legal/TermsPage'));
 const PrivacyPage = lazyWithRetry(() => import('./pages/legal/PrivacyPage'));
 const LGPDPage = lazyWithRetry(() => import('./pages/legal/LGPDPage'));
@@ -153,6 +154,7 @@ function App() {
                             <Route path="timesheet" element={<TimesheetPage />} />
                             <Route path="perfil" element={<ProfilePage />} />
                             <Route path="configuracoes" element={<SettingsPage />} />
+                            <Route path="configuracoes/asaas" element={<Protect roles={['ADMIN', 'LAWYER']} fallback={<AccessDenied />}><AsaasConfigPage /></Protect>} />
                             
                             {/* Gestão do Escritório */}
                             <Route path="gestao/cadeia-valor" element={<CadeiaValorPage />} />

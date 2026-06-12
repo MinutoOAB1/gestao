@@ -93,7 +93,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
         return (
             <Link to="/app/analise-ia">
                 <div 
-                    title="IA Análise"
+                    title="Auditoria de Contratos"
                     className={cn(
                     "group flex items-center justify-center px-3 py-3 mx-2 rounded-xl cursor-pointer transition-fast relative",
                     active ? "bg-white/20 text-white border border-white/20" : "text-white/70 hover:bg-white/10"
@@ -118,7 +118,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                     onClick={() => navigate('/app/analise-ia')}
                 >
                     <Shield size={20} className={cn("transition-fast", active ? "text-white scale-110" : "text-white/60")} />
-                    <span className="font-medium text-[13px] tracking-wide">IA Análise</span>
+                    <span className="font-medium text-[13px] tracking-wide">Auditoria de Contratos</span>
                 </div>
                 {/* Arrow only toggles dropdown */}
                 <button
@@ -141,7 +141,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                         <Link to="/app/analise-ia">
                             <div className="flex items-center gap-2 px-4 py-2 ml-6 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">
                                 <Plus size={12} />
-                                Nova Análise
+                                Nova Auditoria
                             </div>
                         </Link>
 
@@ -174,7 +174,7 @@ const SidebarItemWithHistory = ({ collapsed }: { collapsed: boolean }) => {
                             </div>
                         ) : (
                             <div className="px-4 py-2 ml-6 text-[10px] text-white/30 italic">
-                                Nenhum documento analisado
+                                Nenhuma auditoria realizada
                             </div>
                         )}
                     </motion.div>
@@ -423,18 +423,17 @@ export default function DashboardLayout() {
                     <SidebarItem icon={Settings} label="Ajustes" path="/app/configuracoes" collapsed={collapsed} />
                 </div>
 
-                {/* IA Jurídica Card - only show when not collapsed */}
+                {/* Auditoria Contratual Card - only show when not collapsed */}
                 {!collapsed && user && ['ADMIN', 'LAWYER'].includes(user.role) && (
                     <div className="px-4 py-3">
                         <Link to="/app/analise-ia">
                             <div className="relative bg-white/[0.06] rounded-2xl p-4 overflow-hidden group cursor-pointer hover:bg-white/[0.09] transition-all border border-white/[0.08]">
                                 <h3 className="text-white font-bold text-sm mb-1 font-display tracking-tight flex items-center gap-2">
-                                    IA Jurídica
-                                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                                    Auditoria de Contratos
                                 </h3>
-                                <p className="text-white/40 text-[11px] mb-4 leading-relaxed font-medium">Analise contratos com precisão absoluta.</p>
+                                <p className="text-white/40 text-[11px] mb-4 leading-relaxed font-medium">Verifique conformidade e identifique riscos.</p>
                                 <button className="w-full py-2 bg-white/10 text-white rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-white/20 transition-all">
-                                    Acessar Agora
+                                    Acessar Painel
                                 </button>
                             </div>
                         </Link>
@@ -670,7 +669,7 @@ export default function DashboardLayout() {
                                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 text-center leading-tight">{item.label}</span>
                                     </Link>
                                 ))}
-                                {/* IA Análise in drawer */}
+                                 {/* IA Análise in drawer */}
                                 {user && ['ADMIN', 'LAWYER'].includes(user.role) && (
                                     <Link
                                         to="/app/analise-ia"
@@ -680,7 +679,7 @@ export default function DashboardLayout() {
                                         <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-white/10 flex items-center justify-center">
                                             <Shield size={20} className="text-primary dark:text-white" />
                                         </div>
-                                        <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">IA Análise</span>
+                                        <span className="text-[10px] font-medium text-app-text-main text-center leading-tight">Auditoria de Contratos</span>
                                     </Link>
                                 )}
                                 {/* Settings in drawer too */}

@@ -604,7 +604,7 @@ export default function IAAnalisePage() {
                 }],
             });
             const blob = await Packer.toBlob(doc);
-            saveAs(blob, `Analise_Elite_${new Date().getTime()}.docx`);
+            saveAs(blob, `Auditoria_Contrato_${new Date().getTime()}.docx`);
         } catch (e) {
             console.error(e);
             alert('Erro ao exportar Word');
@@ -618,7 +618,7 @@ export default function IAAnalisePage() {
                 <div className="space-y-1">
                     <div className="flex items-center gap-4">
                         <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
-                            {analysis ? 'Contrato Prestação de Serviços - v2.pdf' : 'IA Jurídica'}
+                            {analysis ? 'Contrato Prestação de Serviços - v2.pdf' : 'Auditoria Contratual'}
                         </h1>
                         {analysis && (
                             <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[9px] font-black uppercase ring-1 ring-amber-500/30">
@@ -628,7 +628,7 @@ export default function IAAnalisePage() {
                     </div>
                     <div className="flex items-center gap-4">
                         <p className="text-xs text-slate-500 dark:text-slate-400 font-medium font-mono">
-                            {analysis ? 'Última análise gerada pela IA há 12 minutos' : 'Auditória Dinâmica e Auditoria Contratual de Elite.'}
+                            {analysis ? 'Última revisão de conformidade gerada há 12 minutos' : 'Auditoria Dinâmica e Conformidade Contratual.'}
                         </p>
 
                         {/* History Dropdown - Only show when analysis exists */}
@@ -701,7 +701,7 @@ export default function IAAnalisePage() {
                     <button
                         onClick={() => setShowFeedback(true)}
                         className="flex items-center gap-2 px-4 py-2 text-slate-500 hover:text-white transition-colors"
-                        title="Avaliar IA"
+                        title="Feedback do Sistema"
                     >
                         <Star size={16} />
                     </button>
@@ -766,11 +766,11 @@ export default function IAAnalisePage() {
                         <div className="w-24 h-24 bg-primary/20 rounded-[32px] flex items-center justify-center text-primary mb-8 mx-auto shadow-2xl shadow-primary/20 rotate-12 group-hover:rotate-0 transition-transform duration-500">
                             <Shield size={48} fill="currentColor" />
                         </div>
-                        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight italic">
-                            "A Inteligência Artificial que pensa <br /> como um sócio sênior."
+                        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter leading-tight">
+                            Auditoria e Conformidade <br /> Contratual de Alta Performance
                         </h2>
                         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium max-w-lg mx-auto leading-relaxed">
-                            Identificamos cláusulas predatórias, omissões críticas e falhas de compliance em segundos com precisão jurídica absoluta.
+                            Verifique cláusulas predatórias, omissões críticas e falhas de conformidade com precisão analítica e total segurança jurídica.
                         </p>
                         <div className="pt-4 flex justify-center">
                             <button
@@ -785,8 +785,8 @@ export default function IAAnalisePage() {
 
                         <div className="grid grid-cols-3 gap-6 pt-12">
                             {[
-                                { icon: Shield, label: 'Due Diligence Profunda' },
-                                { icon: Zap, label: 'Sugestões de Redação' },
+                                { icon: Shield, label: 'Revisão Estruturada' },
+                                { icon: FileText, label: 'Ajustes de Redação' },
                             ].map((feat, i) => (
                                 <div key={i} className="flex flex-col items-center gap-2">
                                     <div className="p-3 bg-slate-100 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-500">
@@ -811,7 +811,7 @@ export default function IAAnalisePage() {
                     >
                         <div className="flex justify-between items-center">
                             <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-slate-900 dark:text-whiteTracking-tight">Auditória Dinâmica: Novo Contrato</h2>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-whiteTracking-tight">Auditoria Dinâmica: Novo Contrato</h2>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Selecione o modo de análise especializada</p>
                             </div>
                             <div className="flex items-center gap-4">
@@ -905,7 +905,7 @@ export default function IAAnalisePage() {
                                 >
                                     <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 flex-none">
                                         <div className="space-y-1">
-                                            <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Sumário de Elite</h3>
+                                            <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Sumário de Auditoria</h3>
                                             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Navegação e Resumo Rápido</p>
                                         </div>
                                         <button onClick={() => setSummaryOpen(false)} className="text-slate-400 hover:text-slate-950 dark:hover:text-white"><X size={16} /></button>
@@ -1170,7 +1170,7 @@ export default function IAAnalisePage() {
                                             </div>
                                             <div className="flex justify-between items-center mb-8 border-b border-primary/20 pb-2 pr-8 select-none">
                                                 <h4 className="text-[10px] font-black uppercase text-primary flex items-center gap-2">
-                                                    <Zap size={12} fill="currentColor"/> Sugestão de Revisão Elite
+                                                    <FileText size={12} /> Sugestão de Revisão
                                                 </h4>
                                                 <div className="flex items-center bg-slate-100 dark:bg-[#0c0e17] rounded-lg border border-slate-200 dark:border-slate-800 px-2 py-0.5 gap-2">
                                                     <button onClick={(e) => { e.stopPropagation(); setZoomLevelDraft(prev => Math.max(50, prev - 25)) }} className="text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" title="Zoom Out"><Minimize2 size={10} /></button>
@@ -1203,7 +1203,7 @@ export default function IAAnalisePage() {
                                                 <div className="mt-12 p-6 bg-[#1053ff]/5 border border-[#1053ff]/20 rounded-2xl flex flex-col gap-4 shadow-inner">
                                                     <div className="flex items-center gap-2">
                                                         <Shield size={16} className="text-[#1053ff]" />
-                                                        <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Ação Sugerida pela Elite AI</p>
+                                                        <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Ação Sugerida pelo Revisor</p>
                                                     </div>
                                                     <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                                         Blindar este trecho com redação jurídica otimizada?
@@ -1520,7 +1520,7 @@ export default function IAAnalisePage() {
 
                                             <div className="space-y-4">
                                                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                    <Search size={14} /> ANÁLISE DA IA
+                                                    <Search size={14} /> DIAGNÓSTICO DE CONFORMIDADE
                                                 </div>
                                                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                                                     {selectedClause.description}
@@ -1531,7 +1531,7 @@ export default function IAAnalisePage() {
                                             <div className="space-y-4">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#1053ff]">
-                                                        <Zap size={14} fill="currentColor" /> SUGESTÃO DE REDAÇÃO
+                                                        <FileText size={14} /> SUGESTÃO DE REDAÇÃO
                                                     </div>
                                                     <div className="flex gap-4">
                                                         <button className="text-slate-500 hover:text-slate-900 dark:text-slate-600 dark:hover:text-white"><Download size={12} /></button>
@@ -1615,7 +1615,7 @@ export default function IAAnalisePage() {
                                 <Star size={28} fill="currentColor" />
                             </div>
 
-                            <h2 className="text-2xl font-black text-white mb-2">Avalie a Análise da IA</h2>
+                            <h2 className="text-2xl font-black text-white mb-2">Avalie a Revisão do Contrato</h2>
                             <p className="text-slate-500 text-xs leading-relaxed mb-8 max-w-[300px] mx-auto">
                                 Sua opinião é fundamental para calibrar nossos algoritmos e melhorar a precisão jurídica.
                             </p>
@@ -1653,7 +1653,7 @@ export default function IAAnalisePage() {
                                     <h3 className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-500 text-left">Comentários (Opcional)</h3>
                                     <textarea
                                         className="w-full bg-[#0c0e17] border border-slate-800 rounded-2xl p-4 text-xs text-white placeholder-slate-700 focus:border-[#1053ff]/50 outline-none resize-none h-24"
-                                        placeholder="Conte-nos o que a IA acertou ou errou..."
+                                        placeholder="Conte-nos o que o sistema identificou corretamente..."
                                     />
                                 </div>
 

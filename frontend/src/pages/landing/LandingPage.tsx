@@ -291,8 +291,8 @@ function HeroSection() {
                         animate={{ opacity: 1, y: 0 }}
                         className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-[#B89B5E] rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-sm backdrop-blur-md"
                     >
-                        <Sparkles size={14} className="animate-pulse" />
-                        Inteligência Jurídica de Elite
+                        <ShieldCheck size={14} />
+                        Gestão Jurídica Integrada e Segura
                     </motion.div>
 
                     {/* Static Headline */}
@@ -381,14 +381,14 @@ function HeroSection() {
                             className="w-full h-auto rounded-xl object-contain"
                         />
                         {/* Glass Overlays */}
-                        <div className="absolute top-10 left-10 p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 hidden lg:block animate-bounce-slow">
+                        <div className="absolute top-10 left-10 p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/10 hidden lg:block">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center">
-                                    <Sparkles className="text-accent" />
+                                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
+                                    <ShieldCheck className="text-white" />
                                 </div>
                                 <div>
-                                    <div className="text-white font-black text-xs uppercase tracking-widest">IA Jurídica</div>
-                                    <div className="text-white/40 text-[10px]">Análise de Risco 98%</div>
+                                    <div className="text-white font-black text-xs uppercase tracking-widest">Auditoria Contratual</div>
+                                    <div className="text-white/40 text-[10px]">Conformidade Legal</div>
                                 </div>
                             </div>
                         </div>
@@ -466,9 +466,9 @@ function FeaturesSection() {
             description: 'Gestão 360º de clientes com histórico completo e automação de atendimento.',
         },
         {
-            icon: Sparkles,
-            title: 'IA Jurídica',
-            description: 'Análise profunda de contratos e identificação de riscos com tecnologia de elite.',
+            icon: ShieldCheck,
+            title: 'Auditoria de Contratos',
+            description: 'Análise profunda de conformidade e identificação de riscos jurídicos em segundos.',
         },
         {
             icon: Shield,
@@ -662,7 +662,7 @@ function EngagementSection() {
                     <div className="p-10 bg-white rounded-[2.5rem] border border-[#EAE6DF] shadow-[0_8px_30px_rgba(46,44,41,0.02)]">
                         <div className="flex items-center gap-4 mb-8">
                             <div className="w-12 h-12 bg-[#B89B5E]/10 rounded-2xl flex items-center justify-center text-[#B89B5E]">
-                                <Sparkles size={24} />
+                                <CheckSquare size={24} />
                             </div>
                             <h3 className="text-xl font-black text-[#2E2C29] uppercase tracking-tight">Quiz de Necessidades</h3>
                         </div>
@@ -727,7 +727,7 @@ function PricingSection() {
                         <ul className="space-y-5 mb-12">
                             {[
                                 'Usuários e Clientes Ilimitados',
-                                'Inteligência Artificial Ilimitada',
+                                'Auditoria Contratual Ilimitada',
                                 'Financeiro Executivo Completo',
                                 'Ecossistema de Colaboração VIP',
                                 'Suporte Especializado 24/7',
@@ -887,8 +887,8 @@ function FAQSection() {
             answer: 'O plano ADV Plus Elite está disponível por R$ 47/mês (de R$ 147). Você tem acesso completo a todos os recursos: usuários e clientes ilimitados, IA Jurídica sem restrições, controle financeiro executivo, assinaturas digitais via Autentique, armazenamento em nuvem e suporte VIP 24/7. Sem limites artificiais.'
         },
         {
-            question: 'Como funciona a IA Jurídica da plataforma?',
-            answer: 'A IA Jurídica do Advus analisa contratos, petições e documentos em profundidade, identificando cláusulas de risco, inconsistências e pontos de atenção com precisão de 98%. Você pode fazer perguntas em linguagem natural sobre qualquer documento carregado e receber análises estruturadas em segundos.'
+            question: 'Como funciona a auditoria de contratos?',
+            answer: 'A auditoria de contratos do Advus analisa seus documentos em profundidade, identificando cláusulas de risco, inconsistências e pontos de atenção com máxima precisão analítica. O sistema mapeia os termos contratuais e fornece sugestões de reescrita em segundos.'
         },
         {
             question: 'Meus dados estão seguros na plataforma?',
@@ -1085,7 +1085,7 @@ function Footer() {
                         <h4 className="text-[#2E2C29] font-black uppercase tracking-[0.2em] text-[10px] mb-8">Tecnologia</h4>
                         <ul className="space-y-4 text-xs font-bold uppercase tracking-wider">
                             <li><a href="#features" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Recursos</a></li>
-                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">IA Jurídica</a></li>
+                            <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Auditoria</a></li>
                             <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">Segurança</a></li>
                             <li><a href="#" className="text-[#2E2C29]/70 hover:text-[#B89B5E] transition-colors">API Dev</a></li>
                         </ul>
@@ -1181,7 +1181,7 @@ function AiSimulatorSection() {
 
     const [activeDocId, setActiveDocId] = useState('contrato');
     const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([
-        { sender: 'ai', text: 'Olá! Sou a IA do Advus. Selecione um documento ao lado e clique em qualquer pergunta sugerida para simular a análise automática.' }
+        { sender: 'ai', text: 'Olá! Sou o assistente de auditoria do Advus. Selecione um documento ao lado e clique em qualquer pergunta sugerida para simular a análise automática.' }
     ]);
     const [isTyping, setIsTyping] = useState(false);
 
@@ -1191,7 +1191,7 @@ function AiSimulatorSection() {
         setActiveDocId(id);
         const selected = documents.find(d => d.id === id) || documents[0];
         setChatMessages([
-            { sender: 'ai', text: `Olá! Sou a IA do Advus. Analisei o documento "${selected.name}". O score de conformidade jurídica é de ${selected.safeScore}%. O que deseja saber sobre ele?` }
+            { sender: 'ai', text: `Olá! Sou o assistente de auditoria do Advus. Analisei o documento "${selected.name}". O score de conformidade jurídica é de ${selected.safeScore}%. O que deseja saber sobre ele?` }
         ]);
     };
 
@@ -1219,14 +1219,14 @@ function AiSimulatorSection() {
                 <div className="text-center max-w-3xl mx-auto mb-20">
                     <ScrollReveal>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#4F73F5]/10 border border-[#4F73F5]/30 rounded-full text-xs font-black uppercase tracking-widest text-[#4F73F5] mb-6">
-                            <Sparkles size={14} className="animate-pulse" />
-                            Inteligência Artificial Integrada
+                            <ShieldCheck size={14} />
+                            Auditoria Contratual Dinâmica
                         </div>
                         <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter leading-none font-display uppercase">
-                            Simulador de IA <span className="text-[#4F73F5]">Advus</span>
+                            Simulador de Auditoria <span className="text-[#4F73F5]">Advus</span>
                         </h2>
                         <p className="mt-6 text-white/50 text-base sm:text-lg leading-relaxed font-medium">
-                            Teste como nossa inteligência artificial audita riscos jurídicos, aponta inconformidades e responde a dúvidas complexas em segundos.
+                            Teste como nosso sistema audita riscos jurídicos, aponta inconformidades e responde a dúvidas complexas em segundos.
                         </p>
                     </ScrollReveal>
                 </div>
@@ -1299,7 +1299,7 @@ function AiSimulatorSection() {
 
                                 <div className="space-y-2">
                                     <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                                        <CheckCircle2 size={12} /> Sugestão da IA Advus
+                                        <CheckCircle2 size={12} /> Sugestão de Revisão
                                     </span>
                                     <div className="text-xs text-white/70 bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl h-[86px] overflow-y-auto leading-relaxed">
                                         {doc.analysis.suggestions}
@@ -1388,7 +1388,7 @@ function ComparisonSection() {
             ]
         },
         {
-            category: 'Inteligência Artificial (IA)',
+            category: 'Auditoria e Conformidade (Contratos)',
             items: [
                 { feature: 'Auditoria de contratos e peças jurídicas com score de segurança', advus: true, legacy: 'Não possui', sheet: 'Não possui' },
                 { feature: 'Cláusulas de risco destacadas com sugestão automática de correção', advus: true, legacy: 'Não possui', sheet: 'Não possui' },
@@ -1441,7 +1441,7 @@ function ComparisonSection() {
                             Compare o <span className="text-[#4F73F5]">Advus</span> com Alternativas
                         </h2>
                         <p className="mt-6 text-[#2E2C29]/65 text-base sm:text-lg leading-relaxed font-medium">
-                            Veja em detalhes o salto tecnológico que sua operação jurídica ganha ao migrar para a inteligência artificial do Advus.
+                            Veja em detalhes o salto tecnológico que sua operação jurídica ganha ao migrar para o ecossistema do Advus.
                         </p>
                     </ScrollReveal>
                 </div>
@@ -1452,7 +1452,7 @@ function ComparisonSection() {
                         {/* Table Header Row */}
                         <div className="hidden md:grid grid-cols-12 gap-4 pb-6 border-b border-[#EAE6DF] text-center text-xs font-black uppercase tracking-widest text-[#2E2C29]/50">
                             <div className="col-span-6 text-left pl-4">Recursos & Funcionalidades</div>
-                            <div className="col-span-2 text-[#4F73F5] font-black">ADVUS (COM IA)</div>
+                            <div className="col-span-2 text-[#4F73F5] font-black">ADVUS (COM REVISOR DIGITAL)</div>
                             <div className="col-span-2">SISTEMAS LEGADOS</div>
                             <div className="col-span-2">PLANILHAS / PAPEL</div>
                         </div>

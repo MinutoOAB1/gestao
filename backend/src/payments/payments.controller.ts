@@ -7,6 +7,30 @@ export class PaymentsController {
   constructor(private readonly asaasService: AsaasService) {}
 
   @UseGuards(JwtAuthGuard)
+  @Get('asaas/config')
+  async getAsaasConfig(@Request() req) {
+    return this.asaasService.getIntegrationStatus(req.user.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('asaas/link')
+  async linkAsaasAccount(@Request() req, @Body('apiKey') apiKey: string) {
+    return this.asaasService.linkAccount(req.user.tenantId, apiKey);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('asaas/create-subaccount')
+  async createAsaasSubaccount(@Request() req, @Body() data: any) {
+    return this.asaasService.createSubaccount(req.user.tenantId, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('asaas/disconnect')
+  async disconnectAsaas(@Request() req) {
+    return this.asaasService.disconnect(req.user.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('generate')
   async generatePayment(@Request() req, @Body() data: {
     clientId: string;

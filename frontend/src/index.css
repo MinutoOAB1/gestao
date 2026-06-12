@@ -823,23 +823,19 @@ html {
   animation: progress 2s ease-in-out infinite;
 }
 
-/* Glow pulse animation */
+/* Clean subtle pulse animation */
 @keyframes glowPulse {
-
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
-
   50% {
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2), 0 0 60px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 }
 
-
-
 .animate-glow-pulse {
-  animation: glowPulse 2s ease-in-out infinite;
+  animation: glowPulse 3s ease-in-out infinite;
 }
 
 /* ==========================================
@@ -848,21 +844,16 @@ html {
 
 .magic-highlight {
   position: relative;
-  animation: magicFade 3s ease-out forwards;
+  animation: magicFade 2s ease-out forwards;
 }
 
 @keyframes magicFade {
   0% {
-    background-color: rgba(16, 185, 129, 0.4);
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
-    color: #064e3b;
-  }
-  20% {
-    background-color: rgba(16, 185, 129, 0.2);
+    background-color: rgba(79, 115, 245, 0.15);
+    color: inherit;
   }
   100% {
     background-color: transparent;
-    box-shadow: none;
     color: inherit;
   }
 }

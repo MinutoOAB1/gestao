@@ -643,7 +643,7 @@ export default function DashboardHome() {
                         </div>
                         <div className="space-y-0.5">
                             <p className="font-black text-xl text-white font-display tracking-tight uppercase">Desbloqueie o potencial máximo</p>
-                            <p className="text-sm text-white/50 font-medium">IA para análise de petições, usuários ilimitados e relatórios premium.</p>
+                            <p className="text-sm text-white/50 font-medium">Auditoria de contratos avançada, usuários ilimitados e relatórios analíticos premium.</p>
                         </div>
                     </div>
                     <button 

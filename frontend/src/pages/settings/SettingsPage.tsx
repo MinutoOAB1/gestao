@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, memo } from 'react';
-import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download, FileText, ChevronRight, Settings2, Trash2, ExternalLink, RefreshCw, Smartphone as MobileIcon, Hash } from 'lucide-react';
+import { Save, User, Bell, Lock, Globe, Camera, Shield, Smartphone, LayoutGrid, Sun, Moon, Download, FileText, ChevronRight, Settings2, Trash2, ExternalLink, RefreshCw, Smartphone as MobileIcon, Hash, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx } from 'clsx';
 import { useTheme } from '../../context/ThemeContext';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import TwoFactorModal from '../../components/settings/TwoFactorModal';
 import TeamPermissionsModal from '../../components/settings/TeamPermissionsModal';
@@ -30,6 +30,7 @@ interface Settings {
     processUpdates: boolean;
     deadlineReminders: boolean;
     logoUrl?: string;
+    asaasApiKey?: string;
 }
 
 const defaultSettings: Settings = {
@@ -104,6 +105,7 @@ const PremiumInput = memo(({ label, error, ...props }: any) => (
 export default function SettingsPage() {
     const { addToast } = useToast();
     const { theme, toggleTheme } = useTheme();
+    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('general');
     const [settings, setSettings] = useState<Settings>(defaultSettings);
     const [isSaving, setIsSaving] = useState(false);
@@ -678,6 +680,39 @@ export default function SettingsPage() {
                                             <div className="mt-auto">
                                                 <div className="w-full py-4 rounded-2xl bg-app-stroke/30 text-app-text-muted text-center text-[10px] font-black uppercase tracking-widest">
                                                     Pré-configurado
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ASAAS Integration Card */}
+                                        <div className="bg-app-bg border border-app-stroke rounded-[2rem] p-8 flex flex-col hover:border-primary/50 transition-all group relative overflow-hidden">
+                                            <div className="flex justify-between items-start mb-8 relative z-10">
+                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-app-card border border-app-stroke flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                                    <CreditCard size={32} className="text-primary" />
+                                                </div>
+                                                <div className={clsx(
+                                                    "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
+                                                    settings.asaasApiKey ? "bg-emerald-500/10 text-emerald-500" : "bg-app-stroke text-app-text-muted"
+                                                )}>
+                                                    {settings.asaasApiKey ? 'Configurado' : 'Não Configurado'}
+                                                </div>
+                                            </div>
+                                            <div className="relative z-10 flex-1 flex flex-col">
+                                                <h3 className="text-xl font-black text-app-text-main tracking-tight uppercase mb-2">ASAAS Cobranças</h3>
+                                                <p className="text-sm text-app-text-muted font-medium mb-10 leading-relaxed">
+                                                    Emita cobranças via Boleto e PIX para seus clientes de forma automatizada e integrada ao financeiro.
+                                                </p>
+                                                
+                                                <div className="mt-auto">
+                                                    <button 
+                                                        onClick={() => {
+                                                            haptics.light();
+                                                            navigate('/app/configuracoes/asaas');
+                                                        }}
+                                                        className="w-full py-4 rounded-2xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:opacity-90 transition-all text-center"
+                                                    >
+                                                        {settings.asaasApiKey ? 'Gerenciar Integração' : 'Configurar Integração'}
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
