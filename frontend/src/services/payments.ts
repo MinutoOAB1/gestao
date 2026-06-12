@@ -35,8 +35,8 @@ export const paymentsService = {
     return response.data;
   },
 
-  linkAsaasAccount: async (apiKey: string) => {
-    const response = await api.post('/payments/asaas/link', { apiKey });
+  linkAsaasAccount: async (apiKey: string, walletId?: string) => {
+    const response = await api.post('/payments/asaas/link', { apiKey, walletId });
     return response.data;
   },
 

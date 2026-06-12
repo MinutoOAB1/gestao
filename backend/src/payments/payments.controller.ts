@@ -14,8 +14,12 @@ export class PaymentsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('asaas/link')
-  async linkAsaasAccount(@Request() req, @Body('apiKey') apiKey: string) {
-    return this.asaasService.linkAccount(req.user.tenantId, apiKey);
+  async linkAsaasAccount(
+    @Request() req, 
+    @Body('apiKey') apiKey: string,
+    @Body('walletId') walletId?: string
+  ) {
+    return this.asaasService.linkAccount(req.user.tenantId, apiKey, walletId);
   }
 
   @UseGuards(JwtAuthGuard)

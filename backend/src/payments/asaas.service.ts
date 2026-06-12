@@ -162,8 +162,8 @@ export class AsaasService {
       const encryptedAsaasKey = this.security.encrypt(mockApiKey);
       await this.prisma.tenantSettings.upsert({
         where: { tenantId },
-        update: { asaasApiKey: encryptedAsaasKey },
-        create: { tenantId, asaasApiKey: encryptedAsaasKey },
+        update: { asaasApiKey: encryptedAsaasKey, asaasWalletId: mockWalletId },
+        create: { tenantId, asaasApiKey: encryptedAsaasKey, asaasWalletId: mockWalletId },
       });
       
       return {
@@ -197,12 +197,13 @@ export class AsaasService {
       
       const subaccount = response.data;
       const childApiKey = subaccount.apiKey;
+      const childWalletId = subaccount.walletId;
       if (childApiKey) {
         const encryptedAsaasKey = this.security.encrypt(childApiKey);
         await this.prisma.tenantSettings.upsert({
           where: { tenantId },
-          update: { asaasApiKey: encryptedAsaasKey },
-          create: { tenantId, asaasApiKey: encryptedAsaasKey },
+          update: { asaasApiKey: encryptedAsaasKey, asaasWalletId: childWalletId },
+          create: { tenantId, asaasApiKey: encryptedAsaasKey, asaasWalletId: childWalletId },
         });
       }
       return subaccount;
@@ -231,10 +232,12 @@ export class AsaasService {
         isConfigured: true,
         balance: details.balance,
         name: details.name,
+        walletId: settings.asaasWalletId,
       };
     } catch (err) {
       return {
         isConfigured: true,
+        walletId: settings.asaasWalletId,
         error: 'Erro ao conectar com as credenciais salvas',
       };
     }
@@ -243,22 +246,23 @@ export class AsaasService {
   /**
    * Links an existing API key.
    */
-  async linkAccount(tenantId: string, apiKey: string) {
+  async linkAccount(tenantId: string, apiKey: string, walletId?: string) {
     // Validate connection first
     const details = await this.testConnection(apiKey);
     
-    // Save key
+    // Save key and wallet
     const encryptedKey = this.security.encrypt(apiKey);
     await this.prisma.tenantSettings.upsert({
       where: { tenantId },
-      update: { asaasApiKey: encryptedKey },
-      create: { tenantId, asaasApiKey: encryptedKey },
+      update: { asaasApiKey: encryptedKey, asaasWalletId: walletId || null },
+      create: { tenantId, asaasApiKey: encryptedKey, asaasWalletId: walletId || null },
     });
 
     return {
       success: true,
       name: details.name,
       balance: details.balance,
+      walletId,
     };
   }
 
@@ -268,7 +272,7 @@ export class AsaasService {
   async disconnect(tenantId: string) {
     await this.prisma.tenantSettings.update({
       where: { tenantId },
-      data: { asaasApiKey: null },
+      data: { asaasApiKey: null, asaasWalletId: null },
     });
     return { success: true };
   }

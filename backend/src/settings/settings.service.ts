@@ -21,7 +21,7 @@ export class SettingsService {
         const {
             officeName, cnpj, email, website, language, timezone, dateFormat,
             emailNotifications, processUpdates, deadlineReminders,
-            twoFactor, loginAlerts, logoUrl, asaasApiKey, autentiqueApiKey,
+            twoFactor, loginAlerts, logoUrl, asaasApiKey, asaasWalletId, autentiqueApiKey,
             kanbanColumns, docKanbanTitles
         } = settings;
 
@@ -38,6 +38,7 @@ export class SettingsService {
                 emailNotifications, processUpdates, deadlineReminders,
                 twoFactor, loginAlerts, logoUrl,
                 kanbanColumns, docKanbanTitles,
+                asaasWalletId,
                 ...(encryptedAsaasKey && { asaasApiKey: encryptedAsaasKey }),
                 ...(encryptedAutentiqueKey && { autentiqueApiKey: encryptedAutentiqueKey }),
             },
@@ -47,6 +48,7 @@ export class SettingsService {
                 emailNotifications, processUpdates, deadlineReminders,
                 twoFactor, loginAlerts, logoUrl,
                 kanbanColumns, docKanbanTitles,
+                asaasWalletId,
                 asaasApiKey: encryptedAsaasKey,
                 autentiqueApiKey: encryptedAutentiqueKey,
             }

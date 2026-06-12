@@ -616,6 +616,7 @@ model TenantSettings {
   tenantId           String  @unique
   letterheadUrl      String?
   asaasApiKey        String?
+  asaasWalletId      String?
   logoUrl            String?
   autentiqueApiKey   String?
   kanbanColumns      String?

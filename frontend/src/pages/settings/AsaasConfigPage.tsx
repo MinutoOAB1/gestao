@@ -63,7 +63,7 @@ export default function AsaasConfigPage() {
   // App state
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [config, setConfig] = useState<{ isConfigured: boolean; balance?: number; name?: string } | null>(null);
+  const [config, setConfig] = useState<{ isConfigured: boolean; balance?: number; name?: string; walletId?: string } | null>(null);
 
   // Wizard state
   const [step, setStep] = useState(1);
@@ -71,6 +71,7 @@ export default function AsaasConfigPage() {
 
   // Form states
   const [linkApiKey, setLinkApiKey] = useState('');
+  const [linkWalletId, setLinkWalletId] = useState('');
 
   const [officeData, setOfficeData] = useState({
     name: '',
@@ -149,6 +150,7 @@ export default function AsaasConfigPage() {
       }
     } else if (flowType === 'link') {
       if (!linkApiKey) return 'A API Key do Asaas é obrigatória';
+      if (!linkWalletId) return 'O Wallet ID do Asaas é obrigatório';
     }
     return null;
   };
@@ -186,18 +188,19 @@ export default function AsaasConfigPage() {
 
     setSaving(true);
     try {
-      const res = await paymentsService.linkAsaasAccount(linkApiKey);
+      const res = await paymentsService.linkAsaasAccount(linkApiKey, linkWalletId);
       addToast('Integração vinculada com sucesso!', 'success');
       setConfig({
         isConfigured: true,
         name: res.name,
-        balance: res.balance
+        balance: res.balance,
+        walletId: res.walletId
       });
       setFlowType(null);
       setStep(1);
     } catch (error: any) {
       console.error(error);
-      const msg = error.response?.data?.message || 'Falha ao vincular conta. Verifique sua API Key.';
+      const msg = error.response?.data?.message || 'Falha ao vincular conta. Verifique sua API Key e Wallet ID.';
       addToast(msg, 'error');
     } finally {
       setSaving(false);
@@ -242,7 +245,8 @@ export default function AsaasConfigPage() {
       setConfig({
         isConfigured: true,
         name: res.name,
-        balance: 0
+        balance: 0,
+        walletId: res.walletId
       });
       setFlowType(null);
       setStep(1);
@@ -337,7 +341,7 @@ export default function AsaasConfigPage() {
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-app-stroke grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+          <div className={`mt-8 pt-8 border-t border-app-stroke grid grid-cols-1 gap-8 text-sm ${config.walletId ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
             <div>
               <p className="text-xs font-black text-app-text-muted uppercase tracking-wider mb-2">Titular da Conta</p>
               <p className="font-bold text-app-text-main text-base">{config.name || 'Advogado Integrado'}</p>
@@ -348,6 +352,14 @@ export default function AsaasConfigPage() {
                 ••••••••••••••••••••••••••••••••
               </p>
             </div>
+            {config.walletId && (
+              <div>
+                <p className="text-xs font-black text-app-text-muted uppercase tracking-wider mb-2">Wallet ID (Carteira)</p>
+                <p className="font-mono text-app-text-muted text-xs bg-app-bg px-3 py-2 rounded-lg border border-app-stroke inline-block">
+                  {config.walletId}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -585,6 +597,19 @@ export default function AsaasConfigPage() {
                     placeholder="Chave de API do Asaas (ex: $aab...)"
                     value={linkApiKey}
                     onChange={(e) => setLinkApiKey(e.target.value)}
+                    className="w-full bg-app-bg border border-app-stroke rounded-[1.25rem] px-5 py-4 text-app-text-main text-sm font-bold focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-inner"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-app-text-muted uppercase tracking-[0.2em] ml-1">
+                    Wallet ID (Identificador da Carteira)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="ID da Carteira Asaas (ex: b64...)"
+                    value={linkWalletId}
+                    onChange={(e) => setLinkWalletId(e.target.value)}
                     className="w-full bg-app-bg border border-app-stroke rounded-[1.25rem] px-5 py-4 text-app-text-main text-sm font-bold focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-inner"
                   />
                 </div>
