@@ -107,8 +107,9 @@ export class AsaasService {
       return mockApi;
     }
 
+    const baseUrl = this.configService.get<string>('ASAAS_API_URL')?.trim() || 'https://api.asaas.com/v3';
     return axios.create({
-      baseURL: 'https://api.asaas.com/v3',
+      baseURL: baseUrl,
       headers: {
         access_token: apiKey,
       },
@@ -124,8 +125,9 @@ export class AsaasService {
     }
     
     try {
+      const baseUrl = this.configService.get<string>('ASAAS_API_URL')?.trim() || 'https://api.asaas.com/v3';
       const testApi = axios.create({
-        baseURL: 'https://api.asaas.com/v3',
+        baseURL: baseUrl,
         headers: { access_token: apiKey },
       });
       
@@ -175,7 +177,8 @@ export class AsaasService {
     }
 
     try {
-      const response = await axios.post('https://api.asaas.com/v3/accounts', {
+      const baseUrl = this.configService.get<string>('ASAAS_API_URL')?.trim() || 'https://api.asaas.com/v3';
+      const response = await axios.post(`${baseUrl}/accounts`, {
         name: data.name,
         email: data.email,
         cpfCnpj: data.cpfCnpj?.replace(/\D/g, ''),
